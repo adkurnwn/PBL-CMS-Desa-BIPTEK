@@ -8,14 +8,18 @@ use App\Http\Controllers\Admin\DepartementController;
 use App\Http\Controllers\Admin\UserManagementController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return view('home');
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
 });
 
+Route::get('/news', function () {
+    return view('news');
+});
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', function () {
