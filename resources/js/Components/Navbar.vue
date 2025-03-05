@@ -26,11 +26,10 @@
         'absolute md:static top-16 left-0 w-full md:w-auto bg-green-800 md:bg-transparent md:flex flex-col md:flex-row space-y-4 md:space-y-0 text-center md:text-left p-4 md:p-0'
       ]"
     >
-      <li><a href="/" :class="{ 'border-b-2 border-white': isHomePage }">Home</a></li>
-      <li><a href="/news">Profil Desa</a></li>
-      <li><a href="#">Infografis</a></li>
-      <li><a href="#">Listing</a></li>
-      <li><a href="#">IDM</a></li>
+      <li><a href="/" :class="{ 'border-b-2 border-white': isHomePage }">Beranda</a></li>
+      <li><a href="#">Profil Desa</a></li>
+      <li><a href="/news">Informasi & Berita</a></li>
+      <li><a href="#">Layanan Publik</a></li>
     </ul>
   </nav>
 </template>
