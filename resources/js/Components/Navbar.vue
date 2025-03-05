@@ -35,10 +35,7 @@
           {{ item.name }}
         </a>
       </li>
-      <li><a href="/" :class="{ 'border-b-2 border-white': isHomePage }">Beranda</a></li>
-      <li><a href="#">Profil Desa</a></li>
-      <li><a href="/news">Informasi & Berita</a></li>
-      <li><a href="#">Layanan Publik</a></li>
+
     </ul>
 
   </nav>
