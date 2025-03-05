@@ -32,6 +32,8 @@ Route::get('/layanan', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin area routes with permission-based middleware
+
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->group(function () {
         // Dashboard accessible to anyone with view_dashboard permission
         Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
@@ -62,7 +64,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:delete_positions'])->delete('/positions/{position}', [PositionController::class, 'destroy'])->name('admin.positions.destroy');
     });
 });
-
+  
+});
+  
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
