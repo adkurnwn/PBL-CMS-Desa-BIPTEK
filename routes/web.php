@@ -17,9 +17,18 @@ Route::get('/', function () {
     // ]);
 });
 
-Route::get('/news', function () {
-    return view('news');
+Route::get('/profildesa', function () {
+    return view('profil');
 });
+
+Route::get('/informasi', function () {
+    return view('informasi');
+});
+
+Route::get('/layanan', function () {
+    return view('layanan');
+});
+
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/dashboard', function () {

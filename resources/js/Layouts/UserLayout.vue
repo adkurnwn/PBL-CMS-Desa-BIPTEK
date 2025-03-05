@@ -1,10 +1,15 @@
 <template>
   <div>
-    <Navbar />
+    
     <main>
+      <div class="fixed top-0 left-0 w-full z-50">
+        <Navbar />
+      </div>
+
       <slot />
+      <Footer />
     </main>
-    <Footer />
+    
   </div>
 </template>
 
