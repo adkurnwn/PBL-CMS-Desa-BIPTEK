@@ -18,6 +18,20 @@ Route::get('/', function () {
     // ]);
 });
 
+Route::get('/profildesa', function () {
+    return view('profil');
+});
+
+Route::get('/informasi', function () {
+    return view('informasi');
+});
+
+Route::get('/layanan', function () {
+    return view('layanan');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Admin area routes with permission-based middleware
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->group(function () {
@@ -51,8 +65,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
   
-Route::get('/news', function () {
-    return view('news');
 });
   
 Route::get('/dashboard', function () {
