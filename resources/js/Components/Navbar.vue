@@ -1,7 +1,7 @@
 <template>
   <nav
     :class="[
-      'sticky z-50 mt-4 mx-6 flex rounded-lg items-center justify-between px-5 md:px-8 py-4 transition-colors duration-300 font-merriweather',
+      'sticky z-50 mt-4 mx-2 md:mx-6 flex rounded-lg items-center justify-between px-4 md:px-8 py-4 transition-colors duration-300 font-merriweather',
       isScrolled || !isHomePage ? 'bg-accent1' : 'bg-transparent'
     ]"
   >
@@ -80,7 +80,5 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-nav {
-  backdrop-filter: blur(10px);
-}
+
 </style>
