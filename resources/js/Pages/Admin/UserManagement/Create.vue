@@ -94,11 +94,11 @@ const submit = () => {
                                         v-model="form.role"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     >
-                                        <option value="admin">Admin</option>
-                                        <option value="kepala_desa">
+                                        <option value="Admin">Admin</option>
+                                        <option value="Kepala Desa">
                                             Kepala Desa
                                         </option>
-                                        <option value="aparat_desa">
+                                        <option value="Aparat Desa">
                                             Aparat Desa
                                         </option>
                                     </select>
