@@ -9,13 +9,15 @@ import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
     user: Object,
+    positions: Array,
 });
 
 const form = useForm({
     name: props.user.name,
     email: props.user.email,
     password: "",
-    is_admin: props.user.is_admin,
+    role: props.user.role,
+    id_position: props.user.id_position,
 });
 
 const submit = () => {
@@ -87,16 +89,52 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div class="flex items-center mt-4">
-                                    <input
-                                        id="is_admin"
-                                        v-model="form.is_admin"
-                                        type="checkbox"
-                                        class="rounded border-gray-300"
-                                    />
-                                    <label for="is_admin" class="ml-2"
-                                        >Is Admin</label
+                                <div>
+                                    <InputLabel for="role" value="Role" />
+                                    <select
+                                        id="role"
+                                        v-model="form.role"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     >
+                                        <option value="admin">Admin</option>
+                                        <option value="kepala_desa">
+                                            Kepala Desa
+                                        </option>
+                                        <option value="aparat_desa">
+                                            Aparat Desa
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.role"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="id_position"
+                                        value="Position"
+                                    />
+                                    <select
+                                        id="id_position"
+                                        v-model="form.id_position"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        <option value="">
+                                            Select Parent Department
+                                        </option>
+                                        <option
+                                            v-for="pos in positions"
+                                            :key="pos.id"
+                                            :value="pos.id"
+                                        >
+                                            {{ pos.name }}
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.id_position"
+                                        class="mt-2"
+                                    />
                                 </div>
                             </div>
 
