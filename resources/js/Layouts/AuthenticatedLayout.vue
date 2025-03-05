@@ -44,12 +44,16 @@ const showingNavigationDropdown = ref(false);
                                     User Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('admin.departements')"
-                                    :active="
-                                        route().current('admin.departements')
-                                    "
+                                    :href="route('admin.positions')"
+                                    :active="route().current('admin.positions')"
                                 >
-                                    Departement Management
+                                    Position Management
+                                </NavLink>
+                                <NavLink
+                                    :href="route('admin.roles')"
+                                    :active="route().current('admin.roles')"
+                                >
+                                    Role Management
                                 </NavLink>
                             </div>
                         </div>
