@@ -9,16 +9,17 @@ use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return view('home');
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
 });
 
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Admin area routes with permission-based middleware
     Route::prefix('admin')->group(function () {
         // Dashboard accessible to anyone with view_dashboard permission
         Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
@@ -49,7 +50,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:delete_positions'])->delete('/positions/{position}', [PositionController::class, 'destroy'])->name('admin.positions.destroy');
     });
 });
-
+  
+Route::get('/news', function () {
+    return view('news');
+});
+  
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
