@@ -1,40 +1,54 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 
-// Add departments prop to receive list of departments from backend
 const props = defineProps({
-    departments: Array,
+    position: {
+        type: Object,
+        required: true,
+    },
+    positions: {
+        type: Array,
+        required: true,
+    },
 });
 
 const form = useForm({
-    name: "",
-    parent_id: "",
+    name: props.position.name,
+    parent_id: props.position.parent_id?.toString() || "",
 });
 
 const submit = () => {
-    form.post(route("admin.departements.store"), {
-        // Fixed route name
-        onSuccess: () => form.reset(),
+    console.log("Submitting form with data:", form.data());
+    form.put(route("admin.positions.update", props.position.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log("Form submitted successfully");
+        },
+        onError: (errors) => {
+            console.error("Form submission errors:", errors);
+        },
     });
 };
 </script>
 <template>
-    <Head title="Departement Management" />
+    <Head title="Edit Position" />
     <AuthenticatedLayout>
+        <template #header>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                Edit Position
+            </h2>
+        </template>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div
-                    class="mb-6 overflow-hidden bg-white shadow-sm sm:rounded-lg"
-                >
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <h3 class="mb-4 text-lg font-semibold">
-                            Create New Departement
-                        </h3>
                         <form @submit.prevent="submit">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -55,22 +69,21 @@ const submit = () => {
                                 <div>
                                     <InputLabel
                                         for="parent_id"
-                                        value="Parent"
+                                        value="Parent Position"
                                     />
                                     <select
                                         id="parent_id"
                                         v-model="form.parent_id"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                     >
-                                        <option value="">
-                                            Select Parent Department
-                                        </option>
+                                        <option value="">No Parent</option>
                                         <option
-                                            v-for="dept in departments"
-                                            :key="dept.id"
-                                            :value="dept.id"
+                                            v-for="pos in positions"
+                                            :key="pos.id"
+                                            :value="pos.id.toString()"
+                                            :disabled="pos.id === position.id"
                                         >
-                                            {{ dept.name }}
+                                            {{ pos.name }}
                                         </option>
                                     </select>
                                     <InputError
@@ -80,10 +93,13 @@ const submit = () => {
                                 </div>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 flex flex-row justify-between">
                                 <PrimaryButton :disabled="form.processing">
-                                    Create Deparatement
+                                    Update Position
                                 </PrimaryButton>
+                                <Link :href="route('admin.positions')">
+                                    <DangerButton>Cancel</DangerButton>
+                                </Link>
                             </div>
                         </form>
                     </div>

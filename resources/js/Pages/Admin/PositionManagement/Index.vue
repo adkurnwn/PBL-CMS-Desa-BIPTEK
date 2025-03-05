@@ -9,14 +9,14 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
-    users: Array,
+    positions: Array,
 });
 
 const form = useForm({}); // Add this line
 
-const deleteDepartement = (departementId) => {
-    if (confirm("Are you sure you want to delete this departement?")) {
-        form.delete(route("admin.departements.destroy", departementId), {
+const deletePosition = (positionId) => {
+    if (confirm("Are you sure you want to delete this position?")) {
+        form.delete(route("admin.positions.destroy", positionId), {
             preserveScroll: true,
         });
     }
@@ -24,15 +24,15 @@ const deleteDepartement = (departementId) => {
 </script>
 
 <template>
-    <Head title="User Management" />
+    <Head title="Position Management" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-row justify-between">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Deparatement Management
+                    Position Management
                 </h2>
-                <Link :href="route('admin.departements.create')">
+                <Link :href="route('admin.positions.create')">
                     <PrimaryButton>Buat Jabatan</PrimaryButton>
                 </Link>
             </div>
@@ -54,11 +54,11 @@ const deleteDepartement = (departementId) => {
                             </thead>
                             <tbody>
                                 <tr
-                                    v-for="departement in departements"
-                                    :key="departement.id"
+                                    v-for="position in positions"
+                                    :key="position.id"
                                 >
-                                    <td>{{ departement.name }}</td>
-                                    <td>{{ departement.email }}</td>
+                                    <td>{{ position.name }}</td>
+                                    <td>{{ position.parent_id }}</td>
                                     <td>
                                         <div
                                             class="flex gap-x-2 justify-center"
@@ -66,8 +66,8 @@ const deleteDepartement = (departementId) => {
                                             <Link
                                                 :href="
                                                     route(
-                                                        'admin.departements.edit',
-                                                        departement.id
+                                                        'admin.positions.edit',
+                                                        position.id
                                                     )
                                                 "
                                             >
@@ -77,9 +77,7 @@ const deleteDepartement = (departementId) => {
                                             </Link>
                                             <DangerButton
                                                 @click="
-                                                    deleteDepartement(
-                                                        departement.id
-                                                    )
+                                                    deletePosition(position.id)
                                                 "
                                             >
                                                 Delete

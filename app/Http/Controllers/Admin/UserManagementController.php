@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Position;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
@@ -20,7 +21,9 @@ class UserManagementController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/UserManagement/Create');
+        return Inertia::render('Admin/UserManagement/Create', [
+            'positions' => Position::all()
+        ]);
     }
 
     public function store(Request $request)
@@ -29,15 +32,18 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', Rules\Password::defaults()],
-            'is_admin' => 'boolean'
+            'role' => 'required|string|exists:roles,name',
+            'id_position' => 'required|integer'
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'is_admin' => $request->is_admin ?? false
+            'id_position' => $request->id_position
         ]);
+
+        $user->assignRole($request->role);
 
         return redirect()->route('admin.users')->with('success', 'User created successfully');
     }
@@ -45,7 +51,11 @@ class UserManagementController extends Controller
     public function edit(User $user)
     {
         return Inertia::render('Admin/UserManagement/Edit', [
-            'user' => $user
+            'user' => array_merge($user->toArray(), [
+                'role' => $user->roles->first()->name ?? null,
+                'id_position' => $user->id_position
+            ]),
+            'positions' => Position::all()
         ]);
     }
 
@@ -55,15 +65,19 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'password' => $request->password ? ['required', Rules\Password::defaults()] : '',
-            'is_admin' => 'boolean'
+            'role' => 'required|string|exists:roles,name',
+            'id_position' => 'required|integer'
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'is_admin' => $request->is_admin,
             'password' => $request->password ? Hash::make($request->password) : $user->password,
+            'id_position' => $request->id_position
         ]);
+
+        // Update role
+        $user->syncRoles([$request->role]);
 
         return redirect()->route('admin.users')->with('success', 'User updated successfully');
     }
