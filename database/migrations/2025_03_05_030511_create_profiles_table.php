@@ -17,7 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('logo');
-
+            $table->string('address');
+            $table->text('history');
+            $table->string('vision');
+            $table->text('mission');
             $table->timestamps();
         });
     }

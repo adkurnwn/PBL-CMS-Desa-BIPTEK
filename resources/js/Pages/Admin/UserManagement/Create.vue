@@ -107,33 +107,6 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
-
-                                <div>
-                                    <InputLabel
-                                        for="id_position"
-                                        value="Position"
-                                    />
-                                    <select
-                                        id="id_position"
-                                        v-model="form.id_position"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="">
-                                            Select Parent Department
-                                        </option>
-                                        <option
-                                            v-for="pos in positions"
-                                            :key="pos.id"
-                                            :value="pos.id"
-                                        >
-                                            {{ pos.name }}
-                                        </option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.id_position"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
                             <div class="mt-4">

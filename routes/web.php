@@ -4,7 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\ProfileController as DesaProfileController;
 use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
 
@@ -41,20 +41,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/roles/{role}', [RoleManagementController::class, 'update'])->name('admin.roles.update');
         });
 
-        // Department routes
-        Route::middleware(['permission:read_positions'])->get('/positions', [PositionController::class, 'index'])->name('admin.positions');
-        Route::middleware(['permission:create_positions'])->get('/positions/create', [PositionController::class, 'create'])->name('admin.positions.create');
-        Route::middleware(['permission:create_positions'])->post('/positions', [PositionController::class, 'store'])->name('admin.positions.store');
-        Route::middleware(['permission:update_positions'])->get('/positions/{position}/edit', [PositionController::class, 'edit'])->name('admin.positions.edit');
-        Route::middleware(['permission:update_positions'])->put('/positions/{position}', [PositionController::class, 'update'])->name('admin.positions.update');
-        Route::middleware(['permission:delete_positions'])->delete('/positions/{position}', [PositionController::class, 'destroy'])->name('admin.positions.destroy');
+        //Profile management routes
+        Route::middleware(['permission:read_profiles'])->get('/profiles', [DesaProfileController::class, 'index'])->name('admin.profiles');
+        Route::middleware(['permission:create_profiles'])->get('/profiles/create', [DesaProfileController::class, 'create'])->name('admin.profiles.create');
+        Route::middleware(['permission:create_profiles'])->post('/profiles', [DesaProfileController::class, 'store'])->name('admin.profiles.store');
+        Route::middleware(['permission:update_profiles'])->get('/profiles/{position}/edit', [DesaProfileController::class, 'edit'])->name('admin.profiles.edit');
+        Route::middleware(['permission:update_profiles'])->put('/profiles/{position}', [DesaProfileController::class, 'update'])->name('admin.profiles.update');
+        Route::middleware(['permission:delete_profiles'])->delete('/profiles/{position}', [DesaProfileController::class, 'destroy'])->name('admin.profiles.destroy');
     });
 });
-  
+
 Route::get('/news', function () {
     return view('news');
 });
-  
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Inertia\Inertia;
-use App\Models\Position;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
@@ -21,9 +20,7 @@ class UserManagementController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/UserManagement/Create', [
-            'positions' => Position::all()
-        ]);
+        return Inertia::render('Admin/UserManagement/Create');
     }
 
     public function store(Request $request)
@@ -55,7 +52,6 @@ class UserManagementController extends Controller
                 'role' => $user->roles->first()->name ?? null,
                 'id_position' => $user->id_position
             ]),
-            'positions' => Position::all()
         ]);
     }
 
