@@ -15,9 +15,11 @@ export default {
             colors: {
                 'accent1': '#244031',
                 'accent2': '#3B614A',
-                'cream': '#EEEBE3',
-                'semiBlack':"1E1E1E"
-                
+                'type1': '#F6F5F1',
+                'type2': '#40483D',
+                'secondary': '#DEA521',
+                'semiBlack':"#1E1E1E"
+
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],

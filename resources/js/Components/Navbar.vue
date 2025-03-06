@@ -21,7 +21,7 @@
     <!-- Navigation Links -->
     <ul
       :class="[
-        'md:flex text-sm md:space-x-8 text-white font-semibold transition-all duration-300',
+        'md:flex text-sm md:text-base md:space-x-8 text-white font-semibold transition-all duration-300 md:mt-2 md:mr-6',
         isMenuOpen ? 'block' : 'max-h-0 opacity-0 scale-y-0 md:max-h-full md:opacity-100 md:scale-y-100',
         'absolute md:static w-1/2 top-20 my-1 rounded-lg right-0 md:w-auto bg-accent1 md:bg-transparent md:flex flex-col md:flex-row space-y-4 md:space-y-0 text-center md:text-left p-4 md:p-0'
       ]"
@@ -29,7 +29,7 @@
       <li v-for="(item, index) in menuItems" :key="index">
         <a
           :href="item.link"
-          class="relative inline-block pb-1 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
+          class="relative inline-block pb-1 after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
           :class="{ 'after:w-full after:left-0': isActive(item.link) }"
         >
           {{ item.name }}
