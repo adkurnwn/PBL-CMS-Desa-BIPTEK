@@ -22,7 +22,8 @@ class UserSeeder extends Seeder
             'name' => 'Kepala Desa',
             'email' => 'kepala@gmail.com',
             'password' => Hash::make('password'),
-            'id_position' => 1,
+            'position' => 'Kepala Desa',
+            'status' => true,
         ]);
 
         $user->assignRole('Kepala Desa');

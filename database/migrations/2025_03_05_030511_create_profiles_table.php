@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone');
-            $table->string('logo');
-            $table->string('address');
+            $table->string('name', 50);
+            $table->string('email', 255)->unique();
+            $table->string('phone', 20);
+            $table->string('logo', 255);
+            $table->string('provinsi', 50);
+            $table->string('kabupaten', 50);
+            $table->string('kecamatan', 50);
+            $table->string('kelurahan', 50);
+            $table->string('hero_image', 255);
+            $table->string('organization_image', 255);
             $table->text('history');
-            $table->string('vision');
+            $table->text('vision');
             $table->text('mission');
             $table->timestamps();
         });

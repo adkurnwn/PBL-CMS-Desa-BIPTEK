@@ -6,27 +6,71 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import { ref, onMounted } from "vue";
 
 const props = defineProps({
     user: Object,
-    positions: Array,
 });
+
+// Parse job_description if it's a JSON string
+const parseJobDescription = () => {
+    if (typeof props.user.job_description === "string") {
+        try {
+            return JSON.parse(props.user.job_description);
+        } catch (e) {
+            return [];
+        }
+    }
+    return Array.isArray(props.user.job_description)
+        ? props.user.job_description
+        : [];
+};
 
 const form = useForm({
     name: props.user.name,
     email: props.user.email,
     password: "",
+    phone: props.user.phone,
+    photo_profile: null,
+    position: props.user.position,
+    job_description: parseJobDescription() ?? [],
+    status: props.user.status !== undefined ? props.user.status : true,
     role: props.user.role,
     id_position: props.user.id_position,
+    _method: "PUT",
 });
 
+// New job description input
+const newJobDescription = ref("");
+
+const handleFileChange = (e) => {
+    form.photo_profile = e.target.files[0];
+};
+
+// Add new job description to the array
+
+const addJobDescription = (e) => {
+    e.preventDefault();
+    if (newJobDescription.value.trim()) {
+        form.job_description.push(newJobDescription.value.trim());
+        newJobDescription.value = "";
+    }
+};
+
+// Remove job description at specific index
+const removeJobDescription = (index) => {
+    form.job_description.splice(index, 1);
+};
+
 const submit = () => {
-    form.put(route("admin.users.update", props.user.id), {
+    form.post(route("admin.users.update", props.user.id), {
         preserveScroll: true,
         onSuccess: () => form.reset("password"),
+        forceFormData: true,
     });
 };
 </script>
+
 <template>
     <Head title="Edit User" />
     <AuthenticatedLayout>
@@ -40,8 +84,12 @@ const submit = () => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <form @submit.prevent="submit">
+                        <form
+                            @submit.prevent="submit"
+                            enctype="multipart/form-data"
+                        >
                             <div class="grid grid-cols-2 gap-4">
+                                <!-- Name Field -->
                                 <div>
                                     <InputLabel for="name" value="Name" />
                                     <TextInput
@@ -57,6 +105,7 @@ const submit = () => {
                                     />
                                 </div>
 
+                                <!-- Email Field -->
                                 <div>
                                     <InputLabel for="email" value="Email" />
                                     <TextInput
@@ -72,6 +121,7 @@ const submit = () => {
                                     />
                                 </div>
 
+                                <!-- Password Field -->
                                 <div>
                                     <InputLabel
                                         for="password"
@@ -89,12 +139,162 @@ const submit = () => {
                                     />
                                 </div>
 
+                                <!-- Phone Field -->
+                                <div>
+                                    <InputLabel for="phone" value="Phone" />
+                                    <TextInput
+                                        id="phone"
+                                        v-model="form.phone"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                    />
+                                    <InputError
+                                        :message="form.errors.phone"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Photo Profile Field -->
+                                <div>
+                                    <InputLabel
+                                        for="photo_profile"
+                                        value="Profile Photo"
+                                    />
+                                    <input
+                                        id="photo_profile"
+                                        type="file"
+                                        @input="handleFileChange"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                    />
+                                    <p
+                                        v-if="user.photo_profile"
+                                        class="mt-1 text-sm text-gray-500"
+                                    >
+                                        Current:
+                                        {{
+                                            user.photo_profile.split("/").pop()
+                                        }}
+                                    </p>
+                                    <InputError
+                                        :message="form.errors.photo_profile"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Position Field -->
+                                <div>
+                                    <InputLabel
+                                        for="position"
+                                        value="Position"
+                                    />
+                                    <select
+                                        id="position"
+                                        v-model="form.position"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        <option value="Kepala Desa">
+                                            Kepala Desa
+                                        </option>
+                                        <option value="Sekretaris Desa">
+                                            Sekretaris Desa
+                                        </option>
+                                        <option value="Kepala Urusan">
+                                            Kepala Urusan
+                                        </option>
+                                        <option value="Kepala Dusun">
+                                            Kepala Dusun
+                                        </option>
+                                        <option value="Kepala Seksi">
+                                            Kepala Seksi
+                                        </option>
+                                        <option value="Staff">Staff</option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.position"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Modified Job Description Field -->
+                                <div class="col-span-2 mb-4">
+                                    <InputLabel
+                                        for="job_description"
+                                        value="Job Description"
+                                    />
+                                    <div class="flex mt-1">
+                                        <TextInput
+                                            id="job_description"
+                                            v-model="newJobDescription"
+                                            type="text"
+                                            class="block w-full"
+                                            placeholder="Enter job description and press Enter"
+                                            @keydown.enter="addJobDescription"
+                                        />
+                                        <PrimaryButton
+                                            type="button"
+                                            class="ml-2"
+                                            @click="addJobDescription"
+                                        >
+                                            Add
+                                        </PrimaryButton>
+                                    </div>
+
+                                    <!-- Display job descriptions as tags -->
+                                    <div class="mt-2 flex flex-wrap gap-2">
+                                        <div
+                                            v-for="(
+                                                description, index
+                                            ) in form.job_description"
+                                            :key="index"
+                                            class="bg-gray-100 px-2 py-1 rounded-md flex items-center gap-1"
+                                        >
+                                            <span>{{ description }}</span>
+                                            <button
+                                                type="button"
+                                                class="text-red-500 hover:text-red-700 focus:outline-none"
+                                                @click="
+                                                    removeJobDescription(index)
+                                                "
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.job_description"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Status Field -->
+                                <div>
+                                    <div class="flex items-center">
+                                        <input
+                                            id="status"
+                                            v-model="form.status"
+                                            type="checkbox"
+                                            class="rounded border-gray-300"
+                                        />
+                                        <InputLabel
+                                            for="status"
+                                            value="Active"
+                                            class="ml-2"
+                                        />
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.status"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Role Field -->
                                 <div>
                                     <InputLabel for="role" value="Role" />
                                     <select
                                         id="role"
                                         v-model="form.role"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     >
                                         <option value="Admin">Admin</option>
                                         <option value="Kepala Desa">
@@ -109,36 +309,9 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
-
-                                <div>
-                                    <InputLabel
-                                        for="id_position"
-                                        value="Position"
-                                    />
-                                    <select
-                                        id="id_position"
-                                        v-model="form.id_position"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="">
-                                            Select Parent Department
-                                        </option>
-                                        <option
-                                            v-for="pos in positions"
-                                            :key="pos.id"
-                                            :value="pos.id"
-                                        >
-                                            {{ pos.name }}
-                                        </option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.id_position"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
-                            <div class="mt-4 flex flex-row justify-between">
+                            <div class="mt-6 flex flex-row justify-between">
                                 <PrimaryButton :disabled="form.processing">
                                     Update User
                                 </PrimaryButton>

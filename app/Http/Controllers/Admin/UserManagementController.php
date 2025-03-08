@@ -29,16 +29,31 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
             'password' => ['required', Rules\Password::defaults()],
+            'phone' => 'required|string|max:20',
+            'photo_profile' => 'nullable|image|max:1024|mimes:jpg,png,jpeg',
+            'position' => 'required|string',
+            'job_description' => 'nullable|array',
+            'status' => 'required|boolean',
             'role' => 'required|string|exists:roles,name',
-            'id_position' => 'required|integer'
         ]);
 
-        $user = User::create([
+        // Convert job_description array to JSON before saving
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'id_position' => $request->id_position
-        ]);
+            'phone' => $request->phone,
+            'position' => $request->position,
+            'job_description' => json_encode($request->job_description), // Encode array as JSON
+            'status' => $request->status,
+        ];
+
+        // Handle file upload separately
+        if ($request->hasFile('photo_profile')) {
+            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos');
+        }
+
+        $user = User::create($userData);
 
         $user->assignRole($request->role);
 
@@ -49,28 +64,58 @@ class UserManagementController extends Controller
     {
         return Inertia::render('Admin/UserManagement/Edit', [
             'user' => array_merge($user->toArray(), [
-                'role' => $user->roles->first()->name ?? null,
-                'id_position' => $user->id_position
+                'role' => $user->roles->first()->name ?? null
             ]),
         ]);
     }
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
-            'password' => $request->password ? ['required', Rules\Password::defaults()] : '',
+            'phone' => 'required|string|max:20',
+            'position' => 'required|string',
+            'job_description' => 'nullable|array',
+            'status' => 'required|boolean',
             'role' => 'required|string|exists:roles,name',
-            'id_position' => 'required|integer'
-        ]);
+            'id_position' => 'nullable|exists:positions,id',
+        ];
 
-        $user->update([
+        // Only validate password if it's provided
+        if ($request->filled('password')) {
+            $rules['password'] = ['required', Rules\Password::defaults()];
+        }
+
+        // Only validate photo if it's provided
+        if ($request->hasFile('photo_profile')) {
+            $rules['photo_profile'] = 'image|max:1024|mimes:jpg,png,jpeg';
+        }
+
+        $request->validate($rules);
+
+        // Build the data array with only fields that should be updated
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-            'id_position' => $request->id_position
-        ]);
+            'phone' => $request->phone,
+            'position' => $request->position,
+            'job_description' => json_encode($request->job_description),
+            'status' => $request->status,
+            'id_position' => $request->id_position,
+        ];
+
+        // Only update password if provided
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+
+        // Only update photo if provided
+        if ($request->hasFile('photo_profile')) {
+            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos');
+        }
+
+        $user->update($userData);
 
         // Update role
         $user->syncRoles([$request->role]);

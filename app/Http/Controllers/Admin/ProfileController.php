@@ -29,6 +29,8 @@ class ProfileController extends Controller
             'phone' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'logo' => 'required|image|max:1024|mimes:jpg,png,jpeg',
+            'kabupaten' => 'required|string',
+            'kecamatan' => 'required|string',
             'history' => 'required|string',
             'vision' => 'required|string',
             'mission' => 'required|string'
