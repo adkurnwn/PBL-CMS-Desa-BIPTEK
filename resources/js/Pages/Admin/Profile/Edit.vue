@@ -110,24 +110,45 @@ const fetchProvinces = async () => {
 };
 
 const fetchRegencies = async (provinceId) => {
-    const response = await axios.get(`/api/regencies/${provinceId}`);
-    regencies.value = response.data;
-    form.kabupaten = ""; // Reset dependent fields
-    form.kecamatan = "";
-    form.kelurahan = "";
+    if (!provinceId) return;
+    try {
+        const response = await axios.get(`/api/regencies/${provinceId}`);
+        regencies.value = response.data;
+        if (!props.profile.kabupaten) {
+            form.kabupaten = "";
+            form.kecamatan = "";
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching regencies:", error);
+    }
 };
 
 const fetchDistricts = async (regencyId) => {
-    const response = await axios.get(`/api/districts/${regencyId}`);
-    districts.value = response.data;
-    form.kecamatan = "";
-    form.kelurahan = "";
+    if (!regencyId) return;
+    try {
+        const response = await axios.get(`/api/districts/${regencyId}`);
+        districts.value = response.data;
+        if (!props.profile.kecamatan) {
+            form.kecamatan = "";
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching districts:", error);
+    }
 };
 
 const fetchVillages = async (districtId) => {
-    const response = await axios.get(`/api/villages/${districtId}`);
-    villages.value = response.data;
-    form.kelurahan = "";
+    if (!districtId) return;
+    try {
+        const response = await axios.get(`/api/villages/${districtId}`);
+        villages.value = response.data;
+        if (!props.profile.kelurahan) {
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching villages:", error);
+    }
 };
 
 // Load provinces when component mounts
