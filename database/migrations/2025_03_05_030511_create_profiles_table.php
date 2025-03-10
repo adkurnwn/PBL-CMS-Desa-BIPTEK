@@ -23,9 +23,13 @@ return new class extends Migration
             $table->string('kelurahan', 50);
             $table->string('hero_image', 255);
             $table->string('organization_image', 255);
+            $table->json('lembaga');
+            $table->json('fasilitas');
             $table->text('history');
             $table->text('vision');
             $table->text('mission');
+            $table->enum('primary_color', ['#000000', '#ffffff']);
+            $table->enum('secondary_color', ['#000000', '#ffffff']);
             $table->timestamps();
         });
     }

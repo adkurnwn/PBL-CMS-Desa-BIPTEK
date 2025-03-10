@@ -7,7 +7,7 @@
  *
  */
 
-namespace App\Models;
+namespace App\Models\Region;
 
 use AzisHapidin\IndoRegion\Traits\VillageTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +36,7 @@ class Village extends Model
         'district_id'
     ];
 
-	/**
+    /**
      * Village belongs to District.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

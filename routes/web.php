@@ -45,9 +45,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:read_profiles'])->get('/profiles', [DesaProfileController::class, 'index'])->name('admin.profiles');
         Route::middleware(['permission:create_profiles'])->get('/profiles/create', [DesaProfileController::class, 'create'])->name('admin.profiles.create');
         Route::middleware(['permission:create_profiles'])->post('/profiles', [DesaProfileController::class, 'store'])->name('admin.profiles.store');
-        Route::middleware(['permission:update_profiles'])->get('/profiles/{position}/edit', [DesaProfileController::class, 'edit'])->name('admin.profiles.edit');
-        Route::middleware(['permission:update_profiles'])->put('/profiles/{position}', [DesaProfileController::class, 'update'])->name('admin.profiles.update');
-        Route::middleware(['permission:delete_profiles'])->delete('/profiles/{position}', [DesaProfileController::class, 'destroy'])->name('admin.profiles.destroy');
+        Route::middleware(['permission:update_profiles'])->get('/profiles/{profile}/edit', [DesaProfileController::class, 'edit'])->name('admin.profiles.edit');
+        Route::middleware(['permission:update_profiles'])->put('/profiles/{profile}', [DesaProfileController::class, 'update'])->name('admin.profiles.update');
+        Route::middleware(['permission:delete_profiles'])->delete('/profiles/{profile}', [DesaProfileController::class, 'destroy'])->name('admin.profiles.destroy');
     });
 });
 

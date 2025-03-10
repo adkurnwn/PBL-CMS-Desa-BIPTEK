@@ -6,5 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model
 {
-    protected $fillable = ['name', 'email', 'phone', 'address', 'logo', 'history', 'vision', 'mission', 'kabupaten', 'kecamatan', 'kelurahan'];
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'logo',
+        'history',
+        'vision',
+        'mission',
+        'provinsi',
+        'kabupaten',
+        'kecamatan',
+        'kelurahan',
+        'hero_image',
+        'organization_image',
+        'lembaga',
+        'fasilitas',
+        'primary_color',
+        'secondary_color'
+    ];
 }

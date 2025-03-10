@@ -2,6 +2,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+const props = defineProps({
+    profiles: Array,
+});
 </script>
 
 <template>
@@ -40,21 +43,24 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="role in roles" :key="role.id">
+                                <tr
+                                    v-for="profile in profiles"
+                                    :key="profile.id"
+                                >
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ role.name }}
+                                        {{ profile.name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="
                                                 route(
-                                                    'admin.roles.edit',
-                                                    role.id
+                                                    'admin.profiles.edit',
+                                                    profile.id
                                                 )
                                             "
                                         >
                                             <PrimaryButton>
-                                                Edit Permissions
+                                                Edit Profile
                                             </PrimaryButton>
                                         </Link>
                                     </td>
