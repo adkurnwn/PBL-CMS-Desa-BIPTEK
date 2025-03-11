@@ -3,10 +3,11 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\ProfileController as DesaProfileController;
 use App\Http\Controllers\Admin\RoleManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\ProfileController as DesaProfileController;
 
 Route::get('/', function () {
     return view('home');
@@ -48,11 +49,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:update_profiles'])->get('/profiles/{profile}/edit', [DesaProfileController::class, 'edit'])->name('admin.profiles.edit');
         Route::middleware(['permission:update_profiles'])->put('/profiles/{profile}', [DesaProfileController::class, 'update'])->name('admin.profiles.update');
         Route::middleware(['permission:delete_profiles'])->delete('/profiles/{profile}', [DesaProfileController::class, 'destroy'])->name('admin.profiles.destroy');
-    });
-});
 
-Route::get('/news', function () {
-    return view('news');
+        Route::middleware(['permission:read_news'])->get('/news', [NewsController::class, 'index'])->name('admin.news');
+        Route::middleware(['permission:create_news'])->get('/news/create', [NewsController::class, 'create'])->name('admin.news.create');
+        Route::middleware(['permission:create_news'])->post('/news', [NewsController::class, 'store'])->name('admin.news.store');
+        Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('admin.news.edit');
+        Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('admin.news.update');
+        Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('admin.news.destroy');
+    });
 });
 
 Route::get('/dashboard', function () {

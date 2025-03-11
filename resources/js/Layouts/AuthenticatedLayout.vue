@@ -55,6 +55,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Profile Desa Management
                                 </NavLink>
+                                <NavLink
+                                    :href="route('admin.news')"
+                                    :active="route().current('admin.news')"
+                                >
+                                    News Management
+                                </NavLink>
                             </div>
                         </div>
 

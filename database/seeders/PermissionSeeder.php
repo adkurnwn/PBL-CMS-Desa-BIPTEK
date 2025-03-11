@@ -16,7 +16,8 @@ class PermissionSeeder extends Seeder
             'positions' => ['create', 'read', 'update', 'delete'],
             'roles' => ['manage'],
             'dashboard' => ['view'],
-            'profiles' => ['create', 'read', 'update', 'delete']
+            'profiles' => ['create', 'read', 'update', 'delete'],
+            'news' => ['create', 'read', 'update', 'delete'],
         ];
 
         foreach ($features as $feature => $actions) {
