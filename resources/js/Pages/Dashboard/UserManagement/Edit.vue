@@ -12,7 +12,6 @@ const props = defineProps({
     user: Object,
 });
 
-// Parse job_description if it's a JSON string
 const parseJobDescription = () => {
     if (typeof props.user.job_description === "string") {
         try {
@@ -35,19 +34,15 @@ const form = useForm({
     position: props.user.position,
     job_description: parseJobDescription() ?? [],
     status: props.user.status !== undefined ? props.user.status : true,
-    role: props.user.role,
     id_position: props.user.id_position,
     _method: "PUT",
 });
 
-// New job description input
 const newJobDescription = ref("");
 
 const handleFileChange = (e) => {
     form.photo_profile = e.target.files[0];
 };
-
-// Add new job description to the array
 
 const addJobDescription = (e) => {
     e.preventDefault();
@@ -57,13 +52,12 @@ const addJobDescription = (e) => {
     }
 };
 
-// Remove job description at specific index
 const removeJobDescription = (index) => {
     form.job_description.splice(index, 1);
 };
 
 const submit = () => {
-    form.post(route("admin.users.update", props.user.id), {
+    form.post(route("dashboard.users.update", props.user.id), {
         preserveScroll: true,
         onSuccess: () => form.reset("password"),
         forceFormData: true,
@@ -287,35 +281,13 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
-
-                                <!-- Role Field -->
-                                <div>
-                                    <InputLabel for="role" value="Role" />
-                                    <select
-                                        id="role"
-                                        v-model="form.role"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="Admin">Admin</option>
-                                        <option value="Kepala Desa">
-                                            Kepala Desa
-                                        </option>
-                                        <option value="Aparat Desa">
-                                            Aparat Desa
-                                        </option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.role"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
                             <div class="mt-6 flex flex-row justify-between">
                                 <PrimaryButton :disabled="form.processing">
                                     Update User
                                 </PrimaryButton>
-                                <Link :href="route('admin.users')">
+                                <Link :href="route('dashboard.users')">
                                     <DangerButton>Cancel</DangerButton>
                                 </Link>
                             </div>

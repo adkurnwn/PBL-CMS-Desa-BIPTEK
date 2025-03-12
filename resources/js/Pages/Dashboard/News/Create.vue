@@ -25,7 +25,7 @@ const handleVideoChange = (e) => {
 };
 
 const submit = () => {
-    form.post(route("admin.news.store"), {
+    form.post(route("dashboard.news.store"), {
         onSuccess: () => form.reset(),
         preserveScroll: true,
         forceFormData: true,

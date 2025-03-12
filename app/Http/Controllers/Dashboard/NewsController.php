@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -11,14 +11,14 @@ class NewsController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/News/Index', [
+        return Inertia::render('Dashboard/News/Index', [
             'news' => News::all(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Admin/News/Create');
+        return Inertia::render('Dashboard/News/Create');
     }
 
     public function store(Request $request)
@@ -63,12 +63,12 @@ class NewsController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.news');
+        return redirect()->route('dashboard.news');
     }
 
     public function edit(News $news)
     {
-        return Inertia::render('Admin/News/Edit', [
+        return Inertia::render('Dashboard/News/Edit', [
             'news' => $news,
         ]);
     }
@@ -121,6 +121,6 @@ class NewsController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.news');
+        return redirect()->route('dashboard.news');
     }
 }

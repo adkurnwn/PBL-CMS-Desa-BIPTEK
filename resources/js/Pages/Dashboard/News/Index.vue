@@ -2,21 +2,24 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-
 const props = defineProps({
-    roles: Array,
+    news: Array,
 });
 </script>
 
 <template>
-    <Head title="Role Management" />
+    <Head title="News" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Role Management
+                    News
                 </h2>
+
+                <Link :href="route('dashboard.news.create')">
+                    <PrimaryButton>Create New News</PrimaryButton>
+                </Link>
             </div>
         </template>
 
@@ -30,7 +33,7 @@ const props = defineProps({
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Role Name
+                                        Judul
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -40,21 +43,21 @@ const props = defineProps({
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="role in roles" :key="role.id">
+                                <tr v-for="news in news" :key="news.id">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ role.name }}
+                                        {{ news.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="
                                                 route(
-                                                    'admin.roles.edit',
-                                                    role.id
+                                                    'dashboard.news.edit',
+                                                    news.id
                                                 )
                                             "
                                         >
                                             <PrimaryButton>
-                                                Edit Permissions
+                                                Edit News
                                             </PrimaryButton>
                                         </Link>
                                     </td>

@@ -17,20 +17,17 @@ const form = useForm({
     password: "",
     phone: "",
     photo_profile: null,
-    position: "Staff", // Default value from enum
-    job_description: [], // Changed to array for multiple descriptions
-    status: true, // Default value
-    role: "Admin", // Default role
+    position: "Staff",
+    job_description: [],
+    status: true,
 });
 
-// New job description input
 const newJobDescription = ref("");
 
 const handleFileChange = (e) => {
     form.photo_profile = e.target.files[0];
 };
 
-// Add new job description to the array
 const addJobDescription = (e) => {
     e.preventDefault();
     if (newJobDescription.value.trim()) {
@@ -39,13 +36,12 @@ const addJobDescription = (e) => {
     }
 };
 
-// Remove job description at specific index
 const removeJobDescription = (index) => {
     form.job_description.splice(index, 1);
 };
 
 const submit = () => {
-    form.post(route("admin.users.store"), {
+    form.post(route("dashboard.users.store"), {
         onSuccess: () => form.reset(),
         preserveScroll: true,
         forceFormData: true,
@@ -258,28 +254,6 @@ const submit = () => {
                                     </div>
                                     <InputError
                                         :message="form.errors.status"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Role Field -->
-                                <div>
-                                    <InputLabel for="role" value="Role" />
-                                    <select
-                                        id="role"
-                                        v-model="form.role"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="Admin">Admin</option>
-                                        <option value="Kepala Desa">
-                                            Kepala Desa
-                                        </option>
-                                        <option value="Aparat Desa">
-                                            Aparat Desa
-                                        </option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.role"
                                         class="mt-2"
                                     />
                                 </div>

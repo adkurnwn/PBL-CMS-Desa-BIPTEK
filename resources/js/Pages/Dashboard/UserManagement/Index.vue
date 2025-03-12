@@ -16,7 +16,7 @@ const form = useForm({}); // Add this line
 
 const deleteUser = (userId) => {
     if (confirm("Are you sure you want to delete this user?")) {
-        form.delete(route("admin.users.destroy", userId), {
+        form.delete(route("dashboard.users.destroy", userId), {
             preserveScroll: true,
         });
     }
@@ -32,7 +32,7 @@ const deleteUser = (userId) => {
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     User Management
                 </h2>
-                <Link :href="route('admin.users.create')">
+                <Link :href="route('dashboard.users.create')">
                     <PrimaryButton>Create New User</PrimaryButton>
                 </Link>
             </div>
@@ -66,7 +66,7 @@ const deleteUser = (userId) => {
                                             <Link
                                                 :href="
                                                     route(
-                                                        'admin.users.edit',
+                                                        'dashboard.users.edit',
                                                         user.id
                                                     )
                                                 "

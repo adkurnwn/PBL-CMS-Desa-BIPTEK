@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\Profile;
@@ -11,18 +11,26 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/Profile/Index', [
+        return Inertia::render('Dashboard/Profile/Index', [
             'profiles' => Profile::all()
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Admin/Profile/Create');
+        if (Profile::exists()) {
+            return redirect()->route('dashboard.profiles')
+                ->with('error', 'Only one village profile can exist');
+        }
+        return Inertia::render('Dashboard/Profile/Create');
     }
 
     public function store(Request $request)
     {
+        if (Profile::exists()) {
+            return redirect()->route('dashboard.profiles')
+                ->with('error', 'Only one village profile can exist');
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:profiles',
@@ -73,12 +81,12 @@ class ProfileController extends Controller
 
         Profile::create($profileData);
 
-        return redirect()->route('admin.profiles')->with('success', 'Village profile created successfully');
+        return redirect()->route('dashboard.profiles')->with('success', 'Village profile created successfully');
     }
 
     public function edit(Profile $profile)
     {
-        return Inertia::render('Admin/Profile/Edit', [
+        return Inertia::render('Dashboard/Profile/Edit', [
             'profile' => $profile
         ]);
     }
@@ -132,6 +140,6 @@ class ProfileController extends Controller
 
         $profile->update($profileData);
 
-        return redirect()->route('admin.profiles')->with('success', 'Village profile updated successfully');
+        return redirect()->route('dashboard.profiles')->with('success', 'Village profile updated successfully');
     }
 }

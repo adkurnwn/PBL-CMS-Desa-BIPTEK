@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
@@ -17,46 +17,30 @@ const villages = ref([]);
 const newFasilitas = ref("");
 const newLembaga = ref("");
 
-const props = defineProps({
-    profile: Object,
-});
-
-const parseJson = (value) => {
-    if (typeof value === "string") {
-        try {
-            return JSON.parse(value);
-        } catch (e) {
-            return [];
-        }
-    }
-    return Array.isArray(value) ? value : [];
-};
-
 const form = useForm({
-    name: props.profile.name,
-    email: props.profile.email,
-    phone: props.profile.phone,
-    address: props.profile.address,
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
     logo: null,
-    provinsi: props.profile.provinsi,
-    kabupaten: props.profile.kabupaten,
-    kecamatan: props.profile.kecamatan,
-    kelurahan: props.profile.kelurahan,
+    provinsi: "",
+    kabupaten: "",
+    kecamatan: "",
+    kelurahan: "",
     hero_image: null,
     organization_image: null,
-    lembaga: parseJson(props.profile.lembaga),
-    fasilitas: parseJson(props.profile.fasilitas),
-    history: props.profile.history,
-    vision: props.profile.vision,
-    mission: props.profile.mission,
-    primary_color: props.profile.primary_color,
-    secondary_color: props.profile.secondary_color,
-    _method: "PUT",
+    lembaga: [],
+    fasilitas: [],
+    history: "",
+    vision: "",
+    mission: "",
+    primary_color: "#000000",
+    secondary_color: "#000000",
 });
 
 const submit = () => {
-    form.post(route("admin.profiles.update", props.profile.id), {
-        preserveScroll: true,
+    form.post(route("dashboard.profiles.store"), {
+        onSuccess: () => form.reset(),
         forceFormData: true,
     });
 };
@@ -110,68 +94,37 @@ const fetchProvinces = async () => {
 };
 
 const fetchRegencies = async (provinceId) => {
-    if (!provinceId) return;
-    try {
-        const response = await axios.get(`/api/regencies/${provinceId}`);
-        regencies.value = response.data;
-        if (!props.profile.kabupaten) {
-            form.kabupaten = "";
-            form.kecamatan = "";
-            form.kelurahan = "";
-        }
-    } catch (error) {
-        console.error("Error fetching regencies:", error);
-    }
+    const response = await axios.get(`/api/regencies/${provinceId}`);
+    regencies.value = response.data;
+    form.kabupaten = ""; // Reset dependent fields
+    form.kecamatan = "";
+    form.kelurahan = "";
 };
 
 const fetchDistricts = async (regencyId) => {
-    if (!regencyId) return;
-    try {
-        const response = await axios.get(`/api/districts/${regencyId}`);
-        districts.value = response.data;
-        if (!props.profile.kecamatan) {
-            form.kecamatan = "";
-            form.kelurahan = "";
-        }
-    } catch (error) {
-        console.error("Error fetching districts:", error);
-    }
+    const response = await axios.get(`/api/districts/${regencyId}`);
+    districts.value = response.data;
+    form.kecamatan = ""; // Reset dependent fields
+    form.kelurahan = "";
 };
 
 const fetchVillages = async (districtId) => {
-    if (!districtId) return;
-    try {
-        const response = await axios.get(`/api/villages/${districtId}`);
-        villages.value = response.data;
-        if (!props.profile.kelurahan) {
-            form.kelurahan = "";
-        }
-    } catch (error) {
-        console.error("Error fetching villages:", error);
-    }
+    const response = await axios.get(`/api/villages/${districtId}`);
+    villages.value = response.data;
+    form.kelurahan = ""; // Reset dependent field
 };
 
 // Load provinces when component mounts
-onMounted(async () => {
-    await fetchProvinces();
-
-    if (props.profile.provinsi) {
-        await fetchRegencies(props.profile.provinsi);
-        if (props.profile.kabupaten) {
-            await fetchDistricts(props.profile.kabupaten);
-            if (props.profile.kecamatan) {
-                await fetchVillages(props.profile.kecamatan);
-            }
-        }
-    }
+onMounted(() => {
+    fetchProvinces();
 });
 </script>
 <template>
-    <Head title="Edit Profile Desa" />
+    <Head title="Profile Desa" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Edit Village Profile
+                Create Village Profile
             </h2>
         </template>
 
@@ -245,6 +198,7 @@ onMounted(async () => {
                                         type="file"
                                         @input="handleFileChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
                                     <InputError
@@ -385,6 +339,7 @@ onMounted(async () => {
                                         type="file"
                                         @input="handleHeroImageChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
                                     <InputError
@@ -403,6 +358,7 @@ onMounted(async () => {
                                         type="file"
                                         @input="handleOrgImageChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
                                     <InputError
@@ -599,13 +555,8 @@ onMounted(async () => {
 
                             <div class="mt-6">
                                 <PrimaryButton :disabled="form.processing">
-                                    Update Village Profile
+                                    Create Village Profile
                                 </PrimaryButton>
-                                <Link :href="route('admin.profiles')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
-                                </Link>
                             </div>
                         </form>
                     </div>
