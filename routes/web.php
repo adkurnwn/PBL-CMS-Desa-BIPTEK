@@ -31,9 +31,6 @@ Route::get('/layanan', function () {
     return view('layanan');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Admin area routes with permission-based middleware
-
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
@@ -81,4 +78,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-});
