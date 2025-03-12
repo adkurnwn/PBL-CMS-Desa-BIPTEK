@@ -25,7 +25,7 @@ const groupedPermissions = props.permissions.reduce((groups, permission) => {
 }, {});
 
 const submit = () => {
-    form.put(route("admin.roles.update", props.role.id), {
+    form.put(route("dashboard.roles.update", props.role.id), {
         preserveScroll: true,
     });
 };
