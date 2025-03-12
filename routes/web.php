@@ -9,6 +9,32 @@ use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
 
+Route::get('/', function () {
+    return view('home');
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
+});
+
+Route::get('/profildesa', function () {
+    return view('profil');
+});
+
+Route::get('/informasi', function () {
+    return view('informasi');
+});
+
+Route::get('/layanan', function () {
+    return view('layanan');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Admin area routes with permission-based middleware
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
         return Inertia::render('Dashboard/Dashboard');
