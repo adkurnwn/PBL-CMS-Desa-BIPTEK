@@ -32,7 +32,6 @@ const handleVideoChange = (e) => {
 const submit = () => {
     form.post(route("dashboard.news.update", props.news.id), {
         preserveScroll: true,
-        forceFormData: true,
     });
 };
 </script>

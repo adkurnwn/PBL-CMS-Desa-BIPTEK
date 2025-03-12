@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\EventController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -32,10 +33,6 @@ Route::get('/layanan', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Admin area routes with permission-based middleware
-
-
-Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
         return Inertia::render('Dashboard/Dashboard');
     })->name('dashboard');
@@ -59,11 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //Profile management routes
         Route::middleware(['permission:read_profiles'])->get('/profiles', [DesaProfileController::class, 'index'])->name('dashboard.profiles');
-        Route::middleware(['permission:create_profiles'])->get('/profiles/create', [DesaProfileController::class, 'create'])->name('dashboard.profiles.create');
-        Route::middleware(['permission:create_profiles'])->post('/profiles', [DesaProfileController::class, 'store'])->name('dashboard.profiles.store');
         Route::middleware(['permission:update_profiles'])->get('/profiles/{profile}/edit', [DesaProfileController::class, 'edit'])->name('dashboard.profiles.edit');
         Route::middleware(['permission:update_profiles'])->put('/profiles/{profile}', [DesaProfileController::class, 'update'])->name('dashboard.profiles.update');
-        Route::middleware(['permission:delete_profiles'])->delete('/profiles/{profile}', [DesaProfileController::class, 'destroy'])->name('dashboard.profiles.destroy');
 
         Route::middleware(['permission:read_news'])->get('/news', [NewsController::class, 'index'])->name('dashboard.news');
         Route::middleware(['permission:create_news'])->get('/news/create', [NewsController::class, 'create'])->name('dashboard.news.create');
@@ -71,6 +65,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
         Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy');
+
+        Route::middleware(['permission:read_events'])->get('/event', [EventController::class, 'index'])->name('dashboard.events');
+        Route::middleware(['permission:create_events'])->get('/event/create', [EventController::class, 'create'])->name('dashboard.events.create');
+        Route::middleware(['permission:create_events'])->post('/event', [EventController::class, 'store'])->name('dashboard.events.store');
+        Route::middleware(['permission:update_events'])->get('/event/{event}/edit', [EventController::class, 'edit'])->name('dashboard.events.edit');
+        Route::middleware(['permission:update_events'])->put('/event/{event}', [EventController::class, 'update'])->name('dashboard.events.update');
+        Route::middleware(['permission:delete_events'])->delete('/event/{event}', [EventController::class, 'destroy'])->name('dashboard.events.destroy');
     });
 });
 
