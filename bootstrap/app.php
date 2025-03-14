@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
         $middleware->alias([
-            "admin" => \App\Http\Middleware\AdminMiddleware::class,
+            "admin" => \App\Http\Middleware\DashboardMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

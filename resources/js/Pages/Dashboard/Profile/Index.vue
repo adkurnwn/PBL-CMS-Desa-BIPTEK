@@ -2,21 +2,24 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-
 const props = defineProps({
-    roles: Array,
+    profiles: Array,
 });
 </script>
 
 <template>
-    <Head title="Role Management" />
+    <Head title="Profile Desa" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Role Management
+                    Profile Desa
                 </h2>
+
+                <!-- <Link :href="route('dashboard.profiles.edit', profile.id)">
+                    <PrimaryButton>Update Profile</PrimaryButton>
+                </Link> -->
             </div>
         </template>
 
@@ -30,7 +33,7 @@ const props = defineProps({
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Role Name
+                                        Nama Desa
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -40,21 +43,24 @@ const props = defineProps({
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="role in roles" :key="role.id">
+                                <tr
+                                    v-for="profile in profiles"
+                                    :key="profile.id"
+                                >
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ role.name }}
+                                        {{ profile.name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="
                                                 route(
-                                                    'admin.roles.edit',
-                                                    role.id
+                                                    'dashboard.profiles.edit',
+                                                    profile.id
                                                 )
                                             "
                                         >
                                             <PrimaryButton>
-                                                Edit Permissions
+                                                Edit Profile
                                             </PrimaryButton>
                                         </Link>
                                     </td>

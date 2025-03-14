@@ -18,7 +18,7 @@ class Profile extends Model
         'kabupaten',
         'kecamatan',
         'kelurahan',
-        'hero_image',
+        'hero_images',
         'organization_image',
         'lembaga',
         'fasilitas',

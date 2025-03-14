@@ -3,22 +3,22 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 const props = defineProps({
-    profiles: Array,
+    news: Array,
 });
 </script>
 
 <template>
-    <Head title="Profile Desa" />
+    <Head title="News" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Profile Desa
+                    News
                 </h2>
 
-                <Link :href="route('admin.profiles.create')">
-                    <PrimaryButton>Create New Profile</PrimaryButton>
+                <Link :href="route('dashboard.news.create')">
+                    <PrimaryButton>Create New News</PrimaryButton>
                 </Link>
             </div>
         </template>
@@ -33,7 +33,7 @@ const props = defineProps({
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Nama Desa
+                                        Judul
                                     </th>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -43,24 +43,21 @@ const props = defineProps({
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr
-                                    v-for="profile in profiles"
-                                    :key="profile.id"
-                                >
+                                <tr v-for="news in news" :key="news.id">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ profile.name }}
+                                        {{ news.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="
                                                 route(
-                                                    'admin.profiles.edit',
-                                                    profile.id
+                                                    'dashboard.news.edit',
+                                                    news.id
                                                 )
                                             "
                                         >
                                             <PrimaryButton>
-                                                Edit Profile
+                                                Edit News
                                             </PrimaryButton>
                                         </Link>
                                     </td>

@@ -32,28 +32,54 @@ const showingNavigationDropdown = ref(false);
                                 class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
                             >
                                 <NavLink
-                                    :href="route('admin.dashboard')"
-                                    :active="route().current('admin.dashboard')"
+                                    :href="route('dashboard')"
+                                    :active="route().current('dashboard')"
                                 >
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    :href="route('admin.users')"
-                                    :active="route().current('admin.users')"
+                                    :href="route('dashboard.users')"
+                                    :active="route().current('dashboard.users')"
                                 >
                                     User Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('admin.roles')"
-                                    :active="route().current('admin.roles')"
+                                    :href="route('dashboard.roles')"
+                                    :active="route().current('dashboard.roles')"
                                 >
                                     Role Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('admin.profiles')"
-                                    :active="route().current('admin.profiles')"
+                                    :href="route('dashboard.profiles')"
+                                    :active="
+                                        route().current('dashboard.profiles')
+                                    "
                                 >
                                     Profile Desa Management
+                                </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.news')"
+                                    :active="route().current('dashboard.news')"
+                                >
+                                    News Management
+                                </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.events')"
+                                    :active="
+                                        route().current('dashboard.events')
+                                    "
+                                >
+                                    Event Management
+                                </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.produk-hukum')"
+                                    :active="
+                                        route().current(
+                                            'dashboard.produk-hukum'
+                                        )
+                                    "
+                                >
+                                    Produk Hukum
                                 </NavLink>
                             </div>
                         </div>
