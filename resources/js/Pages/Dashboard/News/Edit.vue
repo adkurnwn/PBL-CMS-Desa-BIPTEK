@@ -70,7 +70,39 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Password Field -->
+                                <div>
+                                    <InputLabel
+                                        for="category"
+                                        value="Category"
+                                    />
+                                    <select
+                                        id="category"
+                                        v-model="form.category"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        <option value="news">
+                                            Berita Umum
+                                        </option>
+                                        <option value="announcement">
+                                            Pemberitahuan
+                                        </option>
+                                        <option value="event">Kegiatan</option>
+                                        <option value="education">
+                                            Pendidikan
+                                        </option>
+                                        <option value="health">
+                                            Kesehatan
+                                        </option>
+                                        <option value="Tourist">
+                                            Pariwisata
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.category"
+                                        class="mt-2"
+                                    />
+                                </div>
+
                                 <div>
                                     <InputLabel for="content" value="Content" />
                                     <textarea
@@ -86,7 +118,6 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Photo Profile Field -->
                                 <div>
                                     <InputLabel for="image" value="Image" />
                                     <input
@@ -96,13 +127,6 @@ const submit = () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
-                                    <p
-                                        v-if="props.news.image"
-                                        class="mt-1 text-sm text-gray-500"
-                                    >
-                                        Current:
-                                        {{ props.news.image.split("/").pop() }}
-                                    </p>
                                     <InputError
                                         :message="form.errors.image"
                                         class="mt-2"
@@ -118,59 +142,27 @@ const submit = () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="video/mp4, video/ogg, video/webm"
                                     />
-                                    <p
-                                        v-if="props.news.video"
-                                        class="mt-1 text-sm text-gray-500"
-                                    >
-                                        Current:
-                                        {{ props.news.video.split("/").pop() }}
-                                    </p>
                                     <InputError
                                         :message="form.errors.video"
                                         class="mt-2"
                                     />
                                 </div>
 
-                                <!-- Status Field -->
                                 <div>
-                                    <div class="flex items-center">
-                                        <input
-                                            id="is_moderate"
-                                            v-model="form.is_moderate"
-                                            type="checkbox"
-                                            class="rounded border-gray-300"
-                                        />
+                                    <div class="flex-row items-center">
                                         <InputLabel
-                                            for="is_moderate"
-                                            value="Is Moderate"
-                                            class="ml-2"
+                                            for="is_moderated"
+                                            value="Is Moderated"
+                                        />
+                                        <input
+                                            id="is_moderated"
+                                            v-model="form.is_moderated"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 mt-2"
                                         />
                                     </div>
                                     <InputError
-                                        :message="form.errors.is_moderate"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Role Field -->
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="category"
-                                    />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">News</option>
-                                        <option value="announcement">
-                                            Announcement
-                                        </option>
-                                        <option value="event">Event</option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.category"
+                                        :message="form.errors.is_moderated"
                                         class="mt-2"
                                     />
                                 </div>

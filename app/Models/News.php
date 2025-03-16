@@ -8,11 +8,16 @@ class News extends Model
 {
     protected $fillable = [
         'title',
+        'user_id',
         'content',
-        'image',
         'category',
         'video',
         'views',
         'is_moderate',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
