@@ -33,13 +33,18 @@ class ProfileController extends Controller
             'kabupaten' => 'required|string',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
+            'address' => 'required|string',
             'lembaga' => 'required|array',
             'fasilitas' => 'required|array',
             'history' => 'required|string',
             'vision' => 'required|string',
             'mission' => 'required|string',
             'primary_color' => 'required|in:#000000,#ffffff',
-            'secondary_color' => 'required|in:#000000,#ffffff'
+            'secondary_color' => 'required|in:#000000,#ffffff',
+            'hero_images.*' => 'sometimes|image|max:2048|mimes:jpg,png,jpeg',
+            'hero_image_1' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
+            'hero_image_2' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
+            'hero_image_3' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
         ]);
 
         $profileData = [
@@ -50,6 +55,7 @@ class ProfileController extends Controller
             'kabupaten' => $request->kabupaten,
             'kecamatan' => $request->kecamatan,
             'kelurahan' => $request->kelurahan,
+            'address' => $request->address,
             'lembaga' => json_encode($request->lembaga),
             'fasilitas' => json_encode($request->fasilitas),
             'history' => $request->history,
@@ -61,14 +67,30 @@ class ProfileController extends Controller
 
         // Handle file upload
         if ($request->hasFile('logo')) {
-            $profileData['logo'] = $request->file('logo')->store('profile-logos', 'public');
+            $profileData['logo'] = $request->file('logo')->store('profile-logo', 'public');
         }
         if ($request->hasFile('organization_image')) {
             $profileData['organization_image'] = $request->file('organization_image')->store('organization-images', 'public');
         }
-        if ($request->hasFile('hero_image')) {
-            $profileData['hero_image'] = $request->file('hero_image')->store('hero-images', 'public');
+        if ($request->hasFile('hero_images')) {
+            $heroImages = [];
+            foreach ($request->file('hero_images') as $image) {
+                $path = $image->store('hero-images', 'public');
+                $heroImages[] = $path;
+            }
+            $profileData['hero_images'] = json_encode($heroImages);
         }
+
+        $heroImages = json_decode($profile->hero_images) ?? [];
+
+        for ($i = 1; $i <= 3; $i++) {
+            if ($request->hasFile("hero_image_$i")) {
+                $path = $request->file("hero_image_$i")->store('hero-images', 'public');
+                $heroImages[$i - 1] = $path;
+            }
+        }
+
+        $profileData['hero_images'] = json_encode(array_values($heroImages));
 
         $profile->update($profileData);
 

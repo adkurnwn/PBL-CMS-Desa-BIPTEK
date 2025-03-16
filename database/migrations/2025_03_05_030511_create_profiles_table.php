@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('kabupaten', 50);
             $table->string('kecamatan', 50);
             $table->string('kelurahan', 50);
+            $table->string('address', 255);
             $table->json('hero_images');
             $table->string('organization_image', 255);
             $table->json('lembaga');

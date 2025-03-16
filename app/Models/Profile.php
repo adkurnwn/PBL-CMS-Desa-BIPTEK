@@ -18,6 +18,7 @@ class Profile extends Model
         'kabupaten',
         'kecamatan',
         'kelurahan',
+        'address',
         'hero_images',
         'organization_image',
         'lembaga',
