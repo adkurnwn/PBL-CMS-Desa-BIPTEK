@@ -17,6 +17,12 @@ const villages = ref([]);
 const newFasilitas = ref("");
 const newLembaga = ref("");
 
+const logoPreview = ref(null);
+const orgImagePreview = ref(null);
+const heroImage1Preview = ref(null);
+const heroImage2Preview = ref(null);
+const heroImage3Preview = ref(null);
+
 const props = defineProps({
     profile: Object,
 });
@@ -44,6 +50,9 @@ const form = useForm({
     kelurahan: props.profile.kelurahan,
     hero_image: null,
     organization_image: null,
+    hero_image_1: null,
+    hero_image_2: null,
+    hero_image_3: null,
     lembaga: parseJson(props.profile.lembaga),
     fasilitas: parseJson(props.profile.fasilitas),
     history: props.profile.history,
@@ -88,6 +97,7 @@ const removeLembaga = (index) => {
 
 const handleFileChange = (e) => {
     form.logo = e.target.files[0];
+    logoPreview.value = URL.createObjectURL(e.target.files[0]);
 };
 
 // Add new file handlers
@@ -95,12 +105,28 @@ const handleLogoChange = (e) => {
     form.logo = e.target.files[0];
 };
 
-const handleHeroImageChange = (e) => {
-    form.hero_image = e.target.files[0];
+const handleHeroImagesChange = (e) => {
+    form.hero_images = Array.from(e.target.files);
 };
 
 const handleOrgImageChange = (e) => {
     form.organization_image = e.target.files[0];
+    orgImagePreview.value = URL.createObjectURL(e.target.files[0]);
+};
+
+const handleHeroImage1Change = (e) => {
+    form.hero_image_1 = e.target.files[0];
+    heroImage1Preview.value = URL.createObjectURL(e.target.files[0]);
+};
+
+const handleHeroImage2Change = (e) => {
+    form.hero_image_2 = e.target.files[0];
+    heroImage2Preview.value = URL.createObjectURL(e.target.files[0]);
+};
+
+const handleHeroImage3Change = (e) => {
+    form.hero_image_3 = e.target.files[0];
+    heroImage3Preview.value = URL.createObjectURL(e.target.files[0]);
 };
 
 // Add methods to fetch region data
@@ -235,6 +261,7 @@ onMounted(async () => {
                                     />
                                 </div>
 
+                                <!-- Logo Input -->
                                 <div>
                                     <InputLabel
                                         for="logo"
@@ -247,6 +274,18 @@ onMounted(async () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
+                                    <div
+                                        v-if="logoPreview || props.profile.logo"
+                                        class="mt-2"
+                                    >
+                                        <img
+                                            :src="
+                                                logoPreview ||
+                                                `/storage/${props.profile.logo}`
+                                            "
+                                            class="h-32 w-32 object-cover rounded-lg"
+                                        />
+                                    </div>
                                     <InputError
                                         :message="form.errors.logo"
                                         class="mt-2"
@@ -374,25 +413,7 @@ onMounted(async () => {
                                     />
                                 </div>
 
-                                <!-- Images -->
-                                <div>
-                                    <InputLabel
-                                        for="hero_image"
-                                        value="Hero Image"
-                                    />
-                                    <input
-                                        id="hero_image"
-                                        type="file"
-                                        @input="handleHeroImageChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                    />
-                                    <InputError
-                                        :message="form.errors.hero_image"
-                                        class="mt-2"
-                                    />
-                                </div>
-
+                                <!-- Organization Image Input -->
                                 <div>
                                     <InputLabel
                                         for="organization_image"
@@ -405,12 +426,144 @@ onMounted(async () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
+                                    <div
+                                        v-if="
+                                            orgImagePreview ||
+                                            props.profile.organization_image
+                                        "
+                                        class="mt-2"
+                                    >
+                                        <img
+                                            :src="
+                                                orgImagePreview ||
+                                                `/storage/${props.profile.organization_image}`
+                                            "
+                                            class="h-32 w-auto object-cover rounded-lg"
+                                        />
+                                    </div>
                                     <InputError
                                         :message="
                                             form.errors.organization_image
                                         "
                                         class="mt-2"
                                     />
+                                </div>
+
+                                <!-- Hero Images -->
+                                <div class="col-span-2 grid grid-cols-3 gap-4">
+                                    <div>
+                                        <InputLabel
+                                            for="hero_image_1"
+                                            value="Hero Image 1"
+                                        />
+                                        <input
+                                            id="hero_image_1"
+                                            type="file"
+                                            @input="handleHeroImage1Change"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                        />
+                                        <div
+                                            v-if="
+                                                heroImage1Preview ||
+                                                props.profile.hero_images?.[0]
+                                            "
+                                            class="mt-2"
+                                        >
+                                            <img
+                                                :src="
+                                                    heroImage1Preview ||
+                                                    `/storage/${
+                                                        JSON.parse(
+                                                            props.profile
+                                                                .hero_images
+                                                        )[0]
+                                                    }`
+                                                "
+                                                class="h-32 w-full object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <InputError
+                                            :message="form.errors.hero_image_1"
+                                            class="mt-2"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <InputLabel
+                                            for="hero_image_2"
+                                            value="Hero Image 2"
+                                        />
+                                        <input
+                                            id="hero_image_2"
+                                            type="file"
+                                            @input="handleHeroImage2Change"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                        />
+                                        <div
+                                            v-if="
+                                                heroImage2Preview ||
+                                                props.profile.hero_images?.[1]
+                                            "
+                                            class="mt-2"
+                                        >
+                                            <img
+                                                :src="
+                                                    heroImage2Preview ||
+                                                    `/storage/${
+                                                        JSON.parse(
+                                                            props.profile
+                                                                .hero_images
+                                                        )[1]
+                                                    }`
+                                                "
+                                                class="h-32 w-full object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <InputError
+                                            :message="form.errors.hero_image_2"
+                                            class="mt-2"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <InputLabel
+                                            for="hero_image_3"
+                                            value="Hero Image 3"
+                                        />
+                                        <input
+                                            id="hero_image_3"
+                                            type="file"
+                                            @input="handleHeroImage3Change"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            accept="image/png, image/jpeg, image/jpg"
+                                        />
+                                        <div
+                                            v-if="
+                                                heroImage3Preview ||
+                                                props.profile.hero_images?.[2]
+                                            "
+                                            class="mt-2"
+                                        >
+                                            <img
+                                                :src="
+                                                    heroImage3Preview ||
+                                                    `/storage/${
+                                                        JSON.parse(
+                                                            props.profile
+                                                                .hero_images
+                                                        )[2]
+                                                    }`
+                                                "
+                                                class="h-32 w-full object-cover rounded-lg"
+                                            />
+                                        </div>
+                                        <InputError
+                                            :message="form.errors.hero_image_3"
+                                            class="mt-2"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div class="col-span-2 mb-4">
