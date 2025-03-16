@@ -71,6 +71,16 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Event Management
                                 </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.produk-hukum')"
+                                    :active="
+                                        route().current(
+                                            'dashboard.produk-hukum'
+                                        )
+                                    "
+                                >
+                                    Produk Hukum
+                                </NavLink>
                             </div>
                         </div>
 
