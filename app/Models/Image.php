@@ -13,4 +13,14 @@ class Image extends Model
         'path',
         'is_visible',
     ];
+
+    public function news()
+    {
+        return $this->belongsTo(News::class);
+    }
+
+    public function gallery()
+    {
+        return $this->belongsTo(Gallery::class);
+    }
 }

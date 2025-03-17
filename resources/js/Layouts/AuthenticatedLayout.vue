@@ -64,6 +64,14 @@ const showingNavigationDropdown = ref(false);
                                     News Management
                                 </NavLink>
                                 <NavLink
+                                    :href="route('dashboard.galleries')"
+                                    :active="
+                                        route().current('dashboard.galleries')
+                                    "
+                                >
+                                    Gallery Management
+                                </NavLink>
+                                <NavLink
                                     :href="route('dashboard.events')"
                                     :active="
                                         route().current('dashboard.events')

@@ -17,6 +17,7 @@ class PermissionSeeder extends Seeder
             'dashboard' => ['view'],
             'profiles' => ['read', 'update'],
             'news' => ['create', 'read', 'update', 'delete'],
+            'galleries' => ['create', 'read', 'update', 'delete'],
             'events' => ['create', 'read', 'update', 'delete'],
             'produk-hukum' => ['create', 'read', 'update', 'delete'],
         ];

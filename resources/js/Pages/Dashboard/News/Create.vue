@@ -5,19 +5,30 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import { ref, onUnmounted } from "vue";
 
 const form = useForm({
     title: "",
     category: "",
     content: "",
-    video: "",
+    image: null,
+    video: null,
     is_moderate: false,
 });
 
+const imagePreview = ref(null);
+
 const handleImageChange = (e) => {
-    form.image = e.target.files[0];
+    const file = e.target.files[0];
+    form.image = file;
+    imagePreview.value = URL.createObjectURL(file);
 };
+
+onUnmounted(() => {
+    if (imagePreview.value) {
+        URL.revokeObjectURL(imagePreview.value);
+    }
+});
 
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
@@ -122,7 +133,15 @@ const submit = () => {
                                         @input="handleImageChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
+                                        required
                                     />
+                                    <!-- Add image preview -->
+                                    <div v-if="imagePreview" class="mt-2">
+                                        <img
+                                            :src="imagePreview"
+                                            class="h-32 w-auto object-cover rounded-lg"
+                                        />
+                                    </div>
                                     <InputError
                                         :message="form.errors.image"
                                         class="mt-2"
