@@ -33,6 +33,7 @@ Route::get('/layanan', function () {
     return view('layanan');
 });
 
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
         return Inertia::render('Dashboard/Dashboard');
