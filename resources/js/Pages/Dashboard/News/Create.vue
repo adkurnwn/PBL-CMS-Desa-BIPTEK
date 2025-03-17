@@ -11,9 +11,8 @@ const form = useForm({
     title: "",
     category: "",
     content: "",
-    image: "",
     video: "",
-    is_moderated: false,
+    is_moderate: false,
 });
 
 const handleImageChange = (e) => {
@@ -67,7 +66,39 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Password Field -->
+                                <div>
+                                    <InputLabel
+                                        for="category"
+                                        value="Category"
+                                    />
+                                    <select
+                                        id="category"
+                                        v-model="form.category"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    >
+                                        <option value="news">
+                                            Berita Umum
+                                        </option>
+                                        <option value="announcement">
+                                            Pemberitahuan
+                                        </option>
+                                        <option value="event">Kegiatan</option>
+                                        <option value="education">
+                                            Pendidikan
+                                        </option>
+                                        <option value="health">
+                                            Kesehatan
+                                        </option>
+                                        <option value="Tourist">
+                                            Pariwisata
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.category"
+                                        class="mt-2"
+                                    />
+                                </div>
+
                                 <div>
                                     <InputLabel for="content" value="Content" />
                                     <textarea
@@ -76,14 +107,13 @@ const submit = () => {
                                         type="text"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         required
-                                    />
+                                    ></textarea>
                                     <InputError
                                         :message="form.errors.content"
                                         class="mt-2"
                                     />
                                 </div>
 
-                                <!-- Photo Profile Field -->
                                 <div>
                                     <InputLabel for="image" value="Image" />
                                     <input
@@ -114,46 +144,21 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Status Field -->
                                 <div>
-                                    <div class="flex items-center">
-                                        <input
-                                            id="is_moderated"
-                                            v-model="form.is_moderated"
-                                            type="checkbox"
-                                            class="rounded border-gray-300"
-                                        />
+                                    <div class="flex-row items-center">
                                         <InputLabel
                                             for="is_moderated"
                                             value="Is Moderated"
-                                            class="ml-2"
+                                        />
+                                        <input
+                                            id="is_moderated"
+                                            v-model="form.is_moderate"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 mt-2"
                                         />
                                     </div>
                                     <InputError
-                                        :message="form.errors.is_moderated"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Role Field -->
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="category"
-                                    />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">News</option>
-                                        <option value="announcement">
-                                            Announcement
-                                        </option>
-                                        <option value="event">Event</option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.category"
+                                        :message="form.errors.is_moderate"
                                         class="mt-2"
                                     />
                                 </div>

@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Dashboard\EventController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Dashboard\NewsController;
+use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
@@ -56,11 +58,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //Profile management routes
         Route::middleware(['permission:read_profiles'])->get('/profiles', [DesaProfileController::class, 'index'])->name('dashboard.profiles');
-        Route::middleware(['permission:create_profiles'])->get('/profiles/create', [DesaProfileController::class, 'create'])->name('dashboard.profiles.create');
-        Route::middleware(['permission:create_profiles'])->post('/profiles', [DesaProfileController::class, 'store'])->name('dashboard.profiles.store');
         Route::middleware(['permission:update_profiles'])->get('/profiles/{profile}/edit', [DesaProfileController::class, 'edit'])->name('dashboard.profiles.edit');
         Route::middleware(['permission:update_profiles'])->put('/profiles/{profile}', [DesaProfileController::class, 'update'])->name('dashboard.profiles.update');
-        Route::middleware(['permission:delete_profiles'])->delete('/profiles/{profile}', [DesaProfileController::class, 'destroy'])->name('dashboard.profiles.destroy');
 
         Route::middleware(['permission:read_news'])->get('/news', [NewsController::class, 'index'])->name('dashboard.news');
         Route::middleware(['permission:create_news'])->get('/news/create', [NewsController::class, 'create'])->name('dashboard.news.create');
@@ -68,6 +67,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
         Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy');
+
+        Route::middleware(['permission:read_events'])->get('/event', [EventController::class, 'index'])->name('dashboard.events');
+        Route::middleware(['permission:create_events'])->get('/event/create', [EventController::class, 'create'])->name('dashboard.events.create');
+        Route::middleware(['permission:create_events'])->post('/event', [EventController::class, 'store'])->name('dashboard.events.store');
+        Route::middleware(['permission:update_events'])->get('/event/{event}/edit', [EventController::class, 'edit'])->name('dashboard.events.edit');
+        Route::middleware(['permission:update_events'])->put('/event/{event}', [EventController::class, 'update'])->name('dashboard.events.update');
+        Route::middleware(['permission:delete_events'])->delete('/event/{event}', [EventController::class, 'destroy'])->name('dashboard.events.destroy');
+
+        Route::middleware(['permission:read_produk-hukum'])->get('/produk-hukum', [ProdukHukumController::class, 'index'])->name('dashboard.produk-hukum');
+        Route::middleware(['permission:create_produk-hukum'])->get('/produk-hukum/create', [ProdukHukumController::class, 'create'])->name('dashboard.produk-hukum.create');
+        Route::middleware(['permission:create_produk-hukum'])->post('/produk-hukum', [ProdukHukumController::class, 'store'])->name('dashboard.produk-hukum.store');
+        Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produk-hukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
+        Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
+        Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
     });
 });
 
