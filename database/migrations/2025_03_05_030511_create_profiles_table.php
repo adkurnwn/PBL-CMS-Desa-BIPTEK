@@ -17,10 +17,6 @@ return new class extends Migration
             $table->string('email', 255)->unique();
             $table->string('phone', 20);
             $table->string('logo', 255);
-            $table->string('provinsi', 50);
-            $table->string('kabupaten', 50);
-            $table->string('kecamatan', 50);
-            $table->string('kelurahan', 50);
             $table->string('address', 255);
             $table->json('hero_images');
             $table->string('organization_image', 255);
