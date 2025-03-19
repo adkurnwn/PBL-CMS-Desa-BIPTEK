@@ -7,7 +7,7 @@
       </div>
 
       <slot />
-      <!-- <Footer /> -->
+      <Footer />
     </main>
     
   </div>
