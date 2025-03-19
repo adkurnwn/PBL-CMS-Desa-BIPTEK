@@ -9,7 +9,7 @@
   <div class="w-full md:w-1/4 p-1">
       <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
         <div class="px-3 mt-5">
-          <img src="../../images/jamu.png" alt="News Image" class="w-[360px] h-[125px] md:h-[250px] rounded-xl overflow-hidden object-cover " />
+          <img src="../../images/jamu.png" alt="News Image" class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover " />
         </div>
         <div class="px-4">
           <!-- <div class="flex flex-row p-4 pt-1 space-x-2">

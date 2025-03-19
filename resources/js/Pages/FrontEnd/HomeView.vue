@@ -11,7 +11,7 @@
         <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber informasi terbaru tentang pemerintahan di Desa Pao-Pao</h2>
       </div>
     </header>
-    <main>
+    <main class="max-w-screen-2xl mx-auto w-full">
       <!-- Bagian Selamat Datang -->
       <article class="relative w-full  flex flex-col-reverse md:flex-row items-center justify-center font-merriweather bg-type1 md:px-56 py-10 pt-4 md:pt-40"> 
         <!-- Text Section -->
@@ -64,7 +64,7 @@
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Event Terdekat
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 md:mb-0">
+        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4">
           <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
         </h2>
         <div class="flex flex-col md:flex-row justify-center md:space-x-4 space-y-2 md:space-y-0">
@@ -79,7 +79,7 @@
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Galeri Desa
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 md:mb-0">
+        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4">
           <p class="italic">Foto atau Video seputar Desa </p>
         </h2>
         <div class="flex flex-col w-full justify-between space-y-4">
@@ -103,7 +103,7 @@
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Produk Unggulan
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 md:mb-0">
+        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="grid grid-cols-2 md:flex md:flex-row justify-center md:space-x-8 -m-2">
@@ -119,11 +119,11 @@
 
 
       <!-- Layanan Publik-->
-      <article class="w-full px-8 md:px-32 flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
+      <article class="w-full px-8 md:px-32 flex flex-col py-4 md:py-10 md:pb-16 bg-type1 font-merriweather">
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Layanan Publik
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 md:mb-0">
+        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 justify-between py-4 md:px-28">
