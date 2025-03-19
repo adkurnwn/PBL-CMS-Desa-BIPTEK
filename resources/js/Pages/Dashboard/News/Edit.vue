@@ -5,10 +5,18 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import { ref, computed, onUnmounted } from "vue";
 
 const props = defineProps({
-    news: Object,
+    news: {
+        type: Object,
+        required: true,
+    },
+});
+
+// Add a computed property for current image
+const currentImage = computed(() => {
+    return props.news.images?.length > 0 ? props.news.images[0] : null;
 });
 
 const form = useForm({
@@ -21,8 +29,12 @@ const form = useForm({
     _method: "PUT",
 });
 
+const imagePreview = ref(null);
+
 const handleImageChange = (e) => {
-    form.image = e.target.files[0];
+    const file = e.target.files[0];
+    form.image = file;
+    imagePreview.value = URL.createObjectURL(file);
 };
 
 const handleVideoChange = (e) => {
@@ -34,6 +46,13 @@ const submit = () => {
         preserveScroll: true,
     });
 };
+
+// Cleanup preview URL when component unmounts
+onUnmounted(() => {
+    if (imagePreview.value) {
+        URL.revokeObjectURL(imagePreview.value);
+    }
+});
 </script>
 
 <template>
@@ -120,6 +139,18 @@ const submit = () => {
 
                                 <div>
                                     <InputLabel for="image" value="Image" />
+                                    <!-- Current Image Preview -->
+                                    <div v-if="currentImage" class="mb-2">
+                                        <p class="text-sm text-gray-600 mb-1">
+                                            Current Image:
+                                        </p>
+                                        <img
+                                            :src="`/storage/${currentImage.path}`"
+                                            :alt="currentImage.alt"
+                                            class="h-32 w-auto object-cover rounded-lg"
+                                        />
+                                    </div>
+                                    <!-- New Image Input -->
                                     <input
                                         id="image"
                                         type="file"
@@ -127,6 +158,16 @@ const submit = () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
+                                    <!-- New Image Preview -->
+                                    <div v-if="imagePreview" class="mt-2">
+                                        <p class="text-sm text-gray-600 mb-1">
+                                            New Image Preview:
+                                        </p>
+                                        <img
+                                            :src="imagePreview"
+                                            class="h-32 w-auto object-cover rounded-lg"
+                                        />
+                                    </div>
                                     <InputError
                                         :message="form.errors.image"
                                         class="mt-2"

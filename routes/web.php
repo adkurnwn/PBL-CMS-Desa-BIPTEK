@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Dashboard\EventController;
+use App\Http\Controllers\Dashboard\GalleryController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -67,6 +68,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
         Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy');
+
+        Route::middleware(['permission:read_galleries'])->get('/galleries', [GalleryController::class, 'index'])->name('dashboard.galleries');
+        Route::middleware(['permission:create_galleries'])->get('/galleries/create', [GalleryController::class, 'create'])->name('dashboard.galleries.create');
+        Route::middleware(['permission:create_galleries'])->post('/galleries', [GalleryController::class, 'store'])->name('dashboard.galleries.store');
+        Route::middleware(['permission:update_galleries'])->get('/galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('dashboard.galleries.edit');
+        Route::middleware(['permission:update_galleries'])->put('/galleries/{gallery}', [GalleryController::class, 'update'])->name('dashboard.galleries.update');
+        Route::middleware(['permission:delete_galleries'])->delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('dashboard.galleries.destroy');
 
         Route::middleware(['permission:read_events'])->get('/event', [EventController::class, 'index'])->name('dashboard.events');
         Route::middleware(['permission:create_events'])->get('/event/create', [EventController::class, 'create'])->name('dashboard.events.create');

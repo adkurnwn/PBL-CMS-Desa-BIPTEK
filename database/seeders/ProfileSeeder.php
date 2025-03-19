@@ -18,10 +18,6 @@ class ProfileSeeder extends Seeder
             'email' => 'desa.sumberejo@surabaya.go.id',
             'phone' => '031-7405559',
             'logo' => 'defaults/logo/sumberejo.png',
-            'provinsi' => '35',
-            'kabupaten' => '3578',
-            'kecamatan' => '3578120',
-            'kelurahan' => '3578120002',
             'address' => 'Jl. Raya Sumberejo No. 1, Kecamatan Pakal, Kota Surabaya',
             'hero_images' => json_encode([
                 'defaults/hero/hero-1.jpg',

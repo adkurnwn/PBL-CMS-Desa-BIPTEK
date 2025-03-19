@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('category', ['news', 'activity', 'infrastructure', 'nature']);
+            $table->enum('category', ['news', 'event', 'infrastructure', 'nature']);
             $table->text('description');
             $table->timestamps();
         });

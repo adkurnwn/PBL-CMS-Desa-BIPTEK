@@ -11,4 +11,9 @@ class Gallery extends Model
         'category',
         'description',
     ];
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
 }
