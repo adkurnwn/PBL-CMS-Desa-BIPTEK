@@ -7,7 +7,7 @@
     </div>
   </div> -->
   <div class="w-full p-2 ">
-    <div class="flex flex- bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
+    <div class="flex flex-col bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
         <div class="flex">
           <img src="../../images/berita.png" alt="News Image" class="w-full object-cover p-4" />
         </div>      
