@@ -44,6 +44,10 @@ const form = useForm({
     phone: props.profile.phone,
     address: props.profile.address,
     logo: null,
+    provinsi: props.profile.provinsi,
+    kabupaten: props.profile.kabupaten,
+    kecamatan: props.profile.kecamatan,
+    kelurahan: props.profile.kelurahan,
     hero_image: null,
     organization_image: null,
     hero_image_1: null,
@@ -124,6 +128,69 @@ const handleHeroImage3Change = (e) => {
     form.hero_image_3 = e.target.files[0];
     heroImage3Preview.value = URL.createObjectURL(e.target.files[0]);
 };
+
+// Add methods to fetch region data
+const fetchProvinces = async () => {
+    const response = await axios.get("/api/provinces");
+    provinces.value = response.data;
+};
+
+const fetchRegencies = async (provinceId) => {
+    if (!provinceId) return;
+    try {
+        const response = await axios.get(`/api/regencies/${provinceId}`);
+        regencies.value = response.data;
+        if (!props.profile.kabupaten) {
+            form.kabupaten = "";
+            form.kecamatan = "";
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching regencies:", error);
+    }
+};
+
+const fetchDistricts = async (regencyId) => {
+    if (!regencyId) return;
+    try {
+        const response = await axios.get(`/api/districts/${regencyId}`);
+        districts.value = response.data;
+        if (!props.profile.kecamatan) {
+            form.kecamatan = "";
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching districts:", error);
+    }
+};
+
+const fetchVillages = async (districtId) => {
+    if (!districtId) return;
+    try {
+        const response = await axios.get(`/api/villages/${districtId}`);
+        villages.value = response.data;
+        if (!props.profile.kelurahan) {
+            form.kelurahan = "";
+        }
+    } catch (error) {
+        console.error("Error fetching villages:", error);
+    }
+};
+
+// Load provinces when component mounts
+onMounted(async () => {
+    await fetchProvinces();
+
+    if (props.profile.provinsi) {
+        await fetchRegencies(props.profile.provinsi);
+        if (props.profile.kabupaten) {
+            await fetchDistricts(props.profile.kabupaten);
+            if (props.profile.kecamatan) {
+                await fetchVillages(props.profile.kecamatan);
+            }
+        }
+    }
+});
 </script>
 <template>
     <Head title="Edit Profile Desa" />
@@ -194,21 +261,6 @@ const handleHeroImage3Change = (e) => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel for="address" value="Address" />
-                                    <TextInput
-                                        id="address"
-                                        v-model="form.address"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.address"
-                                        class="mt-2"
-                                    />
-                                </div>
-
                                 <!-- Logo Input -->
                                 <div>
                                     <InputLabel
@@ -236,6 +288,127 @@ const handleHeroImage3Change = (e) => {
                                     </div>
                                     <InputError
                                         :message="form.errors.logo"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Region Fields -->
+                                <div>
+                                    <InputLabel
+                                        for="provinsi"
+                                        value="Provinsi"
+                                    />
+                                    <select
+                                        id="provinsi"
+                                        v-model="form.provinsi"
+                                        @change="
+                                            fetchRegencies($event.target.value)
+                                        "
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">
+                                            Select Province
+                                        </option>
+                                        <option
+                                            v-for="province in provinces"
+                                            :key="province.id"
+                                            :value="province.id"
+                                        >
+                                            {{ province.name }}
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.provinsi"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="kabupaten"
+                                        value="Kabupaten"
+                                    />
+                                    <select
+                                        id="kabupaten"
+                                        v-model="form.kabupaten"
+                                        @change="
+                                            fetchDistricts($event.target.value)
+                                        "
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                        :disabled="!form.provinsi"
+                                    >
+                                        <option value="">Select Regency</option>
+                                        <option
+                                            v-for="regency in regencies"
+                                            :key="regency.id"
+                                            :value="regency.id"
+                                        >
+                                            {{ regency.name }}
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.kabupaten"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="kecamatan"
+                                        value="Kecamatan"
+                                    />
+                                    <select
+                                        id="kecamatan"
+                                        v-model="form.kecamatan"
+                                        @change="
+                                            fetchVillages($event.target.value)
+                                        "
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                        :disabled="!form.kabupaten"
+                                    >
+                                        <option value="">
+                                            Select District
+                                        </option>
+                                        <option
+                                            v-for="district in districts"
+                                            :key="district.id"
+                                            :value="district.id"
+                                        >
+                                            {{ district.name }}
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.kecamatan"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="kelurahan"
+                                        value="Kelurahan"
+                                    />
+                                    <select
+                                        id="kelurahan"
+                                        v-model="form.kelurahan"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        required
+                                        :disabled="!form.kecamatan"
+                                    >
+                                        <option value="">Select Village</option>
+                                        <option
+                                            v-for="village in villages"
+                                            :key="village.id"
+                                            :value="village.id"
+                                        >
+                                            {{ village.name }}
+                                        </option>
+                                    </select>
+                                    <InputError
+                                        :message="form.errors.kelurahan"
                                         class="mt-2"
                                     />
                                 </div>
