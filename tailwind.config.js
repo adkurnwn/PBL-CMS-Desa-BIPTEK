@@ -26,6 +26,10 @@ export default {
                 merriweather: ['Merriweather', ...defaultTheme.fontFamily.serif],
                 'merriweather-sans': ['Merriweather Sans', ...defaultTheme.fontFamily.sans],
             },
+            screens: {
+                md: '800px', // Mengubah md dari 768px menjadi 800px
+                lg: '1025px', // Mengubah lg dari 1024px menjadi 1025px
+            },
         },
     },
 

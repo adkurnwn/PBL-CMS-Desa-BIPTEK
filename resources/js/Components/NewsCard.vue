@@ -7,22 +7,26 @@
     </div>
   </div> -->
   <div class="w-full p-2 ">
-    <div class="flex flex-col bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
-        <div class="flex">
-          <img src="../../images/berita.png" alt="News Image" class="w-full object-cover p-4" />
+    <div
+    class="flex flex-col bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300"
+    :class="isHome ? 'sm:flex-row lg:flex-col' : 'sm:flex-col'"
+    >
+        <div class="flex max-w-full w-full h-full">
+          <img src="../../images/BALAI_DESA.png" alt="News Image" class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl" />
         </div>      
-        <div class="flex flex-col px-2">
-          <div class="flex flex-row p-4 pt-1 space-x-2">
+        <div class="flex flex-col px-2 w-full justify-center">
+          <div class="flex flex-row p-4 lg:pt-1 space-x-2">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-type2">
-              <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+              <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+            </svg>
             <h2 class="pr-2 text-sm font-thin text-type2 mt-0.5 ">M.Andi Sulaiman</h2>
           </div>
-          <div>
+          <div class="-mt-2 lg:-mt-0">
             <h2 class="px-4 text-lg font-semibold text-type2 line-clamp-2">Pengukuhan Kader Posyandu Desa Pao-Pao Periode 2025-2030</h2>
             <p class="pt-2 px-4 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis text-justify">Kepala Desa Pao-Pao, Kecamatan Tanete Rilau, Kabupaten Barru, Sulawesi Selatan SYAMSUL BAHRI, S.E., M.M. melakukan penandatanganan kerjasama yang signifikan antara Ikatan fhujediwshnfcujdewsnfhc hjfujedsiwhnfcddnb</p>
           </div>
           <div class="flex flex-row justify-between p-3 py-5">
-            <h2 class="text-xs">5 March 2025</h2>
+            <h2 class="text-xs mt-0.5">5 March 2025</h2>
             <div class="flex flex-row space-x-3 mr-2">
               <div class="flex flex-row space-x-2 justify-center items-center"> 
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-semiBlack">
@@ -43,24 +47,27 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'NewsCard',
-  props: {
-    image: {
-      type: String,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    }
-  }
-}
+<script setup>
+defineProps({
+  isHome: Boolean
+});
+// export default {
+//   name: 'NewsCard',
+//   props: {
+//     image: {
+//       type: String,
+//       required: true
+//     },
+//     title: {
+//       type: String,
+//       required: true
+//     },
+//     description: {
+//       type: String,
+//       required: true
+//     }
+//   }
+// }
 </script>
 
 <style scoped>
