@@ -13,10 +13,18 @@ return new class extends Migration
     {
         Schema::create('produk_hukum', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                ->constrained()
+                ->onDelete('cascade');
+            $table->foreignId('produk_hukum_category_id')
+                ->constrained()
+                ->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->string('file');
+            $table->string('link');
             $table->date('date');
+            $table->boolean('is_moderate')->default(false);
             $table->timestamps();
         });
     }

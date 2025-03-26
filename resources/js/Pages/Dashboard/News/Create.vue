@@ -5,30 +5,50 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref, onUnmounted } from "vue";
+import { ref, onUnmounted, watch } from "vue";
+
+const props = defineProps({
+    categories: {
+        type: Array,
+        required: true,
+    },
+});
 
 const form = useForm({
     title: "",
-    category: "",
+    category_id: "",
+    new_category: "",
     content: "",
-    image: null,
+    images: [],
+    alts: [],
     video: null,
     is_moderate: false,
+    is_draft: false,
 });
+
+const isNewCategory = ref(false);
+
+watch(isNewCategory, (newValue) => {
+    if (newValue) {
+        form.category_id = "";
+    } else {
+        form.new_category = "";
+    }
+});
+
+const URL = window.URL;
 
 const imagePreview = ref(null);
 
-const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    form.image = file;
-    imagePreview.value = URL.createObjectURL(file);
+const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    form.images = files;
+    form.alts = files.map(() => "");
 };
 
-onUnmounted(() => {
-    if (imagePreview.value) {
-        URL.revokeObjectURL(imagePreview.value);
-    }
-});
+const updateAltText = (index, value) => {
+    form.alts[index] = value;
+};
 
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
@@ -82,30 +102,54 @@ const submit = () => {
                                         for="category"
                                         value="Category"
                                     />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">
-                                            Berita Umum
-                                        </option>
-                                        <option value="announcement">
-                                            Pemberitahuan
-                                        </option>
-                                        <option value="event">Kegiatan</option>
-                                        <option value="education">
-                                            Pendidikan
-                                        </option>
-                                        <option value="health">
-                                            Kesehatan
-                                        </option>
-                                        <option value="Tourist">
-                                            Pariwisata
-                                        </option>
-                                    </select>
+                                    <div class="flex gap-4">
+                                        <select
+                                            v-if="!isNewCategory"
+                                            id="category"
+                                            v-model="form.category_id"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="">
+                                                Select Category
+                                            </option>
+                                            <option
+                                                v-for="category in categories"
+                                                :key="category.id"
+                                                :value="category.id"
+                                            >
+                                                {{ category.name }}
+                                            </option>
+                                        </select>
+
+                                        <TextInput
+                                            v-else
+                                            id="new-category"
+                                            v-model="form.new_category"
+                                            type="text"
+                                            class="mt-1 block w-full"
+                                            placeholder="Enter new category name"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                            @click="
+                                                isNewCategory = !isNewCategory
+                                            "
+                                        >
+                                            {{
+                                                isNewCategory
+                                                    ? "Select Existing"
+                                                    : "Add New"
+                                            }}
+                                        </button>
+                                    </div>
                                     <InputError
-                                        :message="form.errors.category"
+                                        :message="form.errors.category_id"
+                                        class="mt-2"
+                                    />
+                                    <InputError
+                                        :message="form.errors.new_category"
                                         class="mt-2"
                                     />
                                 </div>
@@ -126,24 +170,70 @@ const submit = () => {
                                 </div>
 
                                 <div>
-                                    <InputLabel for="image" value="Image" />
+                                    <InputLabel for="images" value="Images" />
                                     <input
-                                        id="image"
+                                        id="images"
                                         type="file"
-                                        @input="handleImageChange"
+                                        @input="handleImagesChange"
+                                        multiple
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                         required
                                     />
-                                    <!-- Add image preview -->
-                                    <div v-if="imagePreview" class="mt-2">
-                                        <img
-                                            :src="imagePreview"
-                                            class="h-32 w-auto object-cover rounded-lg"
-                                        />
+
+                                    <!-- Image previews with alt inputs -->
+                                    <div
+                                        v-if="form.images.length > 0"
+                                        class="mt-4 space-y-4"
+                                    >
+                                        <div
+                                            v-for="(
+                                                image, index
+                                            ) in form.images"
+                                            :key="index"
+                                            class="flex gap-4 items-start"
+                                        >
+                                            <div class="w-32">
+                                                <img
+                                                    :src="
+                                                        URL.createObjectURL(
+                                                            image
+                                                        )
+                                                    "
+                                                    class="w-full h-32 object-cover rounded"
+                                                    @load="
+                                                        URL.revokeObjectURL(
+                                                            image
+                                                        )
+                                                    "
+                                                />
+                                            </div>
+                                            <div class="flex-1">
+                                                <InputLabel
+                                                    :for="'alt-' + index"
+                                                    :value="`Alt Text for Image ${
+                                                        index + 1
+                                                    }`"
+                                                />
+                                                <TextInput
+                                                    :id="'alt-' + index"
+                                                    v-model="form.alts[index]"
+                                                    type="text"
+                                                    class="mt-1 block w-full"
+                                                    :placeholder="`Describe image ${
+                                                        index + 1
+                                                    }`"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                     <InputError
-                                        :message="form.errors.image"
+                                        :message="form.errors.images"
+                                        class="mt-2"
+                                    />
+                                    <InputError
+                                        :message="form.errors.alts"
                                         class="mt-2"
                                     />
                                 </div>
@@ -178,6 +268,25 @@ const submit = () => {
                                     </div>
                                     <InputError
                                         :message="form.errors.is_moderate"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div class="flex-row items-center">
+                                        <InputLabel
+                                            for="is_draft"
+                                            value="Draft"
+                                        />
+                                        <input
+                                            id="is_draft"
+                                            v-model="form.is_draft"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 mt-2"
+                                        />
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.is_draft"
                                         class="mt-2"
                                     />
                                 </div>

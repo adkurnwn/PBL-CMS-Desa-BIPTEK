@@ -17,11 +17,14 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained()
                 ->onDelete('cascade');
-            $table->enum('category', ['news', 'announcement', 'event', 'education', 'health', 'tourist']);
+            $table->foreignId('category_id')
+                ->constrained()
+                ->onDelete('cascade');
             $table->text('content');
             $table->string('video')->nullable();
             $table->integer('views')->default(0);
             $table->boolean('is_moderate')->default(false);
+            $table->boolean('is_draft')->default(false);
             $table->timestamps();
         });
     }

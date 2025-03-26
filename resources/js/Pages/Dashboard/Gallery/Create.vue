@@ -4,13 +4,25 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import CategoryInput from "@/Components/CategoryInput.vue";
 import { Head, useForm } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const URL = window.URL;
 
+const props = defineProps({
+    categories: {
+        type: Array,
+        required: true,
+    },
+});
+
 const form = useForm({
     title: "",
-    category: "",
+    category: {
+        category_id: "",
+        new_category: "",
+    },
     description: "",
     images: [],
     alts: [],
@@ -68,30 +80,11 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="Category"
-                                    />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">
-                                            Berita Umum
-                                        </option>
-                                        <option value="event">Kegiatan</option>
-                                        <option value="infrastructure">
-                                            Infrastruktur
-                                        </option>
-                                        <option value="nature">Alam</option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.category"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <CategoryInput
+                                    v-model="form.category"
+                                    :categories="categories"
+                                    :errors="form.errors"
+                                />
 
                                 <div>
                                     <InputLabel

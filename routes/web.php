@@ -85,8 +85,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:read_produk-hukum'])->get('/produk-hukum', [ProdukHukumController::class, 'index'])->name('dashboard.produk-hukum');
         Route::middleware(['permission:create_produk-hukum'])->get('/produk-hukum/create', [ProdukHukumController::class, 'create'])->name('dashboard.produk-hukum.create');
         Route::middleware(['permission:create_produk-hukum'])->post('/produk-hukum', [ProdukHukumController::class, 'store'])->name('dashboard.produk-hukum.store');
-        Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produk-hukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
-        Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
+        Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produkHukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
+        Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produkHukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
         Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
     });
 });

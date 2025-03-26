@@ -11,9 +11,10 @@ class News extends Model
         'title',
         'user_id',
         'content',
-        'category',
+        'category_id',
         'video',
         'views',
+        'is_draft',
         'is_moderate',
     ];
 
@@ -25,5 +26,10 @@ class News extends Model
     public function images()
     {
         return $this->hasMany(Image::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
+use App\Models\Image;
 use App\Models\Gallery;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Image;
 
 class GalleryController extends Controller
 {
@@ -20,25 +22,40 @@ class GalleryController extends Controller
 
     public function create()
     {
-        return Inertia::render('Dashboard/Gallery/Create');
+        return Inertia::render('Dashboard/Gallery/Create', [
+            'categories' => Category::all()
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required',
-            'category' => 'required|in:news,event,infrastructure,nature',
+        $rules = [
+            'title' => 'required|string|max:255',
             'description' => 'required',
             'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'alts.*' => 'required|string|max:255'
-        ]);
+        ];
 
-        // Create gallery
-        $gallery = Gallery::create([
-            'title' => $request->title,
-            'category' => $request->category,
-            'description' => $request->description,
-        ]);
+        if ($request->filled('category.new_category')) {
+            $rules['category.new_category'] = 'required|string|max:255';
+        } else {
+            $rules['category.category_id'] = 'required|exists:categories,id';
+        }
+
+        $request->validate($rules);
+
+        if ($request->filled('category.new_category')) {
+            $category = Category::create(['name' => $request->category['new_category']]);
+            $category_id = $category->id;
+        } else {
+            $category_id = $request->category['category_id'];
+        }
+
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $data['category_id'] = $category_id;
+
+        $gallery = Gallery::create($data);
 
         // Handle multiple image uploads
         if ($request->hasFile('images')) {
@@ -48,7 +65,7 @@ class GalleryController extends Controller
                 // Create image record
                 $gallery->images()->create([
                     'path' => $path,
-                    'alt' => $request->alts[$index] ?? $gallery->title, // Using gallery title as alt text
+                    'alt' => $request->alts[$index] ?? $gallery->title,
                     'is_visible' => true
                 ]);
             }
@@ -60,7 +77,8 @@ class GalleryController extends Controller
     public function edit(Gallery $gallery)
     {
         return Inertia::render('Dashboard/Gallery/Edit', [
-            'gallery' => $gallery->load('images'),
+            'gallery' => $gallery->load('images', 'category'),
+            'categories' => Category::all()
         ]);
     }
 
@@ -68,7 +86,6 @@ class GalleryController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'category' => 'required|in:news,event,infrastructure,nature',
             'description' => 'required',
             'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
             'alts.*' => 'required_with:images.*|string|max:255',
@@ -77,11 +94,18 @@ class GalleryController extends Controller
         ]);
 
         // Update gallery details
-        $gallery->update([
-            'title' => $request->title,
-            'category' => $request->category,
-            'description' => $request->description,
-        ]);
+        if ($request->filled('category.new_category')) {
+            $category = Category::create(['name' => $request->category['new_category']]);
+            $category_id = $category->id;
+        } else {
+            $category_id = $request->category['category_id'];
+        }
+
+        $data = $request->all();
+        $data['category_id'] = $category_id;
+
+        // Update news record
+        $gallery->update($data);
 
         // Handle image removals
         if ($request->removed_images) {
@@ -104,13 +128,13 @@ class GalleryController extends Controller
                 // Create new image record
                 $gallery->images()->create([
                     'path' => $path,
-                    'alt' => $request->alts[$index],
+                    'alt' => $request->alts[$index] ?? $gallery->title,
                     'is_visible' => true
                 ]);
             }
         }
 
-        return redirect()->route('dashboard.galleries.index')
+        return redirect()->route('dashboard.galleries')
             ->with('success', 'Gallery updated successfully');
     }
 }

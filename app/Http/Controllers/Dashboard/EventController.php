@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -23,25 +24,21 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the request
-        $request->validate([
+        $rules = [
             'title' => 'required',
             'description' => 'required',
             'date' => 'required',
             'time' => 'required',
             'location' => 'required',
-        ]);
+        ];
 
-        // Create the event
-        $event = Event::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'date' => $request->date,
-            'time' => $request->time,
-            'location' => $request->location,
-        ]);
+        $request->validate($rules);
 
-        // Redirect to the events index page
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+
+        Event::create($data);
+
         return redirect()->route('dashboard.events');
     }
 
@@ -54,25 +51,20 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
-        // Validate the request
-        $request->validate([
+        $rules = [
             'title' => 'required',
             'description' => 'required',
             'date' => 'required',
             'time' => 'required',
             'location' => 'required',
-        ]);
+        ];
 
-        // Update the event
-        $event->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'date' => $request->date,
-            'time' => $request->time,
-            'location' => $request->location,
-        ]);
+        $request->validate($rules);
 
-        // Redirect to the events index page
+        $data = $request->all();
+
+        $event->update($data);
+
         return redirect()->route('dashboard.events');
     }
 }
