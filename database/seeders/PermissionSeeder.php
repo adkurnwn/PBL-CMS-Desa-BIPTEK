@@ -20,6 +20,7 @@ class PermissionSeeder extends Seeder
             'galleries' => ['create', 'read', 'update', 'delete'],
             'events' => ['create', 'read', 'update', 'delete'],
             'produk-hukum' => ['create', 'read', 'update', 'delete'],
+            'dana-desa' => ['create', 'read', 'update', 'delete'],
         ];
 
         foreach ($features as $feature => $actions) {

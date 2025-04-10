@@ -18,13 +18,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'position_id',
         'name',
         'email',
         'password',
         'phone',
         'photo_profile',
-        'position',
-        'job_description',
         'status',
     ];
 
@@ -51,5 +50,10 @@ class User extends Authenticatable
             'job_description' => 'array',
             'status' => 'boolean',
         ];
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
     }
 }

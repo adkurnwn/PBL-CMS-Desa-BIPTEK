@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('news_id')
-                ->nullable()
-                ->constrained()
+            $table->smallInteger('news_id')->unsigned()->nullable();
+            $table->foreign('news_id')
+                ->references('id')
+                ->on('news')
                 ->onDelete('cascade');
-            $table->foreignId('gallery_id')
-                ->nullable()
-                ->constrained()
+            $table->smallInteger('gallery_id')->unsigned()->nullable();
+            $table->foreign('gallery_id')
+                ->references('id')
+                ->on('galleries')
                 ->onDelete('cascade');
             $table->string('alt');
             $table->string('path');

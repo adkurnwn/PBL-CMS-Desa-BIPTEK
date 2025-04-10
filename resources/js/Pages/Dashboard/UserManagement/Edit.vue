@@ -6,24 +6,17 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
-import { ref, onMounted } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps({
     user: Object,
+    positions: Array,
 });
 
-const parseJobDescription = () => {
-    if (typeof props.user.job_description === "string") {
-        try {
-            return JSON.parse(props.user.job_description);
-        } catch (e) {
-            return [];
-        }
-    }
-    return Array.isArray(props.user.job_description)
-        ? props.user.job_description
-        : [];
-};
+// Add new position toggle
+const isNewPosition = ref(false);
+const newJobDescription = ref("");
+const jobDescriptions = ref([]);
 
 const form = useForm({
     name: props.user.name,
@@ -31,35 +24,68 @@ const form = useForm({
     password: "",
     phone: props.user.phone,
     photo_profile: null,
-    position: props.user.position,
-    job_description: parseJobDescription() ?? [],
+    position_id: props.user.position_id,
+    new_position: "", // For new position name
+    job_descriptions: [], // For new position job descriptions
     status: props.user.status !== undefined ? props.user.status : true,
-    id_position: props.user.id_position,
     _method: "PUT",
 });
 
-const newJobDescription = ref("");
+// Parse the job description JSON if it's a string
+const parseJobDescription = (description) => {
+    if (!description) return [];
+    if (Array.isArray(description)) return description;
+
+    try {
+        return JSON.parse(description);
+    } catch (e) {
+        console.error("Error parsing job description:", e);
+        return [];
+    }
+};
+
+// Get selected position's job description
+const selectedPosition = computed(() => {
+    if (isNewPosition.value) return null;
+
+    const position = props.positions?.find(
+        (position) => position.id === form.position_id
+    );
+
+    if (position) {
+        return {
+            ...position,
+            job_description: parseJobDescription(position.job_description),
+        };
+    }
+
+    return null;
+});
 
 const handleFileChange = (e) => {
     form.photo_profile = e.target.files[0];
 };
 
-const addJobDescription = (e) => {
-    e.preventDefault();
+// Add job description to the list
+const addJobDescription = () => {
     if (newJobDescription.value.trim()) {
-        form.job_description.push(newJobDescription.value.trim());
+        form.job_descriptions.push(newJobDescription.value);
         newJobDescription.value = "";
     }
 };
 
+// Remove job description from the list
 const removeJobDescription = (index) => {
-    form.job_description.splice(index, 1);
+    form.job_descriptions.splice(index, 1);
 };
 
 const submit = () => {
     form.post(route("dashboard.users.update", props.user.id), {
         preserveScroll: true,
-        onSuccess: () => form.reset("password"),
+        onSuccess: () => {
+            form.reset("password");
+            isNewPosition.value = false;
+        },
         forceFormData: true,
     });
 };
@@ -182,36 +208,64 @@ const submit = () => {
                                         for="position"
                                         value="Position"
                                     />
-                                    <select
-                                        id="position"
-                                        v-model="form.position"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="Kepala Desa">
-                                            Kepala Desa
-                                        </option>
-                                        <option value="Sekretaris Desa">
-                                            Sekretaris Desa
-                                        </option>
-                                        <option value="Kepala Urusan">
-                                            Kepala Urusan
-                                        </option>
-                                        <option value="Kepala Dusun">
-                                            Kepala Dusun
-                                        </option>
-                                        <option value="Kepala Seksi">
-                                            Kepala Seksi
-                                        </option>
-                                        <option value="Staff">Staff</option>
-                                    </select>
+                                    <div class="flex gap-4">
+                                        <select
+                                            v-if="!isNewPosition"
+                                            id="position_id"
+                                            v-model="form.position_id"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            required
+                                        >
+                                            <option value="" disabled>
+                                                Select Position
+                                            </option>
+                                            <option
+                                                v-for="position in positions"
+                                                :key="position.id"
+                                                :value="position.id"
+                                            >
+                                                {{ position.name }}
+                                            </option>
+                                        </select>
+
+                                        <TextInput
+                                            v-else
+                                            id="new_position"
+                                            v-model="form.new_position"
+                                            type="text"
+                                            class="mt-1 block w-full"
+                                            placeholder="Enter new position name"
+                                            required
+                                        />
+
+                                        <button
+                                            type="button"
+                                            class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                            @click="
+                                                isNewPosition = !isNewPosition
+                                            "
+                                        >
+                                            {{
+                                                isNewPosition
+                                                    ? "Select Existing"
+                                                    : "Add New"
+                                            }}
+                                        </button>
+                                    </div>
                                     <InputError
-                                        :message="form.errors.position"
+                                        :message="
+                                            form.errors.position_id ||
+                                            form.errors.new_position
+                                        "
                                         class="mt-2"
                                     />
                                 </div>
 
-                                <!-- Modified Job Description Field -->
-                                <div class="col-span-2 mb-4">
+                                <!-- Job Description Field (only shown when creating a new position) -->
+                                <div
+                                    v-if="isNewPosition"
+                                    class="col-span-2 mt-4"
+                                >
                                     <InputLabel
                                         for="job_description"
                                         value="Job Description"
@@ -222,8 +276,7 @@ const submit = () => {
                                             v-model="newJobDescription"
                                             type="text"
                                             class="block w-full"
-                                            placeholder="Enter job description and press Enter"
-                                            @keydown.enter="addJobDescription"
+                                            placeholder="Enter job description item"
                                         />
                                         <PrimaryButton
                                             type="button"
@@ -235,11 +288,14 @@ const submit = () => {
                                     </div>
 
                                     <!-- Display job descriptions as tags -->
-                                    <div class="mt-2 flex flex-wrap gap-2">
+                                    <div
+                                        class="mt-2 flex flex-wrap gap-2"
+                                        v-if="form.job_descriptions.length > 0"
+                                    >
                                         <div
                                             v-for="(
                                                 description, index
-                                            ) in form.job_description"
+                                            ) in form.job_descriptions"
                                             :key="index"
                                             class="bg-gray-100 px-2 py-1 rounded-md flex items-center gap-1"
                                         >
@@ -255,10 +311,38 @@ const submit = () => {
                                             </button>
                                         </div>
                                     </div>
+                                    <p
+                                        class="text-sm text-gray-500 mt-1"
+                                        v-else
+                                    >
+                                        Add at least one job description for the
+                                        new position
+                                    </p>
                                     <InputError
-                                        :message="form.errors.job_description"
+                                        :message="form.errors.job_descriptions"
                                         class="mt-2"
                                     />
+                                </div>
+
+                                <!-- Job Description Display (Read-only for existing positions) -->
+                                <div
+                                    v-else-if="selectedPosition"
+                                    class="col-span-2"
+                                >
+                                    <h3 class="font-semibold mt-2">
+                                        Job Description:
+                                    </h3>
+                                    <ul class="list-disc ml-5 mt-1">
+                                        <li
+                                            v-for="(
+                                                duty, index
+                                            ) in selectedPosition.job_description"
+                                            :key="index"
+                                            class="text-gray-700"
+                                        >
+                                            {{ duty }}
+                                        </li>
+                                    </ul>
                                 </div>
 
                                 <!-- Status Field -->

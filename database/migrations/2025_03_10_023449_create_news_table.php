@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('news', function (Blueprint $table) {
-            $table->id();
+            $table->smallIncrements('id')->unsigned();
             $table->string('title');
-            $table->foreignId('user_id')
-                ->constrained()
+            $table->unsignedTinyInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
                 ->onDelete('cascade');
-            $table->foreignId('category_id')
-                ->constrained()
+            $table->unsignedTinyInteger('category_id');
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('categories')
                 ->onDelete('cascade');
             $table->text('content');
             $table->string('video')->nullable();

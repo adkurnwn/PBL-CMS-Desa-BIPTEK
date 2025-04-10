@@ -60,7 +60,7 @@ const props = defineProps({
                                             "
                                         >
                                             <PrimaryButton>
-                                                Edit News
+                                                Edit Produk Hukum
                                             </PrimaryButton>
                                         </Link>
                                     </td>

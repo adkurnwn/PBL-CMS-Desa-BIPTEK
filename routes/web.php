@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\Dashboard\EventController;
-use App\Http\Controllers\Dashboard\GalleryController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
-use App\Http\Controllers\Dashboard\NewsController;
-use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Dashboard\NewsController;
+use App\Http\Controllers\Dashboard\EventController;
+use App\Http\Controllers\Dashboard\GalleryController;
+use App\Http\Controllers\Dashboard\DanaDesaController;
+use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
@@ -87,7 +88,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:create_produk-hukum'])->post('/produk-hukum', [ProdukHukumController::class, 'store'])->name('dashboard.produk-hukum.store');
         Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produkHukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
         Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produkHukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
-        Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
+        Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produkHukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
+
+        Route::middleware(['permission:read_dana-desa'])->get('/dana-desa', [DanaDesaController::class, 'index'])->name('dashboard.dana-desa');
+        Route::middleware(['permission:create_dana-desa'])->get('/dana-desa/create', [DanaDesaController::class, 'create'])->name('dashboard.dana-desa.create');
+        Route::middleware(['permission:create_dana-desa'])->post('/dana-desa', [DanaDesaController::class, 'store'])->name('dashboard.dana-desa.store');
+        Route::middleware(['permission:update_dana-desa'])->get('/dana-desa/{danaDesa}/edit', [DanaDesaController::class, 'edit'])->name('dashboard.dana-desa.edit');
+        Route::middleware(['permission:update_dana-desa'])->put('/dana-desa/{danaDesa}', [DanaDesaController::class, 'update'])->name('dashboard.dana-desa.update');
+        Route::middleware(['permission:delete_dana-desa'])->delete('/dana-desa/{danaDesa}', [DanaDesaController::class, 'destroy'])->name('dashboard.dana-desa.destroy');
     });
 });
 

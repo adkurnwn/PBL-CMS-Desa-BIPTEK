@@ -10,7 +10,7 @@ class ProdukHukum extends Model
     protected $fillable = [
         'title',
         'description',
-        'produk_hukum_category_id',
+        'category_id',
         'user_id',
         'link',
         'file',
@@ -20,6 +20,6 @@ class ProdukHukum extends Model
 
     public function category()
     {
-        return $this->belongsTo(ProdukHukumCategory::class, 'produk_hukum_category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 }

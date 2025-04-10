@@ -48,6 +48,7 @@ const deleteUser = (userId) => {
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
+                                    <th>Position</th>
                                     <th>Admin</th>
                                     <th>Actions</th>
                                 </tr>
@@ -56,6 +57,13 @@ const deleteUser = (userId) => {
                                 <tr v-for="user in users" :key="user.id">
                                     <td>{{ user.name }}</td>
                                     <td>{{ user.email }}</td>
+                                    <td>
+                                        {{
+                                            user.position?.name ||
+                                            "Not assigned"
+                                        }}
+                                    </td>
+                                    <!-- New position column -->
                                     <td class="flex justify-center">
                                         {{ user.is_admin ? "Yes" : "No" }}
                                     </td>

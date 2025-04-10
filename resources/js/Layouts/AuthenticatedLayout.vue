@@ -89,6 +89,14 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Produk Hukum
                                 </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.dana-desa')"
+                                    :active="
+                                        route().current('dashboard.dana-desa')
+                                    "
+                                >
+                                    Dana Desa
+                                </NavLink>
                             </div>
                         </div>
 

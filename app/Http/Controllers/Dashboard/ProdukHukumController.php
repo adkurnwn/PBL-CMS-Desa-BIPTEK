@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\ProdukHukum;
+use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Models\ProdukHukumCategory;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +22,7 @@ class ProdukHukumController extends Controller
     public function create()
     {
         return Inertia::render('Dashboard/ProdukHukum/Create', [
-            'categories' => ProdukHukumCategory::all()
+            'categories' => Category::where('category_type', 0)->get()
         ]);
     }
 
@@ -34,19 +34,21 @@ class ProdukHukumController extends Controller
             'file' => 'required|file|mimes:pdf,doc,docx',
             'link' => 'required',
             'date' => 'required',
-
         ];
 
         if ($request->filled('category.new_category')) {
             $rules['category.new_category'] = 'required|string|max:255';
         } else {
-            $rules['category.category_id'] = 'required|exists:produk_hukum_categories,id';
+            $rules['category.category_id'] = 'required|exists:categories,id';
         }
 
         $request->validate($rules);
 
         if ($request->filled('category.new_category')) {
-            $category = ProdukHukumCategory::create(['name' => $request->category['new_category']]);
+            $category = Category::create([
+                'name' => $request->category['new_category'],
+                'category_type' => 0
+            ]);
             $category_id = $category->id;
         } else {
             $category_id = $request->category['category_id'];
@@ -58,9 +60,8 @@ class ProdukHukumController extends Controller
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
-        $data['produk_hukum_category_id'] = $category_id;
+        $data['category_id'] = $category_id;
         $data['file'] = $path;
-
 
         $produkHukum = ProdukHukum::create($data);
 
@@ -71,7 +72,7 @@ class ProdukHukumController extends Controller
     {
         return Inertia::render('Dashboard/ProdukHukum/Edit', [
             'produkHukum' => $produkHukum->load('category'),
-            'categories' => ProdukHukumCategory::all()
+            'categories' => Category::where('category_type', 0)->get()
         ]);
     }
 
@@ -88,13 +89,16 @@ class ProdukHukumController extends Controller
         if ($request->filled('category.new_category')) {
             $rules['category.new_category'] = 'required|string|max:255';
         } else {
-            $rules['category.category_id'] = 'required|exists:produk_hukum_categories,id';
+            $rules['category.category_id'] = 'required|exists:categories,id';
         }
 
         $request->validate($rules);
 
         if ($request->filled('category.new_category')) {
-            $category = ProdukHukumCategory::create(['name' => $request->category['new_category']]);
+            $category = Category::create([
+                'name' => $request->category['new_category'],
+                'category_type' => 0
+            ]);
             $category_id = $category->id;
         } else {
             $category_id = $request->category['category_id'];
@@ -114,8 +118,7 @@ class ProdukHukumController extends Controller
             unset($data['file']);
         }
 
-
-        $data['produk_hukum_category_id'] = $category_id;
+        $data['category_id'] = $category_id;
 
         $produkHukum->update($data);
 

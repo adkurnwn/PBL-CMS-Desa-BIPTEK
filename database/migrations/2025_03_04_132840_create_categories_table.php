@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->tinyIncrements('id')->unsigned();
+            $table->string('name', 20);
+            $table->boolean('category_type')->default(1)->comment('0 = produk hukum, 1 = berita/galeri');
             $table->timestamps();
         });
     }
