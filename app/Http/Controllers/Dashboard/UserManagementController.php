@@ -39,7 +39,6 @@ class UserManagementController extends Controller
             'status' => 'required|boolean',
         ];
 
-        // Validate position fields based on whether it's new or existing
         if ($request->filled('new_position')) {
             $rules['new_position'] = 'required|string|max:255';
             $rules['job_descriptions'] = 'required|array|min:1';
@@ -49,9 +48,7 @@ class UserManagementController extends Controller
 
         $request->validate($rules);
 
-        // Handle position (create new if needed)
         if ($request->filled('new_position')) {
-            // Create a new position
             $position = Position::create([
                 'name' => $request->new_position,
                 'job_description' => json_encode($request->job_descriptions)
@@ -62,7 +59,6 @@ class UserManagementController extends Controller
             $position_id = $position->id;
         }
 
-        // Check if trying to create a Kepala Desa when one already exists
         if ($position->name === 'Kepala Desa') {
             $existingKepalaDesa = User::whereHas('roles', function ($query) {
                 $query->where('name', 'Kepala Desa');
@@ -76,14 +72,9 @@ class UserManagementController extends Controller
         }
 
         // Create user
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'position_id' => $position_id,
-            'status' => $request->status,
-        ];
+        $userData = $request->all();
+        $userData['position_id'] = $position_id;
+        $userData['password'] = Hash::make($request->password);
 
         if ($request->hasFile('photo_profile')) {
             $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
