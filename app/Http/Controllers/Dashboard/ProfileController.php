@@ -47,7 +47,6 @@ class ProfileController extends Controller
             'hero_image_3' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
         ]);
 
-        // Get village name from selected kelurahan
         $village = Village::find($request->kelurahan);
         $villageName = $village ? "Desa " . $village->name : '';
 

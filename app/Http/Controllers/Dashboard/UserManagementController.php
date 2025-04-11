@@ -77,7 +77,7 @@ class UserManagementController extends Controller
         $userData['password'] = Hash::make($request->password);
 
         if ($request->hasFile('photo_profile')) {
-            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
+            $path = $request->file('photo_profile')->store('profile-photos', 'public');
         }
 
         $user = User::create($userData);
