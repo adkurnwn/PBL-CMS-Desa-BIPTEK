@@ -13,6 +13,7 @@ class PermissionSeeder extends Seeder
         // Create permissions for each feature
         $features = [
             'users' => ['create', 'read', 'update', 'delete'],
+            'positions' => ['create', 'read', 'update', 'delete'],
             'roles' => ['manage'],
             'dashboard' => ['view'],
             'profiles' => ['read', 'update'],
@@ -21,6 +22,7 @@ class PermissionSeeder extends Seeder
             'events' => ['create', 'read', 'update', 'delete'],
             'produk-hukum' => ['create', 'read', 'update', 'delete'],
             'dana-desa' => ['create', 'read', 'update', 'delete'],
+            'produk-desa' => ['create', 'read', 'update', 'delete'],
         ];
 
         foreach ($features as $feature => $actions) {

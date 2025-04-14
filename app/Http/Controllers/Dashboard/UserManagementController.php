@@ -17,7 +17,8 @@ class UserManagementController extends Controller
         return Inertia::render('Dashboard/UserManagement/Index', [
             'users' => User::with(['roles', 'position'])->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })->get()
+            })->get(),
+            'positions' => Position::all()
         ]);
     }
 
@@ -78,6 +79,7 @@ class UserManagementController extends Controller
 
         if ($request->hasFile('photo_profile')) {
             $path = $request->file('photo_profile')->store('profile-photos', 'public');
+            $userData['photo_profile'] = $path;
         }
 
         $user = User::create($userData);
@@ -155,13 +157,8 @@ class UserManagementController extends Controller
             }
         }
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'position_id' => $position_id,
-            'status' => $request->status,
-        ];
+        $userData = $request->all();
+        $userData['position_id'] = $position_id;
 
         if ($request->filled('password')) {
             $userData['password'] = Hash::make($request->password);
@@ -173,7 +170,6 @@ class UserManagementController extends Controller
 
         $user->update($userData);
 
-        // Update role based on position name
         if ($position->name === 'Kepala Desa') {
             $user->syncRoles('Kepala Desa');
         } else if ($position->name === 'Admin Sistem') {
