@@ -40,7 +40,12 @@ class ProdukDesaController extends Controller
 
         $dataProduk = $request->all();
         $dataProduk['user_id'] = Auth::id();
-        $produkDesa = ProdukDesa::create($dataProduk);
+
+        try {
+            $produkDesa = ProdukDesa::create($dataProduk);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {

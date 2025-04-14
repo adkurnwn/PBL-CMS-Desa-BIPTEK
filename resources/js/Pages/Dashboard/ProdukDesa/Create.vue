@@ -13,11 +13,11 @@ const form = useForm({
     price: "",
     stock: "",
     kontak_penjual: "",
-    image: [],
+    images: [], // Change from image to images to match controller
 });
 
 const handleImageChange = (e) => {
-    form.image = e.target.files[0];
+    form.images = e.target.files; // Store all files, not just the first one
 };
 
 const submit = () => {
@@ -132,9 +132,10 @@ const submit = () => {
                                         @input="handleImageChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
+                                        multiple
                                     />
                                     <InputError
-                                        :message="form.errors.image"
+                                        :message="form.errors.images"
                                         class="mt-2"
                                     />
                                 </div>
