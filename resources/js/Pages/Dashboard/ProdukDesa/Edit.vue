@@ -13,11 +13,6 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    categories: {
-        type: Array,
-        required: false,
-        default: () => [],
-    },
 });
 
 const form = useForm({
@@ -27,12 +22,8 @@ const form = useForm({
     stock: props.produkDesa.stock,
     kontak_penjual: props.produkDesa.kontak_penjual,
     image: null,
-    category_id: props.produkDesa.category_id,
-    new_category: "",
     _method: "PUT",
 });
-
-const isNewCategory = ref(false);
 
 const handleImageChange = (e) => {
     form.image = e.target.files[0];
@@ -133,81 +124,6 @@ const submit = () => {
                                     />
                                     <InputError
                                         :message="form.errors.kontak_penjual"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Category Field -->
-                                <div v-if="categories.length > 0">
-                                    <InputLabel
-                                        for="category"
-                                        value="Kategori"
-                                    />
-                                    <div class="flex gap-4">
-                                        <select
-                                            v-if="!isNewCategory"
-                                            id="category_id"
-                                            v-model="form.category_id"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        >
-                                            <option value="">
-                                                Select Category
-                                            </option>
-                                            <option
-                                                v-for="category in categories"
-                                                :key="category.id"
-                                                :value="category.id"
-                                            >
-                                                {{ category.name }}
-                                            </option>
-                                        </select>
-
-                                        <TextInput
-                                            v-else
-                                            id="new_category"
-                                            v-model="form.new_category"
-                                            type="text"
-                                            class="mt-1 block w-full"
-                                            placeholder="Enter new category name"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
-                                            @click="
-                                                isNewCategory = !isNewCategory
-                                            "
-                                        >
-                                            {{
-                                                isNewCategory
-                                                    ? "Select Existing"
-                                                    : "Add New"
-                                            }}
-                                        </button>
-                                    </div>
-                                    <InputError
-                                        :message="
-                                            form.errors.category_id ||
-                                            form.errors.new_category
-                                        "
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <div v-else>
-                                    <InputLabel
-                                        for="new_category"
-                                        value="New Category"
-                                    />
-                                    <TextInput
-                                        id="new_category"
-                                        v-model="form.new_category"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        placeholder="Enter category name"
-                                    />
-                                    <InputError
-                                        :message="form.errors.new_category"
                                         class="mt-2"
                                     />
                                 </div>
