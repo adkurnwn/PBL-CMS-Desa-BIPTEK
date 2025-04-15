@@ -21,7 +21,7 @@
     <!-- Navigation Links -->
     <ul
       :class="[
-        'md:flex text-sm sm:text-xl lg:text-base lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt- lg:mt-2.5 lg:mr-6',
+        'md:flex text-sm sm:text-xl lg:text-base lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt-6 lg:mt-2.5 lg:mr-6',
         isMenuOpen ? 'block' : 'max-h-0 opacity-0 scale-y-0 sm:max-h-full sm:opacity-100 lg:scale-y-100',
         'absolute lg:static w-1/2 top-20 my-1 rounded-lg right-0 lg:w-auto bg-accent1 lg:bg-transparent lg:flex flex-col lg:flex-row space-y-4 sm:space-y-6 py-5 sm:py-8 lg:py-0 lg:space-y-0 text-center xl:text-left p-4 lg:p-0'
       ]"

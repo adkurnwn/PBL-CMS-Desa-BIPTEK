@@ -11,8 +11,8 @@
     class="flex flex-col bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300"
     :class="isHome ? 'sm:flex-row lg:flex-col' : 'sm:flex-col'"
     >
-        <div class="flex max-w-full w-full h-full">
-          <img src="../../images/BALAI_DESA.png" alt="News Image" class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl" />
+        <div class="flex max-w-full w-full h-full rounded-full">
+          <img src="../../images/profile.jpg" alt="News Image" class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl overflow-hidden" />
         </div>      
         <div class="flex flex-col px-2 w-full justify-center">
           <div class="flex flex-row p-4 lg:pt-1 space-x-2">
