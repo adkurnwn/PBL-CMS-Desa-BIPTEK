@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
 use App\Http\Controllers\Dashboard\PositionController;
 use App\Http\Controllers\Dashboard\ProdukDesaController;
+use App\Http\Controllers\Dashboard\KomentarBeritaController;
 use App\Models\ProdukDesa;
 
 Route::get('/', function () {
@@ -31,6 +32,26 @@ Route::get('/informasi', function () {
 Route::get('/layanan', function () {
     return view('layanan');
 });
+
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
+
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
+
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
+
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
@@ -107,6 +128,10 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:update_produk-desa'])->get('/produk-desa/{produkDesa}/edit', [ProdukDesaController::class, 'edit'])->name('dashboard.produk-desa.edit');
         Route::middleware(['permission:update_produk-desa'])->put('/produk-desa/{produkDesa}', [ProdukDesaController::class, 'update'])->name('dashboard.produk-desa.update');
         Route::middleware(['permission:delete_produk-desa'])->delete('/produk-desa/{produkDesa}', [ProdukDesaController::class, 'destroy'])->name('dashboard.produk-desa.destroy');
+
+        Route::middleware(['permission:read_comments'])->get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
+        Route::middleware(['permission:update_comments'])->patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
+        Route::middleware(['permission:delete_comments'])->delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');
     });
 });
 
