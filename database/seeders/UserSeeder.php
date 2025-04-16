@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
-            'position_id' => $adminPosition->id,
+            'position_id' => null,
             'phone' => '081234567890',
             'status' => true,
         ]);

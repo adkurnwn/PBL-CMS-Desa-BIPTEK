@@ -25,9 +25,8 @@ const form = useForm({
     phone: props.user.phone,
     photo_profile: null,
     position_id: props.user.position_id,
-    new_position: "", // For new position name
-    job_descriptions: [], // For new position job descriptions
-    status: props.user.status !== undefined ? props.user.status : true,
+    new_position: "",
+    job_descriptions: [],
     _method: "PUT",
 });
 
@@ -343,27 +342,6 @@ const submit = () => {
                                             {{ duty }}
                                         </li>
                                     </ul>
-                                </div>
-
-                                <!-- Status Field -->
-                                <div>
-                                    <div class="flex items-center">
-                                        <input
-                                            id="status"
-                                            v-model="form.status"
-                                            type="checkbox"
-                                            class="rounded border-gray-300"
-                                        />
-                                        <InputLabel
-                                            for="status"
-                                            value="Active"
-                                            class="ml-2"
-                                        />
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.status"
-                                        class="mt-2"
-                                    />
                                 </div>
                             </div>
 

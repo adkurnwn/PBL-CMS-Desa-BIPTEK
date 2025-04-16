@@ -10,17 +10,16 @@ import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
     users: Array,
-    positions: Array, // Add positions prop
+    positions: Array,
+    flash: Object,
 });
 
 const form = useForm({});
 
-const deleteUser = (userId) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-        form.delete(route("dashboard.users.destroy", userId), {
-            preserveScroll: true,
-        });
-    }
+const toggleUserStatus = (userId) => {
+    form.delete(route("dashboard.users.destroy", userId), {
+        preserveScroll: true,
+    });
 };
 
 // Add delete position function
@@ -76,7 +75,7 @@ const parseJobDescription = (description) => {
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Position</th>
-                                    <th>Admin</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -91,7 +90,9 @@ const parseJobDescription = (description) => {
                                         }}
                                     </td>
                                     <td class="flex justify-center">
-                                        {{ user.is_admin ? "Yes" : "No" }}
+                                        {{
+                                            user.status ? "Active" : "Inactive"
+                                        }}
                                     </td>
                                     <td>
                                         <div
@@ -109,11 +110,33 @@ const parseJobDescription = (description) => {
                                                     >Edit</PrimaryButton
                                                 >
                                             </Link>
-                                            <DangerButton
-                                                @click="deleteUser(user.id)"
-                                            >
-                                                Delete
-                                            </DangerButton>
+                                            <div class="flex items-center">
+                                                <button
+                                                    @click="
+                                                        toggleUserStatus(
+                                                            user.id
+                                                        )
+                                                    "
+                                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    :class="
+                                                        user.status
+                                                            ? 'bg-indigo-600'
+                                                            : 'bg-gray-200'
+                                                    "
+                                                    role="switch"
+                                                    :aria-checked="user.status"
+                                                >
+                                                    <span
+                                                        aria-hidden="true"
+                                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                                        :class="
+                                                            user.status
+                                                                ? 'translate-x-5'
+                                                                : 'translate-x-0'
+                                                        "
+                                                    ></span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -205,9 +228,7 @@ const parseJobDescription = (description) => {
                                                 "
                                                 v-if="
                                                     position.name !==
-                                                        'Admin Sistem' &&
-                                                    position.name !==
-                                                        'Kepala Desa'
+                                                    'Kepala Desa'
                                                 "
                                             >
                                                 Delete

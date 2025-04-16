@@ -37,7 +37,6 @@ class UserManagementController extends Controller
             'password' => ['required', Rules\Password::defaults()],
             'phone' => 'required|string|max:20',
             'photo_profile' => 'nullable|image|max:1024|mimes:jpg,png,jpeg',
-            'status' => 'required|boolean',
         ];
 
         if ($request->filled('new_position')) {
@@ -74,6 +73,7 @@ class UserManagementController extends Controller
 
         // Create user
         $userData = $request->all();
+        $userData['status'] = true;
         $userData['position_id'] = $position_id;
         $userData['password'] = Hash::make($request->password);
 
@@ -110,7 +110,6 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'required|string|max:20',
-            'status' => 'required|boolean',
         ];
 
         // Validate position fields based on whether it's new or existing
@@ -157,7 +156,7 @@ class UserManagementController extends Controller
             }
         }
 
-        $userData = $request->all();
+        $userData = $request->except('password');
         $userData['position_id'] = $position_id;
 
         if ($request->filled('password')) {
@@ -183,7 +182,16 @@ class UserManagementController extends Controller
 
     public function destroy(User $user)
     {
-        $user->delete();
+        if ($user->status === false) {
+            $user->update([
+                'status' => true
+            ]);
+        } else {
+            $user->update([
+                'status' => false
+            ]);
+        }
+
         return redirect()->route('dashboard.users')->with('success', 'User deleted successfully');
     }
 }

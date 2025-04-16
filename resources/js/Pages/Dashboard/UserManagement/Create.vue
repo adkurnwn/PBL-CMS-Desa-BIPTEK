@@ -22,10 +22,9 @@ const form = useForm({
     password: "",
     phone: "",
     photo_profile: null,
-    position_id: "", // For existing position
-    new_position: "", // For new position name
-    job_descriptions: [], // For new position job descriptions
-    status: true,
+    position_id: "",
+    new_position: "",
+    job_descriptions: [],
 });
 
 const handleFileChange = (e) => {
@@ -278,27 +277,6 @@ const submit = () => {
                                     </p>
                                     <InputError
                                         :message="form.errors.job_descriptions"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Status Field -->
-                                <div>
-                                    <div class="flex items-center">
-                                        <input
-                                            id="status"
-                                            v-model="form.status"
-                                            type="checkbox"
-                                            class="rounded border-gray-300"
-                                        />
-                                        <InputLabel
-                                            for="status"
-                                            value="Active"
-                                            class="ml-2"
-                                        />
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.status"
                                         class="mt-2"
                                     />
                                 </div>

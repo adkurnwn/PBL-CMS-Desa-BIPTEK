@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->tinyIncrements('id')->unsigned();
-            $table->unsignedTinyInteger('position_id');
+            $table->unsignedTinyInteger('position_id')->nullable();
             $table->foreign('position_id')
                 ->references('id')
                 ->on('positions')
