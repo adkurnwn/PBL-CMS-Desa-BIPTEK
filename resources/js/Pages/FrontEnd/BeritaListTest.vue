@@ -22,7 +22,7 @@
           <Link 
             v-for="item in news" 
             :key="item.id"
-            :href="`/berita/${item.id}`"
+            :href="`/berita-test/${item.id}`"
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
             <!-- Image -->

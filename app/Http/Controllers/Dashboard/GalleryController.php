@@ -23,7 +23,7 @@ class GalleryController extends Controller
     public function create()
     {
         return Inertia::render('Dashboard/Gallery/Create', [
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 
@@ -78,7 +78,7 @@ class GalleryController extends Controller
     {
         return Inertia::render('Dashboard/Gallery/Edit', [
             'gallery' => $gallery->load('images', 'category'),
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 

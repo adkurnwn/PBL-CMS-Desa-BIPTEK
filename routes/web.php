@@ -44,15 +44,25 @@ Route::get('/berita/{id}', function ($id) {
     ]);
 })->name('berita.show');
 
-Route::get('/berita', function () {
+Route::get('/berita-test', function () {
     return Inertia::render('FrontEnd/BeritaListTest');
 })->name('berita');
 
-Route::get('/berita/{id}', function ($id) {
-    return Inertia::render('FrontEnd/BeritaDetail', [
+Route::get('/berita-test/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetailTest', [
         'id' => $id
     ]);
 })->name('berita.show');
+
+Route::get('/produk-hukum-test', function () {
+    return Inertia::render('FrontEnd/ProdukHukumListTest');
+})->name('produk-hukum');
+
+Route::get('/produk-hukum-test/{id}', function ($id) {
+    return Inertia::render('FrontEnd/ProdukHukumDetailTest', [
+        'id' => $id
+    ]);
+})->name('produk-hukum.show');
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
@@ -133,6 +143,10 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:read_comments'])->get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
         Route::middleware(['permission:update_comments'])->patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
         Route::middleware(['permission:delete_comments'])->delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');
+
+        Route::middleware(['permission:read_comments'])->get('/produk-hukum-comments', [App\Http\Controllers\Dashboard\KomentarProdukHukumController::class, 'index'])->name('dashboard.produk-hukum-comments');
+        Route::middleware(['permission:update_comments'])->patch('/produk-hukum-comments/{comment}/approve', [App\Http\Controllers\Dashboard\KomentarProdukHukumController::class, 'approve'])->name('dashboard.produk-hukum-comments.approve');
+        Route::middleware(['permission:delete_comments'])->delete('/produk-hukum-comments/{comment}', [App\Http\Controllers\Dashboard\KomentarProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum-comments.destroy');
 
         Route::middleware(['permission:read_demografi'])->get('/demografi', [DemografiController::class, 'index'])->name('dashboard.demografi');
         Route::middleware(['permission:create_demografi'])->get('/demografi/create', [DemografiController::class, 'create'])->name('dashboard.demografi.create');
