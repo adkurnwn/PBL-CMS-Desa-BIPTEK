@@ -105,6 +105,12 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Produk Desa
                                 </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.comments')"
+                                    :active="route().current('dashboard.comments')"
+                                >
+                                    Comment Moderation
+                                </NavLink>
                             </div>
                         </div>
 
