@@ -15,18 +15,47 @@ class KomentarBeritaController extends Controller
         
         $comments = KomentarBerita::where('id_berita', $newsId)
             ->when($news->is_moderate, function($query) {
-                // If news is moderated, only show approved comments
                 $query->where('is_approved', true);
             })
             ->whereNull('id_ref_komentar')
-            ->with(['replies' => function($query) use ($news) {
-                if ($news->is_moderate) {
-                    $query->where('is_approved', true);
-                }
-            }])
+            ->withCount('replies')
             ->get();
 
         return response()->json($comments);
+    }
+
+    public function getReplies($newsId, $commentId)
+    {
+        $news = News::findOrFail($newsId);
+        
+        $replies = KomentarBerita::where('id_berita', $newsId)
+            ->where(function($query) use ($commentId) {
+                $query->where('id_ref_komentar', $commentId)
+                      ->orWhereHas('parent', function($q) use ($commentId) {
+                          $q->where('id_ref_komentar', $commentId)
+                            ->orWhereHas('parent', function($q2) use ($commentId) {
+                                $q2->where('id_ref_komentar', $commentId);
+                            });
+                      });
+            })
+            ->when($news->is_moderate, function($query) {
+                $query->where('is_approved', true);
+            })
+            ->with(['parent', 'replies.parent'])
+            ->get();
+
+        return response()->json($this->addParentUserNames($replies));
+    }
+
+    private function addParentUserNames($replies)
+    {
+        return $replies->map(function($reply) {
+            $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            if ($reply->replies) {
+                $reply->replies = $this->addParentUserNames($reply->replies);
+            }
+            return $reply;
+        });
     }
 
     public function store(Request $request)
@@ -45,8 +74,13 @@ class KomentarBeritaController extends Controller
             'nama_user' => $request->nama_user,
             'komentar' => $request->komentar,
             'id_ref_komentar' => $request->id_ref_komentar,
-            'is_approved' => !$news->is_moderate // Auto-approve if news is not moderated
+            'is_approved' => !$news->is_moderate
         ]);
+
+        if ($comment->id_ref_komentar) {
+            $comment->load('parent');
+            $comment->parent_user = $comment->parent->nama_user;
+        }
 
         $message = $news->is_moderate 
             ? 'Comment submitted and waiting for approval'

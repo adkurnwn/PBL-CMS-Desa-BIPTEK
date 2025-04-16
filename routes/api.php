@@ -21,4 +21,5 @@ Route::prefix('news')->group(function () {
 Route::prefix('comments')->group(function () {
     Route::get('/{newsId}', [App\Http\Controllers\Api\KomentarBeritaController::class, 'index']);
     Route::post('/', [App\Http\Controllers\Api\KomentarBeritaController::class, 'store']);
+    Route::get('/{newsId}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
 });

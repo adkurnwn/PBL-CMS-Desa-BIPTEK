@@ -91,72 +91,211 @@
 
               <!-- Comments List -->
               <div class="space-y-6">
-                <div v-for="comment in comments" :key="comment.id" class="bg-gray-50 p-4 rounded">
-                  <div class="font-semibold">{{ comment.nama_user }}</div>
-                  <div class="text-gray-600 mt-1">{{ comment.komentar }}</div>
-                  <div class="flex items-center justify-between mt-2">
-                    <div class="text-sm text-gray-500">
-                      {{ formatDate(comment.created_at) }}
-                    </div>
-                    <button 
-                      @click="showReplyForm(comment.id)" 
-                      class="text-blue-600 text-sm hover:text-blue-800"
-                    >
-                      Reply
-                    </button>
-                  </div>
-
-                  <!-- Reply Form -->
-                  <div v-if="activeReplyId === comment.id" class="mt-4 ml-8">
-                    <form @submit.prevent="submitReply(comment.id)" class="space-y-4">
-                      <div>
-                        <input 
-                          v-model="replyForm.nama_user"
-                          type="text"
-                          placeholder="Your Name"
-                          class="w-full p-2 border rounded"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <textarea
-                          v-model="replyForm.komentar"
-                          placeholder="Your Reply"
-                          rows="3"
-                          class="w-full p-2 border rounded"
-                          required
-                        ></textarea>
-                      </div>
-                      <div class="flex gap-2">
+                <template v-for="comment in comments" :key="comment.id">
+                  <div class="bg-gray-50 p-4 rounded">
+                    <!-- Main Comment -->
+                    <div class="font-semibold">{{ comment.nama_user }}</div>
+                    <div class="text-gray-600 mt-1">{{ comment.komentar }}</div>
+                    <div class="flex items-center justify-between mt-2">
+                      <div class="flex items-center gap-4">
+                        <div class="text-sm text-gray-500">
+                          {{ formatDate(comment.created_at) }}
+                        </div>
+                        <!-- Add Show Replies button if has replies -->
                         <button 
-                          type="submit"
-                          class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-                          :disabled="submitting"
+                          v-if="comment.replies_count > 0"
+                          @click="loadReplies(comment)" 
+                          class="text-sm text-gray-600 hover:text-gray-800"
                         >
-                          {{ submitting ? 'Submitting...' : 'Submit Reply' }}
-                        </button>
-                        <button 
-                          type="button"
-                          @click="cancelReply"
-                          class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
-                        >
-                          Cancel
+                          {{ comment.showReplies ? 'Hide' : 'Show' }} 
+                          {{ comment.replies_count }} {{ comment.replies_count === 1 ? 'reply' : 'replies' }}
                         </button>
                       </div>
-                    </form>
-                  </div>
+                      <button 
+                        @click="showReplyForm(comment.id)" 
+                        class="text-blue-600 text-sm hover:text-blue-800"
+                      >
+                        Reply
+                      </button>
+                    </div>
 
-                  <!-- Nested Replies -->
-                  <div v-if="comment.replies?.length" class="ml-8 mt-4 space-y-4">
-                    <div v-for="reply in comment.replies" :key="reply.id" class="bg-white p-3 rounded border border-gray-100">
-                      <div class="font-semibold">{{ reply.nama_user }}</div>
-                      <div class="text-gray-600 mt-1">{{ reply.komentar }}</div>
-                      <div class="text-sm text-gray-500 mt-2">
-                        {{ formatDate(reply.created_at) }}
-                      </div>
+                    <!-- Reply Form -->
+                    <div v-if="activeReplyId === comment.id" class="mt-4 ml-8">
+                      <form @submit.prevent="submitReply(comment.id)" class="space-y-4">
+                        <div>
+                          <input 
+                            v-model="replyForm.nama_user"
+                            type="text"
+                            placeholder="Your Name"
+                            class="w-full p-2 border rounded"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <textarea
+                            v-model="replyForm.komentar"
+                            placeholder="Your Reply"
+                            rows="3"
+                            class="w-full p-2 border rounded"
+                            required
+                          ></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                          <button 
+                            type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+                            :disabled="submitting"
+                          >
+                            {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                          </button>
+                          <button 
+                            type="button"
+                            @click="cancelReply"
+                            class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <!-- Replies Section -->
+                    <div v-if="comment.showReplies && comment.replies?.length" class="mt-4 space-y-4">
+                      <template v-for="reply in comment.replies" :key="reply.id">
+                        <div class="ml-8 bg-white p-3 rounded border border-gray-100">
+                          <!-- Reply Content -->
+                          <div class="flex items-center gap-1">
+                            <div class="font-semibold">{{ reply.nama_user }}</div>
+                            <div class="font-light italic text-gray-400">→</div>
+                            <div class="font-semibold">{{ reply.parent_user }}</div>
+                          </div>
+                          <div class="text-gray-600 mt-2">{{ reply.komentar }}</div>
+                          <div class="flex items-center justify-between mt-2">
+                            <div class="text-sm text-gray-500">
+                              {{ formatDate(reply.created_at) }}
+                            </div>
+                            <button 
+                              @click="showReplyForm(reply.id)" 
+                              class="text-blue-600 text-sm hover:text-blue-800"
+                            >
+                              Reply
+                            </button>
+                          </div>
+
+                          <!-- Reply Form for Level 2 -->
+                          <div v-if="activeReplyId === reply.id" class="mt-4 ml-8">
+                            <form @submit.prevent="submitReply(reply.id)" class="space-y-4">
+                              <div>
+                                <input 
+                                  v-model="replyForm.nama_user"
+                                  type="text"
+                                  placeholder="Your Name"
+                                  class="w-full p-2 border rounded"
+                                  required
+                                />
+                              </div>
+                              <div>
+                                <textarea
+                                  v-model="replyForm.komentar"
+                                  placeholder="Your Reply"
+                                  rows="3"
+                                  class="w-full p-2 border rounded"
+                                  required
+                                ></textarea>
+                              </div>
+                              <div class="flex gap-2">
+                                <button 
+                                  type="submit"
+                                  class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+                                  :disabled="submitting"
+                                >
+                                  {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                                </button>
+                                <button 
+                                  type="button"
+                                  @click="cancelReply"
+                                  class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+
+                          <!-- Nested Replies (Level 3+) -->
+                          <div v-if="reply.replies?.length" class="mt-4 space-y-4">
+                            <div v-for="deepReply in getAllDeeperReplies(reply)" :key="deepReply.id" 
+                                 class="ml-8 bg-white p-3 rounded border border-gray-100">
+                              <!-- Reply Content with Referenced Comment -->
+                              <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1">
+                                  <div class="font-semibold">{{ deepReply.nama_user }}</div>
+                                  <div class="font-light italic text-gray-400">→</div>
+                                  <div class="font-semibold">{{ deepReply.parent_user }}</div>
+                                  <div class="text-gray-400 italic text-sm">
+                                    ("{{ truncateText(deepReply.parent?.komentar, 30) }}")
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="text-gray-600 mt-2">{{ deepReply.komentar }}</div>
+                              <div class="flex items-center justify-between mt-2">
+                                <div class="text-sm text-gray-500">
+                                  {{ formatDate(deepReply.created_at) }}
+                                </div>
+                                <button 
+                                  @click="showReplyForm(deepReply.id)" 
+                                  class="text-blue-600 text-sm hover:text-blue-800"
+                                >
+                                  Reply
+                                </button>
+                              </div>
+
+                              <!-- Reply Form -->
+                              <div v-if="activeReplyId === deepReply.id" class="mt-4">
+                                <form @submit.prevent="submitReply(deepReply.id)" class="space-y-4">
+                                  <div>
+                                    <input 
+                                      v-model="replyForm.nama_user"
+                                      type="text"
+                                      placeholder="Your Name"
+                                      class="w-full p-2 border rounded"
+                                      required
+                                    />
+                                  </div>
+                                  <div>
+                                    <textarea
+                                      v-model="replyForm.komentar"
+                                      placeholder="Your Reply"
+                                      rows="3"
+                                      class="w-full p-2 border rounded"
+                                      required
+                                    ></textarea>
+                                  </div>
+                                  <div class="flex gap-2">
+                                    <button 
+                                      type="submit"
+                                      class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+                                      :disabled="submitting"
+                                    >
+                                      {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      @click="cancelReply"
+                                      class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
-                </div>
+                </template>
               </div>
             </div>
           </div>
@@ -205,6 +344,11 @@ const formatDate = (date) => {
   });
 };
 
+const truncateText = (text, length) => {
+  if (!text) return '';
+  return text.length > length ? text.substring(0, length) + '...' : text;
+};
+
 const fetchNews = async () => {
   try {
     loading.value = true;
@@ -221,7 +365,12 @@ const fetchNews = async () => {
 const fetchComments = async () => {
   try {
     const response = await axios.get(`/api/comments/${props.id}`);
-    comments.value = response.data;
+    // Only map top-level comments (those without parent)
+    comments.value = response.data.filter(comment => !comment.id_ref_komentar).map(comment => ({
+      ...comment,
+      showReplies: false,
+      replies: []
+    }));
   } catch (err) {
     console.error('Error fetching comments:', err);
   }
@@ -286,6 +435,65 @@ const submitReply = async (commentId) => {
   } finally {
     submitting.value = false;
   }
+};
+
+const getParentUser = (reply) => {
+  return reply.parent_user || 'Unknown';
+};
+
+const loadReplies = async (comment) => {
+  if (comment.showReplies) {
+    comment.showReplies = false;
+    return;
+  }
+
+  try {
+    const response = await axios.get(`/api/comments/${props.id}/replies/${comment.id}`);
+    
+    // Create a map of all replies
+    const repliesMap = new Map();
+    response.data.forEach(reply => {
+      repliesMap.set(reply.id, { ...reply, replies: [] });
+    });
+
+    // Build reply tree
+    response.data.forEach(reply => {
+      const replyObj = repliesMap.get(reply.id);
+      if (reply.id_ref_komentar === comment.id) {
+        // Direct replies to main comment
+        if (!comment.replies) comment.replies = [];
+        comment.replies.push(replyObj);
+      } else {
+        // Nested replies
+        const parentReply = repliesMap.get(reply.id_ref_komentar);
+        if (parentReply) {
+          if (!parentReply.replies) parentReply.replies = [];
+          parentReply.replies.push(replyObj);
+        }
+      }
+    });
+
+    comment.showReplies = true;
+  } catch (err) {
+    console.error('Error loading replies:', err);
+    alert('Failed to load replies');
+  }
+};
+
+const getAllDeeperReplies = (reply) => {
+  let allReplies = [];
+  
+  const collectReplies = (r) => {
+    if (r.replies?.length) {
+      r.replies.forEach(nestedReply => {
+        allReplies.push(nestedReply);
+        collectReplies(nestedReply);
+      });
+    }
+  };
+  
+  collectReplies(reply);
+  return allReplies;
 };
 
 onMounted(() => {
