@@ -15,7 +15,7 @@ return new class extends Migration
             $table->smallIncrements('id');
             $table->string('judul');
             $table->text('isi');
-            $table->email('email');
+            $table->string('email', 50);
             $table->enum('status', ['Menunggu', 'Ditanggapi'])->default('Menunggu');
             $table->text('tanggapan')->nullable();
             $table->timestamps();

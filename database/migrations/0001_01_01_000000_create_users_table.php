@@ -19,7 +19,7 @@ return new class extends Migration
                 ->on('positions')
                 ->onDelete('cascade');
             $table->string('name', 50);
-            $table->string('email')->unique();
+            $table->string('email', 50)->unique();
             $table->char('password', 60);
             $table->string('phone', 20)->nullable();
             $table->string('photo_profile', 255)->nullable();
