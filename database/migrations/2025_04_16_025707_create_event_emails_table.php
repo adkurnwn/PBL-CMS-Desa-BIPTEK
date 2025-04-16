@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('event_emails', function (Blueprint $table) {
             $table->integerIncrements('id')->unsigned();
-            $table->Integer('event_id')->unsigned();
+            $table->unsignedInteger('event_id');
             $table->foreign('event_id')
                 ->references('id')
                 ->on('events')
                 ->onDelete('cascade');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->timestamps();
         });
     }

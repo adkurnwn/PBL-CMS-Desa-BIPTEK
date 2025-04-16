@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->tinyIncrements('id')->unsigned();
-            $table->unsignedTinyInteger('position_id');
+            $table->unsignedTinyInteger('position_id')->nullable();
             $table->foreign('position_id')
                 ->references('id')
                 ->on('positions')
                 ->onDelete('cascade');
             $table->string('name', 50);
-            $table->string('email')->unique();
+            $table->string('email', 50)->unique();
             $table->char('password', 60);
             $table->string('phone', 20)->nullable();
             $table->string('photo_profile', 255)->nullable();

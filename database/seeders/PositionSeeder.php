@@ -77,15 +77,6 @@ class PositionSeeder extends Seeder
                     'Melaksanakan keputusan dan kebijakan kepala desa',
                     'Membina ketentraman dan ketertiban masyarakat'
                 ])
-            ],
-            [
-                'name' => 'Admin Sistem',
-                'job_description' => json_encode([
-                    'Mengelola website dan sistem informasi desa',
-                    'Melakukan backup data secara berkala',
-                    'Memelihara keamanan sistem dan data',
-                    'Melakukan pembaruan sistem sesuai kebutuhan'
-                ])
             ]
         ];
 

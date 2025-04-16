@@ -134,7 +134,7 @@ const showingNavigationDropdown = ref(false);
                                                 >
                                                     <path
                                                         fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
                                                         clip-rule="evenodd"
                                                     />
                                                 </svg>
@@ -253,6 +253,34 @@ const showingNavigationDropdown = ref(false);
                     <slot name="header" />
                 </div>
             </header>
+
+            <!-- Flash Messages -->
+            <div class="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
+                <div
+                    v-if="$page.props.flash?.success"
+                    class="mb-4 p-4 bg-green-100 text-green-700 rounded-md"
+                >
+                    {{ $page.props.flash.success }}
+                </div>
+                <div
+                    v-if="$page.props.flash?.error"
+                    class="mb-4 p-4 bg-red-100 text-red-700 rounded-md"
+                >
+                    {{ $page.props.flash.error }}
+                </div>
+                <div
+                    v-if="$page.props.flash?.warning"
+                    class="mb-4 p-4 bg-yellow-100 text-yellow-700 rounded-md"
+                >
+                    {{ $page.props.flash.warning }}
+                </div>
+                <div
+                    v-if="$page.props.flash?.info"
+                    class="mb-4 p-4 bg-blue-100 text-blue-700 rounded-md"
+                >
+                    {{ $page.props.flash.info }}
+                </div>
+            </div>
 
             <!-- Page Content -->
             <main>

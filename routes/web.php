@@ -19,12 +19,6 @@ use App\Models\ProdukDesa;
 
 Route::get('/', function () {
     return view('home');
-    // return Inertia::render('Welcome', [
-    //     'canLogin' => Route::has('login'),
-    //     'canRegister' => Route::has('register'),
-    //     'laravelVersion' => Application::VERSION,
-    //     'phpVersion' => PHP_VERSION,
-    // ]);
 });
 
 Route::get('/profildesa', function () {
@@ -49,12 +43,22 @@ Route::get('/berita/{id}', function ($id) {
     ]);
 })->name('berita.show');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
+
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
+
+Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
         return Inertia::render('Dashboard/Dashboard');
     })->name('dashboard');
+
     Route::prefix('dashboard')->group(function () {
-        // Dashboard accessible to anyone with view_dashboard permission
 
         // User management routes
         Route::middleware(['permission:read_users'])->get('/users', [UserManagementController::class, 'index'])->name('dashboard.users');
@@ -131,7 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
