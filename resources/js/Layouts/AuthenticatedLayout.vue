@@ -107,9 +107,19 @@ const showingNavigationDropdown = ref(false);
                                 </NavLink>
                                 <NavLink
                                     :href="route('dashboard.comments')"
-                                    :active="route().current('dashboard.comments')"
+                                    :active="
+                                        route().current('dashboard.comments')
+                                    "
                                 >
                                     Comment Moderation
+                                </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.demografi')"
+                                    :active="
+                                        route().current('dashboard.demografi')
+                                    "
+                                >
+                                    Demografi
                                 </NavLink>
                             </div>
                         </div>

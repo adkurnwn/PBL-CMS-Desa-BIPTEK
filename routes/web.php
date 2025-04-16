@@ -8,6 +8,7 @@ use App\Http\Controllers\Dashboard\NewsController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\GalleryController;
 use App\Http\Controllers\Dashboard\DanaDesaController;
+use App\Http\Controllers\Dashboard\DemografiController;
 use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
@@ -132,6 +133,13 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:read_comments'])->get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
         Route::middleware(['permission:update_comments'])->patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
         Route::middleware(['permission:delete_comments'])->delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');
+
+        Route::middleware(['permission:read_demografi'])->get('/demografi', [DemografiController::class, 'index'])->name('dashboard.demografi');
+        Route::middleware(['permission:create_demografi'])->get('/demografi/create', [DemografiController::class, 'create'])->name('dashboard.demografi.create');
+        Route::middleware(['permission:create_demografi'])->post('/demografi', [DemografiController::class, 'store'])->name('dashboard.demografi.store');
+        Route::middleware(['permission:update_demografi'])->get('/demografi/{demografi}/edit', [DemografiController::class, 'edit'])->name('dashboard.demografi.edit');
+        Route::middleware(['permission:update_demografi'])->put('/demografi/{demografi}', [DemografiController::class, 'update'])->name('dashboard.demografi.update');
+        Route::middleware(['permission:delete_demografi'])->delete('/demografi/{demografi}', [DemografiController::class, 'destroy'])->name('dashboard.demografi.destroy');
     });
 });
 

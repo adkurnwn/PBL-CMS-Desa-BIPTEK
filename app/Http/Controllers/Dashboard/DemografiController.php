@@ -12,20 +12,19 @@ class DemografiController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Demografi/Index', [
+        return Inertia::render('Dashboard/Demografi/Index', [
             'demografi' => Demografi::all(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Demografi/Create');
+        return Inertia::render('Dashboard/Demografi/Create');
     }
 
     public function store(Request $request)
     {
         $rules = [
-            'user_id' => 'required',
             'penduduk_pria' => 'required',
             'penduduk_wanita' => 'required',
             'tahun' => 'required',
@@ -54,7 +53,7 @@ class DemografiController extends Controller
 
     public function edit(Demografi $demografi)
     {
-        return Inertia::render('Demografi/Edit', [
+        return Inertia::render('Dashboard/Demografi/Edit', [
             'demografi' => $demografi,
         ]);
     }

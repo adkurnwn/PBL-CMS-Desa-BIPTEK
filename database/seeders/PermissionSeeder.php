@@ -23,7 +23,8 @@ class PermissionSeeder extends Seeder
             'produk-hukum' => ['create', 'read', 'update', 'delete'],
             'dana-desa' => ['create', 'read', 'update', 'delete'],
             'produk-desa' => ['create', 'read', 'update', 'delete'],
-            'comments' => ['read', 'update', 'delete']
+            'comments' => ['read', 'update', 'delete'],
+            'demografi' => ['create', 'read', 'update'],
         ];
 
         foreach ($features as $feature => $actions) {
