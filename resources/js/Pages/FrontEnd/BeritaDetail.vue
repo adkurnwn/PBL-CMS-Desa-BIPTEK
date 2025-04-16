@@ -58,7 +58,7 @@
 
             <!-- Comments Section -->
             <div class="mt-12">
-              <h2 class="text-2xl font-bold mb-6">Comments</h2>
+              <h2 class="text-2xl font-bold mb-6">Komentar</h2>
               
               <!-- Comment Form -->
               <form @submit.prevent="submitComment" class="mb-8">
@@ -66,7 +66,7 @@
                   <input 
                     v-model="commentForm.nama_user"
                     type="text"
-                    placeholder="Your Name"
+                    placeholder="Masukkan Nama..."
                     class="w-full p-2 border rounded"
                     required
                   />
@@ -74,7 +74,7 @@
                 <div class="mb-4">
                   <textarea
                     v-model="commentForm.komentar"
-                    placeholder="Your Comment"
+                    placeholder="Masukkan Komentar..."
                     rows="4"
                     class="w-full p-2 border rounded"
                     required
@@ -85,7 +85,7 @@
                   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   :disabled="submitting"
                 >
-                  {{ submitting ? 'Submitting...' : 'Submit Comment' }}
+                  {{ submitting ? 'Mengirim...' : 'Kirim Komentar' }}
                 </button>
               </form>
 
@@ -94,29 +94,34 @@
                 <template v-for="comment in comments" :key="comment.id">
                   <div class="bg-gray-50 p-4 rounded">
                     <!-- Main Comment -->
-                    <div class="font-semibold">{{ comment.nama_user }}</div>
-                    <div class="text-gray-600 mt-1">{{ comment.komentar }}</div>
-                    <div class="flex items-center justify-between mt-2">
-                      <div class="flex items-center gap-4">
-                        <div class="text-sm text-gray-500">
-                          {{ formatDate(comment.created_at) }}
+                    <div class="flex gap-3">
+                      <img :src="getAvatar(comment.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
+                      <div class="flex-1">
+                        <div class="font-semibold">{{ comment.nama_user }}</div>
+                        <div class="text-gray-600 mt-1">{{ comment.komentar }}</div>
+                        <div class="flex items-center justify-between mt-2">
+                          <div class="flex items-center gap-4">
+                            <div class="text-sm text-gray-500">
+                              {{ formatDate(comment.created_at) }}
+                            </div>
+                            <!-- Add Show Replies button if has replies -->
+                            <button 
+                              v-if="comment.replies_count > 0"
+                              @click="loadReplies(comment)" 
+                              class="text-sm text-gray-600 hover:text-gray-800"
+                            >
+                              {{ comment.showReplies ? 'Sembunyikan' : 'Tampilkan' }} 
+                              {{ comment.replies_count }} {{ 'balasan'}}
+                            </button>
+                          </div>
+                          <button 
+                            @click="showReplyForm(comment.id)" 
+                            class="text-blue-600 text-sm hover:text-blue-800"
+                          >
+                            Balas
+                          </button>
                         </div>
-                        <!-- Add Show Replies button if has replies -->
-                        <button 
-                          v-if="comment.replies_count > 0"
-                          @click="loadReplies(comment)" 
-                          class="text-sm text-gray-600 hover:text-gray-800"
-                        >
-                          {{ comment.showReplies ? 'Hide' : 'Show' }} 
-                          {{ comment.replies_count }} {{ comment.replies_count === 1 ? 'reply' : 'replies' }}
-                        </button>
                       </div>
-                      <button 
-                        @click="showReplyForm(comment.id)" 
-                        class="text-blue-600 text-sm hover:text-blue-800"
-                      >
-                        Reply
-                      </button>
                     </div>
 
                     <!-- Reply Form -->
@@ -126,7 +131,7 @@
                           <input 
                             v-model="replyForm.nama_user"
                             type="text"
-                            placeholder="Your Name"
+                            placeholder="Masukkan Nama..."
                             class="w-full p-2 border rounded"
                             required
                           />
@@ -134,7 +139,7 @@
                         <div>
                           <textarea
                             v-model="replyForm.komentar"
-                            placeholder="Your Reply"
+                            placeholder="Masukkan Balasan..."
                             rows="3"
                             class="w-full p-2 border rounded"
                             required
@@ -146,14 +151,14 @@
                             class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
                             :disabled="submitting"
                           >
-                            {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                            {{ submitting ? 'Membalas...' : 'Kirim Balasan' }}
                           </button>
                           <button 
                             type="button"
                             @click="cancelReply"
                             class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
                           >
-                            Cancel
+                            Batal
                           </button>
                         </div>
                       </form>
@@ -164,22 +169,27 @@
                       <template v-for="reply in comment.replies" :key="reply.id">
                         <div class="ml-8 bg-white p-3 rounded border border-gray-100">
                           <!-- Reply Content -->
-                          <div class="flex items-center gap-1">
-                            <div class="font-semibold">{{ reply.nama_user }}</div>
-                            <div class="font-light italic text-gray-400">→</div>
-                            <div class="font-semibold">{{ reply.parent_user }}</div>
-                          </div>
-                          <div class="text-gray-600 mt-2">{{ reply.komentar }}</div>
-                          <div class="flex items-center justify-between mt-2">
-                            <div class="text-sm text-gray-500">
-                              {{ formatDate(reply.created_at) }}
+                          <div class="flex gap-3">
+                            <img :src="getAvatar(reply.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                              <div class="flex items-center gap-1">
+                                <div class="font-semibold">{{ reply.nama_user }}</div>
+                                <div class="font-light italic text-gray-400">membalas</div>
+                                <div class="font-semibold">{{ reply.parent_user }}</div>
+                              </div>
+                              <div class="text-gray-600 mt-2">{{ reply.komentar }}</div>
+                              <div class="flex items-center justify-between mt-2">
+                                <div class="text-sm text-gray-500">
+                                  {{ formatDate(reply.created_at) }}
+                                </div>
+                                <button 
+                                  @click="showReplyForm(reply.id)" 
+                                  class="text-blue-600 text-sm hover:text-blue-800"
+                                >
+                                  Balas
+                                </button>
+                              </div>
                             </div>
-                            <button 
-                              @click="showReplyForm(reply.id)" 
-                              class="text-blue-600 text-sm hover:text-blue-800"
-                            >
-                              Reply
-                            </button>
                           </div>
 
                           <!-- Reply Form for Level 2 -->
@@ -189,7 +199,7 @@
                                 <input 
                                   v-model="replyForm.nama_user"
                                   type="text"
-                                  placeholder="Your Name"
+                                  placeholder="Masukkan Nama..."
                                   class="w-full p-2 border rounded"
                                   required
                                 />
@@ -197,7 +207,7 @@
                               <div>
                                 <textarea
                                   v-model="replyForm.komentar"
-                                  placeholder="Your Reply"
+                                  placeholder="Masukkan Balasan..."
                                   rows="3"
                                   class="w-full p-2 border rounded"
                                   required
@@ -209,7 +219,7 @@
                                   class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
                                   :disabled="submitting"
                                 >
-                                  {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                                  {{ submitting ? 'Mengirim...' : 'Kirim' }}
                                 </button>
                                 <button 
                                   type="button"
@@ -227,27 +237,32 @@
                             <div v-for="deepReply in getAllDeeperReplies(reply)" :key="deepReply.id" 
                                  class="ml-8 bg-white p-3 rounded border border-gray-100">
                               <!-- Reply Content with Referenced Comment -->
-                              <div class="flex items-center gap-2">
-                                <div class="flex items-center gap-1">
-                                  <div class="font-semibold">{{ deepReply.nama_user }}</div>
-                                  <div class="font-light italic text-gray-400">→</div>
-                                  <div class="font-semibold">{{ deepReply.parent_user }}</div>
-                                  <div class="text-gray-400 italic text-sm">
-                                    ("{{ truncateText(deepReply.parent?.komentar, 30) }}")
+                              <div class="flex gap-3">
+                                <img :src="getAvatar(deepReply.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
+                                <div class="flex-1">
+                                  <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-1">
+                                      <div class="font-semibold">{{ deepReply.nama_user }}</div>
+                                      <div class="font-light italic text-gray-400">membalas</div>
+                                      <div class="font-semibold">{{ deepReply.parent_user }}</div>
+                                      <div class="text-gray-400 italic text-sm">
+                                        ("{{ truncateText(deepReply.parent?.komentar, 30) }}")
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="text-gray-600 mt-2">{{ deepReply.komentar }}</div>
+                                  <div class="flex items-center justify-between mt-2">
+                                    <div class="text-sm text-gray-500">
+                                      {{ formatDate(deepReply.created_at) }}
+                                    </div>
+                                    <button 
+                                      @click="showReplyForm(deepReply.id)" 
+                                      class="text-blue-600 text-sm hover:text-blue-800"
+                                    >
+                                      Balas
+                                    </button>
                                   </div>
                                 </div>
-                              </div>
-                              <div class="text-gray-600 mt-2">{{ deepReply.komentar }}</div>
-                              <div class="flex items-center justify-between mt-2">
-                                <div class="text-sm text-gray-500">
-                                  {{ formatDate(deepReply.created_at) }}
-                                </div>
-                                <button 
-                                  @click="showReplyForm(deepReply.id)" 
-                                  class="text-blue-600 text-sm hover:text-blue-800"
-                                >
-                                  Reply
-                                </button>
                               </div>
 
                               <!-- Reply Form -->
@@ -257,7 +272,7 @@
                                     <input 
                                       v-model="replyForm.nama_user"
                                       type="text"
-                                      placeholder="Your Name"
+                                      placeholder="Masukkan Nama..."
                                       class="w-full p-2 border rounded"
                                       required
                                     />
@@ -265,7 +280,7 @@
                                   <div>
                                     <textarea
                                       v-model="replyForm.komentar"
-                                      placeholder="Your Reply"
+                                      placeholder="Masukkan Balasan..."
                                       rows="3"
                                       class="w-full p-2 border rounded"
                                       required
@@ -277,7 +292,7 @@
                                       class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
                                       :disabled="submitting"
                                     >
-                                      {{ submitting ? 'Submitting...' : 'Submit Reply' }}
+                                      {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
                                     </button>
                                     <button 
                                       type="button"
@@ -347,6 +362,10 @@ const formatDate = (date) => {
 const truncateText = (text, length) => {
   if (!text) return '';
   return text.length > length ? text.substring(0, length) + '...' : text;
+};
+
+const getAvatar = (name) => {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
 };
 
 const fetchNews = async () => {
