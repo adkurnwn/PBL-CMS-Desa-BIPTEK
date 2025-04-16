@@ -12,9 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('galleries', function (Blueprint $table) {
-            $table->id();
+            $table->smallIncrements('id')->unsigned();
             $table->string('title');
-            $table->enum('category', ['news', 'event', 'infrastructure', 'nature']);
+            $table->unsignedTinyInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->unsignedTinyInteger('category_id');
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('categories')
+                ->onDelete('cascade');
             $table->text('description');
             $table->timestamps();
         });

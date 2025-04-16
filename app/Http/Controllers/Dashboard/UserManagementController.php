@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\User;
+use App\Models\Position;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
@@ -14,60 +15,80 @@ class UserManagementController extends Controller
     public function index()
     {
         return Inertia::render('Dashboard/UserManagement/Index', [
-            'users' => User::with('roles')->whereDoesntHave('roles', function ($query) {
+            'users' => User::with(['roles', 'position'])->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })->get()
+            })->get(),
+            'positions' => Position::all()
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Dashboard/UserManagement/Create');
+        return Inertia::render('Dashboard/UserManagement/Create', [
+            'positions' => Position::all()
+        ]);
     }
 
     public function store(Request $request)
     {
-        if ($request->position === 'Kepala Desa') {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
+            'password' => ['required', Rules\Password::defaults()],
+            'phone' => 'required|string|max:20',
+            'photo_profile' => 'nullable|image|max:1024|mimes:jpg,png,jpeg',
+        ];
+
+        if ($request->filled('new_position')) {
+            $rules['new_position'] = 'required|string|max:255';
+            $rules['job_descriptions'] = 'required|array|min:1';
+        } else {
+            $rules['position_id'] = 'required|exists:positions,id';
+        }
+
+        $request->validate($rules);
+
+        if ($request->filled('new_position')) {
+            $position = Position::create([
+                'name' => $request->new_position,
+                'job_description' => json_encode($request->job_descriptions)
+            ]);
+            $position_id = $position->id;
+        } else {
+            $position = Position::findOrFail($request->position_id);
+            $position_id = $position->id;
+        }
+
+        if ($position->name === 'Kepala Desa') {
             $existingKepalaDesa = User::whereHas('roles', function ($query) {
                 $query->where('name', 'Kepala Desa');
             })->where('status', true)->first();
 
             if ($existingKepalaDesa) {
                 return back()->withErrors([
-                    'position' => 'There is already an active Kepala Desa'
+                    'position_id' => 'There is already an active Kepala Desa'
                 ]);
             }
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
-            'password' => ['required', Rules\Password::defaults()],
-            'phone' => 'required|string|max:20',
-            'photo_profile' => 'nullable|image|max:1024|mimes:jpg,png,jpeg',
-            'position' => 'required|string',
-            'job_description' => 'nullable|array',
-            'status' => 'required|boolean',
-        ]);
-
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'position' => $request->position,
-            'job_description' => json_encode($request->job_description),
-            'status' => $request->status,
-        ];
+        // Create user
+        $userData = $request->all();
+        $userData['status'] = true;
+        $userData['position_id'] = $position_id;
+        $userData['password'] = Hash::make($request->password);
 
         if ($request->hasFile('photo_profile')) {
-            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos');
+            $path = $request->file('photo_profile')->store('profile-photos', 'public');
+            $userData['photo_profile'] = $path;
         }
 
         $user = User::create($userData);
 
-        if ($request->position === 'Kepala Desa') {
+        // Assign role based on position name
+        if ($position->name === 'Kepala Desa') {
             $user->assignRole('Kepala Desa');
+        } else if ($position->name === 'Admin Sistem') {
+            $user->assignRole('Admin');
         } else {
             $user->assignRole('Aparat Desa');
         }
@@ -78,33 +99,26 @@ class UserManagementController extends Controller
     public function edit(User $user)
     {
         return Inertia::render('Dashboard/UserManagement/Edit', [
-            'user' => $user
+            'user' => $user->load('position'),
+            'positions' => Position::all()
         ]);
     }
 
     public function update(Request $request, User $user)
     {
-        if ($request->position === 'Kepala Desa' && $request->status) {
-            $existingKepalaDesa = User::whereHas('roles', function ($query) use ($user) {
-                $query->where('name', 'Kepala Desa');
-            })->where('status', true)->where('id', '!=', $user->id)->first();
-
-            if ($existingKepalaDesa) {
-                return back()->withErrors([
-                    'position' => 'There is already an active Kepala Desa'
-                ]);
-            }
-        }
-
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'required|string|max:20',
-            'position' => 'required|string',
-            'job_description' => 'nullable|array',
-            'status' => 'required|boolean',
-            'id_position' => 'nullable|exists:positions,id',
-        ]);
+        ];
+
+        // Validate position fields based on whether it's new or existing
+        if ($request->filled('new_position')) {
+            $rules['new_position'] = 'required|string|max:255';
+            $rules['job_descriptions'] = 'required|array|min:1';
+        } else {
+            $rules['position_id'] = 'required|exists:positions,id';
+        }
 
         if ($request->filled('password')) {
             $rules['password'] = ['required', Rules\Password::defaults()];
@@ -114,28 +128,51 @@ class UserManagementController extends Controller
             $rules['photo_profile'] = 'image|max:1024|mimes:jpg,png,jpeg';
         }
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'position' => $request->position,
-            'job_description' => json_encode($request->job_description),
-            'status' => $request->status,
-            'id_position' => $request->id_position,
-        ];
+        $request->validate($rules);
+
+        // Handle position (create new if needed)
+        if ($request->filled('new_position')) {
+            // Create a new position
+            $position = Position::create([
+                'name' => $request->new_position,
+                'job_description' => json_encode($request->job_descriptions)
+            ]);
+            $position_id = $position->id;
+        } else {
+            $position = Position::findOrFail($request->position_id);
+            $position_id = $position->id;
+        }
+
+        // Check if trying to update to Kepala Desa when one already exists
+        if ($position->name === 'Kepala Desa' && $request->status) {
+            $existingKepalaDesa = User::whereHas('roles', function ($query) use ($user) {
+                $query->where('name', 'Kepala Desa');
+            })->where('status', true)->where('id', '!=', $user->id)->first();
+
+            if ($existingKepalaDesa) {
+                return back()->withErrors([
+                    'position_id' => 'There is already an active Kepala Desa'
+                ]);
+            }
+        }
+
+        $userData = $request->except('password');
+        $userData['position_id'] = $position_id;
 
         if ($request->filled('password')) {
             $userData['password'] = Hash::make($request->password);
         }
 
         if ($request->hasFile('photo_profile')) {
-            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos');
+            $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
         }
 
         $user->update($userData);
 
-        if ($request->position === 'Kepala Desa') {
+        if ($position->name === 'Kepala Desa') {
             $user->syncRoles('Kepala Desa');
+        } else if ($position->name === 'Admin Sistem') {
+            $user->syncRoles('Admin');
         } else {
             $user->syncRoles(['Aparat Desa']);
         }
@@ -145,7 +182,16 @@ class UserManagementController extends Controller
 
     public function destroy(User $user)
     {
-        $user->delete();
+        if ($user->status === false) {
+            $user->update([
+                'status' => true
+            ]);
+        } else {
+            $user->update([
+                'status' => false
+            ]);
+        }
+
         return redirect()->route('dashboard.users')->with('success', 'User deleted successfully');
     }
 }

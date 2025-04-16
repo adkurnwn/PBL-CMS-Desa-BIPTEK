@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Region\Village; // Add this at the top
 
 class ProfileController extends Controller
 {
@@ -26,7 +27,6 @@ class ProfileController extends Controller
     public function update(Request $request, Profile $profile)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255',
             'phone' => 'required|string|max:255',
             'provinsi' => 'required|string',
@@ -47,8 +47,11 @@ class ProfileController extends Controller
             'hero_image_3' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
         ]);
 
+        $village = Village::find($request->kelurahan);
+        $villageName = $village ? "Desa " . $village->name : '';
+
         $profileData = [
-            'name' => $request->name,
+            'name' => $villageName,
             'email' => $request->email,
             'phone' => $request->phone,
             'provinsi' => $request->provinsi,

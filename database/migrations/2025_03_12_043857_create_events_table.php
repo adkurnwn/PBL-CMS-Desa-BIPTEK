@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
+            $table->integerIncrements('id')->unsigned();
+            $table->unsignedTinyInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->date('date');

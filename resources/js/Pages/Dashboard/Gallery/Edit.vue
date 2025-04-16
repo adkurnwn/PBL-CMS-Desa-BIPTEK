@@ -7,20 +7,25 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import DangerButton from "@/Components/DangerButton.vue";
+import CategoryInput from "@/Components/CategoryInput.vue";
 
 const props = defineProps({
     gallery: Object,
+    categories: Array,
 });
 
 const URL = window.URL;
 
 const form = useForm({
     title: props.gallery.title,
-    category: props.gallery.category,
+    category: {
+        category_id: props.gallery.category_id,
+        new_category: "",
+    },
     description: props.gallery.description,
     images: [],
     alts: [],
-    removed_images: [], // Add this to track removed images
+    removed_images: [],
     _method: "PUT",
 });
 
@@ -82,30 +87,11 @@ const removeImage = (imageId) => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="Category"
-                                    />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">
-                                            Berita Umum
-                                        </option>
-                                        <option value="event">Kegiatan</option>
-                                        <option value="infrastructure">
-                                            Infrastruktur
-                                        </option>
-                                        <option value="nature">Alam</option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.category"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <CategoryInput
+                                    v-model="form.category"
+                                    :categories="categories"
+                                    :errors="form.errors"
+                                />
 
                                 <div>
                                     <InputLabel

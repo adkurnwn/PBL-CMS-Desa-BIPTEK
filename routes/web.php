@@ -1,25 +1,25 @@
 <?php
 
-use App\Http\Controllers\Dashboard\EventController;
-use App\Http\Controllers\Dashboard\GalleryController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
-use App\Http\Controllers\Dashboard\NewsController;
-use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Dashboard\NewsController;
+use App\Http\Controllers\Dashboard\EventController;
+use App\Http\Controllers\Dashboard\GalleryController;
+use App\Http\Controllers\Dashboard\DanaDesaController;
+use App\Http\Controllers\Dashboard\DemografiController;
+use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
+use App\Http\Controllers\Dashboard\PositionController;
+use App\Http\Controllers\Dashboard\ProdukDesaController;
+use App\Http\Controllers\Dashboard\KomentarBeritaController;
+use App\Models\ProdukDesa;
 
 Route::get('/', function () {
     return view('home');
-    // return Inertia::render('Welcome', [
-    //     'canLogin' => Route::has('login'),
-    //     'canRegister' => Route::has('register'),
-    //     'laravelVersion' => Application::VERSION,
-    //     'phpVersion' => PHP_VERSION,
-    // ]);
 });
 
 Route::get('/profildesa', function () {
@@ -34,13 +34,32 @@ Route::get('/layanan', function () {
     return view('layanan');
 });
 
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
+
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
+
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
+
+Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
         return Inertia::render('Dashboard/Dashboard');
     })->name('dashboard');
+
     Route::prefix('dashboard')->group(function () {
-        // Dashboard accessible to anyone with view_dashboard permission
 
         // User management routes
         Route::middleware(['permission:read_users'])->get('/users', [UserManagementController::class, 'index'])->name('dashboard.users');
@@ -86,13 +105,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['permission:read_produk-hukum'])->get('/produk-hukum', [ProdukHukumController::class, 'index'])->name('dashboard.produk-hukum');
         Route::middleware(['permission:create_produk-hukum'])->get('/produk-hukum/create', [ProdukHukumController::class, 'create'])->name('dashboard.produk-hukum.create');
         Route::middleware(['permission:create_produk-hukum'])->post('/produk-hukum', [ProdukHukumController::class, 'store'])->name('dashboard.produk-hukum.store');
-        Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produk-hukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
-        Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
-        Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produk-hukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
+        Route::middleware(['permission:update_produk-hukum'])->get('/produk-hukum/{produkHukum}/edit', [ProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.edit');
+        Route::middleware(['permission:update_produk-hukum'])->put('/produk-hukum/{produkHukum}', [ProdukHukumController::class, 'update'])->name('dashboard.produk-hukum.update');
+        Route::middleware(['permission:delete_produk-hukum'])->delete('/produk-hukum/{produkHukum}', [ProdukHukumController::class, 'destroy'])->name('dashboard.produk-hukum.destroy');
+
+        Route::middleware(['permission:read_dana-desa'])->get('/dana-desa', [DanaDesaController::class, 'index'])->name('dashboard.dana-desa');
+        Route::middleware(['permission:create_dana-desa'])->get('/dana-desa/create', [DanaDesaController::class, 'create'])->name('dashboard.dana-desa.create');
+        Route::middleware(['permission:create_dana-desa'])->post('/dana-desa', [DanaDesaController::class, 'store'])->name('dashboard.dana-desa.store');
+        Route::middleware(['permission:update_dana-desa'])->get('/dana-desa/{danaDesa}/edit', [DanaDesaController::class, 'edit'])->name('dashboard.dana-desa.edit');
+        Route::middleware(['permission:update_dana-desa'])->put('/dana-desa/{danaDesa}', [DanaDesaController::class, 'update'])->name('dashboard.dana-desa.update');
+        Route::middleware(['permission:delete_dana-desa'])->delete('/dana-desa/{danaDesa}', [DanaDesaController::class, 'destroy'])->name('dashboard.dana-desa.destroy');
+
+        Route::middleware(['permission:read_positions'])->get('/position', [PositionController::class, 'index'])->name('dashboard.positions');
+        Route::middleware(['permission:create_positions'])->get('/position/create', [PositionController::class, 'create'])->name('dashboard.positions.create');
+        Route::middleware(['permission:create_positions'])->post('/position', [PositionController::class, 'store'])->name('dashboard.positions.store');
+        Route::middleware(['permission:update_positions'])->get('/position/{position}/edit', [PositionController::class, 'edit'])->name('dashboard.positions.edit');
+        Route::middleware(['permission:update_positions'])->put('/position/{position}', [PositionController::class, 'update'])->name('dashboard.positions.update');
+        Route::middleware(['permission:delete_positions'])->delete('/position/{position}', [PositionController::class, 'destroy'])->name('dashboard.positions.destroy');
+
+        Route::middleware(['permission:read_produk-desa'])->get('/produk-desa', [ProdukDesaController::class, 'index'])->name('dashboard.produk-desa');
+        Route::middleware(['permission:create_produk-desa'])->get('/produk-desa/create', [ProdukDesaController::class, 'create'])->name('dashboard.produk-desa.create');
+        Route::middleware(['permission:create_produk-desa'])->post('/produk-desa', [ProdukDesaController::class, 'store'])->name('dashboard.produk-desa.store');
+        Route::middleware(['permission:update_produk-desa'])->get('/produk-desa/{produkDesa}/edit', [ProdukDesaController::class, 'edit'])->name('dashboard.produk-desa.edit');
+        Route::middleware(['permission:update_produk-desa'])->put('/produk-desa/{produkDesa}', [ProdukDesaController::class, 'update'])->name('dashboard.produk-desa.update');
+        Route::middleware(['permission:delete_produk-desa'])->delete('/produk-desa/{produkDesa}', [ProdukDesaController::class, 'destroy'])->name('dashboard.produk-desa.destroy');
+
+        Route::middleware(['permission:read_comments'])->get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
+        Route::middleware(['permission:update_comments'])->patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
+        Route::middleware(['permission:delete_comments'])->delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');
+
+        Route::middleware(['permission:read_demografi'])->get('/demografi', [DemografiController::class, 'index'])->name('dashboard.demografi');
+        Route::middleware(['permission:create_demografi'])->get('/demografi/create', [DemografiController::class, 'create'])->name('dashboard.demografi.create');
+        Route::middleware(['permission:create_demografi'])->post('/demografi', [DemografiController::class, 'store'])->name('dashboard.demografi.store');
+        Route::middleware(['permission:update_demografi'])->get('/demografi/{demografi}/edit', [DemografiController::class, 'edit'])->name('dashboard.demografi.edit');
+        Route::middleware(['permission:update_demografi'])->put('/demografi/{demografi}', [DemografiController::class, 'update'])->name('dashboard.demografi.update');
+        Route::middleware(['permission:delete_demografi'])->delete('/demografi/{demografi}', [DemografiController::class, 'destroy'])->name('dashboard.demografi.destroy');
     });
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

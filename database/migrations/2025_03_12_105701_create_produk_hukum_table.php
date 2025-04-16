@@ -12,11 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('produk_hukum', function (Blueprint $table) {
-            $table->id();
+            $table->smallIncrements('id')->unsigned();
+            $table->unsignedTinyInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table->unsignedTinyInteger('category_id');
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('categories')
+                ->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->string('file');
+            $table->string('link');
             $table->date('date');
+            $table->boolean('is_moderate')->default(false);
             $table->timestamps();
         });
     }
