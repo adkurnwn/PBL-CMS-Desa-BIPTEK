@@ -23,3 +23,12 @@ Route::prefix('comments')->group(function () {
     Route::post('/', [App\Http\Controllers\Api\KomentarBeritaController::class, 'store']);
     Route::get('/{newsId}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
 });
+
+Route::get('/produk-hukum', [App\Http\Controllers\API\ProdukHukumController::class, 'index']);
+Route::get('/produk-hukum/{id}', [App\Http\Controllers\API\ProdukHukumController::class, 'show']);
+
+Route::prefix('produk-hukum-comments')->group(function () {
+    Route::get('/{dokumenId}', [App\Http\Controllers\Api\KomentarProdukHukumController::class, 'index']);
+    Route::post('/', [App\Http\Controllers\Api\KomentarProdukHukumController::class, 'store']);
+    Route::get('/{dokumenId}/replies/{commentId}', [App\Http\Controllers\Api\KomentarProdukHukumController::class, 'getReplies']);
+});

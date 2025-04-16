@@ -23,7 +23,7 @@ class NewsController extends Controller
     public function create()
     {
         return Inertia::render('Dashboard/News/Create', [
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 
@@ -89,7 +89,7 @@ class NewsController extends Controller
     {
         return Inertia::render('Dashboard/News/Edit', [
             'news' => $news->load('images', 'category'),
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 
