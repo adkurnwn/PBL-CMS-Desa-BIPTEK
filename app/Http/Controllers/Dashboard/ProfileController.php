@@ -48,7 +48,10 @@ class ProfileController extends Controller
         ]);
 
         $village = Village::find($request->kelurahan);
-        $villageName = $village ? "Desa " . $village->name : '';
+        if ($village) {
+            $formattedName = ucwords(strtolower($village->name));
+            $villageName = "Desa " . $formattedName;
+        }
 
         $profileData = [
             'name' => $villageName,
