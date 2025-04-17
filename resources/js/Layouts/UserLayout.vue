@@ -9,13 +9,8 @@
       <!-- Page Content -->
       <slot />
 
-      <!-- Feedback Component -->
-      <Feedback />
     </main>
   </div>
 </template>
 
 <script setup>
-import Navbar from '../Components/Navbar.vue'
-import Feedback from '../Components/Feedback.vue'
-</script>
