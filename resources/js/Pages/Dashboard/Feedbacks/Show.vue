@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { ref, onMounted } from 'vue';
 
 const props = defineProps({
     feedback: Object,
@@ -9,6 +10,18 @@ const props = defineProps({
 
 const form = useForm({
     tanggapan: props.feedback.tanggapan || '',
+});
+
+const buktiFiles = ref([]);
+
+onMounted(() => {
+    if (props.feedback.bukti) {
+        try {
+            buktiFiles.value = JSON.parse(props.feedback.bukti);
+        } catch (e) {
+            console.error('Error parsing bukti JSON:', e);
+        }
+    }
 });
 
 const submitResponse = () => {
@@ -25,6 +38,12 @@ const formatDate = (date) => {
         hour: '2-digit',
         minute: '2-digit'
     });
+};
+
+// Helper function to get file type
+const getFileType = (path) => {
+    const extension = path.split('.').pop().toLowerCase();
+    return ['jpg', 'jpeg', 'png'].includes(extension) ? 'image' : 'pdf';
 };
 </script>
 
@@ -84,6 +103,42 @@ const formatDate = (date) => {
                             </div>
                             <div class="prose max-w-none">
                                 <p class="text-gray-700 whitespace-pre-line">{{ feedback.isi }}</p>
+                                
+                                <!-- Attachments Section -->
+                                <div v-if="buktiFiles.length > 0" class="mt-6">
+                                    <h4 class="text-lg font-semibold mb-4">Attachments</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div v-for="(file, index) in buktiFiles" :key="index" class="relative">
+                                            <!-- Image Preview -->
+                                            <div v-if="getFileType(file) === 'image'" class="relative aspect-video">
+                                                <img 
+                                                    :src="`/storage/${file}`"
+                                                    :alt="`Attachment ${index + 1}`"
+                                                    class="rounded-lg object-cover w-full h-full shadow-sm"
+                                                />
+                                            </div>
+                                            
+                                            <!-- PDF Preview -->
+                                            <div v-else class="relative aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <div class="text-center">
+                                                    <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    <span class="mt-2 block text-sm text-gray-500">PDF Document</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Download Link -->
+                                            <a 
+                                                :href="`/storage/${file}`"
+                                                target="_blank"
+                                                class="mt-2 text-sm text-blue-600 hover:text-blue-800 block"
+                                            >
+                                                View Full Size
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

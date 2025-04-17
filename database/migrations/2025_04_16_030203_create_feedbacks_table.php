@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email', 50);
             $table->enum('status', ['Menunggu', 'Ditanggapi'])->default('Menunggu');
             $table->text('tanggapan')->nullable();
+            $table->json('bukti')->nullable();
             $table->timestamps();
         });
     }

@@ -9,8 +9,16 @@
       <!-- Page Content -->
       <slot />
 
+      <Feedback />  
+      <Footer />
     </main>
   </div>
 </template>
 
 <script setup>
+import Feedback from '@/Components/Feedback.vue';
+import Navbar from '../Components/Navbar.vue'
+import Footer from '@/Components/Footer.vue'
+
+</script>
+

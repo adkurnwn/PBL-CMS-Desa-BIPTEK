@@ -15,7 +15,8 @@ class Feedback extends Model
         'nama_user',
         'email',
         'status',
-        'tanggapan'
+        'tanggapan',
+        'bukti'
     ];
 
     protected $casts = [
