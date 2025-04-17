@@ -129,6 +129,14 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Comment Produk Hukum
                                 </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.feedbacks')"
+                                    :active="
+                                        route().current('dashboard.feedbacks')
+                                    "
+                                >
+                                    Feedback
+                                </NavLink>
                             </div>
                         </div>
 
