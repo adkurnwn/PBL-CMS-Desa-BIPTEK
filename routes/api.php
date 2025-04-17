@@ -39,3 +39,8 @@ Route::prefix('produk-hukum-comments')->group(function () {
     Route::post('/', [KomentarProdukHukumController::class, 'store']);
     Route::get('/{dokumenId}/replies/{commentId}', [KomentarProdukHukumController::class, 'getReplies']);
 });
+
+Route::prefix('feedback')->group(function () {
+    Route::get('/kategori', [App\Http\Controllers\API\FeedbackController::class, 'getKategori']);
+    Route::post('/', [App\Http\Controllers\API\FeedbackController::class, 'store']);
+});

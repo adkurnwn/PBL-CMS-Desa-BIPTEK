@@ -88,7 +88,7 @@ class KomentarBeritaController extends Controller
 
         return response()->json([
             'message' => $message,
-            'comment' => $comment
+            //'comment' => $comment
         ], 201);
     }
 }

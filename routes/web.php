@@ -9,6 +9,7 @@ use App\Http\Controllers\Dashboard\NewsController;
 use App\Http\Controllers\Dashboard\EventController;
 use App\Http\Controllers\Dashboard\GalleryController;
 use App\Http\Controllers\Dashboard\DanaDesaController;
+use App\Http\Controllers\Dashboard\FeedbackController;
 use App\Http\Controllers\Dashboard\PositionController;
 use App\Http\Controllers\Dashboard\DemografiController;
 use App\Http\Controllers\Dashboard\ProdukDesaController;
@@ -155,6 +156,10 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:update_demografi'])->get('/demografi/{demografi}/edit', [DemografiController::class, 'edit'])->name('dashboard.demografi.edit');
         Route::middleware(['permission:update_demografi'])->put('/demografi/{demografi}', [DemografiController::class, 'update'])->name('dashboard.demografi.update');
         Route::middleware(['permission:delete_demografi'])->delete('/demografi/{demografi}', [DemografiController::class, 'destroy'])->name('dashboard.demografi.destroy');
+
+        Route::middleware(['permission:read_feedbacks'])->get('/feedbacks', [FeedbackController::class, 'index'])->name('dashboard.feedbacks');
+        Route::middleware(['permission:read_feedbacks'])->get('/feedbacks/{feedback}', [FeedbackController::class, 'show'])->name('dashboard.feedbacks.show');
+        Route::middleware(['permission:update_feedbacks'])->post('/feedbacks/{feedback}/respond', [FeedbackController::class, 'respond'])->name('dashboard.feedbacks.respond');
     });
 });
 
