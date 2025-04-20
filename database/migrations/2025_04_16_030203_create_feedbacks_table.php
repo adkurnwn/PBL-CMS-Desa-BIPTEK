@@ -15,9 +15,12 @@ return new class extends Migration
             $table->smallIncrements('id');
             $table->string('judul');
             $table->text('isi');
+            $table->enum('kategori', ['Saran', 'Keluhan']);
+            $table->string('nama_user', 50);
             $table->string('email', 50);
             $table->enum('status', ['Menunggu', 'Ditanggapi'])->default('Menunggu');
             $table->text('tanggapan')->nullable();
+            $table->json('bukti')->nullable();
             $table->timestamps();
         });
     }
