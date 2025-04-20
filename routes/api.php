@@ -3,9 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\ProfileControler;
+use App\Http\Controllers\Api\LayoutController;
 use App\Http\Controllers\Api\RegionController;
+use App\Http\Controllers\Api\HomePageController;
 use App\Http\Controllers\Api\ProdukHukumController;
+use App\Http\Controllers\Api\ProfilePageController;
 use App\Http\Controllers\Api\KomentarBeritaController;
 use App\Http\Controllers\Api\KomentarProdukHukumController;
 
@@ -17,8 +19,9 @@ Route::get('regencies/{province_id}', [RegionController::class, 'getRegencies'])
 Route::get('districts/{regency_id}', [RegionController::class, 'getDistricts']);
 Route::get('villages/{district_id}', [RegionController::class, 'getVillages']);
 
-Route::get('profile', [ProfileControler::class, 'index']);
-Route::get('navbar', [ProfileControler::class, 'navbar']);
+Route::get('profile', [ProfilePageController::class, 'index']);
+Route::get('layout', [LayoutController::class, 'index']);
+Route::get('home', [HomePageController::class, 'index']);
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-const props = defineProps({
-    profile: {
+defineProps({
+    layout: {
         type: Object,
         default: () => ({}),
     },
@@ -52,11 +52,7 @@ onUnmounted(() => {
     >
         <div class="flex items-center space-x-4">
             <img
-                :src="
-                    profile.logo
-                        ? `/storage/${profile.logo}`
-                        : '../../images/LOGO_KABUPATEN_KLATEN.png'
-                "
+                :src="`/storage/${layout.logo}`"
                 alt="Logo"
                 class="w-10 h-12 md:w-12 md:h-16"
             />
@@ -64,10 +60,10 @@ onUnmounted(() => {
                 <h1
                     class="text-white font-bold text-base sm:text-2xl lg:text-xl"
                 >
-                    {{ profile.name || "Desa Karanganom" }}
+                    {{ layout.name || "Desa Karanganom" }}
                 </h1>
                 <p class="text-white text-[12px] sm:text-base lg:text-sm">
-                    Kabupaten {{ profile.kabupaten_name || "Klaten" }}
+                    {{ layout.kabupaten || "Klaten" }}
                 </p>
             </div>
         </div>

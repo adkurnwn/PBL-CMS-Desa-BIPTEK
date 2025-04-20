@@ -1,23 +1,48 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import EventCard from '@/Components/EventCard.vue';
+import NewsCard from '@/Components/NewsCard.vue';
+import ProductCard from '@/Components/ProductCard.vue';
+import UserLayout from '@/Layouts/UserLayout.vue';
+
+const home = ref({});
+const loading = ref(false);
+const fetchHome = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/home");
+        home.value = response.data;
+        loading.value = false;
+    } catch (error) {
+        console.error("Error fetching home data:", error);
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchHome();
+});
+</script>
 <!-- Homeview.vue -->
 <template>
   <UserLayout>
     <header class="relative flex flex-col items-center justify-center w-full h-screen bg-red-100">
-      <img src="../../../images/profile.jpg" alt="Logo" class="absolute z-0 w-full h-screen object-cover" />
+      <img :src="`/storage/${home.hero_image}`" alt="Hero Image" class="absolute z-0 w-full h-screen object-cover" />
       <div class="absolute bg-black z-0 w-full h-screen opacity-60">
-        
+
       </div>
       <div class="absolute z-10 font-merriweather text-type1 mt-4 px-6 md:px-0">
         <h1 class=" justify-center items-center text-center text-4xl md:text-6xl font-semibold">Selamat Datang</h1>
-        <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber informasi terbaru tentang pemerintahan di Desa Pao-Pao</h2>
+        <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber informasi terbaru tentang pemerintahan di {{ home.name }}</h2>
       </div>
     </header>
     <main class="max-w-screen-2xl mx-auto w-full">
       <!-- Bagian Selamat Datang -->
-      <article class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 lg:px-56 py-10 pt-4 md:pt-16 lg:pt-40"> 
+      <article class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 lg:px-56 py-10 pt-4 md:pt-16 lg:pt-40">
         <!-- Text Section -->
         <section class="flex flex-col  w-2/3 space-y-3 md:mx-8">
           <h1 class="text-xl md:text-3xl font-semibold text-accent2 text-center lg:text-left">
-            Selamat datang di website resmi Pemerintah Desa Pao Pao!
+            Selamat datang di website resmi Pemerintah {{ home.name }}!
           </h1>
           <div class="space-y-3 md:text-xl text-semiBlack text-justify font-thin">
             <p>
@@ -48,9 +73,12 @@
           :title="news.title"
           :description="news.description"></NewsCard> -->
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
-          <NewsCard :isHome="true" />
-          <NewsCard :isHome="true" />
-          <NewsCard :isHome="true" />
+            <NewsCard
+                v-for="newsItem in home.news"
+                :key="newsItem.id"
+                :isHome="true"
+                :news="newsItem"
+            />
 
         </div>
         <h1 class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
@@ -59,7 +87,7 @@
 
       </article>
 
-      
+
       <!-- Event Terdekat-->
       <article class="w-full px-8 sm:px-20 lg:px-32 flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
@@ -69,9 +97,11 @@
           <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
         </h2>
         <div class="flex flex-col md:flex-row justify-center lg:space-x-4 space-y-2 md:space-y-0">
-          <EventCard />
-          <EventCard />
-          <EventCard />
+          <EventCard
+            v-for="eventItem in home.events"
+                :key="eventItem.id"
+                :isHome="true"
+                :event="eventItem" />
         </div>
       </article>
 
@@ -80,22 +110,62 @@
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Galeri Desa
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4">
-          <p class="italic">Foto atau Video seputar Desa </p>
+        <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
+          <p class="italic">Foto atau Video seputar Desa</p>
         </h2>
-        <div class="flex flex-col w-full justify-between space-y-4">
-          <div class="flex flex-row w-full justify-between space-x-2 ">
-            <img src="../../../images/berita.png" alt="" class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2" />
-            <img src="../../../images/berita.png" alt="" class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover" />
+
+        <!-- Loading state -->
+        <div v-if="loading" class="flex justify-center py-8">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent2"></div>
+        </div>
+
+        <!-- Gallery content -->
+        <div v-else-if="home.gallery && home.gallery.images && home.gallery.images.length > 0" class="flex flex-col w-full justify-between space-y-4">
+          <!-- First row - 2 images -->
+          <div class="flex flex-row w-full justify-between space-x-2">
+            <img
+              v-if="home.gallery.images[0]"
+              :src="`/storage/${home.gallery.images[0].path}`"
+              :alt="home.gallery.images[0].alt"
+              class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
+            />
+            <img
+              v-if="home.gallery.images[1]"
+              :src="`/storage/${home.gallery.images[1].path}`"
+              :alt="home.gallery.images[1].alt"
+              class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
+            />
           </div>
-          <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0 ">
-            <img src="../../../images/berita.png" alt="" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2" />
-            <img src="../../../images/berita.png" alt="" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2" />
-            <img src="../../../images/berita.png" alt="" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover " />
+
+          <!-- Second row - 3 images -->
+          <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
+            <img
+              v-if="home.gallery.images[2]"
+              :src="`/storage/${home.gallery.images[2].path}`"
+              :alt="home.gallery.images[2].alt"
+              class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
+            />
+            <img
+              v-if="home.gallery.images[3]"
+              :src="`/storage/${home.gallery.images[3].path}`"
+              :alt="home.gallery.images[3].alt"
+              class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
+            />
+            <img
+              v-if="home.gallery.images[4]"
+              :src="`/storage/${home.gallery.images[4].path}`"
+              :alt="home.gallery.images[4].alt"
+              class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
+            />
           </div>
         </div>
+
+        <!-- No images fallback -->
+        <div v-else class="text-center py-8 text-gray-500">
+          Belum ada gambar dalam galeri
+        </div>
       </article>
-      
+
 
       <!-- Produk Unggulan-->
       <article class="w-full px-8 sm:px-20 lg:px-32 flex flex-col py-6 lg:py-10 bg-type1 font-merriweather">
@@ -106,10 +176,11 @@
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard
+          v-for="produkDesa in home.produkDesa"
+                :key="produkDesa.id"
+                :produkDesa="produkDesa"
+           />
         </div>
         <h1 class="text-lg md:text-xl font-semibold text-secondary my-6 ml-2 text-right justify-end">
           Selengkapnya >>
@@ -168,14 +239,6 @@
     </main>
   </UserLayout>
 </template>
-
-<script setup>
-import EventCard from '@/Components/EventCard.vue';
-import NewsCard from '@/Components/NewsCard.vue';
-import ProductCard from '@/Components/ProductCard.vue';
-import UserLayout from '@/Layouts/UserLayout.vue';
-
-</script>
 
 <style scoped>
 
