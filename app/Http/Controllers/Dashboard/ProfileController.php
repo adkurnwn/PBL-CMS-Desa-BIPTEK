@@ -100,6 +100,6 @@ class ProfileController extends Controller
 
         $profile->update($profileData);
 
-        return redirect()->route('dashboard.profiles')->with('success', 'Village profile updated successfully');
+        return redirect()->route('dashboard.profiles')->with('success', 'Profile Updated Successfully');
     }
 }

@@ -178,49 +178,51 @@ const removeImage = (imageId) => {
                                 </div>
                             </div>
 
+                            <!-- Add section to display existing images -->
                             <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create Gallery
-                                </PrimaryButton>
-                            </div>
-                        </form>
-
-                        <!-- Add section to display existing images -->
-                        <div class="mt-6">
-                            <h3 class="text-lg font-medium mb-4">
-                                Existing Images
-                            </h3>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div
-                                    v-for="image in props.gallery.images"
-                                    :key="image.id"
-                                    class="space-y-2 relative"
-                                    v-show="
-                                        !form.removed_images.includes(image.id)
-                                    "
-                                >
-                                    <img
-                                        :src="`/storage/${image.path}`"
-                                        :alt="image.alt"
-                                        class="w-full h-32 object-cover rounded"
-                                    />
+                                <h3 class="text-lg font-medium mb-4">
+                                    Existing Images
+                                </h3>
+                                <div class="grid grid-cols-3 gap-4">
                                     <div
-                                        class="flex justify-between items-center"
+                                        v-for="image in props.gallery.images"
+                                        :key="image.id"
+                                        class="space-y-2 relative"
+                                        v-show="
+                                            !form.removed_images.includes(
+                                                image.id
+                                            )
+                                        "
                                     >
-                                        <p class="text-sm text-gray-600">
-                                            Alt text: {{ image.alt }}
-                                        </p>
-                                        <DangerButton
-                                            type="button"
-                                            @click="removeImage(image.id)"
-                                            class="absolute top-2 right-2"
+                                        <img
+                                            :src="`/storage/${image.path}`"
+                                            :alt="image.alt"
+                                            class="w-full h-32 object-cover rounded"
+                                        />
+                                        <div
+                                            class="flex justify-between items-center"
                                         >
-                                            ×
-                                        </DangerButton>
+                                            <p class="text-sm text-gray-600">
+                                                Alt text: {{ image.alt }}
+                                            </p>
+                                            <DangerButton
+                                                type="button"
+                                                @click="removeImage(image.id)"
+                                                class="absolute top-2 right-2"
+                                            >
+                                                ×
+                                            </DangerButton>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <div class="mt-6">
+                                <PrimaryButton :disabled="form.processing">
+                                    Edit Gallery
+                                </PrimaryButton>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

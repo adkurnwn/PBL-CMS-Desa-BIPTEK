@@ -71,7 +71,7 @@ class GalleryController extends Controller
             }
         }
 
-        return redirect()->route('dashboard.galleries');
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Added Successfully');
     }
 
     public function edit(Gallery $gallery)
@@ -134,7 +134,6 @@ class GalleryController extends Controller
             }
         }
 
-        return redirect()->route('dashboard.galleries')
-            ->with('success', 'Gallery updated successfully');
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Updated Successfully');
     }
 }

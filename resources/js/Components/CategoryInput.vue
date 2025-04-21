@@ -19,24 +19,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["update:modelValue"]);
-
 const isNewCategory = ref(false);
-
-watch(isNewCategory, (newValue) => {
-    const updatedValue = {
-        category_id: newValue ? "" : props.modelValue.category_id,
-        new_category: newValue ? props.modelValue.new_category : "",
-    };
-    emit("update:modelValue", updatedValue);
-});
-
-const updateValue = (key, value) => {
-    emit("update:modelValue", {
-        ...props.modelValue,
-        [key]: value,
-    });
-};
 </script>
 
 <template>
@@ -63,8 +46,7 @@ const updateValue = (key, value) => {
             <TextInput
                 v-else
                 id="new-category"
-                :value="modelValue.new_category"
-                @input="updateValue('new_category', $event.target.value)"
+                v-model="modelValue.new_category"
                 type="text"
                 class="mt-1 block w-full"
                 placeholder="Enter new category name"

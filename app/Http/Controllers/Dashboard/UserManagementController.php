@@ -93,7 +93,7 @@ class UserManagementController extends Controller
             $user->assignRole('Aparat Desa');
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User created successfully');
+        return redirect()->route('dashboard.users')->with('success', 'User Added Successfully');
     }
 
     public function edit(User $user)
@@ -177,7 +177,7 @@ class UserManagementController extends Controller
             $user->syncRoles(['Aparat Desa']);
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User updated successfully');
+        return redirect()->route('dashboard.users')->with('success', 'User Updated Successfully');
     }
 
     public function destroy(User $user)
@@ -192,6 +192,6 @@ class UserManagementController extends Controller
             ]);
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User deleted successfully');
+        return redirect()->route('dashboard.users')->with('success', 'User Deleted Successfully');
     }
 }

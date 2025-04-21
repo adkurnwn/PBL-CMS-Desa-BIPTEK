@@ -29,7 +29,7 @@ class NewsController extends Controller
 
     public function store(Request $request)
     {
-        $validate = [
+        $rules = [
             'title' => 'required',
             'content' => 'required',
             'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
@@ -39,29 +39,37 @@ class NewsController extends Controller
             'is_draft' => 'required|boolean',
         ];
 
-        if ($request->filled('new_category')) {
-            $validate['new_category'] = 'required|string|max:255';
+        if ($request->filled('category.new_category')) {
+            $rules['category.new_category'] = 'required|string|max:255';
         } else {
-            $validate['category_id'] = 'required|exists:categories,id';
+            $rules['category.category_id'] = 'required|exists:categories,id';
         }
 
-        $request->validate($validate);
+        if ($request->filled('category.edit_category_id') && $request->filled('category.new_category_name')) {
+            $rules['category.eddit_category_id'] = 'required|exists:categories,id';
+            $rules['category.new_category_name'] = 'required|string|max:255';
+        }
 
-        if ($request->filled('new_category')) {
-            $category = Category::create(['name' => $request->new_category]);
+        $request->validate($rules);
+
+        if ($request->filled('category.new_category')) {
+            $category = Category::create(['name' => $request->category['new_category']]);
             $category_id = $category->id;
         } else {
-            $category_id = $request->category_id;
+            $category_id = $request->category['category_id'];
+        }
+
+        if ($request->filled('category.edit_category_id') && $request->filled('category.new_category_name')) {
+            $category = Category::find($request->category['edit_category_id']);
+            if ($category) {
+                $category->name = $request->category['new_category_name'];
+                $category->save();
+            }
         }
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
-
-        unset($data['images']);
-        unset($data['alts']);
-        unset($data['video']);
-        unset($data['new_category']);
 
         $news = News::create($data);
 
@@ -82,7 +90,7 @@ class NewsController extends Controller
             $news->update(['video' => $videoPath]);
         }
 
-        return redirect()->route('dashboard.news');
+        return redirect()->route('dashboard.news')->with('success', 'News Added Successfully');
     }
 
     public function edit(News $news)
@@ -108,22 +116,15 @@ class NewsController extends Controller
         ]);
 
         // Handle category
-        if ($request->filled('new_category')) {
-            $category = Category::create(['name' => $request->new_category]);
+        if ($request->filled('category.new_category')) {
+            $category = Category::create(['name' => $request->category['new_category']]);
             $category_id = $category->id;
         } else {
-            $category_id = $request->category_id;
+            $category_id = $request->category['category_id'];
         }
 
         $data = $request->all();
-        $data['category_id'] = $category_id; // Set category_id
-
-        // Remove unnecessary data
-        unset($data['images']);
-        unset($data['alts']);
-        unset($data['removed_images']);
-        unset($data['video']);
-        unset($data['new_category']);
+        $data['category_id'] = $category_id;
 
         // Update news record
         $news->update($data);
@@ -161,6 +162,6 @@ class NewsController extends Controller
             $news->update(['video' => $videoPath]);
         }
 
-        return redirect()->route('dashboard.news');
+        return redirect()->route('dashboard.news')->with('success', 'News Updated Successfully');
     }
 }
