@@ -1,3 +1,12 @@
+<script setup>
+defineProps({
+    produkDesa: {
+        type: Object,
+        required: false,
+        default: () => ({}),
+    },
+});
+</script>
 <template>
   <!-- <div class="news-card">
     <img :src="image" alt="News Image" class="news-card__image" />
@@ -7,9 +16,15 @@
     </div>
   </div> -->
   <div class="w-full lg:w-1/4 p-1">
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
+        <div
+            class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300 h-"
+        >
         <div class="px-3 mt-5">
-          <img src="../../images/jamu.png" alt="News Image" class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover " />
+                <img
+                    :src="`/storage/${produkDesa.image.path}`"
+                    :alt="produkDesa.image.alt"
+                    class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
+                />
         </div>
         <div class="px-4">
           <!-- <div class="flex flex-row p-4 pt-1 space-x-2">
@@ -17,36 +32,28 @@
             <h2 class="pr-2 text-sm font-thin text-type2 ">M.Andi Sulaiman</h2>
           </div> -->
           <div class="mt-2 space-y-1">
-            <h2 class="px-1 text-lg nd:text-2xl font-semibold text-accent2">Jamu</h2>
-            <h3 class="px-1 text-xs md:text-sm  text-accent2">Rp150.000</h3>
+                    <h2
+                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2"
+                    >
+                        {{ produkDesa.name }}
+                    </h2>
+                    <h3 class="px-1 text-xs md:text-sm text-accent2">
+                        {{ produkDesa.price }}
+                    </h3>
           </div>
-          <div class=" flex flex-row justify-center py-4 hover:scale-105 transition-transform">
-            <button class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl">Lihat Katalog</button>
+                <div
+                    class="flex flex-row justify-center py-4 hover:scale-105 transition-transform"
+                >
+                    <button
+                        class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
+                    >
+                        Lihat Katalog
+                    </button>
           </div>
         </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'NewsCard',
-  props: {
-    image: {
-      type: String,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    }
-  }
-}
-</script>
 
 <style scoped>
 .news-card {

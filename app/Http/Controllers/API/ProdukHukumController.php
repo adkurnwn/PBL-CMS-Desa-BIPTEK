@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProdukHukum;
@@ -13,7 +13,7 @@ class ProdukHukumController extends Controller
         $produkHukum = ProdukHukum::with('category')
             ->orderBy('date', 'desc')
             ->paginate(10);
-            
+
         return response()->json($produkHukum);
     }
 
