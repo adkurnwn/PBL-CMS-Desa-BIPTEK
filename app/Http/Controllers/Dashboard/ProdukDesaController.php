@@ -53,17 +53,18 @@ class ProdukDesaController extends Controller
 
                 $produkDesa->images()->create([
                     'produk_desa_id' => $produkDesa->id,
-                    'images' => $path,
+                    'path' => $path,
                 ]);
             }
         }
         return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    public function edit(ProdukDesa $produk)
+    public function edit(ProdukDesa $produkDesa)
     {
         return Inertia::render('Dashboard/ProdukDesa/Edit', [
-            'produk' => $produk
+            'produkDesa' => $produkDesa->load('images'),
+
         ]);
     }
 
@@ -72,10 +73,10 @@ class ProdukDesaController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
-            'price' => 'required|decimal|min:0',
+            'price' => 'required|decimal:2',
             'kontak_penjual' => 'required|string|max:20',
-            'description' => 'required|text',
-            'images' => 'required|array',
+            'description' => 'required',
+            'images' => 'sometimes|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'removed_images' => 'sometimes|array',
             'removed_images.*' => 'exists:gambar_produk_desa,id',
@@ -101,17 +102,20 @@ class ProdukDesaController extends Controller
 
                 $produkDesa->images()->create([
                     'produk_desa_id' => $produkDesa->id,
-                    'images' => $path,
+                    'path' => $path,
                 ]);
             }
         }
 
-        return redirect()->route('dashboard.produk_desa.index')->with('success', 'Produk berhasil diperbarui.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function destroy(ProdukDesa $produkDesa)
     {
+        foreach ($produkDesa->images as $image) {
+            Storage::disk('public')->delete($image->path);
+        }
         $produkDesa->delete();
-        return redirect()->route('dashboard.produk_desa.index')->with('success', 'Produk berhasil dihapus.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil dihapus.');
     }
 }

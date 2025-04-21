@@ -21,12 +21,19 @@ const form = useForm({
     price: props.produkDesa.price,
     stock: props.produkDesa.stock,
     kontak_penjual: props.produkDesa.kontak_penjual,
-    image: null,
+    images: [],
+    removed_images: [],
     _method: "PUT",
 });
 
 const handleImageChange = (e) => {
-    form.image = e.target.files[0];
+    form.images = [...e.target.files];
+};
+
+const removeImage = (imageId) => {
+    if (confirm("Are you sure you want to remove this image?")) {
+        form.removed_images.push(imageId);
+    }
 };
 
 const submit = () => {
@@ -131,34 +138,60 @@ const submit = () => {
                                 <!-- Image Field -->
                                 <div>
                                     <InputLabel
-                                        for="image"
-                                        value="Product Image"
+                                        for="images"
+                                        value="Product Images"
                                     />
 
-                                    <!-- Show current image if exists -->
-                                    <div v-if="produkDesa.image" class="mb-2">
+                                    <!-- Show current images if they exist -->
+                                    <div
+                                        v-if="
+                                            produkDesa.images &&
+                                            produkDesa.images.length > 0
+                                        "
+                                        class="mb-2"
+                                    >
                                         <p class="text-sm text-gray-600">
-                                            Current image:
+                                            Current images:
                                         </p>
-                                        <img
-                                            :src="`/storage/${produkDesa.image}`"
-                                            alt="Product image"
-                                            class="h-32 object-cover rounded-md mt-1"
-                                        />
+                                        <div class="flex flex-wrap gap-2 mt-1">
+                                            <div
+                                                v-for="(
+                                                    image, index
+                                                ) in produkDesa.images"
+                                                :key="index"
+                                                class="relative"
+                                            >
+                                                <img
+                                                    :src="`/storage/${image.path}`"
+                                                    alt="Product image"
+                                                    class="h-32 object-cover rounded-md"
+                                                />
+                                                <DangerButton
+                                                    type="button"
+                                                    @click="
+                                                        removeImage(image.id)
+                                                    "
+                                                    class="absolute top-2 right-2"
+                                                >
+                                                    ×
+                                                </DangerButton>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <input
-                                        id="image"
+                                        id="images"
                                         type="file"
                                         @input="handleImageChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
+                                        multiple
                                     />
                                     <p class="mt-1 text-sm text-gray-500">
-                                        Leave empty to keep the current image
+                                        You can select multiple images
                                     </p>
                                     <InputError
-                                        :message="form.errors.image"
+                                        :message="form.errors.images"
                                         class="mt-2"
                                     />
                                 </div>
