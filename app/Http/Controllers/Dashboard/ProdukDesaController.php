@@ -57,7 +57,7 @@ class ProdukDesaController extends Controller
                 ]);
             }
         }
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil ditambahkan.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Created Successfully');
     }
 
     public function edit(ProdukDesa $produkDesa)
@@ -107,7 +107,7 @@ class ProdukDesaController extends Controller
             }
         }
 
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil diperbarui.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Updated Successfully');
     }
 
     public function destroy(ProdukDesa $produkDesa)
@@ -116,6 +116,6 @@ class ProdukDesaController extends Controller
             Storage::disk('public')->delete($image->path);
         }
         $produkDesa->delete();
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil dihapus.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Deleted Successfully');
     }
 }

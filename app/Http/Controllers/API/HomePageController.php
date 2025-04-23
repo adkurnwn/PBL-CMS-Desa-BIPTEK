@@ -21,16 +21,6 @@ class HomePageController extends Controller
         $gallery = Gallery::with('images')->latest()->first();
         $produkDesa = ProdukDesa::with('images')->latest()->take(4)->get();
 
-        $response['produkDesa'] = $produkDesa->map(function ($item) {
-            return [
-                'name' => $item->name,
-                'price' => 'Rp ' . number_format($item->price, 0, ',', '.'),
-                'image' => [
-                    'path' => $item->images->first()->images,
-                ],
-            ];
-        });
-
         return response()->json([
             'name' => $profile->name,
             'hero_image' => json_decode($profile->hero_images)[0],
@@ -41,8 +31,8 @@ class HomePageController extends Controller
                     'created_at' => Carbon::parse($item->created_at)->format('j F Y'),
                     'views' => $item->views,
                     'image' => [
-                        'path' => $item->images->first()->path,
-                        'alt' => $item->images->first()->alt
+                        'path' => $item->images->first()->path ?? null,
+                        'alt' => $item->images->first()->alt ?? null
                     ],
                     'category' => $item->category,
                     'author' => [
@@ -71,7 +61,7 @@ class HomePageController extends Controller
                     'name' => $item->name,
                     'price' => 'Rp ' . number_format($item->price, 0, ',', '.'),
                     'image' => [
-                        'path' => $item->images->first()->images,
+                        'path' => $item->images->first()->path ?? null,
                     ],
                 ];
             }),
