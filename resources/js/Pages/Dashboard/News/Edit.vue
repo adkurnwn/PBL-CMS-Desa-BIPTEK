@@ -18,6 +18,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    unused_categories: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
@@ -25,6 +29,9 @@ const form = useForm({
     category: {
         category_id: props.news.category_id,
         new_category: "",
+        edit_category_id: "",
+        new_category_name: "",
+        deleting_category_id: [],
     },
     content: props.news.content,
     images: [],
@@ -101,6 +108,7 @@ const submit = () => {
                                 <CategoryInput
                                     v-model="form.category"
                                     :categories="categories"
+                                    :unused_categories="unused_categories"
                                     :errors="form.errors"
                                 />
 
