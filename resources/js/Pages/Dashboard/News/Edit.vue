@@ -6,7 +6,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref, computed, onUnmounted, watch } from "vue";
 
 const props = defineProps({
@@ -42,6 +42,8 @@ const form = useForm({
     is_draft: Boolean(props.news.is_draft),
     _method: "PUT",
 });
+
+const URL = window.URL;
 
 const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
@@ -295,6 +297,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Edit News
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.news')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

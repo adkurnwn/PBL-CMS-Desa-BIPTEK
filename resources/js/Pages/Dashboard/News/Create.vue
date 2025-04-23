@@ -5,8 +5,8 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { Head, useForm } from "@inertiajs/vue3";
-import { ref, onUnmounted, watch } from "vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const props = defineProps({
     categories: {
@@ -20,6 +20,8 @@ const form = useForm({
     category: {
         category_id: "",
         new_category: "",
+        edit_category_id: "",
+        new_category_name: "",
     },
     content: "",
     images: [],
@@ -238,6 +240,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create News
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.news')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

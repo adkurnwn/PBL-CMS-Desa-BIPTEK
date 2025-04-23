@@ -221,9 +221,9 @@ const submit = () => {
                                     Update Produk Desa
                                 </PrimaryButton>
                                 <Link :href="route('dashboard.produk-desa')">
-                                    <DangerButton type="button">
-                                        Cancel
-                                    </DangerButton>
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
                                 </Link>
                             </div>
                         </form>

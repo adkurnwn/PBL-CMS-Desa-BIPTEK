@@ -1,11 +1,10 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const form = useForm({
     title: "",
@@ -130,6 +129,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Event
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.events')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>
