@@ -44,3 +44,8 @@ Route::prefix('feedback')->group(function () {
     Route::get('/kategori', [App\Http\Controllers\API\FeedbackController::class, 'getKategori']);
     Route::post('/', [App\Http\Controllers\API\FeedbackController::class, 'store']);
 });
+
+Route::prefix('events')->group(function () {
+    Route::get('/', [App\Http\Controllers\Api\EventController::class, 'index']);
+    Route::post('/{event}/reminder', [App\Http\Controllers\Api\EventController::class, 'setReminder']);
+});

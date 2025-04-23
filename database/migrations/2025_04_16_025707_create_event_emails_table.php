@@ -18,7 +18,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('events')
                 ->onDelete('cascade');
-            $table->string('email')->unique();
+            $table->string('email'); 
+            $table->unique(['event_id', 'email']);
             $table->timestamps();
         });
     }
