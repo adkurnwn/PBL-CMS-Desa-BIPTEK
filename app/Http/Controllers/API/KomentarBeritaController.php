@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
 
 use App\Models\News;
 use App\Models\KomentarBerita;
@@ -12,7 +12,7 @@ class KomentarBeritaController extends Controller
     public function index($newsId)
     {
         $news = News::findOrFail($newsId);
-        
+
         $comments = KomentarBerita::where('id_berita', $newsId)
             ->when($news->is_moderate, function($query) {
                 $query->where('is_approved', true);
@@ -27,7 +27,7 @@ class KomentarBeritaController extends Controller
     public function getReplies($newsId, $commentId)
     {
         $news = News::findOrFail($newsId);
-        
+
         $replies = KomentarBerita::where('id_berita', $newsId)
             ->where(function($query) use ($commentId) {
                 $query->where('id_ref_komentar', $commentId)
@@ -82,7 +82,7 @@ class KomentarBeritaController extends Controller
             $comment->parent_user = $comment->parent->nama_user;
         }
 
-        $message = $news->is_moderate 
+        $message = $news->is_moderate
             ? 'Comment submitted and waiting for approval'
             : 'Comment posted successfully';
 

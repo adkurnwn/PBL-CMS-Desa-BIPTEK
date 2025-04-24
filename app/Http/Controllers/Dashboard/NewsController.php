@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Image;
 use App\Models\Gallery;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +70,7 @@ class NewsController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
+        $data['slug'] = Str::of($request->title)->slug('-');
 
         $news = News::create($data);
 
@@ -182,6 +184,7 @@ class NewsController extends Controller
 
         $data = $request->all();
         $data['category_id'] = $category_id;
+        $data['slug'] = Str::of($request->title)->slug('-');
 
         // Update news record
         $news->update($data);
@@ -220,5 +223,21 @@ class NewsController extends Controller
         }
 
         return redirect()->route('dashboard.news')->with('success', 'News Updated Successfully');
+    }
+
+
+    public function archive()
+    {
+        News::onlyTrashed()->with('category')->get();
+        return Inertia::render('Dashboard/News/Archive', [
+            'news' => News::onlyTrashed()->with('category')->get(),
+        ]);
+    }
+
+    public function destroy(News $news)
+    {
+        $news->delete();
+
+        return redirect()->route('dashboard.news')->with('success', 'News Deleted Successfully');
     }
 }

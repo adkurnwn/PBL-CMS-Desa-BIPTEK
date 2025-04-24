@@ -21,12 +21,12 @@ use App\Http\Controllers\Dashboard\KomentarProdukHukumController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
 
 Route::get('/', function () {
-    return view('home');
-});
+    return Inertia::render('FrontEnd/HomeView');
+})->name('home');
 
 Route::get('/profildesa', function () {
-    return view('profil');
-});
+    return Inertia::render('FrontEnd/ProfileView');
+})->name('profil-desa');
 
 Route::get('/informasi', function () {
     return view('informasi');
@@ -162,6 +162,8 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:update_feedbacks'])->post('/feedbacks/{feedback}/respond', [FeedbackController::class, 'respond'])->name('dashboard.feedbacks.respond');
     });
 });
+
+Route::get('/dashboard/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
 
 Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
