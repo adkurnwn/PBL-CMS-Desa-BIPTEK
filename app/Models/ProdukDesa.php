@@ -10,6 +10,7 @@ class ProdukDesa extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'slug',
         'stock',
         'price',
         'kontak_penjual',

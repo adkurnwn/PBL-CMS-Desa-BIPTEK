@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\News;
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
 use Illuminate\Support\Facades\Route;
@@ -50,9 +51,10 @@ Route::get('/berita-test', function () {
     return Inertia::render('FrontEnd/BeritaListTest');
 })->name('berita');
 
-Route::get('/berita-test/{id}', function ($id) {
+Route::get('/berita-test/{slug}', function ($slug) {
+    $news = News::where('slug', $slug)->firstOrFail();
     return Inertia::render('FrontEnd/BeritaDetailTest', [
-        'id' => $id
+        'slug' => $slug
     ]);
 })->name('berita.show');
 
@@ -98,7 +100,9 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:create_news'])->post('/news', [NewsController::class, 'store'])->name('dashboard.news.store');
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
-        Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy');
+        Route::middleware(['permission:archive_news'])->patch('/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
+        Route::middleware(['permission:restore_news'])->get('/news/{news}/restore', [NewsController::class, 'restore'])->name('dashboard.news.restore')->withTrashed();
+        Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy')->withTrashed();
 
         Route::middleware(['permission:read_galleries'])->get('/galleries', [GalleryController::class, 'index'])->name('dashboard.galleries');
         Route::middleware(['permission:create_galleries'])->get('/galleries/create', [GalleryController::class, 'create'])->name('dashboard.galleries.create');
@@ -162,8 +166,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:update_feedbacks'])->post('/feedbacks/{feedback}/respond', [FeedbackController::class, 'respond'])->name('dashboard.feedbacks.respond');
     });
 });
-
-Route::get('/dashboard/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
 
 Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Image;
 use App\Models\Gallery;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,7 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
+        $data['slug'] = Str::of($request->title)->slug('-');
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
 
@@ -172,6 +174,7 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
+        $data['slug'] = Str::of($request->title)->slug('-');
         $data['category_id'] = $category_id;
 
         // Update news record

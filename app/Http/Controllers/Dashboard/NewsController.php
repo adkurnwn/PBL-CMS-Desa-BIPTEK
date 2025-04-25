@@ -234,9 +234,19 @@ class NewsController extends Controller
         ]);
     }
 
+    public function restore(News $news)
+    {
+        $news->restore();
+        return redirect()->route('dashboard.news')->with('success', 'News Restored Successfully');
+    }
+
     public function destroy(News $news)
     {
-        $news->delete();
+        if ($news->trashed()) {
+            $news->forceDelete();
+        } else {
+            $news->delete();
+        }
 
         return redirect()->route('dashboard.news')->with('success', 'News Deleted Successfully');
     }

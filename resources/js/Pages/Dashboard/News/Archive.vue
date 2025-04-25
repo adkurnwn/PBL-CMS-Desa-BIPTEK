@@ -66,6 +66,20 @@ const deleteNews = (newsId) => {
                                             Delete
                                         </DangerButton>
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.news.restore',
+                                                    news.id
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton
+                                                >Restore</PrimaryButton
+                                            >
+                                        </Link>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

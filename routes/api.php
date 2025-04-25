@@ -25,13 +25,13 @@ Route::get('home', [HomePageController::class, 'index']);
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);
-    Route::get('/{news}', [NewsController::class, 'show']);
+    Route::get('/{slug}', [NewsController::class, 'show']);
 });
 
 Route::prefix('comments')->group(function () {
-    Route::get('/{newsId}', [KomentarBeritaController::class, 'index']);
+    Route::get('/{slug}', [KomentarBeritaController::class, 'index']);
     Route::post('/', [KomentarBeritaController::class, 'store']);
-    Route::get('/{newsId}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
+    Route::get('/{slug}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
 });
 
 Route::get('/produk-hukum', [ProdukHukumController::class, 'index']);
