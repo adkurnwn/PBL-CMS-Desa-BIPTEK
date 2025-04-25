@@ -19,6 +19,7 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade');
             $table->string('name');
+            $table->string('slug')->unique();
             $table->unsignedSmallInteger('stock');
             $table->decimal('price', 10, 2);
             $table->string('kontak_penjual', 20);

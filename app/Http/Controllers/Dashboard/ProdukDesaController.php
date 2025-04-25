@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\GambarProdukDesa;
 use App\Http\Controllers\Controller;
@@ -39,6 +40,7 @@ class ProdukDesaController extends Controller
         $request->validate($rules);
 
         $dataProduk = $request->all();
+        $dataProduk['slug'] = Str::of($request->name)->slug('-');
         $dataProduk['user_id'] = Auth::id();
 
         try {
@@ -84,7 +86,10 @@ class ProdukDesaController extends Controller
 
         $request->validate($rules);
 
-        $produkDesa->update($request->all());
+        $dataProduk = $request->all();
+        $dataProduk['slug'] = Str::of($request->name)->slug('-');
+
+        $produkDesa->update($dataProduk);
 
         if ($request->removed_images) {
             foreach ($request->removed_images as $imageId) {

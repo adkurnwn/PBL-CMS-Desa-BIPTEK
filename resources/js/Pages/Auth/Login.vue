@@ -31,15 +31,12 @@ const submit = () => {
 
 <template>
     <GuestLayout>
-        
         <Head title="Log in" />
-        
+
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
             {{ status }}
         </div>
-        <div>
-            
-        </div>
+        <div></div>
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
@@ -105,5 +102,13 @@ const submit = () => {
                 </PrimaryButton>
             </div>
         </form>
+        <div class="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
+            <div
+                v-if="$page.props.flash?.error"
+                class="mb-4 p-4 bg-red-100 text-red-700 rounded-md"
+            >
+                {{ $page.props.flash.error }}
+            </div>
+        </div>
     </GuestLayout>
 </template>

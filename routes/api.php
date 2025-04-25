@@ -2,14 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\NewsController;
-use App\Http\Controllers\Api\LayoutController;
-use App\Http\Controllers\Api\RegionController;
-use App\Http\Controllers\Api\HomePageController;
-use App\Http\Controllers\Api\ProdukHukumController;
-use App\Http\Controllers\Api\ProfilePageController;
-use App\Http\Controllers\Api\KomentarBeritaController;
-use App\Http\Controllers\Api\KomentarProdukHukumController;
+use App\Http\Controllers\api\NewsController;
+use App\Http\Controllers\api\LayoutController;
+use App\Http\Controllers\api\RegionController;
+use App\Http\Controllers\api\HomePageController;
+use App\Http\Controllers\api\ProdukHukumController;
+use App\Http\Controllers\api\ProfilePageController;
+use App\Http\Controllers\api\KomentarBeritaController;
+use App\Http\Controllers\api\KomentarProdukHukumController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -25,13 +25,13 @@ Route::get('home', [HomePageController::class, 'index']);
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);
-    Route::get('/{news}', [NewsController::class, 'show']);
+    Route::get('/{slug}', [NewsController::class, 'show']);
 });
 
 Route::prefix('comments')->group(function () {
-    Route::get('/{newsId}', [KomentarBeritaController::class, 'index']);
+    Route::get('/{slug}', [KomentarBeritaController::class, 'index']);
     Route::post('/', [KomentarBeritaController::class, 'store']);
-    Route::get('/{newsId}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
+    Route::get('/{slug}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
 });
 
 Route::get('/produk-hukum', [ProdukHukumController::class, 'index']);

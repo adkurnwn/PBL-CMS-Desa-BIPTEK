@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Demografi;
 
 class ProfilePageController extends Controller
 {
@@ -15,8 +16,10 @@ class ProfilePageController extends Controller
         $kepalaDesa = User::whereHas('roles', function ($query) {
             $query->where('name', 'Kepala Desa');
         })->where('status', true)->first();
+        $dataDemografi = Demografi::latest()->first();
 
         return response()->json([
+            'name' => $profile->name,
             'hero_image' => json_decode($profile->hero_images)[1],
             'history' => $profile->history,
             'vision' => $profile->vision,
@@ -27,6 +30,12 @@ class ProfilePageController extends Controller
             'kepala_desa' => [
                 'name' => $kepalaDesa->name,
                 'photo_profile' => $kepalaDesa->photo_profile,
+            ],
+            'data_demografi' => [
+                'penduduk' => $dataDemografi->jumlah_penduduk,
+                'kepala_keluarga' => $dataDemografi->jumlah_keluarga,
+                'penduduk_laki_laki' => $dataDemografi->penduduk_pria,
+                'penduduk_perempuan' => $dataDemografi->penduduk_wanita,
             ]
         ]);
     }
