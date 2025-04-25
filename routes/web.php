@@ -30,12 +30,13 @@ Route::get('/profildesa', function () {
 })->name('profil-desa');
 
 Route::get('/informasi', function () {
-    return view('informasi');
-});
+    return Inertia::render('FrontEnd/InformasiView');
+})->name('informasi');
 
 Route::get('/layanan', function () {
-    return view('layanan');
-});
+    return Inertia::render('FrontEnd/LayananView');
+})->name('layanan');
+
 
 Route::get('/berita', function () {
     return Inertia::render('FrontEnd/BeritaListTest');

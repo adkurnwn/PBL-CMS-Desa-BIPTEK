@@ -20,10 +20,34 @@
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="grid grid-cols-2 gap-1 xl:flex xl:flex-row justify-center -m-2">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard 
+              :produk-desa="{
+                  image: { path: 'default-image.jpg', alt: 'Product Image' },
+                  name: 'Product 1',
+                  price: 'Rp 100.000'
+              }"
+          />
+          <ProductCard 
+              :produk-desa="{
+                  image: { path: 'default-image.jpg', alt: 'Product Image' },
+                  name: 'Product 2',
+                  price: 'Rp 150.000'
+              }"
+          />
+          <ProductCard 
+              :produk-desa="{
+                  image: { path: 'default-image.jpg', alt: 'Product Image' },
+                  name: 'Product 3',
+                  price: 'Rp 200.000'
+              }"
+          />
+          <ProductCard 
+              :produk-desa="{
+                  image: { path: 'default-image.jpg', alt: 'Product Image' },
+                  name: 'Product 4',
+                  price: 'Rp 250.000'
+              }"
+          />
         </div>
         <h1 class="flex text-secondary text-md lg:text-xl justify-end mt-5">Selengkapnya
           <svg class="mt-1 w-5 h-5 md:w-6 md:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="24px" fill="#DEA521">

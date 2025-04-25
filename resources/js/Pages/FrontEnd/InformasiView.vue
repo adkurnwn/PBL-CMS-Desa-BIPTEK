@@ -39,19 +39,73 @@
         <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 ml-2">
           Berita Terbaru
         </h1>
-        <!-- <NewsCard
-          v-for="news in newsList"
-          :key="news.id"
-          :image="news.image"
-          :title="news.title"
-          :description="news.description"></NewsCard> -->
-        <div class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0  ">
-          <NewsCard :isHome="false" />
-          <NewsCard :isHome="false" />
-          <NewsCard :isHome="false" />
-          <NewsCard :isHome="false" />
-          <NewsCard :isHome="false" />
-          <NewsCard :isHome="false" />
+        <div class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0">
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
+          <NewsCard 
+              :is-home="false"
+              :news="{
+                  image: { path: 'default-image.jpg', alt: 'Default Image' },
+                  author: { name: 'Anonymous' },
+                  title: 'Sample Title',
+                  content: 'Sample content',
+                  created_at: '2024-04-25',
+                  views: 0
+              }"
+          />
         </div>
         <h1 class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
           Selengkapnya >>
