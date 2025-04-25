@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\GambarProdukDesa;
 use App\Http\Controllers\Controller;
@@ -39,6 +40,7 @@ class ProdukDesaController extends Controller
         $request->validate($rules);
 
         $dataProduk = $request->all();
+        $dataProduk['slug'] = Str::of($request->name)->slug('-');
         $dataProduk['user_id'] = Auth::id();
 
         try {
@@ -53,17 +55,18 @@ class ProdukDesaController extends Controller
 
                 $produkDesa->images()->create([
                     'produk_desa_id' => $produkDesa->id,
-                    'images' => $path,
+                    'path' => $path,
                 ]);
             }
         }
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk berhasil ditambahkan.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Created Successfully');
     }
 
-    public function edit(ProdukDesa $produk)
+    public function edit(ProdukDesa $produkDesa)
     {
         return Inertia::render('Dashboard/ProdukDesa/Edit', [
-            'produk' => $produk
+            'produkDesa' => $produkDesa->load('images'),
+
         ]);
     }
 
@@ -72,10 +75,10 @@ class ProdukDesaController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
-            'price' => 'required|decimal|min:0',
+            'price' => 'required|decimal:2',
             'kontak_penjual' => 'required|string|max:20',
-            'description' => 'required|text',
-            'images' => 'required|array',
+            'description' => 'required',
+            'images' => 'sometimes|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'removed_images' => 'sometimes|array',
             'removed_images.*' => 'exists:gambar_produk_desa,id',
@@ -83,7 +86,10 @@ class ProdukDesaController extends Controller
 
         $request->validate($rules);
 
-        $produkDesa->update($request->all());
+        $dataProduk = $request->all();
+        $dataProduk['slug'] = Str::of($request->name)->slug('-');
+
+        $produkDesa->update($dataProduk);
 
         if ($request->removed_images) {
             foreach ($request->removed_images as $imageId) {
@@ -101,17 +107,20 @@ class ProdukDesaController extends Controller
 
                 $produkDesa->images()->create([
                     'produk_desa_id' => $produkDesa->id,
-                    'images' => $path,
+                    'path' => $path,
                 ]);
             }
         }
 
-        return redirect()->route('dashboard.produk_desa.index')->with('success', 'Produk berhasil diperbarui.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Updated Successfully');
     }
 
     public function destroy(ProdukDesa $produkDesa)
     {
+        foreach ($produkDesa->images as $image) {
+            Storage::disk('public')->delete($image->path);
+        }
         $produkDesa->delete();
-        return redirect()->route('dashboard.produk_desa.index')->with('success', 'Produk berhasil dihapus.');
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Deleted Successfully');
     }
 }

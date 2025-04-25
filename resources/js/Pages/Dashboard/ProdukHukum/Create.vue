@@ -1,12 +1,11 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { ref } from "vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     categories: {
@@ -21,6 +20,8 @@ const form = useForm({
     category: {
         category_id: "",
         new_category: "",
+        edit_category_id: "",
+        new_category_name: "",
     },
     file: null,
     link: "",
@@ -169,6 +170,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Produk Hukum
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.produk-hukum')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

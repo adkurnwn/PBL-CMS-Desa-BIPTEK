@@ -1,11 +1,12 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import CategoryInput from "@/Components/CategoryInput.vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref, computed, onUnmounted, watch } from "vue";
 
 const props = defineProps({
@@ -17,12 +18,21 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    unused_categories: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const form = useForm({
     title: props.news.title,
-    category_id: props.news.category_id,
-    new_category: "",
+    category: {
+        category_id: props.news.category_id,
+        new_category: "",
+        edit_category_id: "",
+        new_category_name: "",
+        deleting_category_id: [],
+    },
     content: props.news.content,
     images: [],
     alts: [],
@@ -33,15 +43,7 @@ const form = useForm({
     _method: "PUT",
 });
 
-const isNewCategory = ref(false);
-
-watch(isNewCategory, (newValue) => {
-    if (newValue) {
-        form.category_id = "";
-    } else {
-        form.new_category = "";
-    }
-});
+const URL = window.URL;
 
 const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
@@ -105,62 +107,12 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="Category"
-                                    />
-                                    <div class="flex gap-4">
-                                        <select
-                                            v-if="!isNewCategory"
-                                            id="category"
-                                            v-model="form.category_id"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        >
-                                            <option value="">
-                                                Select Category
-                                            </option>
-                                            <option
-                                                v-for="category in categories"
-                                                :key="category.id"
-                                                :value="category.id"
-                                            >
-                                                {{ category.name }}
-                                            </option>
-                                        </select>
-
-                                        <TextInput
-                                            v-else
-                                            id="new-category"
-                                            v-model="form.new_category"
-                                            type="text"
-                                            class="mt-1 block w-full"
-                                            placeholder="Enter new category name"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
-                                            @click="
-                                                isNewCategory = !isNewCategory
-                                            "
-                                        >
-                                            {{
-                                                isNewCategory
-                                                    ? "Select Existing"
-                                                    : "Add New"
-                                            }}
-                                        </button>
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.category_id"
-                                        class="mt-2"
-                                    />
-                                    <InputError
-                                        :message="form.errors.new_category"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <CategoryInput
+                                    v-model="form.category"
+                                    :categories="categories"
+                                    :unused_categories="unused_categories"
+                                    :errors="form.errors"
+                                />
 
                                 <div>
                                     <InputLabel for="content" value="Content" />
@@ -345,6 +297,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Edit News
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.news')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

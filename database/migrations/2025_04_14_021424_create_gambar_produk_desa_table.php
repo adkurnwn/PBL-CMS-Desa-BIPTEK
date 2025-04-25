@@ -18,7 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('produk_desa')
                 ->onDelete('cascade');
-            $table->string('images');
+            $table->string('path');
             $table->timestamps();
         });
     }

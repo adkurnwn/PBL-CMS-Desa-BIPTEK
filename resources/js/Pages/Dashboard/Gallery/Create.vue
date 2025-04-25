@@ -5,7 +5,7 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 const URL = window.URL;
@@ -22,6 +22,8 @@ const form = useForm({
     category: {
         category_id: "",
         new_category: "",
+        edit_category_id: "",
+        new_category_name: "",
     },
     description: "",
     images: [],
@@ -175,6 +177,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Gallery
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.galleries')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

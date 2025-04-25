@@ -48,7 +48,10 @@ class ProfileController extends Controller
         ]);
 
         $village = Village::find($request->kelurahan);
-        $villageName = $village ? "Desa " . $village->name : '';
+        if ($village) {
+            $formattedName = ucwords(strtolower($village->name));
+            $villageName = "Desa " . $formattedName;
+        }
 
         $profileData = [
             'name' => $villageName,
@@ -97,6 +100,6 @@ class ProfileController extends Controller
 
         $profile->update($profileData);
 
-        return redirect()->route('dashboard.profiles')->with('success', 'Village profile updated successfully');
+        return redirect()->route('dashboard.profiles')->with('success', 'Profile Updated Successfully');
     }
 }

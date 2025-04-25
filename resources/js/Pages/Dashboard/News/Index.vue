@@ -1,10 +1,22 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+
 const props = defineProps({
     news: Array,
 });
+
+const form = useForm({});
+
+const deleteNews = (newsId) => {
+    if (confirm("Are you sure you want to delete this news?")) {
+        form.delete(route("dashboard.news.destroy", newsId), {
+            preserveScroll: true,
+        });
+    }
+};
 </script>
 
 <template>
@@ -16,10 +28,14 @@ const props = defineProps({
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     News
                 </h2>
-
-                <Link :href="route('dashboard.news.create')">
-                    <PrimaryButton>Create New News</PrimaryButton>
-                </Link>
+                <div class="flex space-x-2">
+                    <Link :href="route('dashboard.news.archive')">
+                        <PrimaryButton>Archived News</PrimaryButton>
+                    </Link>
+                    <Link :href="route('dashboard.news.create')">
+                        <PrimaryButton>Create New News</PrimaryButton>
+                    </Link>
+                </div>
             </div>
         </template>
 
@@ -60,6 +76,11 @@ const props = defineProps({
                                                 Edit News
                                             </PrimaryButton>
                                         </Link>
+                                        <DangerButton
+                                            @click="deleteNews(news.id)"
+                                        >
+                                            Delete
+                                        </DangerButton>
                                     </td>
                                 </tr>
                             </tbody>
