@@ -31,11 +31,16 @@ class ProfilePageController extends Controller
                 'name' => $kepalaDesa->name,
                 'photo_profile' => $kepalaDesa->photo_profile,
             ],
-            'data_demografi' => [
+            'data_demografi' => $dataDemografi ? [
                 'penduduk' => $dataDemografi->jumlah_penduduk,
                 'kepala_keluarga' => $dataDemografi->jumlah_keluarga,
                 'penduduk_laki_laki' => $dataDemografi->penduduk_pria,
                 'penduduk_perempuan' => $dataDemografi->penduduk_wanita,
+            ] : [
+                'penduduk' => 0,
+                'kepala_keluarga' => 0,
+                'penduduk_laki_laki' => 0,
+                'penduduk_perempuan' => 0,
             ]
         ]);
     }
