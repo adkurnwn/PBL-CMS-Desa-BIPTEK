@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
@@ -66,12 +67,7 @@ onMounted(() => {
         <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 ml-2">
           Berita Terbaru
         </h1>
-        <!-- <NewsCard
-          v-for="news in newsList"
-          :key="news.id"
-          :image="news.image"
-          :title="news.title"
-          :description="news.description"></NewsCard> -->
+
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
             <NewsCard
                 v-for="newsItem in home.news"
@@ -81,9 +77,9 @@ onMounted(() => {
             />
 
         </div>
-        <h1 class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
+        <a href="/berita" class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
           Selengkapnya >>
-        </h1>
+        </a>
 
       </article>
 
@@ -210,19 +206,21 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <div class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+
+          <a href="/produk-hukum-test" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
               <div>
                 <svg xmlns=w3.org/2000/svg height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">
                   <path d="M160-120v-60h480v60H160Zm222-212L160-554l70-72 224 222-72 72Zm254-254L414-810l72-70 222 222-72 72Zm202 426L302-696l42-42 536 536-42 42Z"/>"http://www.
                 </svg>
               </div>
+
               <div class="mt-2 space-y-1 ">
                 <h2 class="px-1 text-xl font-semibold text-accent1">Produk Hukum</h2>
                 <h3 class="px-1 text-base font-normal  text-accent1 leading-5">Ajukan feedback dan saran mu untuk kami dapat memperbaiki diri</h3>
               </div>
             </div>
-          </div>
+          </a>
           <div class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300 h-">
               <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">

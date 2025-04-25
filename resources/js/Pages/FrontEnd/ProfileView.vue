@@ -1,14 +1,26 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import axios from "axios";
 import UserLayout from "@/Layouts/UserLayout.vue";
 
 // Define reactive variables
 const profile = ref({});
 const loading = ref(false);
-const heroImages = ref([]);
-const currentHeroIndex = ref(0);
-const kepalaDesa = computed(() => profile.value.kepala_desa || {});
+
+const fetchProfile = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/profile");
+        profile.value = response.data;
+        loading.value = false;
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchProfile();
+});
 
 // Compute missionList after profile is loaded
 const missionList = computed(() => {
@@ -38,22 +50,6 @@ const parseFasilitas = computed(() => {
     return Array.isArray(profile.value.fasilitas)
         ? profile.value.fasilitas
         : [];
-});
-
-const fetchProfile = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get("/api/profile");
-        profile.value = response.data;
-        loading.value = false;
-    } catch (error) {
-        console.error("Error fetching profile data:", error);
-        loading.value = false;
-    }
-};
-
-onMounted(() => {
-    fetchProfile();
 });
 
 const parseJson = (value) => {
@@ -101,7 +97,8 @@ const parseJson = (value) => {
                     class="relative oval-container mb-40 mt-10 md:mt-36 mr-96 ml-96 md:-ml-80"
                 >
                     <img
-                        :src="`/storage/${kepalaDesa.photo_profile}`"
+                        v-if="profile.kepala_desa"
+                        :src="`/storage/${profile.kepala_desa.photo_profile}`"
                         alt="Kepala Desa"
                         class="mt-4 md:mt-5 ml-0 md:ml-3 w-62 md:w-80"
                     />
@@ -110,8 +107,11 @@ const parseJson = (value) => {
                 <div
                     class="bg-accent2 text-white text-center py-2 md:py-4 px-0 md:px-12 rounded-lg z-10 w-72 md:w-fit h-16 md:h-20 -mt-56 md:-mt-60 -mr-80 md:mr-96 -ml-80"
                 >
-                    <p class="font-bold text-md md:text-xl">
-                        {{ kepalaDesa.name }}
+                    <p
+                        v-if="profile.kepala_desa"
+                        class="font-bold text-md md:text-xl"
+                    >
+                        {{ profile.kepala_desa.name }}
                     </p>
                     <p class="italic text-sm md:text-md">
                         Kepala {{ profile.name }}
@@ -365,8 +365,7 @@ const parseJson = (value) => {
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
-                    >
-                    </iframe>
+                    ></iframe>
                 </div>
                 <div
                     class="-ml-64 -mr-64 md:-mr-40 pl-96 text-accent1 text-sm md:text-lg -mt-96 pt-2"
@@ -427,9 +426,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            2.114
+                            {{ profile.data_demografi.penduduk }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk
@@ -451,9 +451,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            674
+                            {{ profile.data_demografi.kepala_keluarga }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Kepala Keluarga
@@ -475,9 +476,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            1.049
+                            {{ profile.data_demografi.penduduk_laki_laki }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk Laki-Laki
@@ -499,9 +501,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            1.065
+                            {{ profile.data_demografi.penduduk_perempuan }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk Perempuan

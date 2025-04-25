@@ -39,7 +39,7 @@ class EventController extends Controller
 
         Event::create($data);
 
-        return redirect()->route('dashboard.events');
+        return redirect()->route('dashboard.events')->with('success', 'Event Added Successfully.');
     }
 
     public function edit(Event $event)
@@ -65,6 +65,6 @@ class EventController extends Controller
 
         $event->update($data);
 
-        return redirect()->route('dashboard.events');
+        return redirect()->route('dashboard.events')->with('success', 'Event Updated Successfully.');
     }
 }

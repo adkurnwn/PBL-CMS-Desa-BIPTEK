@@ -8,6 +8,7 @@ class Gallery extends Model
 {
     protected $fillable = [
         'title',
+        'slug',
         'user_id',
         'category_id',
         'description',
