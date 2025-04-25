@@ -22,7 +22,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor" class="text-secondary md:h-[24px] md:w-[24px]">
                                         <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z"/>
                                     </svg>
-                                    <h2 class="text-xs md:text-sm text-type1 font-extralight mt-0.5">{{ event.time }}</h2>
+                                    <h2 class="text-xs md:text-sm text-type1 font-extralight mt-0.5">{{ formatTime }}</h2>
                                 </div>
                             </div>
                         </div>
@@ -36,37 +36,61 @@
 
                 <!-- Back of card -->
                 <div class="flip-card-back bg-accent2 rounded-lg shadow-2xl">
-                    <div class="px-7 md:px-9 py-7">
-                        <h3 class="text-2xl font-semibold text-secondary mb-4">Atur Email Pengingat</h3>
-                        <form @submit.prevent="submitEmail" class="space-y-4">
-                            <div>
-                                <input 
-                                    type="email" 
-                                    v-model="email"
-                                    placeholder="Masukkan email Anda"
-                                    class="w-full px-3 py-2 rounded-lg bg-white text-accent2"
-                                    required
-                                >
-                            </div>
-                            <div class="flex space-x-2">
+                    <div class="px-7 md:px-9 py-7 h-full flex flex-col">
+                        <h3 class="text-xl font-semibold text-secondary mb-4">Atur Email Pengingat</h3>
+                        
+                        <!-- Description section with inline button -->
+                        <div class="flex-grow">
+                            <div class="flex items-start gap-2">
+                                <p class="text-white text-sm text-justify" :class="descriptionClass">
+                                    {{ event.description }}
+                                </p>
                                 <button 
-                                    type="submit" 
-                                    class="bg-accent1 text-white text-sm px-8 py-2 rounded-lg"
-                                    :disabled="loading"
+                                    @click="toggleDescription"
+                                    class="text-accent1 text-sm hover:underline whitespace-nowrap"
                                 >
-                                    {{ loading ? 'Mengirim...' : 'Ingatkan' }}
-                                </button>
-                                <button 
-                                    type="button"
-                                    @click="flipCard"
-                                    class="bg-type2 text-white text-sm px-8 py-2 rounded-lg"
-                                >
-                                    Batalkan
+                                    {{ showFullDescription ? 'Sembunyikan' : 'Lihat lebih' }}
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Form section - fixed at bottom -->
+                        <div class="mt-4" v-show="!showFullDescription">
+                            <form @submit.prevent="submitEmail" class="space-y-4">
+                                <div>
+                                    <input 
+                                        type="email" 
+                                        v-model="email"
+                                        placeholder="Masukkan email Anda"
+                                        class="w-full px-3 py-2 rounded-lg bg-white text-accent2"
+                                        required
+                                    >
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button 
+                                        type="submit" 
+                                        class="bg-accent1 text-white text-sm px-8 py-2 rounded-lg"
+                                        :class="{ 'opacity-50 cursor-not-allowed': isToday || loading }"
+                                        :disabled="isToday || loading"
+                                    >
+                                        {{ loading ? 'Mengirim...' : (isToday ? 'Tidak Tersedia' : 'Kirim') }}
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        @click="flipCard"
+                                        class="bg-type2 text-white text-sm px-8 py-2 rounded-lg"
+                                    >
+                                        Batalkan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Message section - fixed at bottom -->
+                        <div class="mt-4">
                             <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
                             <p v-if="success" class="text-green-500 text-sm">{{ success }}</p>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,6 +121,12 @@ const year = computed(() => {
     return new Date(props.event.date).getFullYear();
 });
 
+const formatTime = computed(() => {
+    const time = props.event.time;
+    if (!time) return '';
+    return time.substring(0, 5) + ' - Selesai'; // Convert "13:00:00" to "13:00 - Selesai"
+});
+
 const isFlipped = ref(false);
 const email = ref('');
 const loading = ref(false);
@@ -110,7 +140,14 @@ const flipCard = () => {
     email.value = '';
 };
 
+const isToday = computed(() => {
+    const today = new Date().toISOString().split('T')[0];
+    return props.event.date === today;
+});
+
 const submitEmail = async () => {
+    if (isToday.value) return;
+    
     loading.value = true;
     error.value = '';
     success.value = '';
@@ -119,15 +156,24 @@ const submitEmail = async () => {
         await axios.post(`/api/events/${props.event.id}/reminder`, {
             email: email.value
         });
-        success.value = 'Email reminder set successfully!';
+        success.value = 'Email pengingat berhasil diatur!';
         setTimeout(() => {
             flipCard();
         }, 2000);
     } catch (e) {
-        error.value = e.response?.data?.message || 'An error occurred';
+        error.value = e.response?.data?.message || 'Terjadi kesalahan';
     } finally {
         loading.value = false;
     }
+};
+
+const showFullDescription = ref(false);
+const descriptionClass = computed(() => ({
+    'line-clamp-1': !showFullDescription.value
+}));
+
+const toggleDescription = () => {
+    showFullDescription.value = !showFullDescription.value;
 };
 </script>
 
@@ -163,5 +209,27 @@ const submitEmail = async () => {
 
 .flip-card-back {
     transform: rotateY(180deg);
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.flex-grow {
+    flex-grow: 1;
 }
 </style>

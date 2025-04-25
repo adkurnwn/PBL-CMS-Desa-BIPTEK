@@ -20,6 +20,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('email'); 
             $table->unique(['event_id', 'email']);
+            $table->boolean('is_sent')->default(false);
             $table->timestamps();
         });
     }

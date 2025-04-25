@@ -8,7 +8,8 @@ class EventEmails extends Model
 {
     protected $fillable = [
         'event_id',
-        'email'
+        'email',
+        'is_sent'
     ];
 
     // Add composite unique rule

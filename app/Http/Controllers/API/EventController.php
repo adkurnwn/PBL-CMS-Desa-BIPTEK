@@ -12,7 +12,14 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::orderBy('date', 'asc')
-            ->where('date', '>=', now())
+            ->where(function($query) {
+                $now = now();
+                $query->where('date', '>', $now->format('Y-m-d'))
+                    ->orWhere(function($q) use ($now) {
+                        $q->where('date', '=', $now->format('Y-m-d'))
+                           ->where('time', '>=', $now->format('H:i:s'));
+                    });
+            })
             ->get();
 
         return response()->json($events);
@@ -25,6 +32,14 @@ class EventController extends Controller
         ]);
 
         try {
+            // Check if event is today
+            if ($event->date === now()->format('Y-m-d')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Event tidak dapat diingatkan pada hari yang sama!'
+                ], 422);
+            }
+
             $existingReminder = EventEmails::where('event_id', $event->id)
                 ->where('email', $request->email)
                 ->exists();
@@ -32,7 +47,7 @@ class EventController extends Controller
             if ($existingReminder) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You have already registered for this event'
+                    'message' => 'Anda sudah terdaftar di pengingat event ini!'
                 ], 422);
             }
 
@@ -43,13 +58,13 @@ class EventController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Successfully registered for event reminder'
+                'message' => 'Berhasil mendaftar untuk pengingat event!'
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while registering for the event'
+                'message' => 'Terjadi kesalahan saat mendaftar pengingat event!'
             ], 500);
         }
     }
