@@ -24,6 +24,7 @@ return new class extends Migration
                 ->on('categories')
                 ->onDelete('cascade');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->text('description');
             $table->string('file');
             $table->string('link');

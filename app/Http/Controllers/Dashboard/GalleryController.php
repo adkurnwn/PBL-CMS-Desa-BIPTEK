@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Image;
 use App\Models\Gallery;
 use App\Models\Category;
+use App\Helpers\SlugHelper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -71,7 +72,7 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
-        $data['slug'] = Str::of($request->title)->slug('-');
+        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
 
@@ -174,7 +175,7 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
-        $data['slug'] = Str::of($request->title)->slug('-');
+        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
         $data['category_id'] = $category_id;
 
         // Update news record

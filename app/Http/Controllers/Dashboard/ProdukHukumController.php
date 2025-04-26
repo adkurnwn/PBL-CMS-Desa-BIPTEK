@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
-use App\Models\ProdukHukum;
 use App\Models\Category;
+use App\Helpers\SlugHelper;
+use App\Models\ProdukHukum;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -71,6 +72,7 @@ class ProdukHukumController extends Controller
         }
 
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
         $data['file'] = $path ?? null;
@@ -182,6 +184,7 @@ class ProdukHukumController extends Controller
             unset($data['file']);
         }
 
+        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
         $data['category_id'] = $category_id;
 
         $produkHukum->update($data);

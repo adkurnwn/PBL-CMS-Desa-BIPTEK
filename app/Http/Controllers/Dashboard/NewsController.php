@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\SlugHelper;
 use App\Models\News;
 use Inertia\Inertia;
 use App\Models\Image;
@@ -70,7 +71,7 @@ class NewsController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
-        $data['slug'] = Str::of($request->title)->slug('-');
+        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
 
         $news = News::create($data);
 
@@ -160,19 +161,16 @@ class NewsController extends Controller
         }
 
         if ($request->filled('category.deleting_category_id')) {
-            // Handle category deletion
             $deletionResults = [];
 
             foreach ($request->category['deleting_category_id'] as $deletingCategoryId) {
                 $category = Category::find($deletingCategoryId);
                 if ($category) {
-                    // Check if the category is being used by any news
                     $newsCount = News::where('category_id', $category->id)->count();
                     $galleryCount = Gallery::where('category_id', $category->id)->count();
                     $inUseCount = $newsCount + $galleryCount;
 
                     if ($inUseCount > 0) {
-                        // Skip deletion and add to results
                         $deletionResults[$category->name] = "Cannot delete: in use by {$inUseCount} news and gallery";
                     } else {
                         $category->delete();
@@ -184,7 +182,7 @@ class NewsController extends Controller
 
         $data = $request->all();
         $data['category_id'] = $category_id;
-        $data['slug'] = Str::of($request->title)->slug('-');
+        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);;
 
         // Update news record
         $news->update($data);

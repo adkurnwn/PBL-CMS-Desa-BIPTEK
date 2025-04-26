@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
+use App\Helpers\SlugHelper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\GambarProdukDesa;
@@ -40,7 +41,7 @@ class ProdukDesaController extends Controller
         $request->validate($rules);
 
         $dataProduk = $request->all();
-        $dataProduk['slug'] = Str::of($request->name)->slug('-');
+        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->title);
         $dataProduk['user_id'] = Auth::id();
 
         try {
@@ -87,7 +88,7 @@ class ProdukDesaController extends Controller
         $request->validate($rules);
 
         $dataProduk = $request->all();
-        $dataProduk['slug'] = Str::of($request->name)->slug('-');
+        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->title);
 
         $produkDesa->update($dataProduk);
 
