@@ -1,28 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import axios from "axios";
 import UserLayout from "@/Layouts/UserLayout.vue";
 
 // Define reactive variables
 const profile = ref({});
 const loading = ref(false);
-
-// Compute missionList after profile is loaded
-const missionList = computed(() => {
-    if (!profile.value || !profile.value.mission) return [];
-
-    if (typeof profile.value.mission === "string") {
-        return profile.value.mission
-            .split(/\d+\.\s/)
-            .filter((item) => item.trim() !== "");
-    }
-
-    return [];
-});
-
-
-
-
 
 const fetchProfile = async () => {
     try {
@@ -38,6 +20,36 @@ const fetchProfile = async () => {
 
 onMounted(() => {
     fetchProfile();
+});
+
+// Compute missionList after profile is loaded
+const missionList = computed(() => {
+    if (!profile.value || !profile.value.mission) return [];
+
+    if (typeof profile.value.mission === "string") {
+        return profile.value.mission
+            .split(/\d+\.\s/)
+            .filter((item) => item.trim() !== "");
+    }
+
+    return [];
+});
+
+const parseFasilitas = computed(() => {
+    if (!profile.value || !profile.value.fasilitas) return [];
+
+    if (typeof profile.value.fasilitas === "string") {
+        try {
+            return JSON.parse(profile.value.fasilitas);
+        } catch (e) {
+            console.error("Error parsing fasilitas:", e);
+            return [];
+        }
+    }
+
+    return Array.isArray(profile.value.fasilitas)
+        ? profile.value.fasilitas
+        : [];
 });
 
 const parseJson = (value) => {
@@ -59,9 +71,9 @@ const parseJson = (value) => {
             class="flex flex-col justify-center h-screen font-merriweather space-y-1 bg-green-100"
         >
             <img
-                src="../../../images/profile.jpg"
+                :src="`/storage/${profile.hero_image}`"
                 alt="Logo"
-                class="absolute z-0 w-screen h-screen"
+                class="absolute z-0 h-screen w-full object-cover"
             />
             <div class="absolute bg-black z-0 w-full h-screen opacity-60"></div>
             <h1
@@ -85,7 +97,8 @@ const parseJson = (value) => {
                     class="relative oval-container mb-40 mt-10 md:mt-36 mr-96 ml-96 md:-ml-80"
                 >
                     <img
-                        src="../../../images/FOTO_KADES.png"
+                        v-if="profile.kepala_desa"
+                        :src="`/storage/${profile.kepala_desa.photo_profile}`"
                         alt="Kepala Desa"
                         class="mt-4 md:mt-5 ml-0 md:ml-3 w-62 md:w-80"
                     />
@@ -94,10 +107,15 @@ const parseJson = (value) => {
                 <div
                     class="bg-accent2 text-white text-center py-2 md:py-4 px-0 md:px-12 rounded-lg z-10 w-72 md:w-fit h-16 md:h-20 -mt-56 md:-mt-60 -mr-80 md:mr-96 -ml-80"
                 >
-                    <p class="font-bold text-md md:text-xl">
-                        SYAMSUL BAHRI, S.E., M.M.
+                    <p
+                        v-if="profile.kepala_desa"
+                        class="font-bold text-md md:text-xl"
+                    >
+                        {{ profile.kepala_desa.name }}
                     </p>
-                    <p class="italic text-sm md:text-md">Kepala Desa Pao-Pao</p>
+                    <p class="italic text-sm md:text-md">
+                        Kepala {{ profile.name }}
+                    </p>
                 </div>
                 <div
                     class="flex flex-col relative md:-top-20 text-semiBlack ml-0 md:ml-72 mr-0 md:-mr-40 mt-4 md:-mt-80"
@@ -155,7 +173,7 @@ const parseJson = (value) => {
                         class="container bg-white rounded-lg md:rounded-xl shadow-lg text-center mt-2 md:mt-0 ml-2 md:ml-0"
                     >
                         <img
-                            src="../../../images/SO_PEMERINTAHAN_DESA.png"
+                            :src="`/storage/${profile.organization_image}`"
                             alt="Gambar 1"
                             class="w-full h-72 -mt-5 md:-mt-3 object-contain"
                         />
@@ -299,9 +317,14 @@ const parseJson = (value) => {
                     class="flex flex-wrap ml-96 md:ml-80 pr-12 -mr-40 md:-mr-0 -mt-96 pt-40 md:pt-20 text-accent2"
                 >
                     <ol
-                        class="list-disc list-inside font-semibold text-sm md:text-xl max-w-lg md:max-w-3xl space-y-1 -mt-96"
+                        class="list-disc list-inside font-semibold text-sm md:text-xl max-w-lg md:max-w-3xl space-y-1 -mt-96 ml-20"
                     >
-                        <li></li>
+                        <li
+                            v-for="(fasilitas, index) in parseFasilitas"
+                            :key="index"
+                        >
+                            {{ fasilitas }}
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -342,8 +365,7 @@ const parseJson = (value) => {
                         allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
-                    >
-                    </iframe>
+                    ></iframe>
                 </div>
                 <div
                     class="-ml-64 -mr-64 md:-mr-40 pl-96 text-accent1 text-sm md:text-lg -mt-96 pt-2"
@@ -404,9 +426,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            2.114
+                            {{ profile.data_demografi.penduduk }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk
@@ -428,9 +451,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            674
+                            {{ profile.data_demografi.kepala_keluarga }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Kepala Keluarga
@@ -452,9 +476,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            1.049
+                            {{ profile.data_demografi.penduduk_laki_laki }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk Laki-Laki
@@ -476,9 +501,10 @@ const parseJson = (value) => {
                             />
                         </svg>
                         <p
+                            v-if="profile.data_demografi"
                             class="text-2xl md:text-3xl font-thin text-left ml-2 md:ml-3 -mt-1 md:-mt-0"
                         >
-                            1.065
+                            {{ profile.data_demografi.penduduk_perempuan }}
                         </p>
                         <p class="text-sm md:text-lg text-left ml-2 md:ml-3">
                             Penduduk Perempuan

@@ -1,3 +1,14 @@
+<script setup>
+import { defineProps } from "vue";
+
+defineProps({
+    event: {
+        type: Object,
+        required: false,
+        default: () => ({}),
+    },
+});
+</script>
 <template>
   <div class="relative w-full md:w-1/3">
       <div class="flip-card" :class="{ 'is-flipped': isFlipped }">

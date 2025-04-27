@@ -33,6 +33,7 @@ class UserSeeder extends Seeder
             'email' => 'kepala@gmail.com',
             'password' => Hash::make('password'),
             'position_id' => $kepalaDesaPosition->id,
+            'photo_profile' => '/profile-photos/kepala-desa.png',
             'phone' => '089876543210',
             'status' => true,
         ]);

@@ -3,11 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\NewsController;
-use App\Http\Controllers\api\EventController;
-use App\Http\Controllers\api\ProfileControler;
+use App\Http\Controllers\api\LayoutController;
 use App\Http\Controllers\api\RegionController;
 use App\Http\Controllers\api\FeedbackController;
+use App\Http\Controllers\api\HomePageController;
 use App\Http\Controllers\api\ProdukHukumController;
+use App\Http\Controllers\api\ProfilePageController;
 use App\Http\Controllers\api\KomentarBeritaController;
 use App\Http\Controllers\api\KomentarProdukHukumController;
 
@@ -19,18 +20,19 @@ Route::get('regencies/{province_id}', [RegionController::class, 'getRegencies'])
 Route::get('districts/{regency_id}', [RegionController::class, 'getDistricts']);
 Route::get('villages/{district_id}', [RegionController::class, 'getVillages']);
 
-Route::get('profile', [ProfileControler::class, 'index']);
-Route::get('navbar', [ProfileControler::class, 'navbar']);
+Route::get('profile', [ProfilePageController::class, 'index']);
+Route::get('layout', [LayoutController::class, 'index']);
+Route::get('home', [HomePageController::class, 'index']);
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);
-    Route::get('/{news}', [NewsController::class, 'show']);
+    Route::get('/{slug}', [NewsController::class, 'show']);
 });
 
 Route::prefix('comments')->group(function () {
-    Route::get('/{newsId}', [KomentarBeritaController::class, 'index']);
+    Route::get('/{slug}', [KomentarBeritaController::class, 'index']);
     Route::post('/', [KomentarBeritaController::class, 'store']);
-    Route::get('/{newsId}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
+    Route::get('/{slug}/replies/{commentId}', [KomentarBeritaController::class, 'getReplies']);
 });
 
 Route::get('/produk-hukum', [ProdukHukumController::class, 'index']);
@@ -45,9 +47,4 @@ Route::prefix('produk-hukum-comments')->group(function () {
 Route::prefix('feedback')->group(function () {
     Route::get('/kategori', [FeedbackController::class, 'getKategori']);
     Route::post('/', [FeedbackController::class, 'store']);
-});
-
-Route::prefix('events')->group(function () {
-    Route::get('/', [EventController::class, 'index']);
-    Route::post('/{event}/reminder', [EventController::class, 'setReminder']);
 });

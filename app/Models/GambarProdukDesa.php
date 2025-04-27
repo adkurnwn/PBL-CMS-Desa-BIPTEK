@@ -10,6 +10,6 @@ class GambarProdukDesa extends Model
 
     protected $fillable = [
         'produk_desa_id',
-        'images',
+        'path',
     ];
 }

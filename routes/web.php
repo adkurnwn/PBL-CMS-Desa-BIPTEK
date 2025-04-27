@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\News;
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
 use Illuminate\Support\Facades\Route;
@@ -21,20 +22,21 @@ use App\Http\Controllers\Dashboard\KomentarProdukHukumController;
 use App\Http\Controllers\Dashboard\ProfileController as DesaProfileController;
 
 Route::get('/', function () {
-    return view('home');
-});
+    return Inertia::render('FrontEnd/HomeView');
+})->name('home');
 
 Route::get('/profildesa', function () {
-    return view('profil');
-});
+    return Inertia::render('FrontEnd/ProfileView');
+})->name('profil-desa');
 
 Route::get('/informasi', function () {
-    return view('informasi');
-});
+    return Inertia::render('FrontEnd/InformasiView');
+})->name('informasi');
 
 Route::get('/layanan', function () {
-    return view('layanan');
-});
+    return Inertia::render('FrontEnd/LayananView');
+})->name('layanan');
+
 
 
             //TESTING ROUTES
@@ -48,9 +50,12 @@ Route::get('/layanan', function () {
                 ]);
             })->name('berita.show');
 
-            Route::get('/berita-test', function () {
-                return Inertia::render('FrontEnd/BeritaListTest');
-            })->name('berita');
+Route::get('/berita-test/{slug}', function ($slug) {
+    $news = News::where('slug', $slug)->firstOrFail();
+    return Inertia::render('FrontEnd/BeritaDetailTest', [
+        'slug' => $slug
+    ]);
+})->name('berita.show');
 
             Route::get('/berita-test/{id}', function ($id) {
                 return Inertia::render('FrontEnd/BeritaDetailTest', [
@@ -106,7 +111,9 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:create_news'])->post('/news', [NewsController::class, 'store'])->name('dashboard.news.store');
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
-        Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy');
+        Route::middleware(['permission:archive_news'])->patch('/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
+        Route::middleware(['permission:restore_news'])->get('/news/{news}/restore', [NewsController::class, 'restore'])->name('dashboard.news.restore')->withTrashed();
+        Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy')->withTrashed();
 
         Route::middleware(['permission:read_galleries'])->get('/galleries', [GalleryController::class, 'index'])->name('dashboard.galleries');
         Route::middleware(['permission:create_galleries'])->get('/galleries/create', [GalleryController::class, 'create'])->name('dashboard.galleries.create');

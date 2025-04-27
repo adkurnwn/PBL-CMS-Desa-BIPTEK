@@ -12,7 +12,7 @@ class KomentarProdukHukumController extends Controller
     public function index($newsId)
     {
         $news = ProdukHukum::findOrFail($newsId);
-        
+
         $comments = KomentarProdukHukum::where('id_produk_hukum', $newsId)
             ->when($news->is_moderate, function($query) {
                 $query->where('is_approved', true);
@@ -27,7 +27,7 @@ class KomentarProdukHukumController extends Controller
     public function getReplies($produkhukumId, $commentId)
     {
         $produkhukum = ProdukHukum::findOrFail($produkhukumId);
-        
+
         // Only get direct replies to the comment
         $replies = KomentarProdukHukum::where('id_produk_hukum', $produkhukumId)
             ->where('id_ref_komentar', $commentId)
@@ -75,7 +75,7 @@ class KomentarProdukHukumController extends Controller
             $comment->parent_user = $comment->parent->nama_user;
         }
 
-        $message = $produkhukum->is_moderate 
+        $message = $produkhukum->is_moderate
             ? 'Komentar telah dikirim dan menunggu persetujuan'
             : 'Komentar berhasil dikirim';
 

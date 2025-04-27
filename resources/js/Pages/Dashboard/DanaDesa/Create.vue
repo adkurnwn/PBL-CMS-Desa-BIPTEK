@@ -1,11 +1,10 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     categories: {
@@ -137,6 +136,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Dana Desa
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.dana-desa')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

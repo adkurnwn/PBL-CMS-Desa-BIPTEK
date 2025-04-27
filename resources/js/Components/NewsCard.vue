@@ -1,21 +1,20 @@
 <script setup>
 defineProps({
-    isHome: Boolean,
-    name: "NewsCard",
-    // props: {
-    //     image: {
-    //         type: String,
-    //         required: true,
-    //     },
-    //     title: {
-    //         type: String,
-    //         required: true,
-    //     },
-    //     description: {
-    //         type: String,
-    //         required: true,
-    //     },
-    // },
+    isHome: {
+        type: Boolean,
+        default: false,
+    },
+    news: {
+        type: Object,
+        default: () => ({
+            image: { path: 'default-image.jpg', alt: 'Default Image' },
+            author: { name: 'Anonymous' },
+            title: 'No Title',
+            content: 'No content available',
+            created_at: '-',
+            views: 0
+        }),
+    },
 });
 </script>
 <template>
@@ -33,8 +32,8 @@ defineProps({
         >
             <div class="flex max-w-full w-full h-full rounded-full">
                 <img
-                    src="../../images/profile.jpg"
-                    alt="News Image"
+                    :src="`/storage/${news.image.path}`"
+                    :alt="news.image.alt"
                     class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl overflow-hidden"
                 />
             </div>
@@ -53,26 +52,23 @@ defineProps({
                         />
                     </svg>
                     <h2 class="pr-2 text-sm font-thin text-type2 mt-0.5">
-                        M.Andi Sulaiman
+                        {{ news.author.name }}
                     </h2>
                 </div>
                 <div class="-mt-2 lg:-mt-0">
                     <h2
                         class="px-4 text-lg font-semibold text-type2 line-clamp-2"
                     >
-                        Pengukuhan Kader Posyandu Desa Pao-Pao Periode 2025-2030
+                        {{ news.title }}
                     </h2>
                     <p
                         class="pt-2 px-4 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis text-justify"
                     >
-                        Kepala Desa Pao-Pao, Kecamatan Tanete Rilau, Kabupaten
-                        Barru, Sulawesi Selatan SYAMSUL BAHRI, S.E., M.M.
-                        melakukan penandatanganan kerjasama yang signifikan
-                        antara Ikatan fhujediwshnfcujdewsnfhc hjfujedsiwhnfcddnb
+                        {{ news.content }}
                     </p>
                 </div>
                 <div class="flex flex-row justify-between p-3 py-5">
-                    <h2 class="text-xs mt-0.5">5 March 2025</h2>
+                    <h2 class="text-xs mt-0.5">{{ news.created_at }}</h2>
                     <div class="flex flex-row space-x-3 mr-2">
                         <div
                             class="flex flex-row space-x-2 justify-center items-center"
@@ -89,7 +85,7 @@ defineProps({
                                     d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"
                                 />
                             </svg>
-                            <h2 class="text-xs">0</h2>
+                            <h2 class="text-xs">{{ news.views }}</h2>
                         </div>
                         <div
                             class="flex flex-row space-x-2 justify-center items-center"
@@ -103,7 +99,7 @@ defineProps({
                                 class="text-semiBlack"
                             >
                                 <path
-                                    d="M320-400h320v-22q0-44-44-71t-116-27q-72 0-116 27t-44 71v22Zm160-160q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"
+                                    d="M320-400h320v-22q0-44-44-71t-116-27q-72 0-116 27t-44 71v22Zm160-160q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0-33-23.5-56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"
                                 />
                             </svg>
                             <h2 class="text-xs">3</h2>
