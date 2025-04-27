@@ -2,8 +2,29 @@
 import EventCard from "@/Components/EventCard.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const events = ref([]);
+const loading = ref(true);
+
+const fetchEvents = async () => {
+    try {
+        const response = await axios.get('/api/events');
+        events.value = response.data;
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        events.value = []; // Empty array if API fails
+    } finally {
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchEvents();
+});
 </script>
-<!-- Homeview.vue -->
+
 <template>
     <UserLayout>
         <header
@@ -67,9 +88,15 @@ import UserLayout from "@/Layouts/UserLayout.vue";
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
-                    <EventCard />
-                    <EventCard />
-                    <EventCard />
+                    <div v-if="loading" class="text-center w-full">
+                        <p>Loading events...</p>
+                    </div>
+                    <div v-else-if="events.length === 0" class="text-center w-full">
+                        <p>Tidak ada event yang akan datang</p>
+                    </div>
+                    <template v-else>
+                        <EventCard v-for="event in events" :key="event.id" :event="event" />
+                    </template>
                 </div>
             </article>
 
