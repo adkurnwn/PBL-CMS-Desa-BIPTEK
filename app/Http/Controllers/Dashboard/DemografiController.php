@@ -6,6 +6,8 @@ use Inertia\Inertia;
 use App\Models\Demografi;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validation\StoreDemografiRequest;
+use App\Http\Requests\Validation\UpdateDemografiRequest;
 use Illuminate\Support\Facades\Auth;
 
 class DemografiController extends Controller
@@ -22,33 +24,14 @@ class DemografiController extends Controller
         return Inertia::render('Dashboard/Demografi/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreDemografiRequest $request)
     {
-        $rules = [
-            'penduduk_pria' => 'required',
-            'penduduk_wanita' => 'required',
-            'tahun' => 'required',
-            'jumlah_peserta_bpjs' => 'required',
-            'jumlah_pindah_keluar' => 'required',
-            'jumlah_pendatang' => 'required',
-            'tamat_pt' => 'required',
-            'tamat_sma' => 'required',
-            'tamat_smp' => 'required',
-            'tamat_sd' => 'required',
-            'jumlah_lansia' => 'required',
-            'jumlah_dewasa' => 'required',
-            'jumlah_remaja' => 'required',
-            'jumlah_anak' => 'required',
-            'jumlah_penduduk' => 'required',
-            'jumlah_keluarga' => 'required',
-        ];
-
-        $demografiData = $request->validate($rules);
+        $demografiData = $request->all();
         $demografiData['user_id'] = Auth::id();
 
         Demografi::create($demografiData);
 
-        return redirect()->route('dashboard.demografi');
+        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Created Successfully');
     }
 
     public function edit(Demografi $demografi)
@@ -58,31 +41,12 @@ class DemografiController extends Controller
         ]);
     }
 
-    public function update(Request $request, Demografi $demografi)
+    public function update(UpdateDemografiRequest $request, Demografi $demografi)
     {
-        $rules = [
-            'penduduk_pria' => 'required',
-            'penduduk_wanita' => 'required',
-            'tahun' => 'required',
-            'jumlah_peserta_bpjs' => 'required',
-            'jumlah_pindah_keluar' => 'required',
-            'jumlah_pendatang' => 'required',
-            'tamat_pt' => 'required',
-            'tamat_sma' => 'required',
-            'tamat_smp' => 'required',
-            'tamat_sd' => 'required',
-            'jumlah_lansia' => 'required',
-            'jumlah_dewasa' => 'required',
-            'jumlah_remaja' => 'required',
-            'jumlah_anak' => 'required',
-            'jumlah_penduduk' => 'required',
-            'jumlah_keluarga' => 'required',
-        ];
-
-        $demografiData = $request->validate($rules);
+        $demografiData = $request->all();
 
         $demografi->update($demografiData);
 
-        return redirect()->route('dashboard.demografi');
+        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Updated Successfully');
     }
 }

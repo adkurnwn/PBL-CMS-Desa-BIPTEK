@@ -33,18 +33,19 @@ const form = useForm({
     jumlah_anak: props.demografi.jumlah_anak,
     jumlah_penduduk: props.demografi.jumlah_penduduk,
     jumlah_keluarga: props.demografi.jumlah_keluarga,
-    _method: "PUT"
+    _method: "PUT",
 });
 
 // Calculate total population when gender populations change
 const calculateTotalPopulation = () => {
     if (form.penduduk_pria && form.penduduk_wanita) {
-        form.jumlah_penduduk = parseInt(form.penduduk_pria) + parseInt(form.penduduk_wanita);
+        form.jumlah_penduduk =
+            parseInt(form.penduduk_pria) + parseInt(form.penduduk_wanita);
     }
 };
 
 const submit = () => {
-    form.post(route("dashboard.demografis.update", props.demografi.id), {
+    form.post(route("dashboard.demografi.update", props.demografi.id), {
         preserveScroll: true,
     });
 };
@@ -300,4 +301,102 @@ const submit = () => {
 
                                 <div>
                                     <InputLabel
-                                        for
+                                        for="jumlah_keluarga"
+                                        value="Jumlah KK"
+                                    />
+                                    <TextInput
+                                        id="jumlah_keluarga"
+                                        v-model="form.jumlah_keluarga"
+                                        type="number"
+                                        class="mt-1 block w-full"
+                                        min="0"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.jumlah_keluarga"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="jumlah_peserta_bpjs"
+                                        value="Jumlah Peserta BPJS"
+                                    />
+                                    <TextInput
+                                        id="jumlah_peserta_bpjs"
+                                        v-model="form.jumlah_peserta_bpjs"
+                                        type="number"
+                                        class="mt-1 block w-full"
+                                        min="0"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="
+                                            form.errors.jumlah_peserta_bpjs
+                                        "
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="jumlah_pendatang"
+                                        value="Jumlah Pendatang"
+                                    />
+                                    <TextInput
+                                        id="jumlah_pendatang"
+                                        v-model="form.jumlah_pendatang"
+                                        type="number"
+                                        class="mt-1 block w-full"
+                                        min="0"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.jumlah_pendatang"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <InputLabel
+                                        for="jumlah_pindah_keluar"
+                                        value="Jumlah Pindah Keluar"
+                                    />
+                                    <TextInput
+                                        id="jumlah_pindah_keluar"
+                                        v-model="form.jumlah_pindah_keluar"
+                                        type="number"
+                                        class="mt-1 block w-full"
+                                        min="0"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="
+                                            form.errors.jumlah_pindah_keluar
+                                        "
+                                        class="mt-2"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex space-x-4">
+                                <PrimaryButton :disabled="form.processing">
+                                    Update Demographic Data
+                                </PrimaryButton>
+                                <Link :href="route('dashboard.demografi')">
+                                    <PrimaryButton
+                                        type="button"
+                                        class="bg-gray-500 hover:bg-gray-600"
+                                    >
+                                        Cancel
+                                    </PrimaryButton>
+                                </Link>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>

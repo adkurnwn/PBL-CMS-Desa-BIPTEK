@@ -14,6 +14,9 @@ defineProps({
     status: {
         type: String,
     },
+    profile: {
+        type: Object,
+    },
 });
 
 const form = useForm({
@@ -30,7 +33,7 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
+    <GuestLayout :profile="profile">
         <Head title="Log in" />
 
         <div v-if="status" class="mb-4 text-sm font-medium text-green-600">

@@ -26,6 +26,7 @@ return new class extends Migration
                 ->on('categories')
                 ->onDelete('cascade');
             $table->text('description');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -32,7 +32,7 @@ const form = useForm({
         new_category_name: "",
         deleting_category_id: [],
     },
-    file: null,
+    file: "",
     link: props.produkHukum.link,
     date: props.produkHukum.date,
     is_moderate: Boolean(props.produkHukum.is_moderate),

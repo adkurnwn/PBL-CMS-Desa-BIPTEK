@@ -23,7 +23,7 @@ const form = useForm({
     email: props.user.email,
     password: "",
     phone: props.user.phone,
-    photo_profile: null,
+    photo_profile: "",
     position_id: props.user.position_id,
     new_position: "",
     job_descriptions: [],
