@@ -17,18 +17,17 @@ class ProfileSeeder extends Seeder
             'name' => 'Desa Sumberejo',
             'email' => 'desa.sumberejo@surabaya.go.id',
             'phone' => '031-7405559',
-            'logo' => 'defaults/logo/sumberejo.png',
+            'logo' => '/profile-logo/logo.png',
             'provinsi' => '35',
             'kabupaten' => '3578',
             'kecamatan' => '3578120',
             'kelurahan' => '3578120002',
-            'address' => 'Jl. Raya Sumberejo No. 1, Kecamatan Pakal, Kota Surabaya',
             'hero_images' => json_encode([
-                'defaults/hero/hero-1.jpg',
-                'defaults/hero/hero-2.jpg',
-                'defaults/hero/hero-3.jpg'
+                '/hero-images/hero-1.jpg',
+                '/hero-images/hero-2.jpg',
+                '/hero-images/hero-3.jpg'
             ]),
-            'organization_image' => 'defaults/organization/structure.png',
+            'organization_image' => '/organization-images/organization.jpg',
             'lembaga' => json_encode([
                 'BPD (Badan Permusyawaratan Desa)',
                 'LPMD (Lembaga Pemberdayaan Masyarakat Desa)',

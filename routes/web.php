@@ -30,12 +30,13 @@ Route::get('/profildesa', function () {
 })->name('profil-desa');
 
 Route::get('/informasi', function () {
-    return view('informasi');
-});
+    return Inertia::render('FrontEnd/InformasiView');
+})->name('informasi');
 
 Route::get('/layanan', function () {
-    return view('layanan');
-});
+    return Inertia::render('FrontEnd/LayananView');
+})->name('layanan');
+
 
 Route::get('/berita', function () {
     return Inertia::render('FrontEnd/BeritaListTest');
@@ -100,7 +101,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:create_news'])->post('/news', [NewsController::class, 'store'])->name('dashboard.news.store');
         Route::middleware(['permission:update_news'])->get('/news/{news}/edit', [NewsController::class, 'edit'])->name('dashboard.news.edit');
         Route::middleware(['permission:update_news'])->put('/news/{news}', [NewsController::class, 'update'])->name('dashboard.news.update');
-        Route::middleware(['permission:archive_news'])->patch('/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
+        Route::middleware(['permission:archive_news'])->get('/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
         Route::middleware(['permission:restore_news'])->get('/news/{news}/restore', [NewsController::class, 'restore'])->name('dashboard.news.restore')->withTrashed();
         Route::middleware(['permission:delete_news'])->delete('/news/{news}', [NewsController::class, 'destroy'])->name('dashboard.news.destroy')->withTrashed();
 
@@ -109,7 +110,9 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:create_galleries'])->post('/galleries', [GalleryController::class, 'store'])->name('dashboard.galleries.store');
         Route::middleware(['permission:update_galleries'])->get('/galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('dashboard.galleries.edit');
         Route::middleware(['permission:update_galleries'])->put('/galleries/{gallery}', [GalleryController::class, 'update'])->name('dashboard.galleries.update');
-        Route::middleware(['permission:delete_galleries'])->delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('dashboard.galleries.destroy');
+        Route::middleware(['permission:archive_galleries'])->get('/galleries/archive', [GalleryController::class, 'archive'])->name('dashboard.galleries.archive');
+        Route::middleware(['permission:restore_galleries'])->get('/galleries/{gallery}/restore', [GalleryController::class, 'restore'])->name('dashboard.galleries.restore')->withTrashed();
+        Route::middleware(['permission:delete_galleries'])->delete('/galleries/{gallery}', [GalleryController::class, 'destroy'])->name('dashboard.galleries.destroy')->withTrashed();
 
         Route::middleware(['permission:read_events'])->get('/event', [EventController::class, 'index'])->name('dashboard.events');
         Route::middleware(['permission:create_events'])->get('/event/create', [EventController::class, 'create'])->name('dashboard.events.create');

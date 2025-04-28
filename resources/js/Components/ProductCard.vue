@@ -2,57 +2,41 @@
 defineProps({
     produkDesa: {
         type: Object,
-        required: false,
-        default: () => ({}),
+        default: () => ({
+            image: { path: 'default-image.jpg', alt: 'Default Product Image' },
+            name: 'Sample Product',
+            price: 'Rp 0',
+        }),
     },
 });
 </script>
 <template>
-  <!-- <div class="news-card">
-    <img :src="image" alt="News Image" class="news-card__image" />
-    <div class="news-card__content">
-      <h2 class="news-card__title">{{ title }}</h2>
-      <p class="news-card__description">{{ description }}</p>
-    </div>
-  </div> -->
-  <div class="w-full lg:w-1/4 p-1">
-        <div
-            class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300 h-"
-        >
-        <div class="px-3 mt-5">
+    <div class="w-full lg:w-1/4 p-1">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300">
+            <div class="px-3 mt-5">
                 <img
-                    :src="`/storage/${produkDesa.image.path}`"
-                    :alt="produkDesa.image.alt"
+                    :src="produkDesa?.image?.path ? `/storage/${produkDesa.image.path}` : '/default-image.jpg'"
+                    :alt="produkDesa?.image?.alt || 'Default Image'"
                     class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
                 />
-        </div>
-        <div class="px-4">
-          <!-- <div class="flex flex-row p-4 pt-1 space-x-2">
-            <img src="../../images/person.png" alt="" class="w-[16px] h-[16px] object-contain " />
-            <h2 class="pr-2 text-sm font-thin text-type2 ">M.Andi Sulaiman</h2>
-          </div> -->
-          <div class="mt-2 space-y-1">
-                    <h2
-                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2"
-                    >
-                        {{ produkDesa.name }}
+            </div>
+            <div class="px-4">
+                <div class="mt-2 space-y-1">
+                    <h2 class="px-1 text-lg nd:text-2xl font-semibold text-accent2">
+                        {{ produkDesa?.name || 'Unnamed Product' }}
                     </h2>
                     <h3 class="px-1 text-xs md:text-sm text-accent2">
-                        {{ produkDesa.price }}
+                        {{ produkDesa?.price || 'Price not set' }}
                     </h3>
-          </div>
-                <div
-                    class="flex flex-row justify-center py-4 hover:scale-105 transition-transform"
-                >
-                    <button
-                        class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
-                    >
+                </div>
+                <div class="flex flex-row justify-center py-4 hover:scale-105 transition-transform">
+                    <button class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl">
                         Lihat Katalog
                     </button>
-          </div>
+                </div>
+            </div>
         </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
