@@ -5,28 +5,62 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import { ref, computed, onUnmounted, watch } from "vue";
 
 const props = defineProps({
-    news: Object,
+    news: {
+        type: Object,
+        required: true,
+    },
+    categories: {
+        type: Array,
+        required: true,
+    },
 });
 
 const form = useForm({
     title: props.news.title,
-    category: props.news.category,
+    category_id: props.news.category_id,
+    new_category: "",
     content: props.news.content,
-    image: null,
+    images: [],
+    alts: [],
+    removed_images: [],
     video: null,
-    is_moderate: props.news.is_moderate, // Change from is_moderated
+    is_moderate: Boolean(props.news.is_moderate),
+    is_draft: Boolean(props.news.is_draft),
     _method: "PUT",
 });
 
-const handleImageChange = (e) => {
-    form.image = e.target.files[0];
+const isNewCategory = ref(false);
+
+watch(isNewCategory, (newValue) => {
+    if (newValue) {
+        form.category_id = "";
+    } else {
+        form.new_category = "";
+    }
+});
+
+const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    form.images = files;
+    form.alts = files.map(() => "");
+};
+
+const updateAltText = (index, value) => {
+    form.alts[index] = value;
 };
 
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
+};
+
+const removeImage = (imageId) => {
+    if (confirm("Are you sure you want to remove this image?")) {
+        form.removed_images.push(imageId);
+    }
 };
 
 const submit = () => {
@@ -71,7 +105,63 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Password Field -->
+                                <div>
+                                    <InputLabel
+                                        for="category"
+                                        value="Category"
+                                    />
+                                    <div class="flex gap-4">
+                                        <select
+                                            v-if="!isNewCategory"
+                                            id="category"
+                                            v-model="form.category_id"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        >
+                                            <option value="">
+                                                Select Category
+                                            </option>
+                                            <option
+                                                v-for="category in categories"
+                                                :key="category.id"
+                                                :value="category.id"
+                                            >
+                                                {{ category.name }}
+                                            </option>
+                                        </select>
+
+                                        <TextInput
+                                            v-else
+                                            id="new-category"
+                                            v-model="form.new_category"
+                                            type="text"
+                                            class="mt-1 block w-full"
+                                            placeholder="Enter new category name"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
+                                            @click="
+                                                isNewCategory = !isNewCategory
+                                            "
+                                        >
+                                            {{
+                                                isNewCategory
+                                                    ? "Select Existing"
+                                                    : "Add New"
+                                            }}
+                                        </button>
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.category_id"
+                                        class="mt-2"
+                                    />
+                                    <InputError
+                                        :message="form.errors.new_category"
+                                        class="mt-2"
+                                    />
+                                </div>
+
                                 <div>
                                     <InputLabel for="content" value="Content" />
                                     <textarea
@@ -87,25 +177,115 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Photo Profile Field -->
                                 <div>
-                                    <InputLabel for="image" value="Image" />
+                                    <InputLabel for="images" value="Images" />
+
+                                    <!-- Existing Images -->
+                                    <div
+                                        v-if="props.news.images?.length"
+                                        class="mb-4"
+                                    >
+                                        <p class="text-sm text-gray-600 mb-2">
+                                            Current Images:
+                                        </p>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div
+                                                v-for="image in props.news
+                                                    .images"
+                                                :key="image.id"
+                                                class="relative"
+                                                v-show="
+                                                    !form.removed_images.includes(
+                                                        image.id
+                                                    )
+                                                "
+                                            >
+                                                <img
+                                                    :src="`/storage/${image.path}`"
+                                                    :alt="image.alt"
+                                                    class="h-32 w-full object-cover rounded-lg"
+                                                />
+                                                <p
+                                                    class="text-sm text-gray-600 mt-1"
+                                                >
+                                                    Alt: {{ image.alt }}
+                                                </p>
+                                                <DangerButton
+                                                    type="button"
+                                                    @click="
+                                                        removeImage(image.id)
+                                                    "
+                                                    class="absolute top-2 right-2"
+                                                >
+                                                    ×
+                                                </DangerButton>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- New Images Input -->
                                     <input
-                                        id="image"
+                                        id="images"
                                         type="file"
-                                        @input="handleImageChange"
+                                        @input="handleImagesChange"
+                                        multiple
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
-                                    <p
-                                        v-if="props.news.image"
-                                        class="mt-1 text-sm text-gray-500"
+
+                                    <!-- New Images Preview with Alt Inputs -->
+                                    <div
+                                        v-if="form.images.length > 0"
+                                        class="mt-4 space-y-4"
                                     >
-                                        Current:
-                                        {{ props.news.image.split("/").pop() }}
-                                    </p>
+                                        <div
+                                            v-for="(
+                                                image, index
+                                            ) in form.images"
+                                            :key="index"
+                                            class="flex gap-4 items-start"
+                                        >
+                                            <div class="w-32">
+                                                <img
+                                                    :src="
+                                                        URL.createObjectURL(
+                                                            image
+                                                        )
+                                                    "
+                                                    class="w-full h-32 object-cover rounded"
+                                                    @load="
+                                                        URL.revokeObjectURL(
+                                                            image
+                                                        )
+                                                    "
+                                                />
+                                            </div>
+                                            <div class="flex-1">
+                                                <InputLabel
+                                                    :for="'alt-' + index"
+                                                    :value="`Alt Text for New Image ${
+                                                        index + 1
+                                                    }`"
+                                                />
+                                                <TextInput
+                                                    :id="'alt-' + index"
+                                                    v-model="form.alts[index]"
+                                                    type="text"
+                                                    class="mt-1 block w-full"
+                                                    :placeholder="`Describe new image ${
+                                                        index + 1
+                                                    }`"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                     <InputError
-                                        :message="form.errors.image"
+                                        :message="form.errors.images"
+                                        class="mt-2"
+                                    />
+                                    <InputError
+                                        :message="form.errors.alts"
                                         class="mt-2"
                                     />
                                 </div>
@@ -119,32 +299,23 @@ const submit = () => {
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="video/mp4, video/ogg, video/webm"
                                     />
-                                    <p
-                                        v-if="props.news.video"
-                                        class="mt-1 text-sm text-gray-500"
-                                    >
-                                        Current:
-                                        {{ props.news.video.split("/").pop() }}
-                                    </p>
                                     <InputError
                                         :message="form.errors.video"
                                         class="mt-2"
                                     />
                                 </div>
 
-                                <!-- Status Field -->
                                 <div>
-                                    <div class="flex items-center">
+                                    <div class="flex-row items-center">
+                                        <InputLabel
+                                            for="is_moderate"
+                                            value="Is Moderate"
+                                        />
                                         <input
                                             id="is_moderate"
                                             v-model="form.is_moderate"
                                             type="checkbox"
-                                            class="rounded border-gray-300"
-                                        />
-                                        <InputLabel
-                                            for="is_moderate"
-                                            value="Is Moderate"
-                                            class="ml-2"
+                                            class="rounded border-gray-300 mt-2"
                                         />
                                     </div>
                                     <InputError
@@ -152,29 +323,22 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
+                            </div>
 
-                                <!-- Role Field -->
-                                <div>
-                                    <InputLabel
-                                        for="category"
-                                        value="category"
-                                    />
-                                    <select
-                                        id="category"
-                                        v-model="form.category"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    >
-                                        <option value="news">News</option>
-                                        <option value="announcement">
-                                            Announcement
-                                        </option>
-                                        <option value="event">Event</option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.category"
-                                        class="mt-2"
+                            <div>
+                                <div class="flex-row items-center">
+                                    <InputLabel for="is_draft" value="Draft" />
+                                    <input
+                                        id="is_draft"
+                                        v-model="form.is_draft"
+                                        type="checkbox"
+                                        class="rounded border-gray-300 mt-2"
                                     />
                                 </div>
+                                <InputError
+                                    :message="form.errors.is_draft"
+                                    class="mt-2"
+                                />
                             </div>
 
                             <div class="mt-6">

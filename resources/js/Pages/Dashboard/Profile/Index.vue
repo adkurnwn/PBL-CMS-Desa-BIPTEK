@@ -17,9 +17,9 @@ const props = defineProps({
                     Profile Desa
                 </h2>
 
-                <Link :href="route('dashboard.profiles.create')">
-                    <PrimaryButton>Create New Profile</PrimaryButton>
-                </Link>
+                <!-- <Link :href="route('dashboard.profiles.edit', profile.id)">
+                    <PrimaryButton>Update Profile</PrimaryButton>
+                </Link> -->
             </div>
         </template>
 

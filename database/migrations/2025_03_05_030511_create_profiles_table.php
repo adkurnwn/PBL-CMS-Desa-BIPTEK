@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
+            $table->tinyIncrements('id')->unsigned();
             $table->string('name', 50);
             $table->string('email', 255)->unique();
             $table->string('phone', 20);
@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('kabupaten', 50);
             $table->string('kecamatan', 50);
             $table->string('kelurahan', 50);
-            $table->string('hero_image', 255);
+            $table->string('address', 255);
+            $table->json('hero_images');
             $table->string('organization_image', 255);
             $table->json('lembaga');
             $table->json('fasilitas');

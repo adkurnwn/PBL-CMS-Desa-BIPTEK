@@ -2,65 +2,84 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Models\News;
+use App\Models\Category;
 use Inertia\Inertia;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\News;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
     public function index()
     {
         return Inertia::render('Dashboard/News/Index', [
-            'news' => News::all(),
+            'news' => News::with('category')->get(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Dashboard/News/Create');
+        return Inertia::render('Dashboard/News/Create', [
+            'categories' => Category::all()
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validate = [
             'title' => 'required',
-            'category' => 'required',
             'content' => 'required',
-            'image' => 'required|image|max:1024|mimes:jpg,png,jpeg',
-            'video' => 'sometimes|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
-            'is_moderate' => 'required|boolean', // Change from is_moderated
-        ]);
+            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'alts.*' => 'required|string|max:255',
+            'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
+            'is_moderate' => 'required|boolean',
+            'is_draft' => 'required|boolean',
+        ];
+
+        if ($request->filled('new_category')) {
+            $validate['new_category'] = 'required|string|max:255';
+        } else {
+            $validate['category_id'] = 'required|exists:categories,id';
+        }
+
+        $request->validate($validate);
+
+        if ($request->filled('new_category')) {
+            $category = Category::create(['name' => $request->new_category]);
+            $category_id = $category->id;
+        } else {
+            $category_id = $request->category_id;
+        }
 
         $data = $request->all();
+        $data['user_id'] = Auth::id();
+        $data['category_id'] = $category_id;
 
-        // Remove files from initial data
-        unset($data['image']);
+        unset($data['images']);
+        unset($data['alts']);
         unset($data['video']);
+        unset($data['new_category']);
 
-        // Create news record
         $news = News::create($data);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $image->hashName();
-            $image->storeAs('public/news', $imageName);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('news-images', 'public');
 
-            // Update the image path
-            $news->update([
-                'image' => 'news/' . $imageName
-            ]);
+                $news->images()->create([
+                    'path' => $path,
+                    'alt' => $request->alts[$index],
+                    'is_visible' => true
+                ]);
+            }
         }
 
         if ($request->hasFile('video')) {
-            $video = $request->file('video');
-            $videoName = $video->hashName();
-            $video->storeAs('public/news', $videoName);
-
-            // Update the video path
-            $news->update([
-                'video' => 'news/' . $videoName
-            ]);
+            $videoPath = $request->file('video')->store('news-videos', 'public');
+            $news->update(['video' => $videoPath]);
         }
 
         return redirect()->route('dashboard.news');
@@ -69,7 +88,8 @@ class NewsController extends Controller
     public function edit(News $news)
     {
         return Inertia::render('Dashboard/News/Edit', [
-            'news' => $news,
+            'news' => $news->load('images', 'category'),
+            'categories' => Category::all()
         ]);
     }
 
@@ -77,48 +97,68 @@ class NewsController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'category' => 'required',
             'content' => 'required',
-            'image' => 'nullable|sometimes|image|max:1024|mimes:jpg,png,jpeg',
-            'video' => 'nullable|sometimes|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
+            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'alts.*' => 'required_with:images.*|string|max:255',
+            'removed_images' => 'sometimes|array',
+            'removed_images.*' => 'exists:images,id',
+            'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
             'is_moderate' => 'required|boolean',
+            'is_draft' => 'required|boolean',
         ]);
 
+        // Handle category
+        if ($request->filled('new_category')) {
+            $category = Category::create(['name' => $request->new_category]);
+            $category_id = $category->id;
+        } else {
+            $category_id = $request->category_id;
+        }
+
         $data = $request->all();
+        $data['category_id'] = $category_id; // Set category_id
 
-        // Remove files from data if not uploading new ones
-        if (!$request->hasFile('image')) {
-            unset($data['image']);
-        }
+        // Remove unnecessary data
+        unset($data['images']);
+        unset($data['alts']);
+        unset($data['removed_images']);
+        unset($data['video']);
+        unset($data['new_category']);
 
-        if (!$request->hasFile('video')) {
-            unset($data['video']);
-        }
-
-        // First update non-file data
+        // Update news record
         $news->update($data);
 
-        // Then handle file uploads and update the database with file names
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $image->hashName();
-            $image->storeAs('public/news', $imageName);
-
-            // Update the image path in database
-            $news->update([
-                'image' => 'news/' . $imageName
-            ]);
+        // Handle removed images
+        if ($request->removed_images) {
+            foreach ($request->removed_images as $imageId) {
+                $image = Image::find($imageId);
+                if ($image && $image->news_id === $news->id) {
+                    Storage::disk('public')->delete($image->path);
+                    $image->delete();
+                }
+            }
         }
 
-        if ($request->hasFile('video')) {
-            $video = $request->file('video');
-            $videoName = $video->hashName();
-            $video->storeAs('public/news', $videoName);
+        // Handle new images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('news-images', 'public');
 
-            // Update the video path in database
-            $news->update([
-                'video' => 'news/' . $videoName
-            ]);
+                $news->images()->create([
+                    'path' => $path,
+                    'alt' => $request->alts[$index],
+                    'is_visible' => true
+                ]);
+            }
+        }
+
+        // Handle video upload if needed
+        if ($request->hasFile('video')) {
+            if ($news->video) {
+                Storage::disk('public')->delete($news->video);
+            }
+            $videoPath = $request->file('video')->store('news-videos', 'public');
+            $news->update(['video' => $videoPath]);
         }
 
         return redirect()->route('dashboard.news');
