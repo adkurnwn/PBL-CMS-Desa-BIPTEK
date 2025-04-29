@@ -39,16 +39,16 @@ Route::get('/layanan', function () {
 
 
 
-            //TESTING ROUTES
-            Route::get('/berita', function () {
-                return Inertia::render('FrontEnd/BeritaListTest');
-            })->name('berita');
+//TESTING ROUTES
+Route::get('/berita', function () {
+    return Inertia::render('FrontEnd/BeritaListTest');
+})->name('berita');
 
-            Route::get('/berita/{id}', function ($id) {
-                return Inertia::render('FrontEnd/BeritaDetail', [
-                    'id' => $id
-                ]);
-            })->name('berita.show');
+Route::get('/berita/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetail', [
+        'id' => $id
+    ]);
+})->name('berita.show');
 
 Route::get('/berita-test/{slug}', function ($slug) {
     $news = News::where('slug', $slug)->firstOrFail();
@@ -57,27 +57,27 @@ Route::get('/berita-test/{slug}', function ($slug) {
     ]);
 })->name('berita.show');
 
-            Route::get('/berita-test/{id}', function ($id) {
-                return Inertia::render('FrontEnd/BeritaDetailTest', [
-                    'id' => $id
-                ]);
-            })->name('berita.show');
+Route::get('/berita-test/{id}', function ($id) {
+    return Inertia::render('FrontEnd/BeritaDetailTest', [
+        'id' => $id
+    ]);
+})->name('berita.show');
 
-            Route::get('/produk-hukum-test', function () {
-                return Inertia::render('FrontEnd/ProdukHukumListTest');
-            })->name('produk-hukum');
+Route::get('/produk-hukum-test', function () {
+    return Inertia::render('FrontEnd/ProdukHukumListTest');
+})->name('produk-hukum');
 
-            Route::get('/produk-hukum-test/{id}', function ($id) {
-                return Inertia::render('FrontEnd/ProdukHukumDetailTest', [
-                    'id' => $id
-                ]);
-            })->name('produk-hukum.show');
+Route::get('/produk-hukum-test/{id}', function ($id) {
+    return Inertia::render('FrontEnd/ProdukHukumDetailTest', [
+        'id' => $id
+    ]);
+})->name('produk-hukum.show');
 
-            Route::get('/event-test', function () {
-                return Inertia::render('FrontEnd/EventListTest');
-            })->name('event-test');
+Route::get('/event-test', function () {
+    return Inertia::render('FrontEnd/EventListTest');
+})->name('event-test');
 
-            //TESTING ROUTES END
+//TESTING ROUTES END
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
