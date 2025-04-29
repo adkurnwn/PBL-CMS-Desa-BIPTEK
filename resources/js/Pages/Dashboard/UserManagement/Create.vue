@@ -21,7 +21,7 @@ const form = useForm({
     email: "",
     password: "",
     phone: "",
-    photo_profile: null,
+    photo_profile: "",
     position_id: "",
     new_position: "",
     job_descriptions: [],
@@ -152,6 +152,7 @@ const submit = () => {
                                         @input="handleFileChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         accept="image/png, image/jpeg, image/jpg"
+                                        required
                                     />
                                     <InputError
                                         :message="form.errors.photo_profile"

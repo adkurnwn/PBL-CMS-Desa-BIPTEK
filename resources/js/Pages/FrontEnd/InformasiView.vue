@@ -2,26 +2,25 @@
 import EventCard from "@/Components/EventCard.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, onMounted } from "vue";
 
-const events = ref([]);
-const loading = ref(true);
+const informasi = ref({});
+const loading = ref(false);
 
-const fetchEvents = async () => {
+const fetchInformasi = async () => {
     try {
-        const response = await axios.get('/api/events');
-        events.value = response.data;
+        loading.value = true;
+        const response = await axios.get("/api/informasi");
+        informasi.value = response.data;
+        loading.value = false;
     } catch (error) {
-        console.error('Error fetching events:', error);
-        events.value = []; // Empty array if API fails
-    } finally {
+        console.error("Error fetching informasi data:", error);
         loading.value = false;
     }
 };
 
 onMounted(() => {
-    fetchEvents();
+    fetchInformasi();
 });
 </script>
 
@@ -39,12 +38,14 @@ onMounted(() => {
                         class="flex flex-row w-full h-full justify-between space-x-2"
                     >
                         <img
-                            src="../../../images/POTENSI_2.png"
+                            v-if="informasi.gallery"
+                            :src="`/storage/${informasi.gallery.images[0].path}`"
                             alt=""
                             class="w-3/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-3xl object-cover"
                         />
                         <img
-                            src="../../../images/POTENSI_3.png"
+                            v-if="informasi.gallery"
+                            :src="`/storage/${informasi.gallery.images[1].path}`"
                             alt=""
                             class="w-2/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-3xl object-cover"
                         />
@@ -53,17 +54,20 @@ onMounted(() => {
                         class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:-m-1"
                     >
                         <img
-                            src="../../../images/PASAR.png"
+                            v-if="informasi.gallery"
+                            :src="`/storage/${informasi.gallery.images[2].path}`"
                             alt=""
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover sm:mr-2"
                         />
                         <img
-                            src="../../../images/POTENSI_1.png"
+                            v-if="informasi.gallery"
+                            :src="`/storage/${informasi.gallery.images[3].path}`"
                             alt=""
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover sm:mr-2"
                         />
                         <img
-                            src="../../../images/POTENSI_3.png"
+                            v-if="informasi.gallery"
+                            :src="`/storage/${informasi.gallery.images[4].path}`"
                             alt=""
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover"
                         />
@@ -88,6 +92,9 @@ onMounted(() => {
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
+
+                    
+
                     <div v-if="loading" class="text-center w-full">
                         <p>Loading events...</p>
                     </div>
@@ -95,8 +102,14 @@ onMounted(() => {
                         <p>Tidak ada event yang akan datang</p>
                     </div>
                     <template v-else>
-                        <EventCard v-for="event in events" :key="event.id" :event="event" />
+                        <EventCard
+                        v-for="eventItem in informasi.events"
+                        :key="eventItem.id"
+                        :isHome="true"
+                        :event="eventItem"
+                    />
                     </template>
+
                 </div>
             </article>
 
@@ -113,95 +126,18 @@ onMounted(() => {
                     class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0"
                 >
                     <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
-                    />
-                    <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
-                    />
-                    <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
-                    />
-                    <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
-                    />
-                    <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
-                    />
-                    <NewsCard
-                        :is-home="false"
-                        :news="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Default Image',
-                            },
-                            author: { name: 'Anonymous' },
-                            title: 'Sample Title',
-                            content: 'Sample content',
-                            created_at: '2024-04-25',
-                            views: 0,
-                        }"
+                        v-for="newsItem in informasi.news"
+                        :key="newsItem.id"
+                        :isHome="true"
+                        :news="newsItem"
                     />
                 </div>
-                <h1
+                <a
+                    href="/berita-test"
                     class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end"
                 >
                     Selengkapnya >>
-                </h1>
+                </a>
             </article>
         </main>
     </UserLayout>

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('email', 50)->unique();
             $table->char('password', 60);
             $table->string('phone', 20)->nullable();
-            $table->string('photo_profile', 255)->nullable();
+            $table->string('photo_profile', 255);
             $table->boolean('status')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

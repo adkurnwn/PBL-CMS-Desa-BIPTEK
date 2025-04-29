@@ -8,8 +8,10 @@ use App\Http\Controllers\api\LayoutController;
 use App\Http\Controllers\api\RegionController;
 use App\Http\Controllers\api\FeedbackController;
 use App\Http\Controllers\api\HomePageController;
+use App\Http\Controllers\api\LayananPageController;
 use App\Http\Controllers\api\ProdukHukumController;
 use App\Http\Controllers\api\ProfilePageController;
+use App\Http\Controllers\api\InformasiPageController;
 use App\Http\Controllers\api\KomentarBeritaController;
 use App\Http\Controllers\api\KomentarProdukHukumController;
 
@@ -21,9 +23,11 @@ Route::get('regencies/{province_id}', [RegionController::class, 'getRegencies'])
 Route::get('districts/{regency_id}', [RegionController::class, 'getDistricts']);
 Route::get('villages/{district_id}', [RegionController::class, 'getVillages']);
 
-Route::get('profile', [ProfilePageController::class, 'index']);
 Route::get('layout', [LayoutController::class, 'index']);
 Route::get('home', [HomePageController::class, 'index']);
+Route::get('profile', [ProfilePageController::class, 'index']);
+Route::get('informasi', [InformasiPageController::class, 'index']);
+Route::get('layanan', [LayananPageController::class, 'index']);
 
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);

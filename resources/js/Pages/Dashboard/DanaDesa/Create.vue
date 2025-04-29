@@ -15,7 +15,6 @@ const props = defineProps({
 
 const form = useForm({
     title: "",
-    description: "",
     file: null,
     link: "",
     date: "",
@@ -79,23 +78,6 @@ const submit = () => {
                                     />
                                     <InputError
                                         :message="form.errors.link"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <div>
-                                    <InputLabel
-                                        for="description"
-                                        value="Description"
-                                    />
-                                    <textarea
-                                        id="description"
-                                        v-model="form.description"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.description"
                                         class="mt-2"
                                     />
                                 </div>
