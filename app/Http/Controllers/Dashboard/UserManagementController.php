@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\User;
-use App\Models\Position;
 use Inertia\Inertia;
+use App\Models\Position;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Validation\StoreUserManagementRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\UpdateUserManagementRequest;
 
 class UserManagementController extends Controller
 {
@@ -29,25 +31,8 @@ class UserManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreUserManagementRequest $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:' . User::class,
-            'password' => ['required', Rules\Password::defaults()],
-            'phone' => 'required|string|max:20',
-            'photo_profile' => 'nullable|image|max:1024|mimes:jpg,png,jpeg',
-        ];
-
-        if ($request->filled('new_position')) {
-            $rules['new_position'] = 'required|string|max:255';
-            $rules['job_descriptions'] = 'required|array|min:1';
-        } else {
-            $rules['position_id'] = 'required|exists:positions,id';
-        }
-
-        $request->validate($rules);
-
         if ($request->filled('new_position')) {
             $position = Position::create([
                 'name' => $request->new_position,
@@ -104,35 +89,9 @@ class UserManagementController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserManagementRequest $request, User $user)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:20',
-        ];
-
-        // Validate position fields based on whether it's new or existing
         if ($request->filled('new_position')) {
-            $rules['new_position'] = 'required|string|max:255';
-            $rules['job_descriptions'] = 'required|array|min:1';
-        } else {
-            $rules['position_id'] = 'required|exists:positions,id';
-        }
-
-        if ($request->filled('password')) {
-            $rules['password'] = ['required', Rules\Password::defaults()];
-        }
-
-        if ($request->hasFile('photo_profile')) {
-            $rules['photo_profile'] = 'image|max:1024|mimes:jpg,png,jpeg';
-        }
-
-        $request->validate($rules);
-
-        // Handle position (create new if needed)
-        if ($request->filled('new_position')) {
-            // Create a new position
             $position = Position::create([
                 'name' => $request->new_position,
                 'job_description' => json_encode($request->job_descriptions)
@@ -143,7 +102,6 @@ class UserManagementController extends Controller
             $position_id = $position->id;
         }
 
-        // Check if trying to update to Kepala Desa when one already exists
         if ($position->name === 'Kepala Desa' && $request->status) {
             $existingKepalaDesa = User::whereHas('roles', function ($query) use ($user) {
                 $query->where('name', 'Kepala Desa');
@@ -156,7 +114,8 @@ class UserManagementController extends Controller
             }
         }
 
-        $userData = $request->except('password');
+        // Get all fields except password and photo_profile
+        $userData = $request->except(['password', 'photo_profile']);
         $userData['position_id'] = $position_id;
 
         if ($request->filled('password')) {
@@ -164,6 +123,10 @@ class UserManagementController extends Controller
         }
 
         if ($request->hasFile('photo_profile')) {
+            // Delete the old photo if it exists
+            if ($user->photo_profile) {
+                Storage::disk('public')->delete($user->photo_profile);
+            }
             $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
         }
 

@@ -1,6 +1,12 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import { Link } from "@inertiajs/vue3";
+
+const props = defineProps({
+    profile: {
+        type: Object,
+    },
+});
 </script>
 
 <template>
@@ -15,12 +21,16 @@ import { Link } from '@inertiajs/vue3';
         </div> -->
         <div class="z-20">
             <Link href="/">
-                <ApplicationLogo class="h-24 w-20 fill-current text-gray-500" />
+                <ApplicationLogo
+                    :logo="profile.logo"
+                    class="h-24 w-20 fill-current text-gray-500"
+                />
             </Link>
         </div>
         <div class="z-20 text-center my-6">
-            <h1 class="ca font-bold text-2xl sm:text-3xl lg:text-4xl">Sistem Informasi Desa Pao-Pao</h1>
-
+            <h1 class="ca font-bold text-2xl sm:text-3xl lg:text-4xl">
+                Sistem Informasi {{ profile.name }}
+            </h1>
         </div>
         <div
             class="mt-6 w-full overflow-hidden bg-slate-100 px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg z-50"

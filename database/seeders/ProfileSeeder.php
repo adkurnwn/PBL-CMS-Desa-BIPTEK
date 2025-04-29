@@ -22,7 +22,6 @@ class ProfileSeeder extends Seeder
             'kabupaten' => '3578',
             'kecamatan' => '3578120',
             'kelurahan' => '3578120002',
-            'address' => 'Jl. Raya Sumberejo No. 1, Kecamatan Pakal, Kota Surabaya',
             'hero_images' => json_encode([
                 '/hero-images/hero-1.jpg',
                 '/hero-images/hero-2.jpg',

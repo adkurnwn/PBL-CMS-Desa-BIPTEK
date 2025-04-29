@@ -1,10 +1,22 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+
 const props = defineProps({
     galleries: Array,
 });
+
+const form = useForm({});
+
+const deleteGallery = (galleryId) => {
+    if (confirm("Are you sure you want to delete this gallery?")) {
+        form.delete(route("dashboard.galleries.destroy", galleryId), {
+            preserveScroll: true,
+        });
+    }
+};
 </script>
 
 <template>
@@ -17,9 +29,14 @@ const props = defineProps({
                     Gallery
                 </h2>
 
-                <Link :href="route('dashboard.galleries.create')">
-                    <PrimaryButton>Create New Gallery</PrimaryButton>
-                </Link>
+                <div class="flex space-x-2">
+                    <Link :href="route('dashboard.galleries.archive')">
+                        <PrimaryButton>Archived Gallery</PrimaryButton>
+                    </Link>
+                    <Link :href="route('dashboard.galleries.create')">
+                        <PrimaryButton>Create New Gallery</PrimaryButton>
+                    </Link>
+                </div>
             </div>
         </template>
 
@@ -63,6 +80,11 @@ const props = defineProps({
                                                 Edit Gallery
                                             </PrimaryButton>
                                         </Link>
+                                        <DangerButton
+                                            @click="deleteGallery(gallery.id)"
+                                        >
+                                            Delete
+                                        </DangerButton>
                                     </td>
                                 </tr>
                             </tbody>

@@ -1,6 +1,25 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import ProductCard from "@/Components/ProductCard.vue";
+import { ref, onMounted } from "vue";
+
+const loading = ref(false);
+const layanan = ref({});
+const fetchLayanan = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/layanan");
+        layanan.value = response.data;
+        loading.value = false;
+    } catch (error) {
+        console.error("Error fetching layanan data:", error);
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchLayanan();
+});
 </script>
 <!-- Homeview.vue -->
 <template>
@@ -61,44 +80,9 @@ import ProductCard from "@/Components/ProductCard.vue";
                     class="grid grid-cols-2 gap-1 xl:flex xl:flex-row justify-center -m-2"
                 >
                     <ProductCard
-                        :produk-desa="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Product Image',
-                            },
-                            name: 'Product 1',
-                            price: 'Rp 100.000',
-                        }"
-                    />
-                    <ProductCard
-                        :produk-desa="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Product Image',
-                            },
-                            name: 'Product 2',
-                            price: 'Rp 150.000',
-                        }"
-                    />
-                    <ProductCard
-                        :produk-desa="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Product Image',
-                            },
-                            name: 'Product 3',
-                            price: 'Rp 200.000',
-                        }"
-                    />
-                    <ProductCard
-                        :produk-desa="{
-                            image: {
-                                path: 'default-image.jpg',
-                                alt: 'Product Image',
-                            },
-                            name: 'Product 4',
-                            price: 'Rp 250.000',
-                        }"
+                        v-for="produkDesa in layanan.produkDesa"
+                        :key="produkDesa.id"
+                        :produkDesa="produkDesa"
                     />
                 </div>
                 <h1

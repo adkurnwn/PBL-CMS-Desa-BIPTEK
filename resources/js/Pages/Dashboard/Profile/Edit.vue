@@ -51,17 +51,17 @@ const form = useForm({
     email: props.profile.email,
     phone: props.profile.phone,
     address: props.profile.address,
-    logo: null,
+    logo: "",
     provinsi: props.profile.provinsi,
     kabupaten: props.profile.kabupaten,
     kecamatan: props.profile.kecamatan,
     kelurahan: props.profile.kelurahan,
-    hero_image: null,
-    organization_image: null,
-    hero_image_1: null,
-    hero_image_2: null,
-    hero_image_3: null,
-    currentHeroImages: heroImages, // Add this to store current images
+    hero_image: "",
+    organization_image: "",
+    hero_image_1: "",
+    hero_image_2: "",
+    hero_image_3: "",
+    currentHeroImages: heroImages,
     lembaga: parseJson(props.profile.lembaga),
     fasilitas: parseJson(props.profile.fasilitas),
     history: props.profile.history,
@@ -127,7 +127,6 @@ const fetchVillages = async (districtId) => {
     }
 };
 
-// Load provinces when component mounts
 onMounted(async () => {
     await fetchProvinces();
 
