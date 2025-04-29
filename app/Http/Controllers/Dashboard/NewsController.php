@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Models\News;
 use Inertia\Inertia;
-use App\Models\Gallery;
 use App\Models\Category;
 use App\Helpers\SlugHelper;
 use App\Services\MediaService;
 use App\Services\CategoryService;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Validation\StoreNewsRequest;
@@ -18,11 +18,13 @@ class NewsController extends Controller
 {
     protected $mediaService;
     protected $categoryService;
+    protected $logHelper;
 
     public function __construct(MediaService $mediaService, CategoryService $categoryService)
     {
         $this->mediaService = $mediaService;
         $this->categoryService = $categoryService;
+        $this->logHelper = new LogActivityHelper();
     }
 
     public function index()
@@ -58,7 +60,8 @@ class NewsController extends Controller
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
 
-        return redirect()->route('dashboard.news')->with('success', 'News Added Successfully');
+        $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
+        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Ditambahkan');
     }
 
     public function edit(News $news)
@@ -103,7 +106,8 @@ class NewsController extends Controller
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
 
-        return redirect()->route('dashboard.news')->with('success', 'News Updated Successfully');
+        $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
+        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diperbarui');
     }
 
 
@@ -118,7 +122,8 @@ class NewsController extends Controller
     public function restore(News $news)
     {
         $news->restore();
-        return redirect()->route('dashboard.news.archive')->with('success', 'News Restored Successfully');
+        $this->logHelper->logActivity('restore', 'news', 'Memulihkan berita ' . $news->title);
+        return redirect()->route('dashboard.news.archive')->with('success', 'Berita Berhasil Dipulihkan');
     }
 
     public function destroy(News $news)
@@ -126,10 +131,14 @@ class NewsController extends Controller
         if ($news->trashed()) {
             $this->mediaService->deleteAllMedia($news);
             $news->forceDelete();
-            return redirect()->route('dashboard.news.archive')->with('success', 'News Deleted Successfully');
+
+            $this->logHelper->logActivity('delete', 'news', 'Menghapus berita ' . $news->title);
+            return redirect()->route('dashboard.news.archive')->with('success', 'Berita Berhasil Dihapus');
         } else {
             $news->delete();
-            return redirect()->route('dashboard.news')->with('success', 'News Archived Successfully');
+
+            $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
+            return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diarsipkan');
         }
     }
 }

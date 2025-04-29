@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
+    protected $logHelper;
+
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/Events/Index', [
@@ -39,7 +47,8 @@ class EventController extends Controller
 
         Event::create($data);
 
-        return redirect()->route('dashboard.events')->with('success', 'Event Added Successfully.');
+        $this->logHelper->logActivity('create', 'event', 'Menambahkan event ' . $request->title);
+        return redirect()->route('dashboard.events')->with('success', 'Event Berhasil Ditambahkan');
     }
 
     public function edit(Event $event)
@@ -65,6 +74,7 @@ class EventController extends Controller
 
         $event->update($data);
 
-        return redirect()->route('dashboard.events')->with('success', 'Event Updated Successfully.');
+        $this->logHelper->logActivity('update', 'event', 'Memperbarui event ' . $request->title);
+        return redirect()->route('dashboard.events')->with('success', 'Event Berhasil Diperbarui');
     }
 }

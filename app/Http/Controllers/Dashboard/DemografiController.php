@@ -5,13 +5,21 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\Demografi;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Validation\StoreDemografiRequest;
 use App\Http\Requests\Validation\UpdateDemografiRequest;
-use Illuminate\Support\Facades\Auth;
 
 class DemografiController extends Controller
 {
+    protected $logHelper;
+
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/Demografi/Index', [
@@ -31,7 +39,8 @@ class DemografiController extends Controller
 
         Demografi::create($demografiData);
 
-        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Created Successfully');
+        $this->logHelper->logActivity('create', 'demografi', 'Menambahkan demografi ' . $request->title);
+        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Berhasil Ditambahkan');
     }
 
     public function edit(Demografi $demografi)
@@ -47,6 +56,7 @@ class DemografiController extends Controller
 
         $demografi->update($demografiData);
 
-        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Updated Successfully');
+        $this->logHelper->logActivity('update', 'demografi', 'Memperbarui demografi ' . $request->title);
+        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Berhasil Diperbarui');
     }
 }
