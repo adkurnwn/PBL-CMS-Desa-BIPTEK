@@ -23,7 +23,7 @@ onMounted(() => {
     fetchInformasi();
 });
 </script>
-<!-- Homeview.vue -->
+
 <template>
     <UserLayout>
         <header
@@ -92,12 +92,24 @@ onMounted(() => {
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
-                    <EventCard
+
+                    
+
+                    <div v-if="loading" class="text-center w-full">
+                        <p>Loading events...</p>
+                    </div>
+                    <div v-else-if="events.length === 0" class="text-center w-full">
+                        <p>Tidak ada event yang akan datang</p>
+                    </div>
+                    <template v-else>
+                        <EventCard
                         v-for="eventItem in informasi.events"
                         :key="eventItem.id"
                         :isHome="true"
                         :event="eventItem"
                     />
+                    </template>
+
                 </div>
             </article>
 

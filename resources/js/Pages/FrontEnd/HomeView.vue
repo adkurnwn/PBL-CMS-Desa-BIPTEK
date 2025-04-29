@@ -5,23 +5,43 @@ import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
+import axios from 'axios';
 
+// Home data
 const home = ref({});
-const loading = ref(false);
+const homeLoading = ref(false);
+
 const fetchHome = async () => {
     try {
-        loading.value = true;
+        homeLoading.value = true;
         const response = await axios.get("/api/home");
         home.value = response.data;
-        loading.value = false;
     } catch (error) {
         console.error("Error fetching home data:", error);
-        loading.value = false;
+    } finally {
+        homeLoading.value = false;
+    }
+};
+
+// Events data
+const events = ref([]);
+const eventsLoading = ref(true);
+
+const fetchEvents = async () => {
+    try {
+        const response = await axios.get('/api/events');
+        events.value = response.data;
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        events.value = []; // Set to empty array if API fails
+    } finally {
+        eventsLoading.value = false;
     }
 };
 
 onMounted(() => {
     fetchHome();
+    fetchEvents();
 });
 </script>
 <!-- Homeview.vue -->
@@ -89,15 +109,19 @@ onMounted(() => {
         <h1 class="text-xl md:text-3xl font-semibold text-accent2">
           Event Terdekat
         </h1>
-        <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4">
+        <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
           <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
         </h2>
         <div class="flex flex-col md:flex-row justify-center lg:space-x-4 space-y-2 md:space-y-0">
-          <EventCard
-            v-for="eventItem in home.events"
-                :key="eventItem.id"
-                :isHome="true"
-                :event="eventItem" />
+          <div v-if="eventsLoading" class="text-center w-full">
+            <p>Loading events...</p>
+          </div>
+          <div v-else-if="events.length === 0" class="text-center w-full">
+            <p>Tidak ada event yang akan datang</p>
+          </div>
+          <template v-else>
+            <EventCard v-for="event in events.slice(0, 3)" :key="event.id" :event="event" />
+          </template>
         </div>
       </article>
 
@@ -111,7 +135,7 @@ onMounted(() => {
         </h2>
 
         <!-- Loading state -->
-        <div v-if="loading" class="flex justify-center py-8">
+        <div v-if="homeLoading" class="flex justify-center py-8">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent2"></div>
         </div>
 

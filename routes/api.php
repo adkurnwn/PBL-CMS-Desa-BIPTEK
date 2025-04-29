@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\NewsController;
+use App\Http\Controllers\api\EventController;
 use App\Http\Controllers\api\LayoutController;
 use App\Http\Controllers\api\RegionController;
+use App\Http\Controllers\api\FeedbackController;
 use App\Http\Controllers\api\HomePageController;
 use App\Http\Controllers\api\LayananPageController;
 use App\Http\Controllers\api\ProdukHukumController;
@@ -48,6 +50,11 @@ Route::prefix('produk-hukum-comments')->group(function () {
 });
 
 Route::prefix('feedback')->group(function () {
-    Route::get('/kategori', [App\Http\Controllers\API\FeedbackController::class, 'getKategori']);
-    Route::post('/', [App\Http\Controllers\API\FeedbackController::class, 'store']);
+    Route::get('/kategori', [FeedbackController::class, 'getKategori']);
+    Route::post('/', [FeedbackController::class, 'store']);
+});
+
+Route::prefix('events')->group(function () {
+    Route::get('/', [EventController::class, 'index']);
+    Route::post('/{event}/reminder', [EventController::class, 'setReminder']);
 });
