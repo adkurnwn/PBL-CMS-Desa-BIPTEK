@@ -19,15 +19,15 @@
 
         <!-- News Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Link 
-            v-for="item in news" 
+          <Link
+            v-for="item in news"
             :key="item.id"
-            :href="`/berita/${item.id}`"
+            :href="`/berita-test/${item.slug}`"
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
             <!-- Image -->
             <div v-if="item.images?.length > 0" class="h-48 overflow-hidden">
-              <img 
+              <img
                 :src="`/storage/${item.images[0].path}`"
                 :alt="item.images[0].alt"
                 class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
@@ -36,7 +36,7 @@
 
             <div class="p-6">
               <!-- Category Badge -->
-              <span v-if="item.category" 
+              <span v-if="item.category"
                     class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4">
                 {{ item.category.name }}
               </span>

@@ -121,6 +121,22 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Demografi
                                 </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.produk-hukum-comments')"
+                                    :active="
+                                        route().current('dashboard.produk-hukum-comments')
+                                    "
+                                >
+                                    Comment Produk Hukum
+                                </NavLink>
+                                <NavLink
+                                    :href="route('dashboard.feedbacks')"
+                                    :active="
+                                        route().current('dashboard.feedbacks')
+                                    "
+                                >
+                                    Feedback
+                                </NavLink>
                             </div>
                         </div>
 

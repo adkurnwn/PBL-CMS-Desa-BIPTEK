@@ -12,52 +12,59 @@
           <p class="text-red-600">{{ error }}</p>
         </div>
 
-        <!-- News Detail -->
+        <!-- Document Detail -->
         <div v-else class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <!-- Image Gallery -->
-          <div v-if="news.images?.length > 0" class="relative h-96">
-            <img 
-              :src="`/storage/${news.images[0].path}`"
-              :alt="news.images[0].alt"
-              class="w-full h-full object-cover"
-            >
-          </div>
-
           <div class="p-8">
             <!-- Category Badge -->
-            <span v-if="news.category" 
+            <span v-if="dokumen.category" 
                   class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4">
-              {{ news.category.name }}
+              {{ dokumen.category.name }}
             </span>
 
             <!-- Title -->
             <h1 class="text-3xl font-bold text-gray-900 mb-4">
-              {{ news.title }}
+              {{ dokumen.title }}
             </h1>
 
             <!-- Metadata -->
             <div class="flex items-center text-sm text-gray-500 mb-8">
-              <span>{{ formatDate(news.created_at) }}</span>
-              <span class="mx-2">•</span>
-              <span>{{ news.user?.name || 'Admin' }}</span>
-              <span class="mx-2">•</span>
-              <span>{{ news.views }} views</span>
+              <span>{{ formatDate(dokumen.date) }}</span>
             </div>
 
-            <!-- Content -->
-            <div class="prose max-w-none">
-              {{ news.content }}
+            <!-- Description -->
+            <div class="prose max-w-none mb-8">
+              {{ dokumen.description }}
+            </div>
+
+            <!-- Document Actions -->
+            <div class="flex space-x-4">
+              <a v-if="dokumen.file"
+                 :href="`/storage/${dokumen.file}`"
+                 target="_blank"
+                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                Download Document
+              </a>
+              <a v-if="dokumen.link"
+                 :href="dokumen.link"
+                 target="_blank"
+                 class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              >
+                View External Link
+              </a>
             </div>
 
             <!-- Back Button -->
             <div class="mt-8">
-              <Link href="/berita" class="text-blue-600 hover:text-blue-800 font-medium">
-                ← Back to News List
+              <Link href="/produk-hukum-test" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← Back to Documents List
               </Link>
             </div>
+          </div>
+        </div>
 
-            <!-- Comments Section -->
-            <div class="mt-12">
+        <!-- Comments Section -->
+        <div class="mt-12">
               <h2 class="text-2xl font-bold mb-6">Komentar</h2>
               
               <!-- Comment Form -->
@@ -313,8 +320,7 @@
                 </template>
               </div>
             </div>
-          </div>
-        </div>
+
       </div>
     </div>
   </UserLayout>
@@ -323,7 +329,7 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { ref, onMounted } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
 
 const props = defineProps({
@@ -333,23 +339,24 @@ const props = defineProps({
   }
 });
 
-const news = ref({});
+const dokumen = ref({});
 const loading = ref(true);
 const error = ref(null);
+
 const comments = ref([]);
 const submitting = ref(false);
+const activeReplyId = ref(null);
 const commentForm = ref({
   nama_user: '',
   komentar: '',
-  id_berita: props.id
+  id_produk_hukum: props.id
 });
 const replyForm = ref({
   nama_user: '',
   komentar: '',
-  id_berita: props.id,
+  id_produk_hukum: props.id,
   id_ref_komentar: null
 });
-const activeReplyId = ref(null);
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('id-ID', {
@@ -359,23 +366,23 @@ const formatDate = (date) => {
   });
 };
 
+const getAvatar = (name) => {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+};
+
 const truncateText = (text, length) => {
   if (!text) return '';
   return text.length > length ? text.substring(0, length) + '...' : text;
 };
 
-const getAvatar = (name) => {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
-};
-
-const fetchNews = async () => {
+const fetchDokumen = async () => {
   try {
     loading.value = true;
-    const response = await axios.get(`/api/news/${props.id}`);
-    news.value = response.data;
+    const response = await axios.get(`/api/produk-hukum/${props.id}`);
+    dokumen.value = response.data;
   } catch (err) {
-    error.value = 'Failed to load news';
-    console.error('Error fetching news:', err);
+    error.value = 'Gagal memuat dokumen';
+    console.error('Error fetching document:', err);
   } finally {
     loading.value = false;
   }
@@ -383,8 +390,7 @@ const fetchNews = async () => {
 
 const fetchComments = async () => {
   try {
-    const response = await axios.get(`/api/comments/${props.id}`);
-    // Only map top-level comments (those without parent)
+    const response = await axios.get(`/api/produk-hukum-comments/${props.id}`);
     comments.value = response.data.filter(comment => !comment.id_ref_komentar).map(comment => ({
       ...comment,
       showReplies: false,
@@ -398,18 +404,19 @@ const fetchComments = async () => {
 const submitComment = async () => {
   try {
     submitting.value = true;
-    const response = await axios.post('/api/comments', commentForm.value);
-    
-    // If comment was auto-approved (news not moderated), add it to the list
-    if (!news.value.is_moderate) {
-        await fetchComments(); // Refresh comments
-    }
+    const response = await axios.post('/api/produk-hukum-comments', commentForm.value);
     
     commentForm.value.komentar = '';
+    commentForm.value.nama_user = '';
+    
+    if (!dokumen.value.is_moderate) {
+      await fetchComments();
+    }
+    
     alert(response.data.message);
   } catch (err) {
     console.error('Error submitting comment:', err);
-    alert('Failed to submit comment');
+    alert('Gagal mengirim komentar');
   } finally {
     submitting.value = false;
   }
@@ -420,7 +427,7 @@ const showReplyForm = (commentId) => {
   replyForm.value = {
     nama_user: '',
     komentar: '',
-    id_berita: props.id,
+    id_produk_hukum: props.id,
     id_ref_komentar: commentId
   };
 };
@@ -430,7 +437,7 @@ const cancelReply = () => {
   replyForm.value = {
     nama_user: '',
     komentar: '',
-    id_berita: props.id,
+    id_produk_hukum: props.id,
     id_ref_komentar: null
   };
 };
@@ -438,64 +445,44 @@ const cancelReply = () => {
 const submitReply = async (commentId) => {
   try {
     submitting.value = true;
-    const response = await axios.post('/api/comments', replyForm.value);
+    const response = await axios.post('/api/produk-hukum-comments', replyForm.value);
     
-    // If news is not moderated, refresh comments to show the new reply
-    if (!news.value.is_moderate) {
-      await fetchComments();
+    if (!dokumen.value.is_moderate) {
+      const comment = comments.value.find(c => c.id === replyForm.value.id_ref_komentar);
+      if (comment && comment.showReplies) {
+        await loadReplies(comment);
+      } else {
+        await fetchComments();
+      }
     }
     
-    // Reset form and hide reply form
     cancelReply();
     alert(response.data.message);
   } catch (err) {
     console.error('Error submitting reply:', err);
-    alert('Failed to submit reply');
+    alert('Gagal mengirim balasan');
   } finally {
     submitting.value = false;
   }
 };
 
-const getParentUser = (reply) => {
-  return reply.parent_user || 'Unknown';
-};
-
 const loadReplies = async (comment) => {
   if (comment.showReplies) {
     comment.showReplies = false;
+    comment.replies = [];
     return;
   }
 
   try {
-    const response = await axios.get(`/api/comments/${props.id}/replies/${comment.id}`);
+    const response = await axios.get(
+      `/api/produk-hukum-comments/${props.id}/replies/${comment.id}`
+    );
     
-    // Create a map of all replies
-    const repliesMap = new Map();
-    response.data.forEach(reply => {
-      repliesMap.set(reply.id, { ...reply, replies: [] });
-    });
-
-    // Build reply tree
-    response.data.forEach(reply => {
-      const replyObj = repliesMap.get(reply.id);
-      if (reply.id_ref_komentar === comment.id) {
-        // Direct replies to main comment
-        if (!comment.replies) comment.replies = [];
-        comment.replies.push(replyObj);
-      } else {
-        // Nested replies
-        const parentReply = repliesMap.get(reply.id_ref_komentar);
-        if (parentReply) {
-          if (!parentReply.replies) parentReply.replies = [];
-          parentReply.replies.push(replyObj);
-        }
-      }
-    });
-
+    comment.replies = response.data;
     comment.showReplies = true;
   } catch (err) {
     console.error('Error loading replies:', err);
-    alert('Failed to load replies');
+    alert('Gagal memuat balasan');
   }
 };
 
@@ -503,7 +490,7 @@ const getAllDeeperReplies = (reply) => {
   let allReplies = [];
   
   const collectReplies = (r) => {
-    if (r.replies?.length) {
+    if (r.replies && Array.isArray(r.replies)) {
       r.replies.forEach(nestedReply => {
         allReplies.push(nestedReply);
         collectReplies(nestedReply);
@@ -516,7 +503,7 @@ const getAllDeeperReplies = (reply) => {
 };
 
 onMounted(() => {
-  fetchNews();
+  fetchDokumen();
   fetchComments();
 });
 </script>

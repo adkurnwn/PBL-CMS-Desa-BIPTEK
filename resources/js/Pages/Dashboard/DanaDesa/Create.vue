@@ -1,11 +1,10 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref } from "vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     categories: {
@@ -16,7 +15,6 @@ const props = defineProps({
 
 const form = useForm({
     title: "",
-    description: "",
     file: null,
     link: "",
     date: "",
@@ -85,23 +83,6 @@ const submit = () => {
                                 </div>
 
                                 <div>
-                                    <InputLabel
-                                        for="description"
-                                        value="Description"
-                                    />
-                                    <textarea
-                                        id="description"
-                                        v-model="form.description"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.description"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <div>
                                     <InputLabel for="file" value="File" />
                                     <input
                                         id="file"
@@ -137,6 +118,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Dana Desa
                                 </PrimaryButton>
+                                <Link :href="route('dashboard.dana-desa')">
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
+                                </Link>
                             </div>
                         </form>
                     </div>

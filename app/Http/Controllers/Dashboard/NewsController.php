@@ -3,16 +3,28 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Models\News;
-use App\Models\Category;
 use Inertia\Inertia;
-use App\Models\Image;
-use Illuminate\Http\Request;
+use App\Models\Gallery;
+use App\Models\Category;
+use App\Helpers\SlugHelper;
+use App\Services\MediaService;
+use App\Services\CategoryService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\StoreNewsRequest;
+use App\Http\Requests\Validation\UpdateNewsRequest;
 
 class NewsController extends Controller
 {
+    protected $mediaService;
+    protected $categoryService;
+
+    public function __construct(MediaService $mediaService, CategoryService $categoryService)
+    {
+        $this->mediaService = $mediaService;
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/News/Index', [
@@ -23,144 +35,101 @@ class NewsController extends Controller
     public function create()
     {
         return Inertia::render('Dashboard/News/Create', [
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreNewsRequest $request)
     {
-        $validate = [
-            'title' => 'required',
-            'content' => 'required',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'alts.*' => 'required|string|max:255',
-            'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
-            'is_moderate' => 'required|boolean',
-            'is_draft' => 'required|boolean',
-        ];
-
-        if ($request->filled('new_category')) {
-            $validate['new_category'] = 'required|string|max:255';
-        } else {
-            $validate['category_id'] = 'required|exists:categories,id';
-        }
-
-        $request->validate($validate);
-
-        if ($request->filled('new_category')) {
-            $category = Category::create(['name' => $request->new_category]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category_id;
-        }
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
-
-        unset($data['images']);
-        unset($data['alts']);
-        unset($data['video']);
-        unset($data['new_category']);
+        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
 
         $news = News::create($data);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('news-images', 'public');
-
-                $news->images()->create([
-                    'path' => $path,
-                    'alt' => $request->alts[$index],
-                    'is_visible' => true
-                ]);
-            }
+            $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
         }
 
         if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')->store('news-videos', 'public');
-            $news->update(['video' => $videoPath]);
+            $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
 
-        return redirect()->route('dashboard.news');
+        return redirect()->route('dashboard.news')->with('success', 'News Added Successfully');
     }
 
     public function edit(News $news)
     {
+        $categories = $this->categoryService->getCategoriesWithUsageCounts(1);
+
         return Inertia::render('Dashboard/News/Edit', [
             'news' => $news->load('images', 'category'),
-            'categories' => Category::all()
+            'categories' => $categories,
+            'unused_categories' => $this->categoryService->getUnusedCategories(1),
         ]);
     }
 
-    public function update(Request $request, News $news)
+    public function update(UpdateNewsRequest $request, News $news)
     {
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required',
-            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
-            'alts.*' => 'required_with:images.*|string|max:255',
-            'removed_images' => 'sometimes|array',
-            'removed_images.*' => 'exists:images,id',
-            'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
-            'is_moderate' => 'required|boolean',
-            'is_draft' => 'required|boolean',
-        ]);
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
-        // Handle category
-        if ($request->filled('new_category')) {
-            $category = Category::create(['name' => $request->new_category]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category_id;
+        if (!empty($request->category['deleting_category_id'])) {
+            $deletionResults = $this->categoryService->handleCategoryDeletion($request->category['deleting_category_id']);
+            session()->flash('categoryDeletionResults', $deletionResults);
         }
 
         $data = $request->all();
-        $data['category_id'] = $category_id; // Set category_id
-
-        // Remove unnecessary data
-        unset($data['images']);
-        unset($data['alts']);
-        unset($data['removed_images']);
-        unset($data['video']);
-        unset($data['new_category']);
+        $data['category_id'] = $category_id;
+        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);;
 
         // Update news record
         $news->update($data);
 
         // Handle removed images
         if ($request->removed_images) {
-            foreach ($request->removed_images as $imageId) {
-                $image = Image::find($imageId);
-                if ($image && $image->news_id === $news->id) {
-                    Storage::disk('public')->delete($image->path);
-                    $image->delete();
-                }
-            }
+            $this->mediaService->handleImageRemovals($news, $request->removed_images);
         }
 
         // Handle new images
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('news-images', 'public');
-
-                $news->images()->create([
-                    'path' => $path,
-                    'alt' => $request->alts[$index],
-                    'is_visible' => true
-                ]);
-            }
+            $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
         }
 
         // Handle video upload if needed
         if ($request->hasFile('video')) {
-            if ($news->video) {
-                Storage::disk('public')->delete($news->video);
-            }
-            $videoPath = $request->file('video')->store('news-videos', 'public');
-            $news->update(['video' => $videoPath]);
+            $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
 
-        return redirect()->route('dashboard.news');
+        return redirect()->route('dashboard.news')->with('success', 'News Updated Successfully');
+    }
+
+
+    public function archive()
+    {
+        News::onlyTrashed()->with('category')->get();
+        return Inertia::render('Dashboard/News/Archive', [
+            'news' => News::onlyTrashed()->with('category')->get(),
+        ]);
+    }
+
+    public function restore(News $news)
+    {
+        $news->restore();
+        return redirect()->route('dashboard.news.archive')->with('success', 'News Restored Successfully');
+    }
+
+    public function destroy(News $news)
+    {
+        if ($news->trashed()) {
+            $this->mediaService->deleteAllMedia($news);
+            $news->forceDelete();
+            return redirect()->route('dashboard.news.archive')->with('success', 'News Deleted Successfully');
+        } else {
+            $news->delete();
+            return redirect()->route('dashboard.news')->with('success', 'News Archived Successfully');
+        }
     }
 }

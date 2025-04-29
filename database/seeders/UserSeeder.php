@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'position_id' => null,
+            'photo_profile' => '/profile-photos/admin.png',
             'phone' => '081234567890',
             'status' => true,
         ]);
@@ -33,6 +34,7 @@ class UserSeeder extends Seeder
             'email' => 'kepala@gmail.com',
             'password' => Hash::make('password'),
             'position_id' => $kepalaDesaPosition->id,
+            'photo_profile' => '/profile-photos/kepala-desa.png',
             'phone' => '089876543210',
             'status' => true,
         ]);
@@ -46,6 +48,7 @@ class UserSeeder extends Seeder
             'email' => 'sekretaris@gmail.com',
             'password' => Hash::make('password'),
             'position_id' => $sekretarisPosition->id,
+            'photo_profile' => '/profile-photos/sekretaris-desa.png',
             'phone' => '081122334455',
             'status' => true,
         ]);
@@ -59,6 +62,7 @@ class UserSeeder extends Seeder
             'email' => 'bendahara@gmail.com',
             'password' => Hash::make('password'),
             'position_id' => $bendaharaPosition->id,
+            'photo_profile' => '/profile-photos/bendahara-desa.png',
             'phone' => '082233445566',
             'status' => true,
         ]);

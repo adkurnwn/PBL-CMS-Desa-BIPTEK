@@ -9,6 +9,7 @@ class ProdukHukum extends Model
     protected $table = 'produk_hukum';
     protected $fillable = [
         'title',
+        'slug',
         'description',
         'category_id',
         'user_id',

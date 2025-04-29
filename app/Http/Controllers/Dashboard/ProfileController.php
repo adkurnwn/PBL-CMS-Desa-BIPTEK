@@ -4,12 +4,21 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\Profile;
-use Illuminate\Http\Request;
+use App\Models\Region\Village;
+use App\Services\MediaService;
 use App\Http\Controllers\Controller;
-use App\Models\Region\Village; // Add this at the top
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\UpdateProfileRequest;
 
 class ProfileController extends Controller
 {
+    protected $mediaService;
+
+    public function __construct(MediaService $mediaService)
+    {
+        $this->mediaService = $mediaService;
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/Profile/Index', [
@@ -24,79 +33,54 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request, Profile $profile)
+    public function update(UpdateProfileRequest $request, Profile $profile)
     {
-        $request->validate([
-            'email' => 'required|string|lowercase|email|max:255',
-            'phone' => 'required|string|max:255',
-            'provinsi' => 'required|string',
-            'kabupaten' => 'required|string',
-            'kecamatan' => 'required|string',
-            'kelurahan' => 'required|string',
-            'address' => 'required|string',
-            'lembaga' => 'required|array',
-            'fasilitas' => 'required|array',
-            'history' => 'required|string',
-            'vision' => 'required|string',
-            'mission' => 'required|string',
-            'primary_color' => 'required|in:#000000,#ffffff',
-            'secondary_color' => 'required|in:#000000,#ffffff',
-            'hero_images.*' => 'sometimes|image|max:2048|mimes:jpg,png,jpeg',
-            'hero_image_1' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
-            'hero_image_2' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
-            'hero_image_3' => 'nullable|image|max:2048|mimes:jpg,png,jpeg',
-        ]);
-
         $village = Village::find($request->kelurahan);
-        $villageName = $village ? "Desa " . $village->name : '';
+        if ($village) {
+            $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
+        }
 
-        $profileData = [
-            'name' => $villageName,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'provinsi' => $request->provinsi,
-            'kabupaten' => $request->kabupaten,
-            'kecamatan' => $request->kecamatan,
-            'kelurahan' => $request->kelurahan,
-            'address' => $request->address,
-            'lembaga' => json_encode($request->lembaga),
-            'fasilitas' => json_encode($request->fasilitas),
-            'history' => $request->history,
-            'vision' => $request->vision,
-            'mission' => $request->mission,
-            'primary_color' => $request->primary_color,
-            'secondary_color' => $request->secondary_color
-        ];
+        $profileData['lembaga'] = json_encode($request->lembaga);
+        $profileData['fasilitas'] = json_encode($request->fasilitas);
 
-        // Handle file upload
+        // Handle single uploads
         if ($request->hasFile('logo')) {
-            $profileData['logo'] = $request->file('logo')->store('profile-logo', 'public');
+            if ($profile->logo) $this->mediaService->delete($profile->logo);
+            $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
+            $profileData['logo'] = $logoPath;
+
+            $this->updateFaviconFromLogo($logoPath);
         }
+
         if ($request->hasFile('organization_image')) {
-            $profileData['organization_image'] = $request->file('organization_image')->store('organization-images', 'public');
+            if ($profile->organization_image) $this->mediaService->delete($profile->organization_image);
+            $profileData['organization_image'] = $this->mediaService->upload($request->file('organization_image'), 'organization-images');
         }
+
+        // Handle hero images
         if ($request->hasFile('hero_images')) {
-            $heroImages = [];
-            foreach ($request->file('hero_images') as $image) {
-                $path = $image->store('hero-images', 'public');
-                $heroImages[] = $path;
+            $this->mediaService->handleJsonImages($profile, $request->file('hero_images'), 'hero_images', 'hero-images');
+        } else {
+            $heroImageFiles = [];
+
+            for ($i = 1; $i <= 3; $i++) {
+                if ($request->hasFile("hero_image_$i")) {
+                    $heroImageFiles[$i - 1] = $request->file("hero_image_$i");
+                }
             }
-            $profileData['hero_images'] = json_encode($heroImages);
-        }
 
-        $heroImages = json_decode($profile->hero_images) ?? [];
-
-        for ($i = 1; $i <= 3; $i++) {
-            if ($request->hasFile("hero_image_$i")) {
-                $path = $request->file("hero_image_$i")->store('hero-images', 'public');
-                $heroImages[$i - 1] = $path;
+            if (!empty($heroImageFiles)) {
+                $this->mediaService->handleJsonImages($profile, $heroImageFiles, 'hero_images', 'hero-images');
             }
         }
-
-        $profileData['hero_images'] = json_encode(array_values($heroImages));
 
         $profile->update($profileData);
 
-        return redirect()->route('dashboard.profiles')->with('success', 'Village profile updated successfully');
+        return redirect()->route('dashboard.profiles')->with('success', 'Profile Updated Successfully');
+    }
+
+    protected function updateFaviconFromLogo(string $logoPath)
+    {
+        Storage::disk('public')->put('favicon.png', Storage::disk('public')->get($logoPath));
     }
 }

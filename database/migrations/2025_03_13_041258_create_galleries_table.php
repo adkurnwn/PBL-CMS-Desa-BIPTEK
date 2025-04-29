@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('galleries', function (Blueprint $table) {
             $table->smallIncrements('id')->unsigned();
             $table->string('title');
+            $table->string('slug')->unique();
             $table->unsignedTinyInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')
@@ -25,6 +26,7 @@ return new class extends Migration
                 ->on('categories')
                 ->onDelete('cascade');
             $table->text('description');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

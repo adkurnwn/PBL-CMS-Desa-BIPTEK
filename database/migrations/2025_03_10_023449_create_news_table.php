@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('news', function (Blueprint $table) {
             $table->smallIncrements('id')->unsigned();
             $table->string('title');
+            $table->string('slug')->unique();
             $table->unsignedTinyInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->boolean('is_moderate')->default(false);
             $table->boolean('is_draft')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

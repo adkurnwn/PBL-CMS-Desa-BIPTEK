@@ -1,13 +1,79 @@
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import UserLayout from "@/Layouts/UserLayout.vue";
+
+// Define reactive variables
+const profile = ref({});
+const loading = ref(false);
+
+
+const fetchProfile = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/profile");
+        profile.value = response.data;
+        loading.value = false;
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchProfile();
+});
+
+// Compute missionList after profile is loaded
+const missionList = computed(() => {
+    if (!profile.value || !profile.value.mission) return [];
+
+    if (typeof profile.value.mission === "string") {
+        return profile.value.mission
+            .split(/\d+\.\s/)
+            .filter((item) => item.trim() !== "");
+    }
+
+    return [];
+});
+
+const parseFasilitas = computed(() => {
+    if (!profile.value || !profile.value.fasilitas) return [];
+
+    if (typeof profile.value.fasilitas === "string") {
+        try {
+            return JSON.parse(profile.value.fasilitas);
+        } catch (e) {
+            console.error("Error parsing fasilitas:", e);
+            return [];
+        }
+    }
+
+    return Array.isArray(profile.value.fasilitas)
+        ? profile.value.fasilitas
+        : [];
+});
+
+const parseJson = (value) => {
+    if (typeof value === "string") {
+        try {
+            return JSON.parse(value);
+        } catch (e) {
+            return [];
+        }
+    }
+    return Array.isArray(value) ? value : [];
+};
+</script>
 <!-- Profileview.vue -->
 <template>
   <UserLayout>
     <header class="flex items-center justify-center  font-merriweather">
       <!--Sejarah Desa-->
       <article class="h-screen font-merriweather">
-        <img src="../../../images/profile.jpg" alt="Logo" class="absolute z-0 left-0 w-full h-screen object-cover"/>
+        <img :src="`/storage/${profile.hero_image}`" alt="Logo" class="absolute z-0 left-0 w-full h-screen object-cover"/>
         <div class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"></div>
         <h1 class="text-type1 xl:text-3xl md:text-4xl sm:text-xl xl:text-left text-center font-bold relative z-0 xl:right-36 xl:mt-72 md:mt-96 sm:mt-60">Sejarah Desa</h1>
-        <p class="text-type1 xl:text-xl md:text-2xl sm:text-md text-justify font-thin relative z-0 xl:right-36 mt-2 xl:max-w-4xl md:max-w-2xl sm:max-w-xl">Desa Pao-Pao berasal dari nama sebuah Gunung yang berada di Dusun Aroppoe Desa Tellumpanua yang merupakan bekas wilayah Desa Pao-Pao yakni Gunung Pao-Pao. Sejak Kelahirannya Desa Pao-Pao terdiri dari 7 Dusun yakni Dusun Lompengeng, Maralleng, Pucue, Bonto Penno, Polejiwa Aroppoe, Maddo, namun pada tahun 1988 Desa Pao-Pao dimekarkan dan lahirlah Desa Tellumpanua dengan 3 wilayah yakni Dusun Aroppoe, Polejiwa dan Maddo, sehingga sampai sekarang Wilayah Desa Pao-Pao terdiri dari 4 Dusun yakni Dusun Lompengeng, Maralleng, Pucue dan Bonto Penno.</p>
+        <p class="text-type1 xl:text-xl md:text-2xl sm:text-md text-justify font-thin relative z-0 xl:right-36 mt-2 xl:max-w-4xl md:max-w-2xl sm:max-w-xl">{{ profile.history }}</p>
       </article>
     </header>
     <main class="flex flex-col items-center justify-center max-w-7xl mx-auto w-full font-merriweather">
@@ -16,23 +82,28 @@
         <div class="xl:mt-24 md:mt-24 sm:mt-20 xl:mr-12 sm:mr-0">
           <!-- Lingkaran Putih -->
           <div class="relative oval-container xl:ml-4 sm:ml-5">
-            <img src="../../../images/FOTO_KADES.png" alt="Kepala Desa"class="xl:py-5 md:py-7 sm:py-4 py-4 xl:ml-1 md:ml-2 sm:ml-0 xl:w-80 md:w-80 sm:w-72">
+            <img v-if="profile.kepala_desa"
+                        :src="`/storage/${profile.kepala_desa.photo_profile}`"
+                        alt="Kepala Desa"class="xl:py-5 md:py-7 sm:py-4 py-4 xl:ml-1 md:ml-2 sm:ml-0 xl:w-80 md:w-80 sm:w-72">
           </div>
           <!-- Kotak Hijau -->
           <div class="bg-accent2 text-white text-center xl:py-4 md:py-4 sm:py-3 py-3 xl:px-12 md:px-12 sm:px-10 px-2 rounded-lg relative z-0 xl:w-fit md:w-96 sm:w-72 w-64 xl:h-20 md:h-20 sm:h-16 h-16 xl:-mt-20 md:-mt-20 sm:-mt-16 -mt-16 xl:ml-0 md:-ml-1 sm:ml-0 ml-3">
-            <p class="font-bold xl:text-xl md:text-xl sm:text-md text-sm">SYAMSUL BAHRI, S.E., M.M.</p>
-            <p class="italic xl:text-md md:text-md sm:text-xs text-xs">Kepala Desa Pao-Pao</p>
+            <p class="font-bold xl:text-xl md:text-xl sm:text-md text-sm">{{ profile.kepala_desa.name }}</p>
+            <p class="italic xl:text-md md:text-md sm:text-xs text-xs">Kepala {{ profile.name }}</p>
           </div>
         </div>
         <div class="text-semiBlack xl:mt-24 md:mt-6 sm:mt-5">
           <h1 class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl text-center">Visi</h1>
-          <p class="xl:text-xl md:text-lg sm:text-md text-semiBlack text-center italic max-w-3xl xl:mt-1">“Desa Pao-Pao yang Maju, Mandiri, dan Bernafaskan Keagamaan”</p>
+          <p class="xl:text-xl md:text-lg sm:text-md text-semiBlack text-center italic max-w-3xl xl:mt-1">“{{ profile.vision }}”</p>
           <h1 class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl xl:mt-5 md:mt-5 sm:mt-3 text-center">Misi</h1>
           <div class="text-justify xl:mt-1">
             <ol class="list-decimal pl-5 xl:max-w-2xl md:max-w-xl sm:max-w-lg space-y-3 text-semiBlack xl:text-xl md:text-lg sm:text-md italic">
-              <li>Mewujudkan tata kelola pemerintahan desa yang baik, bersih (good and clean governance) serta layanan publik yang prima berbasis teknologi informasi.</li>
-              <li>Meningkatkan keterpenuhan sarana dan prasarana pengembangan wilayah, ekonomi, sosial dan lingkungan hidup di desa serta keterpenuhan hak-hak dasar masyarakat.</li>
-              <li>Meningkatkan pemanfaatan potensi ekonomi untuk kemandirian masyarakat.</li>
+              <li
+                                v-for="(misi, index) in missionList"
+                                :key="index"
+                            >
+                                {{ misi }}
+                            </li>
             </ol>
           </div>
         </div>
@@ -45,7 +116,7 @@
         <div class="relative flex flex-wrap xl:flex-row flex-col xl:gap-7 sm:gap-5 p-7 bg-transparant -mt-3 items-center">
           <!-- Card 1 -->  
           <div class="container bg-white rounded-xl shadow-lg text-center">
-            <img src="../../../images/SO_PEMERINTAHAN_DESA.png" alt="Gambar 1" class="w-full xl:h-72 xl:-mt-2 object-contain">
+            <img :src="`/storage/${profile.organization_image}`" alt="Gambar 1" class="w-full xl:h-72 xl:-mt-2 object-contain">
             <p class="text-accent1 text-lg font-semibold py-2 xl:-mt-1">Struktur Organisasi Pemerintahan Desa</p>
           </div>
           <!-- Card 2 -->
@@ -103,16 +174,12 @@
         </div>
         <div class="flex flex-wrap ml-96 pr-12 -mt-96 pt-8 text-accent2">
           <ol class="list-disc list-inside font-semibold text-xl max-w-3xl space-y-1 -mt-96">
-            <li>Puskesmas</li>
-            <li>Balai Desa</li>
-            <li>Gedung Serba Guna</li>
-            <li>Pasar Desa</li>
-            <li>Masjid</li>
-            <li>Sekolah Dasar</li>
-            <li>Sekolah Menengah Pertama</li>
-            <li>Sekolah Menengah Atas</li>
-            <li>Sekolah Menengah Kejuruan</li>
-            <li>Jembatan Penghubung</li>
+            <li
+                            v-for="(fasilitas, index) in parseFasilitas"
+                            :key="index"
+                        >
+                            {{ fasilitas }}
+                        </li>
           </ol>
         </div>
       </div>       
@@ -161,28 +228,28 @@
          <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
           <svg class="ml-44 h-16 -mt-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="48px" fill="#DEA521">
             <path d="M40-160v-160q0-29 20.5-49.5T110-390h141q17 0 32.5 8.5T310-358q29 42 74 65t96 23q51 0 96-23t75-65q11-15 26-23.5t32-8.5h141q29 0 49.5 20.5T920-320v160H660v-119q-36 33-82.5 51T480-210q-51 0-97-18t-83-51v119H40Zm440-170q-35 0-67.5-16.5T360-392q-16-23-38.5-37T273-448q29-30 91-46t116-16q54 0 116.5 16t91.5 46q-26 5-48.5 19T601-392q-20 29-52.5 45.5T480-330ZM160-460q-45 0-77.5-32.5T50-570q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T160-460Zm640 0q-45 0-77.5-32.5T690-570q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T800-460ZM480-580q-45 0-77.5-32.5T370-690q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T480-580Z"/></svg>
-            <p class="text-3xl font-thin text-left ml-3 mt-3">2.114</p>
+            <p class="text-3xl font-thin text-left ml-3 mt-3">{{ profile.data_demografi.penduduk }}</p>
             <p class="text-lg text-left ml-3">Penduduk</p>
          </div>
          <!-- Grid 2 -->
          <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
           <svg class="ml-44 h-16 -mt-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="48px" fill="#DEA521">
             <path d="M720.08-727q-30.08 0-51.58-21.42t-21.5-51.5q0-30.08 21.42-51.58t51.5-21.5q30.08 0 51.58 21.42t21.5 51.5q0 30.08-21.42 51.58t-51.5 21.5ZM660-80v-336q0-30-15-54t-44-35l41-120q8-25 29.5-40t48.5-15q27 0 48.5 15t29.5 40l102 295H790v250H660ZM495-500q-25 0-42.5-17.5T435-560q0-25 17.5-42.5T495-620q25 0 42.5 17.5T555-560q0 25-17.5 42.5T495-500ZM220.08-727q-30.08 0-51.58-21.42t-21.5-51.5q0-30.08 21.42-51.58t51.5-21.5q30.08 0 51.58 21.42t21.5 51.5q0 30.08-21.42 51.58t-51.5 21.5ZM150-80v-290H80v-250q0-24.75 17.63-42.38Q115.25-680 140-680h160q24.75 0 42.38 17.62Q360-644.75 360-620v250h-70v290H150Zm290 0v-170h-50v-166q0-18.33 12.83-31.17Q415.67-460 434-460h122q18.33 0 31.17 12.83Q600-434.33 600-416v166h-50v170H440Z"/></svg>
-            <p class="text-3xl font-thin text-left ml-3 mt-3">674</p>
+            <p class="text-3xl font-thin text-left ml-3 mt-3">{{ profile.data_demografi.kepala_keluarga }}</p>
             <p class="text-lg text-left ml-3">Kepala Keluarga</p>
          </div> 
          <!-- Grid 3 -->
          <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
           <svg class="ml-44 h-16 -mt-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="48px" fill="#DEA521">
             <path d="M800-800v220h-60v-117L556-514q21 29 32.5 63.5T600-380q0 92-64 156t-156 64q-92 0-156-64t-64-156q0-92 64-156t156-64q36 0 70 11.5t63 32.5l184-184H580v-60h220ZM380.2-540Q314-540 267-493.2t-47 113q0 66.2 46.8 113.2t113 47q66.2 0 113.2-46.8t47-113q0-66.2-46.8-113.2t-113-47Z"/></svg>
-            <p class="text-3xl font-thin text-left ml-3 mt-3">1.049</p>
+            <p class="text-3xl font-thin text-left ml-3 mt-3">{{ profile.data_demografi.penduduk_laki_laki }}</p>
             <p class="text-lg text-left ml-3">Penduduk Laki-Laki</p>
          </div>
          <!-- Grid 4 -->
          <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
           <svg class="ml-44 h-16 -mt-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="48px" fill="#DEA521">
             <path d="M450-120v-80h-80v-60h80v-102q-82-11-136-73.71-54-62.7-54-145.29 0-91.42 64.5-155.21Q389-800 480-800t155.5 63.79Q700-672.42 700-581q0 82.59-54 145.29Q592-373 510-362v102h80v60h-80v80h-60Zm29.8-300q66.2 0 113.2-46.8t47-113q0-66.2-46.8-113.2t-113-47Q414-740 367-693.2t-47 113q0 66.2 46.8 113.2t113 47Z"/></svg>
-            <p class="text-3xl font-thin text-left ml-3 mt-3">1.065</p>
+            <p class="text-3xl font-thin text-left ml-3 mt-3">{{ profile.data_demografi.penduduk_perempuan }}</p>
             <p class="text-lg text-left ml-3">Penduduk Perempuan</p>
           </div>
         </div>
@@ -195,12 +262,6 @@
     </main>
   </UserLayout>
 </template>
-
-<script setup>
-
-import UserLayout from '@/Layouts/UserLayout.vue';
-
-</script>
 
 <style scoped>
   .oval-container {

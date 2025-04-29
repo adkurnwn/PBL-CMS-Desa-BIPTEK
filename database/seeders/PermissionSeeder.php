@@ -17,14 +17,15 @@ class PermissionSeeder extends Seeder
             'roles' => ['manage'],
             'dashboard' => ['view'],
             'profiles' => ['read', 'update'],
-            'news' => ['create', 'read', 'update', 'delete'],
-            'galleries' => ['create', 'read', 'update', 'delete'],
+            'news' => ['create', 'read', 'update', 'archive', 'restore', 'delete'],
+            'galleries' => ['create', 'read', 'update', 'archive', 'restore', 'delete'],
             'events' => ['create', 'read', 'update', 'delete'],
             'produk-hukum' => ['create', 'read', 'update', 'delete'],
             'dana-desa' => ['create', 'read', 'update', 'delete'],
             'produk-desa' => ['create', 'read', 'update', 'delete'],
             'comments' => ['read', 'update', 'delete'],
             'demografi' => ['create', 'read', 'update'],
+            'feedbacks' => ['create', 'read', 'update'],
         ];
 
         foreach ($features as $feature => $actions) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
@@ -32,18 +32,21 @@ class NewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(News $news)
+    public function show($slug)
     {
-        if ($news->is_draft) {
+        $news = News::with(['images', 'category'])
+            ->where('slug', $slug)
+            ->where('is_draft', false)
+            ->first();
+
+        if (!$news) {
             return response()->json(['message' => 'News not found'], 404);
         }
 
         // Increment view count
         $news->increment('views');
 
-        return response()->json(
-            $news->load(['images', 'category'])
-        );
+        return response()->json($news);
     }
 
     /**

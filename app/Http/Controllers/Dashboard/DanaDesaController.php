@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
+use App\Models\DanaDesa;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class DanaDesaController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Dashboard/DanaDesa/Index');
+        return Inertia::render('Dashboard/DanaDesa/Index', [
+            'danaDesa' => DanaDesa::all(),
+        ]);
     }
 
     public function create()
@@ -21,19 +26,55 @@ class DanaDesaController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'title' => 'required',
-            'file' => 'required',
+            'title' => 'required|string|max:255',
+            'file' => 'required|mimes:pdf|max:2048',
             'link' => 'required',
             'date' => 'required'
         ];
 
         $request->validate($rules);
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('dana-desa-documents', 'public');
+            $data['file'] = $path;
+        }
+
+        DanaDesa::create($data);
+
+        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Created Successfully');
     }
 
-    public function edit($id)
+    public function edit(DanaDesa $danaDesa)
     {
-        return Inertia::render('Dashboard/DanaDesa/Edit');
+        return Inertia::render('Dashboard/DanaDesa/Edit', [
+            'danaDesa' => $danaDesa
+        ]);
     }
 
-    public function update(Request $request, $id) {}
+    public function update(Request $request, DanaDesa $danaDesa)
+    {
+        $rules = [
+            'title' => 'required|string|max:255',
+            'file' => 'required|mimes:pdf|max:2048',
+            'link' => 'required',
+            'date' => 'required'
+        ];
+
+        $request->validate($rules);
+        $data = $request->all();
+
+        if ($request->hasFile('file')) {
+            if ($danaDesa->file) {
+                Storage::disk('public')->delete($danaDesa->file);
+            }
+            $path = $request->file('file')->store('dana-desa-documents', 'public');
+            $data['file'] = $path;
+        }
+
+        $danaDesa->update($data);
+
+        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Updated Successfully');
+    }
 }

@@ -2,17 +2,29 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Models\News;
 use Inertia\Inertia;
-use App\Models\Image;
 use App\Models\Gallery;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Helpers\SlugHelper;
+use App\Services\MediaService;
+use App\Services\CategoryService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\StoreGalleryRequest;
+use App\Http\Requests\Validation\UpdateGalleryRequest;
 
 class GalleryController extends Controller
 {
+    protected $mediaService;
+    protected $categoryService;
+
+    public function __construct(MediaService $mediaService, CategoryService $categoryService)
+    {
+        $this->mediaService = $mediaService;
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/Gallery/Index', [
@@ -23,35 +35,16 @@ class GalleryController extends Controller
     public function create()
     {
         return Inertia::render('Dashboard/Gallery/Create', [
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreGalleryRequest $request)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'description' => 'required',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'alts.*' => 'required|string|max:255'
-        ];
-
-        if ($request->filled('category.new_category')) {
-            $rules['category.new_category'] = 'required|string|max:255';
-        } else {
-            $rules['category.category_id'] = 'required|exists:categories,id';
-        }
-
-        $request->validate($rules);
-
-        if ($request->filled('category.new_category')) {
-            $category = Category::create(['name' => $request->category['new_category']]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category['category_id'];
-        }
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
 
@@ -59,49 +52,33 @@ class GalleryController extends Controller
 
         // Handle multiple image uploads
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('gallery-images', 'public');
-
-                // Create image record
-                $gallery->images()->create([
-                    'path' => $path,
-                    'alt' => $request->alts[$index] ?? $gallery->title,
-                    'is_visible' => true
-                ]);
-            }
+            $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
 
-        return redirect()->route('dashboard.galleries');
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Added Successfully');
     }
 
     public function edit(Gallery $gallery)
     {
+        $categories = $this->categoryService->getCategoriesWithUsageCounts(1);
         return Inertia::render('Dashboard/Gallery/Edit', [
             'gallery' => $gallery->load('images', 'category'),
-            'categories' => Category::all()
+            'categories' => Category::where('category_type', 1)->get(),
+            'unused_categories' => $this->categoryService->getUnusedCategories(1),
         ]);
     }
 
-    public function update(Request $request, Gallery $gallery)
+    public function update(UpdateGalleryRequest $request, Gallery $gallery)
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
-            'alts.*' => 'required_with:images.*|string|max:255',
-            'removed_images' => 'sometimes|array',
-            'removed_images.*' => 'exists:images,id'
-        ]);
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
-        // Update gallery details
-        if ($request->filled('category.new_category')) {
-            $category = Category::create(['name' => $request->category['new_category']]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category['category_id'];
+        if (!empty($request->category['deleting_category_id'])) {
+            $deletionResults = $this->categoryService->handleCategoryDeletion($request->category['deleting_category_id']);
+            session()->flash('categoryDeletionResults', $deletionResults);
         }
 
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
         $data['category_id'] = $category_id;
 
         // Update news record
@@ -109,32 +86,40 @@ class GalleryController extends Controller
 
         // Handle image removals
         if ($request->removed_images) {
-            foreach ($request->removed_images as $imageId) {
-                $image = Image::find($imageId);
-                if ($image && $image->gallery_id === $gallery->id) {
-                    // Delete the physical file
-                    Storage::disk('public')->delete($image->path);
-                    // Delete the database record
-                    $image->delete();
-                }
-            }
+            $this->mediaService->handleImageRemovals($gallery, $request->removed_images);
         }
 
         // Handle new image uploads
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('gallery-images', 'public');
-
-                // Create new image record
-                $gallery->images()->create([
-                    'path' => $path,
-                    'alt' => $request->alts[$index] ?? $gallery->title,
-                    'is_visible' => true
-                ]);
-            }
+            $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
 
-        return redirect()->route('dashboard.galleries')
-            ->with('success', 'Gallery updated successfully');
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Updated Successfully');
+    }
+
+    public function archive(Gallery $gallery)
+    {
+        Gallery::onlyTrashed()->with('category')->get();
+        return Inertia::render('Dashboard/Gallery/Archive', [
+            'galleries' => Gallery::onlyTrashed()->with('category')->get(),
+        ]);
+    }
+
+    public function restore(Gallery $gallery)
+    {
+        $gallery->restore();
+        return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Restored Successfully');
+    }
+
+    public function destroy(Gallery $gallery)
+    {
+        if ($gallery->trashed()) {
+            $this->mediaService->deleteAllMedia($gallery);
+            $gallery->forceDelete();
+            return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Deleted Successfully');
+        } else {
+            $gallery->delete();
+            return redirect()->route('dashboard.galleries')->with('success', 'Gallery Archived Successfully');
+        }
     }
 }

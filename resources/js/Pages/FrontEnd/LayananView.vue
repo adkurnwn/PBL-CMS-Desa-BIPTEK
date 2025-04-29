@@ -1,3 +1,26 @@
+<script setup>
+import UserLayout from "@/Layouts/UserLayout.vue";
+import ProductCard from "@/Components/ProductCard.vue";
+import { ref, onMounted } from "vue";
+
+const loading = ref(false);
+const layanan = ref({});
+const fetchLayanan = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/layanan");
+        layanan.value = response.data;
+        loading.value = false;
+    } catch (error) {
+        console.error("Error fetching layanan data:", error);
+        loading.value = false;
+    }
+};
+
+onMounted(() => {
+    fetchLayanan();
+});
+</script>
 <!-- Homeview.vue -->
 <template>
   <UserLayout>      
@@ -18,10 +41,11 @@
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="grid grid-cols-2 gap-1 xl:flex xl:flex-row justify-center -m-1 mt-1">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard
+                        v-for="produkDesa in layanan.produkDesa"
+                        :key="produkDesa.id"
+                        :produkDesa="produkDesa"
+                    />
         </div>
         <h1 class="flex text-secondary xl:text-xl sm:text-lg text-xs justify-end mt-3">Selengkapnya
           <svg class="xl:mt-1 sm:mt-1 xl:w-6 xl:h-6 sm:w-5 sm:h-5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="24px" fill="#DEA521">
@@ -66,13 +90,3 @@
     </main>
   </UserLayout>
 </template>
-
-<script setup>
-import UserLayout from '@/Layouts/UserLayout.vue';
-import ProductCard from '@/Components/ProductCard.vue';
-
-</script>
-
-<style scoped>
-
-</style>

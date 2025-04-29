@@ -3,19 +3,29 @@
 namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
-use App\Models\ProdukHukum;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Helpers\SlugHelper;
+use App\Models\ProdukHukum;
+use App\Services\CategoryService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\StoreProdukHukumRequest;
+use App\Http\Requests\Validation\UpdateProdukHukumRequest;
 
 class ProdukHukumController extends Controller
 {
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function index()
     {
         return inertia('Dashboard/ProdukHukum/Index', [
-            'produkHukum' => ProdukHukum::all()
+            'produkHukum' => ProdukHukum::with('category')->get()
         ]);
     }
 
@@ -26,102 +36,72 @@ class ProdukHukumController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProdukHukumRequest $request)
     {
-        $rules = [
-            'title' => 'required',
-            'description' => 'required',
-            'file' => 'required|file|mimes:pdf,doc,docx',
-            'link' => 'required',
-            'date' => 'required',
-        ];
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? [], 0);
 
-        if ($request->filled('category.new_category')) {
-            $rules['category.new_category'] = 'required|string|max:255';
-        } else {
-            $rules['category.category_id'] = 'required|exists:categories,id';
-        }
-
-        $request->validate($rules);
-
-        if ($request->filled('category.new_category')) {
-            $category = Category::create([
-                'name' => $request->category['new_category'],
-                'category_type' => 0
-            ]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category['category_id'];
-        }
+        $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
+        $data['user_id'] = Auth::id();
+        $data['category_id'] = $category_id;
 
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('produk-hukum-documents', 'public');
+            $data['file'] = $path;
         }
 
-        $data = $request->all();
-        $data['user_id'] = Auth::id();
-        $data['category_id'] = $category_id;
-        $data['file'] = $path;
+        ProdukHukum::create($data);
 
-        $produkHukum = ProdukHukum::create($data);
-
-        return redirect()->route('dashboard.produk-hukum');
+        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Added Successfully');
     }
 
     public function edit(ProdukHukum $produkHukum)
     {
+        $categories = $this->categoryService->getCategoriesWithUsageCounts(0);
+
         return Inertia::render('Dashboard/ProdukHukum/Edit', [
             'produkHukum' => $produkHukum->load('category'),
-            'categories' => Category::where('category_type', 0)->get()
+            'categories' => $categories,
+            'unused_categories' => $this->categoryService->getUnusedCategories(0)
         ]);
     }
 
-    public function update(Request $request, ProdukHukum $produkHukum)
+    public function update(UpdateProdukHukumRequest $request, ProdukHukum $produkHukum)
     {
-        $rules = [
-            'title' => 'required',
-            'description' => 'required',
-            'file' => 'nullable|file|mimes:pdf,doc,docx',
-            'link' => 'required',
-            'date' => 'required',
-        ];
+        $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? [], 0);
 
-        if ($request->filled('category.new_category')) {
-            $rules['category.new_category'] = 'required|string|max:255';
-        } else {
-            $rules['category.category_id'] = 'required|exists:categories,id';
-        }
-
-        $request->validate($rules);
-
-        if ($request->filled('category.new_category')) {
-            $category = Category::create([
-                'name' => $request->category['new_category'],
-                'category_type' => 0
-            ]);
-            $category_id = $category->id;
-        } else {
-            $category_id = $request->category['category_id'];
+        if (!empty($request->category['deleting_category_id'])) {
+            $deletionResults = $this->categoryService->handleCategoryDeletion($request->category['deleting_category_id'], 0);
+            session()->flash('categoryDeletionResults', $deletionResults);
         }
 
         $data = $request->all();
 
         if ($request->hasFile('file')) {
-            // Delete old file if exists
             if ($produkHukum->file) {
                 Storage::disk('public')->delete($produkHukum->file);
             }
             $path = $request->file('file')->store('produk-hukum-documents', 'public');
             $data['file'] = $path;
-        } else {
-            // Keep existing file
-            unset($data['file']);
         }
 
+        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
         $data['category_id'] = $category_id;
 
         $produkHukum->update($data);
 
-        return redirect()->route('dashboard.produk-hukum');
+        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Updated Successfully');
+    }
+
+    public function destroy(ProdukHukum $produkHukum)
+    {
+        // Delete associated file
+        if ($produkHukum->file) {
+            Storage::disk('public')->delete($produkHukum->file);
+        }
+
+        $produkHukum->delete();
+
+        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Deleted Successfully');
     }
 }
