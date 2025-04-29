@@ -26,7 +26,7 @@ const deleteNews = (newsId) => {
         <template #header>
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    News
+                    Archived News
                 </h2>
 
                 <Link :href="route('dashboard.news')">
