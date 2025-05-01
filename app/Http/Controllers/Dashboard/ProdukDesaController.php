@@ -8,14 +8,20 @@ use App\Helpers\SlugHelper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\GambarProdukDesa;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Validation\StoreProdukDesaRequest;
-use App\Http\Requests\Validation\UpdateProdukDesaRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\StoreProdukDesaRequest;
+use App\Http\Requests\Validation\UpdateProdukDesaRequest;
 
 class ProdukDesaController extends Controller
 {
+    protected $logHelper;
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
     public function index()
     {
         return Inertia::render('Dashboard/ProdukDesa/Index', [
@@ -46,7 +52,9 @@ class ProdukDesaController extends Controller
                 ]);
             }
         }
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Created Successfully');
+
+        $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Ditambahkan');
     }
 
     public function edit(ProdukDesa $produkDesa)
@@ -85,7 +93,8 @@ class ProdukDesaController extends Controller
             }
         }
 
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Updated Successfully');
+        $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Diperbarui');
     }
 
     public function destroy(ProdukDesa $produkDesa)
@@ -94,6 +103,8 @@ class ProdukDesaController extends Controller
             Storage::disk('public')->delete($image->path);
         }
         $produkDesa->delete();
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Deleted Successfully');
+
+        $this->logHelper->logActivity('delete', 'produk_desa', 'Menghapus produk desa ' . $produkDesa->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Dihapus');
     }
 }

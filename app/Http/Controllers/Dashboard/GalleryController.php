@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Models\News;
 use Inertia\Inertia;
 use App\Models\Gallery;
 use App\Models\Category;
 use App\Helpers\SlugHelper;
 use App\Services\MediaService;
 use App\Services\CategoryService;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Validation\StoreGalleryRequest;
@@ -18,11 +18,13 @@ class GalleryController extends Controller
 {
     protected $mediaService;
     protected $categoryService;
+    protected $logHelper;
 
     public function __construct(MediaService $mediaService, CategoryService $categoryService)
     {
         $this->mediaService = $mediaService;
         $this->categoryService = $categoryService;
+        $this->logHelper = new LogActivityHelper();
     }
 
     public function index()
@@ -55,7 +57,8 @@ class GalleryController extends Controller
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
 
-        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Added Successfully');
+        $this->logHelper->logActivity('create', 'gallery', 'Menambahkan gallery ' . $gallery->title);
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Ditambahkan');
     }
 
     public function edit(Gallery $gallery)
@@ -81,7 +84,6 @@ class GalleryController extends Controller
         $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
         $data['category_id'] = $category_id;
 
-        // Update news record
         $gallery->update($data);
 
         // Handle image removals
@@ -94,7 +96,8 @@ class GalleryController extends Controller
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
 
-        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Updated Successfully');
+        $this->logHelper->logActivity('edit', 'gallery', 'Memperbarui gallery ' . $gallery->title);
+        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Diperbarui');
     }
 
     public function archive(Gallery $gallery)
@@ -108,7 +111,8 @@ class GalleryController extends Controller
     public function restore(Gallery $gallery)
     {
         $gallery->restore();
-        return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Restored Successfully');
+        $this->logHelper->logActivity('restore', 'gallery', 'Memulihkan gallery ' . $gallery->title);
+        return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dipulihkan');
     }
 
     public function destroy(Gallery $gallery)
@@ -116,10 +120,12 @@ class GalleryController extends Controller
         if ($gallery->trashed()) {
             $this->mediaService->deleteAllMedia($gallery);
             $gallery->forceDelete();
-            return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Deleted Successfully');
+            $this->logHelper->logActivity('delete', 'gallery', 'Menghapus gallery ' . $gallery->title);
+            return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dihapus');
         } else {
             $gallery->delete();
-            return redirect()->route('dashboard.galleries')->with('success', 'Gallery Archived Successfully');
+            $this->logHelper->logActivity('archive', 'gallery', 'Mengarsipkan gallery ' . $gallery->title);
+            return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Diarsipkan');
         }
     }
 }

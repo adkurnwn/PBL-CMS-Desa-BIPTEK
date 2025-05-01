@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Profile;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Profile;
+use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
+use App\Http\Requests\Auth\LoginRequest;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected $logHelper;
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
     /**
      * Display the login view.
      */
@@ -38,6 +44,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $this->logHelper->logActivity('login', 'user', 'Pengguna ' . Auth::user()->name . ' logged in');
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -52,6 +59,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
+        $this->logHelper->logActivity('logout', 'user', 'Pengguna ' . Auth::user()->name . ' logged out');
         return redirect('/');
     }
 }

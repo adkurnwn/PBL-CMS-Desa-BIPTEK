@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Dashboard\ActivityLogController;
 use App\Models\News;
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
@@ -80,9 +81,7 @@ Route::get('/event-test', function () {
 //TESTING ROUTES END
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
-    Route::middleware(['permission:view_dashboard'])->get('/dashboard', function () {
-        return Inertia::render('Dashboard/Dashboard');
-    })->name('dashboard');
+    Route::middleware(['permission:view_dashboard'])->get('/dashboard', [ActivityLogController::class, 'index'])->name('dashboard');
 
     Route::prefix('dashboard')->group(function () {
 

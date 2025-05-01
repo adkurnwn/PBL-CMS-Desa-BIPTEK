@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\DanaDesa;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class DanaDesaController extends Controller
 {
+    protected $logHelper;
+
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/DanaDesa/Index', [
@@ -43,7 +51,8 @@ class DanaDesaController extends Controller
 
         DanaDesa::create($data);
 
-        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Created Successfully');
+        $this->logHelper->logActivity('create', 'dana_desa', 'Menambahkan dana desa ' . $request->title);
+        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Berhasil Ditambahkan');
     }
 
     public function edit(DanaDesa $danaDesa)
@@ -75,6 +84,7 @@ class DanaDesaController extends Controller
 
         $danaDesa->update($data);
 
-        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Updated Successfully');
+        $this->logHelper->logActivity('update', 'dana_desa', 'Memperbarui dana desa ' . $danaDesa->title);
+        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Berhasil Diperbarui');
     }
 }
