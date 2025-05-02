@@ -4,25 +4,33 @@ namespace App\Services;
 
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class MediaService
 {
     public function upload($file, $path, $disk = 'public')
     {
-        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = uniqid() . '.webp';
         $fullPath = $path . '/' . $filename;
 
         if (str_starts_with($file->getMimeType(), 'image/')) {
+            // Convert and encode image to WebP
             $image = Image::make($file)
                 ->resize(1600, null, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })
-                ->encode($file->getClientOriginalExtension(), 75);
+                ->encode('webp', 80);
 
-            Storage::disk($disk)->put($fullPath, $image);
+            // Save the WebP file to storage
+            Storage::disk($disk)->put($fullPath, (string) $image);
+
+            // Optimize the image file (optional, works with WebP too)
+            $absolutePath = Storage::disk($disk)->path($fullPath);
+            $optimizerChain = OptimizerChainFactory::create();
+            $optimizerChain->optimize($absolutePath);
         } else {
-            $file->storeAs($path, $filename, $disk);
+            $file->storeAs($path, $file->getClientOriginalName(), $disk);
         }
 
         return $fullPath;
