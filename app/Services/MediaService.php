@@ -2,13 +2,30 @@
 
 namespace App\Services;
 
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
 class MediaService
 {
     public function upload($file, $path, $disk = 'public')
     {
-        return $file->store($path, $disk);
+        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+        $fullPath = $path . '/' . $filename;
+
+        if (str_starts_with($file->getMimeType(), 'image/')) {
+            $image = Image::make($file)
+                ->resize(1600, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->encode($file->getClientOriginalExtension(), 75);
+
+            Storage::disk($disk)->put($fullPath, $image);
+        } else {
+            $file->storeAs($path, $filename, $disk);
+        }
+
+        return $fullPath;
     }
 
     public function uploadMultiple($files, $path, $disk = 'public')
