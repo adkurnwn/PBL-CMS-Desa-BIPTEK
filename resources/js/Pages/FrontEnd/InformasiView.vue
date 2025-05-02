@@ -92,24 +92,23 @@ onMounted(() => {
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
-
-                    
-
-                    <div v-if="loading" class="text-center w-full">
+                    <div v-if="!informasi.events" class="text-center w-full">
                         <p>Loading events...</p>
                     </div>
-                    <div v-else-if="events.length === 0" class="text-center w-full">
+                    <div
+                        v-else-if="informasi.events.length === 0"
+                        class="text-center w-full"
+                    >
                         <p>Tidak ada event yang akan datang</p>
                     </div>
                     <template v-else>
                         <EventCard
-                        v-for="eventItem in informasi.events"
-                        :key="eventItem.id"
-                        :isHome="true"
-                        :event="eventItem"
-                    />
+                            v-for="eventItem in informasi.events"
+                            :key="eventItem.id"
+                            :isHome="true"
+                            :event="eventItem"
+                        />
                     </template>
-
                 </div>
             </article>
 
@@ -128,7 +127,6 @@ onMounted(() => {
                     <NewsCard
                         v-for="newsItem in informasi.news"
                         :key="newsItem.id"
-                        :isHome="true"
                         :news="newsItem"
                     />
                 </div>

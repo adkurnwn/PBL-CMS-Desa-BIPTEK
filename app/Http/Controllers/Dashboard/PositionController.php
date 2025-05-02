@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Models\Position;
 use Inertia\Inertia;
+use App\Models\Position;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 
 class PositionController extends Controller
 {
+    protected $logHelper;
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function create()
     {
         return Inertia::render('Dashboard/UserManagement/Positions/Create');
@@ -26,7 +33,8 @@ class PositionController extends Controller
             'job_description' => json_encode($request->job_descriptions),
         ]);
 
-        return redirect()->route('dashboard.users')->with('success', 'Position created successfully');
+        $this->logHelper->logActivity('create', 'position', 'Menambahkan posisi ' . $request->name);
+        return redirect()->route('dashboard.users')->with('success', 'Posisi Berhasil Ditambahkan');
     }
 
     public function edit(Position $position)
@@ -48,7 +56,8 @@ class PositionController extends Controller
             'job_description' => json_encode($request->job_descriptions),
         ]);
 
-        return redirect()->route('dashboard.users')->with('success', 'Position updated successfully');
+        $this->logHelper->logActivity('update', 'position', 'Meperbarui posisi ' . $position->name);
+        return redirect()->route('dashboard.users')->with('success', 'Posisi Berhasil Diperbarui');
     }
 
     public function destroy(Position $position)
@@ -63,6 +72,7 @@ class PositionController extends Controller
 
         $position->delete();
 
-        return back()->with('success', 'Position deleted successfully');
+        $this->logHelper->logActivity('delete', 'position', 'Menghapus posisi ' . $position->name);
+        return back()->with('success', 'Posisi Berhasil Dihapus');
     }
 }

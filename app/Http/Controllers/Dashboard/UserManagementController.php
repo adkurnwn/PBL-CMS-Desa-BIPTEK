@@ -6,14 +6,20 @@ use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Position;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Validation\StoreUserManagementRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Validation\StoreUserManagementRequest;
 use App\Http\Requests\Validation\UpdateUserManagementRequest;
 
 class UserManagementController extends Controller
 {
+    protected $logHelper;
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
     public function index()
     {
         return Inertia::render('Dashboard/UserManagement/Index', [
@@ -78,7 +84,8 @@ class UserManagementController extends Controller
             $user->assignRole('Aparat Desa');
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User Added Successfully');
+        $this->logHelper->logActivity('create', 'user', 'Menambahkan pengguna ' . $user->name);
+        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Ditambahkan');
     }
 
     public function edit(User $user)
@@ -140,7 +147,8 @@ class UserManagementController extends Controller
             $user->syncRoles(['Aparat Desa']);
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User Updated Successfully');
+        $this->logHelper->logActivity('update', 'user', 'Memperbarui pengguna ' . $user->name);
+        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Diperbarui');
     }
 
     public function destroy(User $user)
@@ -155,6 +163,7 @@ class UserManagementController extends Controller
             ]);
         }
 
-        return redirect()->route('dashboard.users')->with('success', 'User Deleted Successfully');
+        $this->logHelper->logActivity('delete', 'user', 'Menonaktifkan pengguna ' . $user->name);
+        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Dinonaktifkan');
     }
 }

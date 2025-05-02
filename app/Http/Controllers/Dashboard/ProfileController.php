@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Models\Profile;
 use App\Models\Region\Village;
 use App\Services\MediaService;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\UpdateProfileRequest;
@@ -13,10 +14,12 @@ use App\Http\Requests\Validation\UpdateProfileRequest;
 class ProfileController extends Controller
 {
     protected $mediaService;
+    protected $logHelper;
 
     public function __construct(MediaService $mediaService)
     {
         $this->mediaService = $mediaService;
+        $this->logHelper = new LogActivityHelper();
     }
 
     public function index()
@@ -76,7 +79,8 @@ class ProfileController extends Controller
 
         $profile->update($profileData);
 
-        return redirect()->route('dashboard.profiles')->with('success', 'Profile Updated Successfully');
+        $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
+        return redirect()->route('dashboard.profiles')->with('success', 'Profil Berhasil Diperbarui');
     }
 
     protected function updateFaviconFromLogo(string $logoPath)
