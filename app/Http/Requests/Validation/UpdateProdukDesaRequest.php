@@ -23,7 +23,6 @@ class UpdateProdukDesaRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'stock' => 'required|integer|min:0',
             'price' => 'required|decimal:2',
             'kontak_penjual' => 'required|string|max:20',
             'description' => 'required',

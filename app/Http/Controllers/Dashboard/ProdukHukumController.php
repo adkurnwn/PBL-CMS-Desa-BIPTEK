@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Helpers\SlugHelper;
 use App\Models\ProdukHukum;
 use App\Services\CategoryService;
+use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +17,12 @@ use App\Http\Requests\Validation\UpdateProdukHukumRequest;
 class ProdukHukumController extends Controller
 {
     protected $categoryService;
+    protected $logHelper;
 
     public function __construct(CategoryService $categoryService)
     {
         $this->categoryService = $categoryService;
+        $this->logHelper = new LogActivityHelper();
     }
 
     public function index()
@@ -52,7 +55,8 @@ class ProdukHukumController extends Controller
 
         ProdukHukum::create($data);
 
-        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Added Successfully');
+        $this->logHelper->logActivity('create', 'produk_hukum', 'Menambahkan produk hukum ' . $request->title);
+        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Berhasil Ditambahkan');
     }
 
     public function edit(ProdukHukum $produkHukum)
@@ -90,18 +94,7 @@ class ProdukHukumController extends Controller
 
         $produkHukum->update($data);
 
-        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Updated Successfully');
-    }
-
-    public function destroy(ProdukHukum $produkHukum)
-    {
-        // Delete associated file
-        if ($produkHukum->file) {
-            Storage::disk('public')->delete($produkHukum->file);
-        }
-
-        $produkHukum->delete();
-
-        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Deleted Successfully');
+        $this->logHelper->logActivity('update', 'produk_hukum', 'Memperbarui produk hukum ' . $produkHukum->title);
+        return redirect()->route('dashboard.produk-hukum')->with('success', 'Produk Hukum Berhasil Diperbarui');
     }
 }

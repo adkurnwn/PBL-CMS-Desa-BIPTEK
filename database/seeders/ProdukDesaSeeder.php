@@ -25,7 +25,6 @@ class ProdukDesaSeeder extends Seeder
                 'kontak_penjual' => '08123456789',
                 'description' => 'Description for ' . $produk,
                 'price' => rand(10000, 100000),
-                'stock' => rand(1, 100),
             ]);
             $produkDesa->images()->create([
                 'path' => '/produk-desa-images/' . $i . '.jpg',

@@ -5,17 +5,22 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
 use App\Helpers\SlugHelper;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\GambarProdukDesa;
+use App\Services\MediaService;
+use App\Helpers\LogActivityHelper;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validation\StoreProdukDesaRequest;
 use App\Http\Requests\Validation\UpdateProdukDesaRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ProdukDesaController extends Controller
 {
+    protected $logHelper;
+    protected $mediaService;
+    public function __construct(MediaService $mediaService)
+    {
+        $this->logHelper = new LogActivityHelper();
+        $this->mediaService = new MediaService();
+    }
     public function index()
     {
         return Inertia::render('Dashboard/ProdukDesa/Index', [
@@ -37,16 +42,11 @@ class ProdukDesaController extends Controller
         $produkDesa = ProdukDesa::create($dataProduk);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('produk-desa-images', 'public');
-
-                $produkDesa->images()->create([
-                    'produk_desa_id' => $produkDesa->id,
-                    'path' => $path,
-                ]);
-            }
+            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'));
         }
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Created Successfully');
+
+        $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Ditambahkan');
     }
 
     public function edit(ProdukDesa $produkDesa)
@@ -65,35 +65,23 @@ class ProdukDesaController extends Controller
         $produkDesa->update($dataProduk);
 
         if ($request->removed_images) {
-            foreach ($request->removed_images as $imageId) {
-                $image = GambarProdukDesa::find($imageId);
-                if ($image && $image->produk_desa_id === $produkDesa->id) {
-                    Storage::disk('public')->delete($image->path);
-                    $image->delete();
-                }
-            }
+            $this->mediaService->handleImageRemovals($produkDesa, $request->removed_images, 'produk_desa_id');
         }
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('produk-desa-images', 'public');
-
-                $produkDesa->images()->create([
-                    'produk_desa_id' => $produkDesa->id,
-                    'path' => $path,
-                ]);
-            }
+            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'));
         }
 
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Updated Successfully');
+        $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Diperbarui');
     }
 
     public function destroy(ProdukDesa $produkDesa)
     {
-        foreach ($produkDesa->images as $image) {
-            Storage::disk('public')->delete($image->path);
-        }
+        $this->mediaService->deleteAllMedia($produkDesa);
         $produkDesa->delete();
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Product Deleted Successfully');
+
+        $this->logHelper->logActivity('delete', 'produk_desa', 'Menghapus produk desa ' . $produkDesa->title);
+        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Dihapus');
     }
 }

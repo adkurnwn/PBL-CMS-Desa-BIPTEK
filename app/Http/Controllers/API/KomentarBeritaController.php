@@ -32,7 +32,7 @@ class KomentarBeritaController extends Controller
             ->where('is_draft', false)
             ->firstOrFail();
 
-        $replies = KomentarBerita::where('id_berita', $slug)
+        $replies = KomentarBerita::where('id_berita', $news->id)
             ->where(function ($query) use ($commentId) {
                 $query->where('id_ref_komentar', $commentId)
                     ->orWhereHas('parent', function ($q) use ($commentId) {
@@ -68,10 +68,13 @@ class KomentarBeritaController extends Controller
             'id_berita' => 'required|string',
             'nama_user' => 'required|string|max:50',
             'komentar' => 'required|string',
-            'id_ref_komentar' => 'nullable|exists:komentar_berita,id'
+            'id_ref_komentar' => 'nullable|exists:komentar_berita,id',
+            'captcha' => 'required|captcha_api:' . $request->code . ',default'
         ];
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'captcha.captcha_api' => 'Invalid captcha code'
+        ]);
 
         $news = News::where('slug', $request->id_berita)
             ->where('is_draft', false)

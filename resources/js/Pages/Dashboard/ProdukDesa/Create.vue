@@ -4,20 +4,16 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import ImageUploader from "@/Components/ImageUploader.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const form = useForm({
     name: "",
     description: "",
     price: "",
-    stock: "",
     kontak_penjual: "",
-    images: [], // Change from image to images to match controller
+    images: [],
 });
-
-const handleImageChange = (e) => {
-    form.images = e.target.files; // Store all files, not just the first one
-};
 
 const submit = () => {
     form.post(route("dashboard.produk-desa.store"), {
@@ -84,22 +80,6 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Stock Field -->
-                                <div>
-                                    <InputLabel for="stock" value="Stock" />
-                                    <TextInput
-                                        id="stock"
-                                        v-model="form.stock"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.stock"
-                                        class="mt-2"
-                                    />
-                                </div>
-
                                 <!-- Contact Field -->
                                 <div>
                                     <InputLabel
@@ -121,21 +101,12 @@ const submit = () => {
 
                                 <!-- Image Field -->
                                 <div>
-                                    <InputLabel
-                                        for="image"
-                                        value="Product Image"
-                                    />
-                                    <input
-                                        id="image"
-                                        type="file"
-                                        @input="handleImageChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        multiple
-                                    />
-                                    <InputError
-                                        :message="form.errors.images"
-                                        class="mt-2"
+                                    <ImageUploader
+                                        v-model="form.images"
+                                        label="Product Images"
+                                        :error="form.errors"
+                                        :required="true"
+                                        :altText="false"
                                     />
                                 </div>
 

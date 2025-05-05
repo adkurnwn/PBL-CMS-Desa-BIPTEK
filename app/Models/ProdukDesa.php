@@ -11,7 +11,6 @@ class ProdukDesa extends Model
         'user_id',
         'name',
         'slug',
-        'stock',
         'price',
         'kontak_penjual',
         'description',

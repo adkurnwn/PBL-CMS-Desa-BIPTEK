@@ -6,6 +6,7 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import ImageEditor from "@/Components/ImageEditor.vue";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -19,22 +20,11 @@ const form = useForm({
     name: props.produkDesa.name,
     description: props.produkDesa.description,
     price: props.produkDesa.price,
-    stock: props.produkDesa.stock,
     kontak_penjual: props.produkDesa.kontak_penjual,
     images: [],
     removed_images: [],
     _method: "PUT",
 });
-
-const handleImageChange = (e) => {
-    form.images = [...e.target.files];
-};
-
-const removeImage = (imageId) => {
-    if (confirm("Are you sure you want to remove this image?")) {
-        form.removed_images.push(imageId);
-    }
-};
 
 const submit = () => {
     form.post(route("dashboard.produk-desa.update", props.produkDesa.id), {
@@ -100,22 +90,6 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Stock Field -->
-                                <div>
-                                    <InputLabel for="stock" value="Stock" />
-                                    <TextInput
-                                        id="stock"
-                                        v-model="form.stock"
-                                        type="number"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.stock"
-                                        class="mt-2"
-                                    />
-                                </div>
-
                                 <!-- Contact Field -->
                                 <div>
                                     <InputLabel
@@ -135,66 +109,16 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Image Field -->
-                                <div>
-                                    <InputLabel
-                                        for="images"
-                                        value="Product Images"
-                                    />
-
-                                    <!-- Show current images if they exist -->
-                                    <div
-                                        v-if="
-                                            produkDesa.images &&
-                                            produkDesa.images.length > 0
-                                        "
-                                        class="mb-2"
-                                    >
-                                        <p class="text-sm text-gray-600">
-                                            Current images:
-                                        </p>
-                                        <div class="flex flex-wrap gap-2 mt-1">
-                                            <div
-                                                v-for="(
-                                                    image, index
-                                                ) in produkDesa.images"
-                                                :key="index"
-                                                class="relative"
-                                            >
-                                                <img
-                                                    :src="`/storage/${image.path}`"
-                                                    alt="Product image"
-                                                    class="h-32 object-cover rounded-md"
-                                                />
-                                                <DangerButton
-                                                    type="button"
-                                                    @click="
-                                                        removeImage(image.id)
-                                                    "
-                                                    class="absolute top-2 right-2"
-                                                >
-                                                    ×
-                                                </DangerButton>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        @input="handleImageChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        multiple
-                                    />
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        You can select multiple images
-                                    </p>
-                                    <InputError
-                                        :message="form.errors.images"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <ImageEditor
+                                    v-model="form.images"
+                                    v-model:alts="form.alts"
+                                    :existingImages="produkDesa.images"
+                                    v-model:removedImages="form.removed_images"
+                                    label="Images"
+                                    :error="form.errors"
+                                    :alt-error="form.errors.alts"
+                                    :required="true"
+                                />
 
                                 <!-- Description Field - Full Width -->
                                 <div class="col-span-2">

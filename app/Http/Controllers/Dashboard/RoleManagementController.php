@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Helpers\LogActivityHelper;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Permission;
 
 class RoleManagementController extends Controller
 {
+    protected $logHelper;
+
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/RoleManagement/Index', [
@@ -42,6 +50,7 @@ class RoleManagementController extends Controller
 
         $role->syncPermissions($request->permissions);
 
-        return redirect()->back()->with('success', 'Role permissions updated successfully');
+        $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses role ' . $role->name);
+        return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
     }
 }

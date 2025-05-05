@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Http\Controllers\Controller;
-use App\Mail\FeedbackResponse;
+use Inertia\Inertia;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
+use App\Mail\FeedbackResponse;
+use App\Helpers\LogActivityHelper;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Inertia\Inertia;
 
 class FeedbackController extends Controller
 {
+    protected $logHelper;
+
+    public function __construct()
+    {
+        $this->logHelper = new LogActivityHelper();
+    }
+
     public function index()
     {
         return Inertia::render('Dashboard/Feedbacks/Index', [
@@ -43,7 +51,7 @@ class FeedbackController extends Controller
             return back()->with('error', 'Feedback telah ditanggapi tetapi gagal mengirim email.');
         }
 
+        $this->logHelper->logActivity('update', 'feedback', 'Menanggapi feedback ' . $feedback->name);
         return back()->with('success', 'Feedback telah ditanggapi dan email telah dikirim.');
     }
-
 }

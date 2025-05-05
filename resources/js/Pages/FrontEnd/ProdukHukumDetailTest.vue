@@ -137,6 +137,29 @@
                     required
                   ></textarea>
                 </div>
+                <div class="mb-4">
+                  <div class="flex items-center gap-4 mb-2">
+                    <img 
+                      :src="mainCaptchaData?.image" 
+                      alt="CAPTCHA" 
+                      class="h-10"
+                    />
+                    <button 
+                      type="button" 
+                      @click="() => refreshCaptcha('main')"
+                      class="text-blue-600 hover:text-blue-800"
+                    >
+                      Refresh Captcha
+                    </button>
+                  </div>
+                  <input
+                    v-model="commentForm.captcha"
+                    type="text"
+                    placeholder="Masukkan kode captcha..."
+                    class="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
                 <button 
                   type="submit"
                   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -201,6 +224,29 @@
                             class="w-full p-2 border rounded"
                             required
                           ></textarea>
+                        </div>
+                        <div class="mb-4">
+                          <div class="flex items-center gap-4 mb-2">
+                            <img 
+                              :src="replyCaptchaData?.image" 
+                              alt="CAPTCHA" 
+                              class="h-10"
+                            />
+                            <button 
+                              type="button" 
+                              @click="() => refreshCaptcha('reply')"
+                              class="text-blue-600 hover:text-blue-800"
+                            >
+                              Refresh Captcha
+                            </button>
+                          </div>
+                          <input
+                            v-model="replyForm.captcha"
+                            type="text"
+                            placeholder="Masukkan kode captcha..."
+                            class="w-full p-2 border rounded"
+                            required
+                          />
                         </div>
                         <div class="flex gap-2">
                           <button 
@@ -269,6 +315,29 @@
                                   class="w-full p-2 border rounded"
                                   required
                                 ></textarea>
+                              </div>
+                              <div class="mb-4">
+                                <div class="flex items-center gap-4 mb-2">
+                                  <img 
+                                    :src="replyCaptchaData?.image" 
+                                    alt="CAPTCHA" 
+                                    class="h-10"
+                                  />
+                                  <button 
+                                    type="button" 
+                                    @click="() => refreshCaptcha('reply')"
+                                    class="text-blue-600 hover:text-blue-800"
+                                  >
+                                    Refresh Captcha
+                                  </button>
+                                </div>
+                                <input
+                                  v-model="replyForm.captcha"
+                                  type="text"
+                                  placeholder="Masukkan kode captcha..."
+                                  class="w-full p-2 border rounded"
+                                  required
+                                />
                               </div>
                               <div class="flex gap-2">
                                 <button 
@@ -343,6 +412,29 @@
                                       required
                                     ></textarea>
                                   </div>
+                                  <div class="mb-4">
+                                    <div class="flex items-center gap-4 mb-2">
+                                      <img 
+                                        :src="replyCaptchaData?.image" 
+                                        alt="CAPTCHA" 
+                                        class="h-10"
+                                      />
+                                      <button 
+                                        type="button" 
+                                        @click="() => refreshCaptcha('reply')"
+                                        class="text-blue-600 hover:text-blue-800"
+                                      >
+                                        Refresh Captcha
+                                      </button>
+                                    </div>
+                                    <input
+                                      v-model="replyForm.captcha"
+                                      type="text"
+                                      placeholder="Masukkan kode captcha..."
+                                      class="w-full p-2 border rounded"
+                                      required
+                                    />
+                                  </div>
                                   <div class="flex gap-2">
                                     <button 
                                       type="submit"
@@ -396,16 +488,22 @@ const error = ref(null);
 const comments = ref([]);
 const submitting = ref(false);
 const activeReplyId = ref(null);
+const mainCaptchaData = ref(null);
+const replyCaptchaData = ref(null);
+const mainCaptchaCode = ref('');
+const replyCaptchaCode = ref('');
 const commentForm = ref({
   nama_user: '',
   komentar: '',
-  id_produk_hukum: props.id
+  id_produk_hukum: props.id,
+  captcha: ''
 });
 const replyForm = ref({
   nama_user: '',
   komentar: '',
   id_produk_hukum: props.id,
-  id_ref_komentar: null
+  id_ref_komentar: null,
+  captcha: ''
 });
 
 // Home data
@@ -472,13 +570,32 @@ const fetchComments = async () => {
   }
 };
 
+const refreshCaptcha = async (type = 'main') => {
+  try {
+    const response = await axios.get('/captcha/api/default');
+    if (type === 'main') {
+      mainCaptchaData.value = response.data;
+      mainCaptchaCode.value = response.data.code;
+    } else {
+      replyCaptchaData.value = response.data;
+      replyCaptchaCode.value = response.data.code;
+    }
+  } catch (err) {
+    console.error('Error loading captcha:', err);
+  }
+};
+
 const submitComment = async () => {
   try {
     submitting.value = true;
-    const response = await axios.post('/api/produk-hukum-comments', commentForm.value);
+    const response = await axios.post('/api/produk-hukum-comments', {
+      ...commentForm.value,
+      code: mainCaptchaCode.value
+    });
     
     commentForm.value.komentar = '';
     commentForm.value.nama_user = '';
+    commentForm.value.captcha = '';
     
     if (!dokumen.value.is_moderate) {
       await fetchComments();
@@ -487,9 +604,11 @@ const submitComment = async () => {
     alert(response.data.message);
   } catch (err) {
     console.error('Error submitting comment:', err);
-    alert('Gagal mengirim komentar');
+    commentForm.value.captcha = ''; // Clear captcha input
+    alert(err.response?.data?.message || 'Gagal mengirim komentar');
   } finally {
     submitting.value = false;
+    refreshCaptcha('main'); // Always refresh captcha after submit attempt
   }
 };
 
@@ -499,8 +618,10 @@ const showReplyForm = (commentId) => {
     nama_user: '',
     komentar: '',
     id_produk_hukum: props.id,
-    id_ref_komentar: commentId
+    id_ref_komentar: commentId,
+    captcha: ''
   };
+  refreshCaptcha('reply');
 };
 
 const cancelReply = () => {
@@ -509,14 +630,18 @@ const cancelReply = () => {
     nama_user: '',
     komentar: '',
     id_produk_hukum: props.id,
-    id_ref_komentar: null
+    id_ref_komentar: null,
+    captcha: ''
   };
 };
 
 const submitReply = async (commentId) => {
   try {
     submitting.value = true;
-    const response = await axios.post('/api/produk-hukum-comments', replyForm.value);
+    const response = await axios.post('/api/produk-hukum-comments', {
+      ...replyForm.value,
+      code: replyCaptchaCode.value
+    });
     
     if (!dokumen.value.is_moderate) {
       const comment = comments.value.find(c => c.id === replyForm.value.id_ref_komentar);
@@ -531,9 +656,11 @@ const submitReply = async (commentId) => {
     alert(response.data.message);
   } catch (err) {
     console.error('Error submitting reply:', err);
-    alert('Gagal mengirim balasan');
+    replyForm.value.captcha = ''; // Clear captcha input
+    alert(err.response?.data?.message || 'Gagal mengirim balasan');
   } finally {
     submitting.value = false;
+    refreshCaptcha('reply'); // Always refresh captcha after submit attempt
   }
 };
 
@@ -576,5 +703,6 @@ const getAllDeeperReplies = (reply) => {
 onMounted(() => {
   fetchDokumen();
   fetchComments();
+  refreshCaptcha('main');
 });
 </script>

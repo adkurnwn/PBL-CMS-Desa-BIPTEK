@@ -2,13 +2,38 @@
 
 namespace App\Services;
 
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class MediaService
 {
     public function upload($file, $path, $disk = 'public')
     {
-        return $file->store($path, $disk);
+        $filename = uniqid() . '.webp';
+        $fullPath = $path . '/' . $filename;
+
+        if (str_starts_with($file->getMimeType(), 'image/')) {
+            // Convert and encode image to WebP
+            $image = Image::make($file)
+                ->resize(1600, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })
+                ->encode('webp', 80);
+
+            // Save the WebP file to storage
+            Storage::disk($disk)->put($fullPath, (string) $image);
+
+            // Optimize the image file (optional, works with WebP too)
+            $absolutePath = Storage::disk($disk)->path($fullPath);
+            $optimizerChain = OptimizerChainFactory::create();
+            $optimizerChain->optimize($absolutePath);
+        } else {
+            $file->storeAs($path, $file->getClientOriginalName(), $disk);
+        }
+
+        return $fullPath;
     }
 
     public function uploadMultiple($files, $path, $disk = 'public')
@@ -142,14 +167,12 @@ class MediaService
 
         // Process each file
         foreach ($files as $index => $file) {
-            // If an image already exists at this position, delete it
             if (isset($images[$index])) {
                 $this->delete($images[$index], $disk);
             }
 
-            // Store new image
-            $path = $this->upload($file, $path, $disk);
-            $images[$index] = $path;
+            $storedPath = $this->upload($file, $path, $disk);
+            $images[$index] = $storedPath;
         }
 
         // Ensure array is sequential

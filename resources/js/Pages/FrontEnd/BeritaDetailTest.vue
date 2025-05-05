@@ -21,14 +21,20 @@ const commentForm = ref({
     nama_user: "",
     komentar: "",
     id_berita: props.slug,
+    captcha: "",
 });
 const replyForm = ref({
     nama_user: "",
     komentar: "",
     id_berita: props.slug,
     id_ref_komentar: null,
+    captcha: "",
 });
 const activeReplyId = ref(null);
+const mainCaptchaData = ref(null);
+const replyCaptchaData = ref(null);
+const mainCaptchaCode = ref('');
+const replyCaptchaCode = ref('');
 
 // Home data
 const home = ref({});
@@ -124,21 +130,42 @@ const fetchComments = async () => {
     }
 };
 
+const refreshCaptcha = async (type = 'main') => {
+    try {
+        const response = await axios.get('/captcha/api/default');
+        if (type === 'main') {
+            mainCaptchaData.value = response.data;
+            mainCaptchaCode.value = response.data.code;
+        } else {
+            replyCaptchaData.value = response.data;
+            replyCaptchaCode.value = response.data.code;
+        }
+    } catch (err) {
+        console.error('Error loading captcha:', err);
+    }
+};
+
 const submitComment = async () => {
     try {
         submitting.value = true;
-        const response = await axios.post("/api/comments", commentForm.value);
+        const response = await axios.post("/api/comments", {
+            ...commentForm.value,
+            captcha: commentForm.value.captcha,
+            code: mainCaptchaCode.value
+        });
 
-        // If comment was auto-approved (news not moderated), add it to the list
         if (!news.value.is_moderate) {
-            await fetchComments(); // Refresh comments
+            await fetchComments();
         }
 
-        commentForm.value.komentar = "";
+        commentForm.value.komentar = '';
+        commentForm.value.captcha = '';
         alert(response.data.message);
     } catch (err) {
         console.error("Error submitting comment:", err);
-        alert("Failed to submit comment");
+        await refreshCaptcha('main'); // Refresh on error
+        commentForm.value.captcha = ''; // Clear invalid captcha
+        alert(err.response?.data?.message || "Failed to submit comment");
     } finally {
         submitting.value = false;
     }
@@ -151,7 +178,9 @@ const showReplyForm = (commentId) => {
         komentar: "",
         id_berita: props.slug,
         id_ref_komentar: commentId,
+        captcha: "",
     };
+    refreshCaptcha('reply'); // Get new captcha for reply form
 };
 
 const cancelReply = () => {
@@ -161,25 +190,30 @@ const cancelReply = () => {
         komentar: "",
         id_berita: props.slug,
         id_ref_komentar: null,
+        captcha: "",
     };
 };
 
 const submitReply = async (commentId) => {
     try {
         submitting.value = true;
-        const response = await axios.post("/api/comments", replyForm.value);
+        const response = await axios.post("/api/comments", {
+            ...replyForm.value,
+            captcha: replyForm.value.captcha,
+            code: replyCaptchaCode.value
+        });
 
-        // If news is not moderated, refresh comments to show the new reply
         if (!news.value.is_moderate) {
             await fetchComments();
         }
 
-        // Reset form and hide reply form
         cancelReply();
         alert(response.data.message);
     } catch (err) {
         console.error("Error submitting reply:", err);
-        alert("Failed to submit reply");
+        await refreshCaptcha('reply'); // Refresh on error
+        replyForm.value.captcha = ''; // Clear invalid captcha
+        alert(err.response?.data?.message || "Failed to submit reply");
     } finally {
         submitting.value = false;
     }
@@ -250,7 +284,7 @@ onMounted(() => {
     fetchNewsDetail();
     fetchRelatedNews();
     fetchComments();
-    fetchHome();
+    refreshCaptcha('main');
 });
 </script>
 
@@ -424,6 +458,29 @@ onMounted(() => {
                                         required
                                     ></textarea>
                                 </div>
+                                <div class="mb-4">
+                                    <div class="flex items-center gap-4 mb-2">
+                                        <img 
+                                            :src="mainCaptchaData?.image" 
+                                            alt="CAPTCHA" 
+                                            class="h-10"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            @click="() => refreshCaptcha('main')"
+                                            class="text-blue-600 hover:text-blue-800"
+                                        >
+                                            Refresh Captcha
+                                        </button>
+                                    </div>
+                                    <input
+                                        v-model="commentForm.captcha"
+                                        type="text"
+                                        placeholder="Enter captcha..."
+                                        class="w-full p-2 border rounded"
+                                        required
+                                    />
+                                </div>
                                 <button
                                     type="submit"
                                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -545,6 +602,31 @@ onMounted(() => {
                                                         class="w-full p-2 border rounded"
                                                         required
                                                     ></textarea>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <div class="flex items-center gap-4 mb-2">
+                                                        <img 
+                                                            :src="replyCaptchaData?.image" 
+                                                            alt="CAPTCHA" 
+                                                            class="h-10"
+                                                        />
+                                                        <button 
+                                                            type="button" 
+                                                            @click="() => refreshCaptcha('reply')"
+                                                            class="text-blue-600 hover:text-blue-800"
+                                                        >
+                                                            Refresh Captcha
+                                                        </button>
+                                                    </div>
+                                                    <input
+                                                        v-model="
+                                                            replyForm.captcha
+                                                        "
+                                                        type="text"
+                                                        placeholder="Enter captcha..."
+                                                        class="w-full p-2 border rounded"
+                                                        required
+                                                    />
                                                 </div>
                                                 <div class="flex gap-2">
                                                     <button
@@ -689,6 +771,31 @@ onMounted(() => {
                                                                     class="w-full p-2 border rounded"
                                                                     required
                                                                 ></textarea>
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <div class="flex items-center gap-4 mb-2">
+                                                                    <img 
+                                                                        :src="replyCaptchaData?.image" 
+                                                                        alt="CAPTCHA" 
+                                                                        class="h-10"
+                                                                    />
+                                                                    <button 
+                                                                        type="button" 
+                                                                        @click="() => refreshCaptcha('reply')"
+                                                                        class="text-blue-600 hover:text-blue-800"
+                                                                    >
+                                                                        Refresh Captcha
+                                                                    </button>
+                                                                </div>
+                                                                <input
+                                                                    v-model="
+                                                                        replyForm.captcha
+                                                                    "
+                                                                    type="text"
+                                                                    placeholder="Enter captcha..."
+                                                                    class="w-full p-2 border rounded"
+                                                                    required
+                                                                />
                                                             </div>
                                                             <div
                                                                 class="flex gap-2"
@@ -859,6 +966,31 @@ onMounted(() => {
                                                                             class="w-full p-2 border rounded"
                                                                             required
                                                                         ></textarea>
+                                                                    </div>
+                                                                    <div class="mb-4">
+                                                                        <div class="flex items-center gap-4 mb-2">
+                                                                            <img 
+                                                                                :src="replyCaptchaData?.image" 
+                                                                                alt="CAPTCHA" 
+                                                                                class="h-10"
+                                                                            />
+                                                                            <button 
+                                                                                type="button" 
+                                                                                @click="() => refreshCaptcha('reply')"
+                                                                                class="text-blue-600 hover:text-blue-800"
+                                                                            >
+                                                                                Refresh Captcha
+                                                                            </button>
+                                                                        </div>
+                                                                        <input
+                                                                            v-model="
+                                                                                replyForm.captcha
+                                                                            "
+                                                                            type="text"
+                                                                            placeholder="Enter captcha..."
+                                                                            class="w-full p-2 border rounded"
+                                                                            required
+                                                                        />
                                                                     </div>
                                                                     <div
                                                                         class="flex gap-2"
