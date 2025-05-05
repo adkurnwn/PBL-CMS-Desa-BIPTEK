@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 <template>
     <div
-        class="w-full h-56 flex text-white bg-accent1 space-x-40 font-merriweather md:text-base"
+        class="w-full h-56 flex text-white bg-accent1 space-x-40 sm:space-x-64 font-merriweather sm:text-base"
     >
         <div class="grid mt-4 md:mt-10 ml-3 md:ml-28">
             <img
@@ -64,9 +64,9 @@ const props = defineProps({
             </div>
         </div>
         <div class="flex items-center -mt-20">
-            <div class="-ml-20 md:-ml-9">
+            <div class="xl:-ml-20 sm:-ml-40">
                 <h1
-                    class="text-yellow-600 font-bold text-base md:text-lg md:mt-24 ml-10"
+                    class="text-yellow-600 font-bold text-base md:text-lg sm:mt-20 ml-10"
                 >
                     Layanan Publik
                 </h1>

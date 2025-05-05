@@ -1,11 +1,54 @@
+<!-- BeritaList.vue -->
 <template>
   <UserLayout>
-    <div class="min-h-screen bg-gray-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="flex flex-col items-center justify-center mb-12">
-          <h1 class="text-4xl font-bold text-blue-600">Informasi & Berita</h1>
-          <p class="mt-2 text-gray-600">Berita dan informasi terkini seputar desa</p>
+    <main class="flex flex-col items-center justify-center min-h-screen bg-type1  font-merriweather">
+    <!-- Judul -->
+      <article class="flex flex-col items-center max-w-7xl mx-auto -mt-12">
+        <h1 class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2">Berita Desa</h1>
+        <!-- Search Bar -->
+        <div class="flex items-center mt-6 max-w-2xl">
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Cari Informasi atau Kegiatan..."
+            style="width: 800px;"
+            class="flex-grow py-2 mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-ligh focus:outline-none focus:ring-2 focus:ring-green-500" 
+          />
+          <!-- Button Ikon Search -->
+          <button
+            class="absolute right-96 transform text-accent1"
+            @click="handleSearch"
+          >
+          <svg class="-mr-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#244031"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
+          </button>
         </div>
+        <!-- Button Filter Waktu Berita -->
+        <button
+            @click="openFilter"
+            class="absolute top-52 right-72 mr-5 transform w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:bg- hover:text-white transition"
+          >
+          <svg class="ml-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#244031"><path d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"/></svg>
+          </button>
+      </article>
+      <!-- Kategori Berita -->
+      <article class="flex items-center space-x-7 mt-7 overflow-x-auto text-lg text-accent1 ">
+        <button class="hover:underline font-medium">Semua</button>
+        <button class="hover:underline">Populer</button>
+        <button class="hover:underline">Wisata</button>
+        <button class="hover:underline">Acara</button>
+        <button class="hover:underline">UMKM</button>
+        <button class="hover:underline">Pertanian</button>
+        <button class="hover:underline">Kesehatan</button>
+        <button class="hover:underline">Pendidikan</button>
+        <button class="ml-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" 
+          height="24px" 
+          viewBox="0 -960 960 960" 
+          width="24px" 
+          fill="#244031">
+          <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/></svg>
+        </button>
+      </article>
 
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center items-center py-12">
@@ -73,8 +116,7 @@
         <div v-if="pagination && pagination.last_page > 1" class="mt-8 flex justify-center">
           <!-- Add pagination controls here -->
         </div>
-      </div>
-    </div>
+    </main>
   </UserLayout>
 </template>
 
