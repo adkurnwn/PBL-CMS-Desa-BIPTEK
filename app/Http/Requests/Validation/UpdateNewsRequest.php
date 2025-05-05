@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Validation;
 
+use App\Models\News;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateNewsRequest extends FormRequest
 {
@@ -25,7 +27,7 @@ class UpdateNewsRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'images' => 'sometimes|array',
-            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:10000',
             'alts.*' => 'required_with:images.*|string|max:255',
             'removed_images' => 'sometimes|array',
             'removed_images.*' => 'exists:images,id',
@@ -49,5 +51,28 @@ class UpdateNewsRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            $newsId = $this->route('news')->id ?? null;
+
+            if ($newsId && $this->hasFile('images')) {
+                $news = News::findOrFail($newsId);
+                $existingImagesCount = $news->images()->count();
+                $newImagesCount = count($this->file('images'));
+                $removedImagesCount = $this->input('removed_images') ? count($this->input('removed_images')) : 0;
+
+                $totalImagesAfterUpdate = $existingImagesCount + $newImagesCount - $removedImagesCount;
+
+                if ($totalImagesAfterUpdate > 5) {
+                    $validator->errors()->add(
+                        'images',
+                        'The news cannot have more than 5 images. Please remove some existing images before adding new ones.'
+                    );
+                }
+            }
+        });
     }
 }

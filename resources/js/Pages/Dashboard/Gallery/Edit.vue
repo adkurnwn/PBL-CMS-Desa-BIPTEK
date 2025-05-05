@@ -8,6 +8,7 @@ import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import ImageEditor from "@/Components/ImageEditor.vue";
+import { ref } from "vue";
 
 const props = defineProps({
     gallery: {
@@ -25,6 +26,7 @@ const props = defineProps({
 });
 
 const URL = window.URL;
+const existingImages = ref(props.gallery.images);
 
 const form = useForm({
     title: props.gallery.title,
@@ -39,12 +41,19 @@ const form = useForm({
     images: [],
     alts: [],
     removed_images: [],
+    updated_existing_images: [],
     _method: "PUT",
 });
+
+// Handle updates to existing images (alt text changes)
+const updateExistingImages = (images) => {
+    form.updated_existing_images = images;
+};
 
 const submit = () => {
     form.post(route("dashboard.galleries.update", props.gallery.id), {
         preserveScroll: true,
+        forceFormData: true,
     });
 };
 </script>
@@ -113,6 +122,9 @@ const submit = () => {
                                     v-model:alts="form.alts"
                                     :existingImages="gallery.images"
                                     v-model:removedImages="form.removed_images"
+                                    v-model:existingImages="
+                                        form.updated_existing_images
+                                    "
                                     label="Images"
                                     :error="form.errors"
                                     :alt-error="form.errors.alts"

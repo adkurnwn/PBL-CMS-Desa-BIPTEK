@@ -39,6 +39,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    altText: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits([
@@ -82,7 +86,7 @@ const updateAlts = (alts) => {
                         :alt="image.alt"
                         class="w-full h-32 object-cover rounded"
                     />
-                    <div class="mt-2">
+                    <div class="mt-2" v-if="altText">
                         <p class="text-sm text-gray-600">
                             Alt text: {{ image.alt }}
                         </p>
@@ -112,6 +116,7 @@ const updateAlts = (alts) => {
             "
             @update:modelValue="updateImages"
             @update:alts="updateAlts"
+            :altText="altText"
         />
     </div>
 </template>

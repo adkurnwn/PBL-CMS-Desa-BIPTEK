@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\Validation;
 
+use App\Models\User;
+use App\Models\Position;
+use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -44,5 +47,36 @@ class UpdateUserManagementRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            // Check if the position is Kepala Desa
+            $isKepalaDesa = false;
+
+            if ($this->filled('new_position') && $this->new_position === 'Kepala Desa') {
+                $isKepalaDesa = true;
+            } elseif ($this->filled('position_id')) {
+                $position = Position::find($this->position_id);
+                if ($position && $position->name === 'Kepala Desa') {
+                    $isKepalaDesa = true;
+                }
+            }
+
+            // Check for existing active Kepala Desa
+            if ($isKepalaDesa) {
+                $existingKepalaDesa = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'Kepala Desa');
+                })->where('status', true)->first();
+
+                if ($existingKepalaDesa) {
+                    $validator->errors()->add(
+                        'position_id',
+                        'There is already an active Kepala Desa'
+                    );
+                }
+            }
+        });
     }
 }

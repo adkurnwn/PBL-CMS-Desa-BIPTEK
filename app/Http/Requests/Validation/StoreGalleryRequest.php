@@ -24,7 +24,8 @@ class StoreGalleryRequest extends FormRequest
         $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required',
-            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'images' => 'required|array|max:25',
+            'images.*' => 'required|image|mimes:jpg,jpeg,png|max:10000',
             'alts.*' => 'required|string|max:255'
         ];
 

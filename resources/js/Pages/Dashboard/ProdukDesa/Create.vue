@@ -8,11 +8,19 @@ import ImageUploader from "@/Components/ImageUploader.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 
 const form = useForm({
-    name: "",
+    product_name: "",
     description: "",
     price: "",
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+    youtube: "",
+    x: "",
+    nama_penjual: "",
+    alamat_penjual: "",
     kontak_penjual: "",
     images: [],
+    status: true,
 });
 
 const submit = () => {
@@ -45,18 +53,18 @@ const submit = () => {
                                 <!-- Name Field -->
                                 <div>
                                     <InputLabel
-                                        for="name"
+                                        for="product_name"
                                         value="Nama Produk"
                                     />
                                     <TextInput
-                                        id="name"
-                                        v-model="form.name"
+                                        id="product_name"
+                                        v-model="form.product_name"
                                         type="text"
                                         class="mt-1 block w-full"
                                         required
                                     />
                                     <InputError
-                                        :message="form.errors.name"
+                                        :message="form.errors.product_name"
                                         class="mt-2"
                                     />
                                 </div>
@@ -99,6 +107,63 @@ const submit = () => {
                                     />
                                 </div>
 
+                                <!-- Nama Penjual Field -->
+                                <div>
+                                    <InputLabel
+                                        for="nama_penjual"
+                                        value="Nama Penjual"
+                                    />
+                                    <TextInput
+                                        id="nama_penjual"
+                                        v-model="form.nama_penjual"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.nama_penjual"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Alamat Penjual Field -->
+                                <div>
+                                    <InputLabel
+                                        for="alamat_penjual"
+                                        value="Alamat Penjual"
+                                    />
+                                    <TextInput
+                                        id="alamat_penjual"
+                                        v-model="form.alamat_penjual"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.alamat_penjual"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div class="flex-row items-center">
+                                        <InputLabel
+                                            for="status"
+                                            value="Status"
+                                        />
+                                        <input
+                                            id="status"
+                                            v-model="form.status"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 mt-2"
+                                        />
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.status"
+                                        class="mt-2"
+                                    />
+                                </div>
+
                                 <!-- Image Field -->
                                 <div>
                                     <ImageUploader
@@ -108,6 +173,104 @@ const submit = () => {
                                         :required="true"
                                         :altText="false"
                                     />
+                                </div>
+
+                                <!-- Social Media Section - Full Width -->
+                                <div class="col-span-2 mt-4">
+                                    <h3 class="font-medium text-gray-700 mb-2">
+                                        Social Media Links
+                                    </h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- Instagram Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="instagram"
+                                                value="Instagram"
+                                            />
+                                            <TextInput
+                                                id="instagram"
+                                                v-model="form.instagram"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.instagram"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- Facebook Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="facebook"
+                                                value="Facebook"
+                                            />
+                                            <TextInput
+                                                id="facebook"
+                                                v-model="form.facebook"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.facebook"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- TikTok Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="tiktok"
+                                                value="TikTok"
+                                            />
+                                            <TextInput
+                                                id="tiktok"
+                                                v-model="form.tiktok"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.tiktok"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- YouTube Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="youtube"
+                                                value="YouTube"
+                                            />
+                                            <TextInput
+                                                id="youtube"
+                                                v-model="form.youtube"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.youtube"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- X (Twitter) Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="x"
+                                                value="X (Twitter)"
+                                            />
+                                            <TextInput
+                                                id="x"
+                                                v-model="form.x"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.x"
+                                                class="mt-2"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Description Field - Full Width -->
