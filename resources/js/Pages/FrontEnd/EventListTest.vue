@@ -27,7 +27,7 @@
   
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
-import EventCardTest from '@/Components/EventCardTest.vue';
+import EventCardTest from '@/Components/EventCard.vue';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
