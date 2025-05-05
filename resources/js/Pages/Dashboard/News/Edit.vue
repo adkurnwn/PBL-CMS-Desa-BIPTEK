@@ -1,4 +1,6 @@
 <script setup>
+import { Head, useForm, Link } from "@inertiajs/vue3";
+import { ref, computed, onUnmounted, watch } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -6,8 +8,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
-import { ref, computed, onUnmounted, watch } from "vue";
+import ImageEditor from "@/Components/ImageEditor.vue";
 
 const props = defineProps({
     news: {
@@ -45,24 +46,8 @@ const form = useForm({
 
 const URL = window.URL;
 
-const handleImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    form.images = files;
-    form.alts = files.map(() => "");
-};
-
-const updateAltText = (index, value) => {
-    form.alts[index] = value;
-};
-
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
-};
-
-const removeImage = (imageId) => {
-    if (confirm("Are you sure you want to remove this image?")) {
-        form.removed_images.push(imageId);
-    }
 };
 
 const submit = () => {
@@ -129,118 +114,16 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel for="images" value="Images" />
-
-                                    <!-- Existing Images -->
-                                    <div
-                                        v-if="props.news.images?.length"
-                                        class="mb-4"
-                                    >
-                                        <p class="text-sm text-gray-600 mb-2">
-                                            Current Images:
-                                        </p>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div
-                                                v-for="image in props.news
-                                                    .images"
-                                                :key="image.id"
-                                                class="relative"
-                                                v-show="
-                                                    !form.removed_images.includes(
-                                                        image.id
-                                                    )
-                                                "
-                                            >
-                                                <img
-                                                    :src="`/storage/${image.path}`"
-                                                    :alt="image.alt"
-                                                    class="h-32 w-full object-cover rounded-lg"
-                                                />
-                                                <p
-                                                    class="text-sm text-gray-600 mt-1"
-                                                >
-                                                    Alt: {{ image.alt }}
-                                                </p>
-                                                <DangerButton
-                                                    type="button"
-                                                    @click="
-                                                        removeImage(image.id)
-                                                    "
-                                                    class="absolute top-2 right-2"
-                                                >
-                                                    ×
-                                                </DangerButton>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- New Images Input -->
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        @input="handleImagesChange"
-                                        multiple
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                    />
-
-                                    <!-- New Images Preview with Alt Inputs -->
-                                    <div
-                                        v-if="form.images.length > 0"
-                                        class="mt-4 space-y-4"
-                                    >
-                                        <div
-                                            v-for="(
-                                                image, index
-                                            ) in form.images"
-                                            :key="index"
-                                            class="flex gap-4 items-start"
-                                        >
-                                            <div class="w-32">
-                                                <img
-                                                    :src="
-                                                        URL.createObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                    class="w-full h-32 object-cover rounded"
-                                                    @load="
-                                                        URL.revokeObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                />
-                                            </div>
-                                            <div class="flex-1">
-                                                <InputLabel
-                                                    :for="'alt-' + index"
-                                                    :value="`Alt Text for New Image ${
-                                                        index + 1
-                                                    }`"
-                                                />
-                                                <TextInput
-                                                    :id="'alt-' + index"
-                                                    v-model="form.alts[index]"
-                                                    type="text"
-                                                    class="mt-1 block w-full"
-                                                    :placeholder="`Describe new image ${
-                                                        index + 1
-                                                    }`"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.images"
-                                        class="mt-2"
-                                    />
-                                    <InputError
-                                        :message="form.errors.alts"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <ImageEditor
+                                    v-model="form.images"
+                                    v-model:alts="form.alts"
+                                    :existingImages="news.images"
+                                    v-model:removedImages="form.removed_images"
+                                    label="Images"
+                                    :error="form.errors"
+                                    :alt-error="form.errors.alts"
+                                    :required="true"
+                                />
 
                                 <div>
                                     <InputLabel for="video" value="Video" />

@@ -1,12 +1,13 @@
 <script setup>
+import { Head, useForm, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
-import { ref } from "vue";
+import ImageUploader from "@/Components/ImageUploader.vue";
 
 const URL = window.URL;
 
@@ -29,16 +30,6 @@ const form = useForm({
     images: [],
     alts: [],
 });
-
-const handleImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    form.images = files;
-    form.alts = files.map(() => "");
-};
-
-const updateAltText = (index, value) => {
-    form.alts[index] = value;
-};
 
 const submit = () => {
     form.post(route("dashboard.galleries.store"), {
@@ -106,71 +97,14 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel
-                                        for="images"
-                                        value="Gallery Images"
-                                    />
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        @input="handleImagesChange"
-                                        multiple
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        class="mt-1 block w-full"
-                                    />
-
-                                    <!-- Add alt text inputs for each selected image -->
-                                    <div
-                                        v-if="form.images.length > 0"
-                                        class="mt-4 space-y-4"
-                                    >
-                                        <div
-                                            v-for="(
-                                                image, index
-                                            ) in form.images"
-                                            :key="index"
-                                            class="flex gap-4 items-start"
-                                        >
-                                            <div class="w-32">
-                                                <img
-                                                    :src="
-                                                        URL.createObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                    class="w-full h-32 object-cover rounded"
-                                                    @onload="
-                                                        URL.revokeObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                />
-                                            </div>
-                                            <div class="flex-1">
-                                                <InputLabel
-                                                    :for="'alt-' + index"
-                                                    :value="`Alt Text for Image ${
-                                                        index + 1
-                                                    }`"
-                                                />
-                                                <TextInput
-                                                    :id="'alt-' + index"
-                                                    v-model="form.alts[index]"
-                                                    type="text"
-                                                    class="mt-1 block w-full"
-                                                    :placeholder="`Describe image ${
-                                                        index + 1
-                                                    }`"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.images"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <ImageUploader
+                                    v-model="form.images"
+                                    v-model:alts="form.alts"
+                                    label="Images"
+                                    :error="form.errors"
+                                    :alt-error="form.errors.alts"
+                                    :required="true"
+                                />
                             </div>
 
                             <div class="mt-6">
