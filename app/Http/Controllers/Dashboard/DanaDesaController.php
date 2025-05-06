@@ -52,7 +52,7 @@ class DanaDesaController extends Controller
         DanaDesa::create($data);
 
         $this->logHelper->logActivity('create', 'dana_desa', 'Menambahkan dana desa ' . $request->title);
-        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Berhasil Ditambahkan');
+        return redirect()->route('dashboard.dana-desa.index')->with('success', 'Dana Desa Berhasil Ditambahkan');
     }
 
     public function edit(DanaDesa $danaDesa)
@@ -85,6 +85,6 @@ class DanaDesaController extends Controller
         $danaDesa->update($data);
 
         $this->logHelper->logActivity('update', 'dana_desa', 'Memperbarui dana desa ' . $danaDesa->title);
-        return redirect()->route('dashboard.dana-desa')->with('success', 'Dana Desa Berhasil Diperbarui');
+        return redirect()->route('dashboard.dana-desa.index')->with('success', 'Dana Desa Berhasil Diperbarui');
     }
 }

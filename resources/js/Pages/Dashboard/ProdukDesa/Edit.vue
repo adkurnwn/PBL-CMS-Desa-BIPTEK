@@ -35,8 +35,8 @@ const form = useForm({
 
 const submit = () => {
     form.post(route("dashboard.produk-desa.update", props.produkDesa.id), {
-        preserveScroll: true,
-        forceFormData: true,
+            preserveScroll: true,
+            forceFormData: true,
     });
 };
 </script>

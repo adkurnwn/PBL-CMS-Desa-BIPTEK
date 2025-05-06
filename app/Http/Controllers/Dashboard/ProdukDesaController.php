@@ -46,7 +46,7 @@ class ProdukDesaController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->title);
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Ditambahkan');
+        return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Ditambahkan');
     }
 
     public function edit(ProdukDesa $produkDesa)
@@ -73,7 +73,7 @@ class ProdukDesaController extends Controller
         }
 
         $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->title);
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Diperbarui');
+        return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Diperbarui');
     }
 
     public function destroy(ProdukDesa $produkDesa)
@@ -82,6 +82,6 @@ class ProdukDesaController extends Controller
         $produkDesa->delete();
 
         $this->logHelper->logActivity('delete', 'produk_desa', 'Menghapus produk desa ' . $produkDesa->title);
-        return redirect()->route('dashboard.produk-desa')->with('success', 'Produk Desa Berhasil Dihapus');
+        return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Dihapus');
     }
 }

@@ -38,69 +38,87 @@ const showingNavigationDropdown = ref(false);
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.users')"
-                                    :active="route().current('dashboard.users')"
+                                    :href="route('dashboard.users.index')"
+                                    :active="
+                                        route().current('dashboard.users.index')
+                                    "
                                 >
                                     User Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.roles')"
-                                    :active="route().current('dashboard.roles')"
+                                    :href="route('dashboard.roles.index')"
+                                    :active="
+                                        route().current('dashboard.roles.index')
+                                    "
                                 >
                                     Role Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.profiles')"
+                                    :href="route('dashboard.profiles.index')"
                                     :active="
-                                        route().current('dashboard.profiles')
+                                        route().current(
+                                            'dashboard.profiles.index'
+                                        )
                                     "
                                 >
                                     Profile Desa Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.news')"
-                                    :active="route().current('dashboard.news')"
+                                    :href="route('dashboard.news.index')"
+                                    :active="
+                                        route().current('dashboard.news.index')
+                                    "
                                 >
                                     News Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.galleries')"
+                                    :href="route('dashboard.galleries.index')"
                                     :active="
-                                        route().current('dashboard.galleries')
+                                        route().current(
+                                            'dashboard.galleries.index'
+                                        )
                                     "
                                 >
                                     Gallery Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.events')"
+                                    :href="route('dashboard.events.index')"
                                     :active="
-                                        route().current('dashboard.events')
+                                        route().current(
+                                            'dashboard.events.index'
+                                        )
                                     "
                                 >
                                     Event Management
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.produk-hukum')"
+                                    :href="
+                                        route('dashboard.produk-hukum.index')
+                                    "
                                     :active="
                                         route().current(
-                                            'dashboard.produk-hukum'
+                                            'dashboard.produk-hukum.index'
                                         )
                                     "
                                 >
                                     Produk Hukum
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.dana-desa')"
+                                    :href="route('dashboard.dana-desa.index')"
                                     :active="
-                                        route().current('dashboard.dana-desa')
+                                        route().current(
+                                            'dashboard.dana-desa.index'
+                                        )
                                     "
                                 >
                                     Dana Desa
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.produk-desa')"
+                                    :href="route('dashboard.produk-desa.index')"
                                     :active="
-                                        route().current('dashboard.produk-desa')
+                                        route().current(
+                                            'dashboard.produk-desa.index'
+                                        )
                                     "
                                 >
                                     Produk Desa
@@ -114,25 +132,35 @@ const showingNavigationDropdown = ref(false);
                                     Comment Moderation
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.demografi')"
+                                    :href="route('dashboard.demografi.index')"
                                     :active="
-                                        route().current('dashboard.demografi')
+                                        route().current(
+                                            'dashboard.demografi.index'
+                                        )
                                     "
                                 >
                                     Demografi
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.produk-hukum-comments')"
+                                    :href="
+                                        route(
+                                            'dashboard.produk-hukum.index-comments'
+                                        )
+                                    "
                                     :active="
-                                        route().current('dashboard.produk-hukum-comments')
+                                        route().current(
+                                            'dashboard.produk-hukum.index-comments'
+                                        )
                                     "
                                 >
                                     Comment Produk Hukum
                                 </NavLink>
                                 <NavLink
-                                    :href="route('dashboard.feedbacks')"
+                                    :href="route('dashboard.feedbacks.index')"
                                     :active="
-                                        route().current('dashboard.feedbacks')
+                                        route().current(
+                                            'dashboard.feedbacks.index'
+                                        )
                                     "
                                 >
                                     Feedback
