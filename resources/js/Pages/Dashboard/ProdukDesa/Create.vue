@@ -173,6 +173,9 @@ const submit = () => {
                                         :required="true"
                                         :altText="false"
                                     />
+                                    <label for="images" class="text-red-500"
+                                        >Max 3 images</label
+                                    >
                                 </div>
 
                                 <!-- Social Media Section - Full Width -->
@@ -297,7 +300,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Produk Desa
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-desa')">
+                                <Link
+                                    :href="route('dashboard.produk-desa.index')"
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

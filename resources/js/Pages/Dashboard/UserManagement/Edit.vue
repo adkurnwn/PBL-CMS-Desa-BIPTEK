@@ -349,7 +349,7 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update User
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.users')">
+                                <Link :href="route('dashboard.users.index')">
                                     <DangerButton>Cancel</DangerButton>
                                 </Link>
                             </div>

@@ -136,7 +136,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Edit Gallery
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.galleries')">
+                                <Link
+                                    :href="route('dashboard.galleries.index')"
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

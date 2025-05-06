@@ -12,7 +12,9 @@ const form = useForm({});
 
 const approveComment = (commentId) => {
     if (confirm("Are you sure you want to approve this comment?")) {
-        form.patch(route("dashboard.produk-hukum-comments.approve", commentId), {
+        form.patch(
+            route("dashboard.produk-hukum.index-comments.approve", commentId),
+            {
             preserveScroll: true,
         });
     }
@@ -20,9 +22,12 @@ const approveComment = (commentId) => {
 
 const deleteComment = (commentId) => {
     if (confirm("Are you sure you want to delete this comment?")) {
-        form.delete(route("dashboard.produk-hukum-comments.destroy", commentId), {
+        form.delete(
+            route("dashboard.produk-hukum.index-comments.destroy", commentId),
+            {
             preserveScroll: true,
-        });
+            }
+        );
     }
 };
 

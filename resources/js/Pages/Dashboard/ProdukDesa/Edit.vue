@@ -311,7 +311,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Produk Desa
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-desa')">
+                                <Link
+                                    :href="route('dashboard.produk-desa.index')"
+                                >
                                     <PrimaryButton type="button">
                                         Cancel
                                     </PrimaryButton>
