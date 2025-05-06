@@ -28,12 +28,15 @@ class UpdateNewsRequest extends FormRequest
             'content' => 'required|string',
             'images' => 'sometimes|array',
             'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:10000',
-            'alts.*' => 'required_with:images.*|string|max:255',
+            'alts.*' => 'nullable|string|max:255',
             'removed_images' => 'sometimes|array',
             'removed_images.*' => 'exists:images,id',
             'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
             'is_moderate' => 'required|boolean',
             'is_draft' => 'required|boolean',
+            'updated_existing_images' => 'sometimes|array',
+            'updated_existing_images.*.id' => 'required|exists:images,id',
+            'updated_existing_images.*.alt' => 'nullable|string|max:255',
         ];
 
         // Add validation for category selection

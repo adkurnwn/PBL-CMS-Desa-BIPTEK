@@ -38,19 +38,36 @@ const form = useForm({
     images: [],
     alts: [],
     removed_images: [],
+    updated_existing_images: [],
+    bulk_alt_text: "",
     video: null,
     is_moderate: Boolean(props.news.is_moderate),
     is_draft: Boolean(props.news.is_draft),
     _method: "PUT",
 });
 
-const URL = window.URL;
-
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
 };
 
 const submit = () => {
+    if (form.updated_existing_images && form.updated_existing_images.length) {
+        form.updated_existing_images = form.updated_existing_images.map(
+            (img) => {
+                if (!img.alt || img.alt.trim() === "") {
+                    return { ...img, alt: form.title };
+                }
+                return img;
+            }
+        );
+    }
+
+    // Also handle empty alts for new images
+    if (form.alts && form.alts.length) {
+        form.alts = form.alts.map((alt) =>
+            alt.trim() === "" ? form.title : alt
+        );
+    }
     form.post(route("dashboard.news.update", props.news.id), {
         preserveScroll: true,
         forceFormData: true,
@@ -119,7 +136,11 @@ const submit = () => {
                                     v-model:alts="form.alts"
                                     :existingImages="news.images"
                                     v-model:removedImages="form.removed_images"
+                                    v-model:existingImages="
+                                        form.updated_existing_images
+                                    "
                                     label="Images"
+                                    :defaultAltText="form.title"
                                     :error="form.errors"
                                     :alt-error="form.errors.alts"
                                     :required="true"

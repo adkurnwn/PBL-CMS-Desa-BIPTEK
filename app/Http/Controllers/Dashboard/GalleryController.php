@@ -91,6 +91,11 @@ class GalleryController extends Controller
             $this->mediaService->handleImageRemovals($gallery, $request->removed_images);
         }
 
+        // Handle updated alt texts for existing images
+        if ($request->updated_existing_images) {
+            $this->mediaService->handleImageAltTextUpdates($gallery, $request->updated_existing_images);
+        }
+
         // Handle new image uploads
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);

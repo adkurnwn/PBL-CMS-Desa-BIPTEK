@@ -28,9 +28,12 @@ class UpdateGalleryRequest extends FormRequest
             'description' => 'required',
             'images' => 'sometimes|array',
             'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:10000',
-            'alts.*' => 'required_with:images.*|string|max:255',
+            'alts.*' => 'nullable|string|max:255',
             'removed_images' => 'sometimes|array',
-            'removed_images.*' => 'exists:images,id'
+            'removed_images.*' => 'exists:images,id',
+            'updated_existing_images' => 'sometimes|array',
+            'updated_existing_images.*.id' => 'required|exists:images,id',
+            'updated_existing_images.*.alt' => 'nullable|string|max:255',
         ];
 
         if ($this->filled('category.new_category')) {
