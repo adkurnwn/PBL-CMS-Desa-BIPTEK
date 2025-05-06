@@ -29,7 +29,7 @@ const deleteNews = (newsId) => {
                     Archived News
                 </h2>
 
-                <Link :href="route('dashboard.news')">
+                <Link :href="route('dashboard.news.index')">
                     <PrimaryButton>List News</PrimaryButton>
                 </Link>
             </div>

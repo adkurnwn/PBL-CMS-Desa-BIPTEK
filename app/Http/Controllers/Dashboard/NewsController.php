@@ -61,7 +61,7 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
-        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Ditambahkan');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Ditambahkan');
     }
 
     public function edit(News $news)
@@ -86,7 +86,7 @@ class NewsController extends Controller
 
         $data = $request->all();
         $data['category_id'] = $category_id;
-        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);;
+        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
 
         // Update news record
         $news->update($data);
@@ -94,6 +94,11 @@ class NewsController extends Controller
         // Handle removed images
         if ($request->removed_images) {
             $this->mediaService->handleImageRemovals($news, $request->removed_images);
+        }
+
+        // Handle updated alt texts for existing images
+        if ($request->updated_existing_images) {
+            $this->mediaService->handleImageAltTextUpdates($news, $request->updated_existing_images);
         }
 
         // Handle new images
@@ -107,9 +112,8 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
-        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diperbarui');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');
     }
-
 
     public function archive()
     {
@@ -138,7 +142,7 @@ class NewsController extends Controller
             $news->delete();
 
             $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
-            return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diarsipkan');
+            return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diarsipkan');
         }
     }
 }

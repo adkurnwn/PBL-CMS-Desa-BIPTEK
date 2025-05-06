@@ -28,7 +28,7 @@ const deleteGallery = (galleryId) => {
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     Archived Gallery
                 </h2>
-                <Link :href="route('dashboard.galleries')">
+                <Link :href="route('dashboard.galleries.index')">
                     <PrimaryButton>List Gallery</PrimaryButton>
                 </Link>
             </div>

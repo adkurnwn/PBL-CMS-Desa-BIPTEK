@@ -71,14 +71,20 @@ class MediaService
         }
 
         $createdImages = [];
+        $defaultAltText = $model->title ?? $model->name ?? 'Image';
 
         foreach ($images as $index => $image) {
             $filePath = $this->upload($image, $path, $disk);
 
+            // Get alt text or use default
+            $altText = isset($alts[$index]) && !empty(trim($alts[$index]))
+                ? $alts[$index]
+                : $defaultAltText;
+
             // Create the image record using the appropriate relationship
             $imageData = [
                 'path' => $filePath,
-                'alt' => $alts[$index] ?? $model->title ?? $model->name ?? 'Image',
+                'alt' => $altText,
                 'is_visible' => true
             ];
 
@@ -196,5 +202,30 @@ class MediaService
         if ($model->video) {
             $this->delete($model->video);
         }
+    }
+
+    public function handleImageAltTextUpdates($model, $updatedImages)
+    {
+        $count = 0;
+        $defaultAltText = $model->title ?? $model->name ?? 'Image';
+
+        foreach ($updatedImages as $updatedImage) {
+            if (isset($updatedImage['id'])) {
+                // Find the image using the relationship on the model
+                $image = $model->images()->find($updatedImage['id']);
+
+                if ($image) {
+                    // Use the alt text if provided, otherwise use the default title
+                    $altText = (isset($updatedImage['alt']) && !empty(trim($updatedImage['alt'])))
+                        ? $updatedImage['alt']
+                        : $defaultAltText;
+
+                    $image->update(['alt' => $altText]);
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
     }
 }

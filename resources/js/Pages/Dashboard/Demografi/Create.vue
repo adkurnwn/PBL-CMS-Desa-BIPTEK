@@ -375,7 +375,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Demographic Data
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.demografi')">
+                                <Link
+                                    :href="route('dashboard.demografi.index')"
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

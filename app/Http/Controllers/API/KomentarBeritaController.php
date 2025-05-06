@@ -32,7 +32,7 @@ class KomentarBeritaController extends Controller
             ->where('is_draft', false)
             ->firstOrFail();
 
-        $replies = KomentarBerita::where('id_berita', $slug)
+        $replies = KomentarBerita::where('id_berita', $news->id)
             ->where(function ($query) use ($commentId) {
                 $query->where('id_ref_komentar', $commentId)
                     ->orWhereHas('parent', function ($q) use ($commentId) {

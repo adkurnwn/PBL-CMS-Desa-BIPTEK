@@ -129,7 +129,7 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Event
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.events')">
+                                <Link :href="route('dashboard.events.index')">
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

@@ -18,12 +18,19 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
-            $table->string('name');
+            $table->string('product_name');
             $table->string('slug')->unique();
-            $table->unsignedSmallInteger('stock');
             $table->decimal('price', 10, 2);
+            $table->string('nama_penjual');
+            $table->string('alamat_penjual')->nullable();
             $table->string('kontak_penjual', 20);
+            $table->string('instagram')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('x')->nullable();
+            $table->string('tiktok')->nullable();
+            $table->string('youtube')->nullable();
             $table->text('description');
+            $table->boolean('status')->default(true)->comment('0 = inactive, 1 = active');
             $table->timestamps();
         });
     }

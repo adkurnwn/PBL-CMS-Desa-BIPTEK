@@ -5,6 +5,7 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
+import ImageUploader from "@/Components/ImageUploader.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 
@@ -27,23 +28,13 @@ const form = useForm({
     images: [],
     alts: [],
     video: null,
-    is_moderate: false,
+    is_moderate: true,
     is_draft: false,
 });
 
 const URL = window.URL;
 
 const imagePreview = ref(null);
-
-const handleImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    form.images = files;
-    form.alts = files.map(() => "");
-};
-
-const updateAltText = (index, value) => {
-    form.alts[index] = value;
-};
 
 const handleVideoChange = (e) => {
     form.video = e.target.files[0];
@@ -113,73 +104,15 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <InputLabel for="images" value="Images" />
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        @input="handleImagesChange"
-                                        multiple
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                    />
-
-                                    <!-- Image previews with alt inputs -->
-                                    <div
-                                        v-if="form.images.length > 0"
-                                        class="mt-4 space-y-4"
-                                    >
-                                        <div
-                                            v-for="(
-                                                image, index
-                                            ) in form.images"
-                                            :key="index"
-                                            class="flex gap-4 items-start"
-                                        >
-                                            <div class="w-32">
-                                                <img
-                                                    :src="
-                                                        URL.createObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                    class="w-full h-32 object-cover rounded"
-                                                    @load="
-                                                        URL.revokeObjectURL(
-                                                            image
-                                                        )
-                                                    "
-                                                />
-                                            </div>
-                                            <div class="flex-1">
-                                                <InputLabel
-                                                    :for="'alt-' + index"
-                                                    :value="`Alt Text for Image ${
-                                                        index + 1
-                                                    }`"
-                                                />
-                                                <TextInput
-                                                    :id="'alt-' + index"
-                                                    v-model="form.alts[index]"
-                                                    type="text"
-                                                    class="mt-1 block w-full"
-                                                    :placeholder="`Describe image ${
-                                                        index + 1
-                                                    }`"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.images"
-                                        class="mt-2"
-                                    />
-                                    <InputError
-                                        :message="form.errors.alts"
-                                        class="mt-2"
-                                    />
-                                </div>
+                                <!-- Use the new ImageInput component -->
+                                <ImageUploader
+                                    v-model="form.images"
+                                    v-model:alts="form.alts"
+                                    label="Images"
+                                    :error="form.errors"
+                                    :alt-error="form.errors.alts"
+                                    :required="true"
+                                />
 
                                 <div>
                                     <InputLabel for="video" value="Video" />
@@ -239,7 +172,7 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create News
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.news')">
+                                <Link :href="route('dashboard.news.index')">
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >
