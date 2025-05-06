@@ -45,10 +45,11 @@ const handleFileChange = (e) => {
 
 const submit = () => {
     form.post(route("dashboard.produk-hukum.update", props.produkHukum.id), {
-        onSuccess: () => form.reset(),
-        preserveScroll: true,
-        forceFormData: true,
-    });
+            onSuccess: () => form.reset(),
+            preserveScroll: true,
+            forceFormData: true,
+        }
+    );
 };
 </script>
 
@@ -201,7 +202,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Produk Hukum
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-hukum')">
+                                <Link
+                                    :href="
+                                        route('dashboard.produk-hukum.index')
+                                    "
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

@@ -58,7 +58,7 @@ class GalleryController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'gallery', 'Menambahkan gallery ' . $gallery->title);
-        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Ditambahkan');
+        return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Ditambahkan');
     }
 
     public function edit(Gallery $gallery)
@@ -97,7 +97,7 @@ class GalleryController extends Controller
         }
 
         $this->logHelper->logActivity('edit', 'gallery', 'Memperbarui gallery ' . $gallery->title);
-        return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Diperbarui');
+        return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diperbarui');
     }
 
     public function archive(Gallery $gallery)
@@ -125,7 +125,7 @@ class GalleryController extends Controller
         } else {
             $gallery->delete();
             $this->logHelper->logActivity('archive', 'gallery', 'Mengarsipkan gallery ' . $gallery->title);
-            return redirect()->route('dashboard.galleries')->with('success', 'Gallery Berhasil Diarsipkan');
+            return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diarsipkan');
         }
     }
 }

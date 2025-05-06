@@ -61,7 +61,7 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
-        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Ditambahkan');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Ditambahkan');
     }
 
     public function edit(News $news)
@@ -107,7 +107,7 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
-        return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diperbarui');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');
     }
 
 
@@ -138,7 +138,7 @@ class NewsController extends Controller
             $news->delete();
 
             $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
-            return redirect()->route('dashboard.news')->with('success', 'Berita Berhasil Diarsipkan');
+            return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diarsipkan');
         }
     }
 }

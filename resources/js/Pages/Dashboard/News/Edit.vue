@@ -180,7 +180,7 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Edit News
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.news')">
+                                <Link :href="route('dashboard.news.index')">
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

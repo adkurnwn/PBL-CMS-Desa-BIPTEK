@@ -35,8 +35,8 @@ const form = useForm({
 
 const submit = () => {
     form.post(route("dashboard.produk-desa.update", props.produkDesa.id), {
-        preserveScroll: true,
-        forceFormData: true,
+            preserveScroll: true,
+            forceFormData: true,
     });
 };
 </script>
@@ -311,7 +311,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Produk Desa
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-desa')">
+                                <Link
+                                    :href="route('dashboard.produk-desa.index')"
+                                >
                                     <PrimaryButton type="button">
                                         Cancel
                                     </PrimaryButton>
