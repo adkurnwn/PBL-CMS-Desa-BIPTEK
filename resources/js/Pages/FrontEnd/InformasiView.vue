@@ -126,12 +126,13 @@ onMounted(() => {
                 >
                     <NewsCard
                         v-for="newsItem in informasi.news"
+                        :href="`/berita-test/${newsItem.slug}`"
                         :key="newsItem.id"
                         :news="newsItem"
                     />
                 </div>
                 <a
-                    href="/berita-test"
+                    href="/berita"
                     class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end"
                 >
                     Selengkapnya >>

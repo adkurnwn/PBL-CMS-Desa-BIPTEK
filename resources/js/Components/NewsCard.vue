@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     isHome: {
         type: Boolean,
@@ -15,24 +17,22 @@ defineProps({
             views: 0
         }),
     },
+    href: {
+        type: String,
+        required: true, // Ensure the href is passed
+    },
 });
 </script>
+
 <template>
-    <!-- <div class="news-card">
-    <img :src="image" alt="News Image" class="news-card__image" />
-    <div class="news-card__content">
-      <h2 class="news-card__title">{{ title }}</h2>
-      <p class="news-card__description">{{ description }}</p>
-    </div>
-  </div> -->
-    <div class="w-full p-2">
+    <Link :href="href" class="w-full p-2">
         <div
             class="flex flex-col bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-colors duration-300"
             :class="isHome ? 'sm:flex-row lg:flex-col' : 'sm:flex-col'"
         >
             <div class="flex max-w-full w-full h-full rounded-full">
                 <img
-                    :src="`/storage/${news.image.path}`"
+                   w :src="`/storage/${news.image.path}`"
                     :alt="news.image.alt"
                     class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl overflow-hidden"
                 />
@@ -57,7 +57,7 @@ defineProps({
                 </div>
                 <div class="-mt-2 lg:-mt-0">
                     <h2
-                        class="px-4 text-lg font-semibold text-type2 line-clamp-2"
+                        class="px-4 text-lg min-h-10 font-semibold text-type2 line-clamp-2"
                     >
                         {{ news.title }}
                     </h2>
@@ -108,38 +108,16 @@ defineProps({
                 </div>
             </div>
         </div>
-    </div>
+    </Link>
 </template>
 
 <style scoped>
-.news-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-}
-
-.news-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.news-card__image {
-    width: 100%;
-    height: auto;
-}
-
-.news-card__content {
-    padding: 16px;
-}
-
-.news-card__title {
-    font-size: 1.5em;
-    margin: 0 0 8px;
-}
-
-.news-card__description {
-    font-size: 1em;
-    color: #555;
+.title-two-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 3rem; /* Adjust this value based on your font size and line height */
 }
 </style>
