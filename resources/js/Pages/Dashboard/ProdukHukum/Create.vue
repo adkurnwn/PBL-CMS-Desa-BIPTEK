@@ -6,6 +6,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
+import { onMounted } from "vue";
 
 const props = defineProps({
     categories: {
@@ -13,6 +14,14 @@ const props = defineProps({
         required: true,
     },
 });
+
+const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+};
 
 const form = useForm({
     title: "",
@@ -25,8 +34,8 @@ const form = useForm({
     },
     file: null,
     link: "",
-    date: "",
-    is_moderate: false,
+    date: getTodayDate(),
+    is_moderate: true,
 });
 
 const handleFileChange = (e) => {
@@ -170,7 +179,11 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Produk Hukum
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-hukum')">
+                                <Link
+                                    :href="
+                                        route('dashboard.produk-hukum.index')
+                                    "
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

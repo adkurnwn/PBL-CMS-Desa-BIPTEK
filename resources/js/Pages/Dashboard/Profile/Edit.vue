@@ -477,7 +477,7 @@ onMounted(async () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Village Profile
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.profiles')">
+                                <Link :href="route('dashboard.profiles.index')">
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

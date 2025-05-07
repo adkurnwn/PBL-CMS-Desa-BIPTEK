@@ -8,6 +8,7 @@ import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import ImageEditor from "@/Components/ImageEditor.vue";
+import { ref } from "vue";
 
 const props = defineProps({
     gallery: {
@@ -25,6 +26,7 @@ const props = defineProps({
 });
 
 const URL = window.URL;
+const existingImages = ref(props.gallery.images);
 
 const form = useForm({
     title: props.gallery.title,
@@ -39,22 +41,54 @@ const form = useForm({
     images: [],
     alts: [],
     removed_images: [],
+    updated_existing_images: [],
+    bulk_alt_text: "",
     _method: "PUT",
 });
 
+// Handle updates to existing images (alt text changes)
+const updateExistingImages = (images) => {
+    form.updated_existing_images = images;
+};
+
+// Handle bulk alt text updates
+const updateBulkAltText = (text) => {
+    form.bulk_alt_text = text;
+};
+
 const submit = () => {
+    // Replace any empty alt texts with the title before submission
+    if (form.updated_existing_images && form.updated_existing_images.length) {
+        form.updated_existing_images = form.updated_existing_images.map(
+            (img) => {
+                if (!img.alt || img.alt.trim() === "") {
+                    return { ...img, alt: form.title };
+                }
+                return img;
+            }
+        );
+    }
+
+    // Also handle empty alts for new images
+    if (form.alts && form.alts.length) {
+        form.alts = form.alts.map((alt) =>
+            alt.trim() === "" ? form.title : alt
+        );
+    }
+
     form.post(route("dashboard.galleries.update", props.gallery.id), {
         preserveScroll: true,
+        forceFormData: true,
     });
 };
 </script>
 
 <template>
-    <Head title="Create Gallery" />
+    <Head title="Edit Gallery" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Create New Gallery
+                Edit Gallery
             </h2>
         </template>
 
@@ -109,13 +143,18 @@ const submit = () => {
                                 </div>
 
                                 <ImageEditor
+                                    label="Images"
                                     v-model="form.images"
                                     v-model:alts="form.alts"
                                     :existingImages="gallery.images"
                                     v-model:removedImages="form.removed_images"
-                                    label="Images"
-                                    :error="form.errors"
+                                    v-model:existingImages="
+                                        form.updated_existing_images
+                                    "
+                                    v-model:bulkAltText="form.bulk_alt_text"
+                                    :defaultAltText="form.title"
                                     :alt-error="form.errors.alts"
+                                    :error="form.errors"
                                     :required="true"
                                 />
                             </div>
@@ -124,7 +163,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Edit Gallery
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.galleries')">
+                                <Link
+                                    :href="route('dashboard.galleries.index')"
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

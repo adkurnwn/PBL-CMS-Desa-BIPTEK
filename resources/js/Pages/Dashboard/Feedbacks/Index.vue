@@ -19,12 +19,12 @@ const deleteFeedback = (id) => {
 };
 
 const formatDate = (date) => {
-    return new Date(date).toLocaleString('id-ID', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    return new Date(date).toLocaleString("id-ID", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
     });
 };
 </script>
@@ -45,39 +45,58 @@ const formatDate = (date) => {
                     <div class="p-6">
                         <!-- Feedbacks List -->
                         <div class="space-y-6">
-                            <div v-for="feedback in feedbacks.data" :key="feedback.id" 
-                                 class="bg-gray-50 p-6 rounded-lg shadow">
+                            <div
+                                v-for="feedback in feedbacks.data"
+                                :key="feedback.id"
+                                class="bg-gray-50 p-6 rounded-lg shadow"
+                            >
                                 <!-- Feedback Header -->
-                                <div class="flex justify-between items-start mb-4">
+                                <div
+                                    class="flex justify-between items-start mb-4"
+                                >
                                     <div>
                                         <h3 class="font-semibold text-lg">
                                             {{ feedback.judul }}
                                         </h3>
-                                        <div class="flex space-x-4 text-sm text-gray-500">
+                                        <div
+                                            class="flex space-x-4 text-sm text-gray-500"
+                                        >
                                             <p>By: {{ feedback.nama_user }}</p>
-                                            <p>{{ formatDate(feedback.created_at) }}</p>
+                                            <p>
+                                                {{
+                                                    formatDate(
+                                                        feedback.created_at
+                                                    )
+                                                }}
+                                            </p>
                                         </div>
                                         <div class="mt-1">
-                                            <span 
+                                            <span
                                                 class="px-2 py-1 text-xs rounded-full"
-                                                :class="feedback.status === 'Ditanggapi' ? 
-                                                    'bg-green-100 text-green-800' : 
-                                                    'bg-yellow-100 text-yellow-800'"
+                                                :class="
+                                                    feedback.status ===
+                                                    'Ditanggapi'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-yellow-100 text-yellow-800'
+                                                "
                                             >
                                                 {{ feedback.status }}
                                             </span>
-                                            <span 
+                                            <span
                                                 class="ml-2 px-2 py-1 text-xs rounded-full"
-                                                :class="feedback.kategori === 'Saran' ? 
-                                                    'bg-blue-100 text-blue-800' : 
-                                                    'bg-red-100 text-red-800'"
+                                                :class="
+                                                    feedback.kategori ===
+                                                    'Saran'
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-red-100 text-red-800'
+                                                "
                                             >
                                                 {{ feedback.kategori }}
                                             </span>
                                         </div>
                                     </div>
                                     <div class="space-x-2">
-                                        <Link 
+                                        <Link
                                             :href="route('dashboard.feedbacks.show', feedback.id)"
                                             class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-gray-700"
                                         >
@@ -88,13 +107,17 @@ const formatDate = (date) => {
 
                                 <!-- Feedback Content -->
                                 <div class="prose max-w-none">
-                                    <p class="text-gray-700">{{ feedback.isi }}</p>
+                                    <p class="text-gray-700">
+                                        {{ feedback.isi }}
+                                    </p>
                                 </div>
                             </div>
 
                             <!-- Empty State -->
-                            <div v-if="feedbacks.data.length === 0" 
-                                 class="text-center py-12 text-gray-500">
+                            <div
+                                v-if="feedbacks.data.length === 0"
+                                class="text-center py-12 text-gray-500"
+                            >
                                 No feedbacks available
                             </div>
                         </div>
@@ -102,15 +125,17 @@ const formatDate = (date) => {
                         <!-- Pagination -->
                         <div v-if="feedbacks.last_page > 1" class="mt-6">
                             <nav class="flex items-center justify-between">
-                                <div class="flex justify-between flex-1 sm:hidden">
-                                    <Link 
+                                <div
+                                    class="flex justify-between flex-1 sm:hidden"
+                                >
+                                    <Link
                                         v-if="feedbacks.prev_page_url"
                                         :href="feedbacks.prev_page_url"
                                         class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                                     >
                                         Previous
                                     </Link>
-                                    <Link 
+                                    <Link
                                         v-if="feedbacks.next_page_url"
                                         :href="feedbacks.next_page_url"
                                         class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"

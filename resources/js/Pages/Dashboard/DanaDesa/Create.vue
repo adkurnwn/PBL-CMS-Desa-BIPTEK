@@ -118,7 +118,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create Dana Desa
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.dana-desa')">
+                                <Link
+                                    :href="route('dashboard.dana-desa.index')"
+                                >
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >

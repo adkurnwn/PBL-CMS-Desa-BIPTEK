@@ -159,7 +159,6 @@ const removeImage = (index) => {
                             type="text"
                             class="mt-1 block w-full"
                             :placeholder="`Describe image ${index + 1}`"
-                            required
                         />
                     </template>
                     <InputError :message="imageErrors[index]" class="mt-2" />
