@@ -384,7 +384,9 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Demographic Data
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.demografi')">
+                                <Link
+                                    :href="route('dashboard.demografi.index')"
+                                >
                                     <PrimaryButton
                                         type="button"
                                         class="bg-gray-500 hover:bg-gray-600"

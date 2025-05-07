@@ -9,10 +9,17 @@ class ProdukDesa extends Model
     protected $table = 'produk_desa';
     protected $fillable = [
         'user_id',
-        'name',
+        'product_name',
         'slug',
-        'stock',
         'price',
+        'instagram',
+        'facebook',
+        'x',
+        'tiktok',
+        'youtube',
+        'status',
+        'alamat_penjual',
+        'nama_penjual',
         'kontak_penjual',
         'description',
     ];

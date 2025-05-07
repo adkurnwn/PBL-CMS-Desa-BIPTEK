@@ -26,6 +26,7 @@ class HomePageController extends Controller
             'hero_image' => json_decode($profile->hero_images)[0],
             'news' => $news->map(function ($item) {
                 return [
+                    'slug' => $item->slug,
                     'title' => $item->title,
                     'content' => $item->content,
                     'created_at' => Carbon::parse($item->created_at)->format('j F Y'),
@@ -58,7 +59,7 @@ class HomePageController extends Controller
             ],
             'produkDesa' => $produkDesa->map(function ($item) {
                 return [
-                    'name' => $item->name,
+                    'name' => $item->product_name,
                     'price' => 'Rp ' . number_format($item->price, 0, ',', '.'),
                     'image' => [
                         'path' => $item->images->first()->path ?? null,

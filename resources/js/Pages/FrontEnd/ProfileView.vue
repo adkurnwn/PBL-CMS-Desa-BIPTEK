@@ -392,7 +392,7 @@ const parseJson = (value) => {
             </div>
             <!-- Data Demografi -->
             <div
-                class="flex flex-col items-center w-full font-merriweather bg-type1"
+                class="flex flex-col items-center w-full font-merriweather bg-type1 mb-12"
             >
                 <h1
                     class="font-bold text-accent1 text-4xl max-w-30 -ml-96 mr-96 pr-28 m-20 mt-20"

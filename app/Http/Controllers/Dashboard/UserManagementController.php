@@ -50,18 +50,6 @@ class UserManagementController extends Controller
             $position_id = $position->id;
         }
 
-        if ($position->name === 'Kepala Desa') {
-            $existingKepalaDesa = User::whereHas('roles', function ($query) {
-                $query->where('name', 'Kepala Desa');
-            })->where('status', true)->first();
-
-            if ($existingKepalaDesa) {
-                return back()->withErrors([
-                    'position_id' => 'There is already an active Kepala Desa'
-                ]);
-            }
-        }
-
         // Create user
         $userData = $request->all();
         $userData['status'] = true;
@@ -85,7 +73,7 @@ class UserManagementController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'user', 'Menambahkan pengguna ' . $user->name);
-        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Ditambahkan');
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil Ditambahkan');
     }
 
     public function edit(User $user)
@@ -107,18 +95,6 @@ class UserManagementController extends Controller
         } else {
             $position = Position::findOrFail($request->position_id);
             $position_id = $position->id;
-        }
-
-        if ($position->name === 'Kepala Desa' && $request->status) {
-            $existingKepalaDesa = User::whereHas('roles', function ($query) use ($user) {
-                $query->where('name', 'Kepala Desa');
-            })->where('status', true)->where('id', '!=', $user->id)->first();
-
-            if ($existingKepalaDesa) {
-                return back()->withErrors([
-                    'position_id' => 'There is already an active Kepala Desa'
-                ]);
-            }
         }
 
         // Get all fields except password and photo_profile
@@ -148,7 +124,7 @@ class UserManagementController extends Controller
         }
 
         $this->logHelper->logActivity('update', 'user', 'Memperbarui pengguna ' . $user->name);
-        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Diperbarui');
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil Diperbarui');
     }
 
     public function destroy(User $user)
@@ -164,6 +140,6 @@ class UserManagementController extends Controller
         }
 
         $this->logHelper->logActivity('delete', 'user', 'Menonaktifkan pengguna ' . $user->name);
-        return redirect()->route('dashboard.users')->with('success', 'Pengguna Berhasil Dinonaktifkan');
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil Dinonaktifkan');
     }
 }

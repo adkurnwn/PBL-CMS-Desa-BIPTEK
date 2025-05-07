@@ -12,26 +12,25 @@ class PermissionSeeder extends Seeder
     {
         // Create permissions for each feature
         $features = [
-            'users' => ['create', 'read', 'update', 'delete'],
-            'positions' => ['create', 'read', 'update', 'delete'],
-            'roles' => ['manage'],
-            'dashboard' => ['view'],
-            'profiles' => ['read', 'update'],
-            'news' => ['create', 'read', 'update', 'archive', 'restore', 'delete'],
-            'galleries' => ['create', 'read', 'update', 'archive', 'restore', 'delete'],
-            'events' => ['create', 'read', 'update', 'delete'],
-            'produk-hukum' => ['create', 'read', 'update', 'delete'],
-            'dana-desa' => ['create', 'read', 'update', 'delete'],
-            'produk-desa' => ['create', 'read', 'update', 'delete'],
-            'comments' => ['read', 'update', 'delete'],
-            'demografi' => ['create', 'read', 'update'],
-            'feedbacks' => ['create', 'read', 'update'],
+            'users',
+            'positions',
+            'roles',
+            'dashboard',
+            'profiles',
+            'news',
+            'galleries',
+            'events',
+            'produk-hukum',
+            'dana-desa',
+            'produk-desa',
+            'comments',
+            'demografi',
+            'feedbacks',
+            'activity-logs'
         ];
 
-        foreach ($features as $feature => $actions) {
-            foreach ($actions as $action) {
-                Permission::create(['name' => $action . '_' . $feature]);
-            }
+        foreach ($features as $feature) {
+            Permission::create(['name' => 'manage' . '_' . $feature]);
         }
 
         // Get roles

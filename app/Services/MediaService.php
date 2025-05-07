@@ -4,25 +4,33 @@ namespace App\Services;
 
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class MediaService
 {
     public function upload($file, $path, $disk = 'public')
     {
-        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = uniqid() . '.webp';
         $fullPath = $path . '/' . $filename;
 
         if (str_starts_with($file->getMimeType(), 'image/')) {
+            // Convert and encode image to WebP
             $image = Image::make($file)
                 ->resize(1600, null, function ($constraint) {
                     $constraint->aspectRatio();
                     $constraint->upsize();
                 })
-                ->encode($file->getClientOriginalExtension(), 75);
+                ->encode('webp', 80);
 
-            Storage::disk($disk)->put($fullPath, $image);
+            // Save the WebP file to storage
+            Storage::disk($disk)->put($fullPath, (string) $image);
+
+            // Optimize the image file (optional, works with WebP too)
+            $absolutePath = Storage::disk($disk)->path($fullPath);
+            $optimizerChain = OptimizerChainFactory::create();
+            $optimizerChain->optimize($absolutePath);
         } else {
-            $file->storeAs($path, $filename, $disk);
+            $file->storeAs($path, $file->getClientOriginalName(), $disk);
         }
 
         return $fullPath;
@@ -63,14 +71,20 @@ class MediaService
         }
 
         $createdImages = [];
+        $defaultAltText = $model->title ?? $model->name ?? 'Image';
 
         foreach ($images as $index => $image) {
             $filePath = $this->upload($image, $path, $disk);
 
+            // Get alt text or use default
+            $altText = isset($alts[$index]) && !empty(trim($alts[$index]))
+                ? $alts[$index]
+                : $defaultAltText;
+
             // Create the image record using the appropriate relationship
             $imageData = [
                 'path' => $filePath,
-                'alt' => $alts[$index] ?? $model->title ?? $model->name ?? 'Image',
+                'alt' => $altText,
                 'is_visible' => true
             ];
 
@@ -188,5 +202,30 @@ class MediaService
         if ($model->video) {
             $this->delete($model->video);
         }
+    }
+
+    public function handleImageAltTextUpdates($model, $updatedImages)
+    {
+        $count = 0;
+        $defaultAltText = $model->title ?? $model->name ?? 'Image';
+
+        foreach ($updatedImages as $updatedImage) {
+            if (isset($updatedImage['id'])) {
+                // Find the image using the relationship on the model
+                $image = $model->images()->find($updatedImage['id']);
+
+                if ($image) {
+                    // Use the alt text if provided, otherwise use the default title
+                    $altText = (isset($updatedImage['alt']) && !empty(trim($updatedImage['alt'])))
+                        ? $updatedImage['alt']
+                        : $defaultAltText;
+
+                    $image->update(['alt' => $altText]);
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
     }
 }
