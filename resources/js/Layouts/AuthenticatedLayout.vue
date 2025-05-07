@@ -8,6 +8,8 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
+const showContentManagementDropdown = ref(false);
+const showAdminDropdown = ref(false);
 </script>
 
 <template>
@@ -37,134 +39,245 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.users.index')"
-                                    :active="
-                                        route().current('dashboard.users.index')
-                                    "
-                                >
-                                    User Management
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.roles.index')"
-                                    :active="
-                                        route().current('dashboard.roles.index')
-                                    "
-                                >
-                                    Role Management
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.profiles.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.profiles.index'
-                                        )
-                                    "
-                                >
-                                    Profile Desa Management
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.news.index')"
-                                    :active="
-                                        route().current('dashboard.news.index')
-                                    "
-                                >
-                                    News Management
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.galleries.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.galleries.index'
-                                        )
-                                    "
-                                >
-                                    Gallery Management
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.events.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.events.index'
-                                        )
-                                    "
-                                >
-                                    Event Management
-                                </NavLink>
-                                <NavLink
-                                    :href="
-                                        route('dashboard.produk-hukum.index')
-                                    "
-                                    :active="
-                                        route().current(
-                                            'dashboard.produk-hukum.index'
-                                        )
-                                    "
-                                >
-                                    Produk Hukum
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.dana-desa.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.dana-desa.index'
-                                        )
-                                    "
-                                >
-                                    Dana Desa
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.produk-desa.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.produk-desa.index'
-                                        )
-                                    "
-                                >
-                                    Produk Desa
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.comments')"
-                                    :active="
-                                        route().current('dashboard.comments')
-                                    "
-                                >
-                                    Comment Moderation
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.demografi.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.demografi.index'
-                                        )
-                                    "
-                                >
-                                    Demografi
-                                </NavLink>
-                                <NavLink
-                                    :href="
-                                        route(
-                                            'dashboard.produk-hukum.index-comments'
-                                        )
-                                    "
-                                    :active="
-                                        route().current(
-                                            'dashboard.produk-hukum.index-comments'
-                                        )
-                                    "
-                                >
-                                    Comment Produk Hukum
-                                </NavLink>
-                                <NavLink
-                                    :href="route('dashboard.feedbacks.index')"
-                                    :active="
-                                        route().current(
-                                            'dashboard.feedbacks.index'
-                                        )
-                                    "
-                                >
-                                    Feedback
-                                </NavLink>
+
+                                <!-- Content Management Dropdown -->
+                                <div class="relative">
+                                    <button
+                                        @click="
+                                            showContentManagementDropdown =
+                                                !showContentManagementDropdown
+                                        "
+                                        class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out mt-4"
+                                        :class="[
+                                            route().current(
+                                                'dashboard.news.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.galleries.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.events.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.produk-hukum.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.dana-desa.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.produk-desa.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.comments'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.demografi.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.produk-hukum.index-comments'
+                                            )
+                                                ? 'border-indigo-400 text-gray-900'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                                        ]"
+                                    >
+                                        Content Management
+                                        <svg
+                                            class="ml-2 -mr-0.5 h-4 w-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    <div
+                                        v-show="showContentManagementDropdown"
+                                        class="absolute z-50 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5"
+                                        @click.outside="
+                                            showContentManagementDropdown = false
+                                        "
+                                    >
+                                        <Link
+                                            :href="
+                                                route('dashboard.news.index')
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            News Management
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.galleries.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Gallery Management
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route('dashboard.events.index')
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Event Management
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.produk-hukum.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Produk Hukum
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.dana-desa.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Dana Desa
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.produk-desa.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Produk Desa
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.demografi.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Demografi
+                                        </Link>
+                                    </div>
+                                </div>
+
+                                <!-- Admin Dropdown -->
+                                <div class="relative">
+                                    <button
+                                        @click="
+                                            showAdminDropdown =
+                                                !showAdminDropdown
+                                        "
+                                        class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out mt-4"
+                                        :class="[
+                                            route().current(
+                                                'dashboard.users.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.roles.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.profiles.*'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.comments'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.produk-hukum.index-comments'
+                                            ) ||
+                                            route().current(
+                                                'dashboard.feedbacks.*'
+                                            )
+                                                ? 'border-indigo-400 text-gray-900'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                                        ]"
+                                    >
+                                        Administration
+                                        <svg
+                                            class="ml-2 -mr-0.5 h-4 w-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    <div
+                                        v-show="showAdminDropdown"
+                                        class="absolute z-50 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5"
+                                        @click.outside="
+                                            showAdminDropdown = false
+                                        "
+                                    >
+                                        <Link
+                                            :href="
+                                                route('dashboard.users.index')
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            User Management
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route('dashboard.roles.index')
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Role Management
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.profiles.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Profile Desa Management
+                                        </Link>
+                                        <Link
+                                            :href="route('dashboard.comments')"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Comment Moderation
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.produk-hukum.index-comments'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Comment Produk Hukum
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.feedbacks.index'
+                                                )
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Feedback
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -343,3 +456,15 @@ const showingNavigationDropdown = ref(false);
         </div>
     </div>
 </template>
+
+<style scoped>
+.dropdown-enter-active,
+.dropdown-leave-active {
+    transition: all 0.3s ease;
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+</style>

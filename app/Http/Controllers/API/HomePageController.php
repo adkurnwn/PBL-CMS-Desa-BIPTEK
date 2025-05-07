@@ -58,7 +58,7 @@ class HomePageController extends Controller
             ],
             'produkDesa' => $produkDesa->map(function ($item) {
                 return [
-                    'name' => $item->name,
+                    'name' => $item->product_name,
                     'price' => 'Rp ' . number_format($item->price, 0, ',', '.'),
                     'image' => [
                         'path' => $item->images->first()->path ?? null,
