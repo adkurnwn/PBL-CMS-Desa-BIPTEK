@@ -120,7 +120,8 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+// Add 'image-added' to emits
+const emit = defineEmits(['update:modelValue', 'image-added'])
 
 const editor = ref(null)
 const imageInput = ref(null)
@@ -129,9 +130,11 @@ const focusEditor = () => {
   editor.value?.commands.focus()
 }
 
+// Modify the insertImage function
 const insertImage = (event) => {
   const file = event.target.files[0]
   if (file) {
+    emit('image-added', file) // Add this emit
     const reader = new FileReader()
     reader.onload = (e) => {
       if (editor.value) {

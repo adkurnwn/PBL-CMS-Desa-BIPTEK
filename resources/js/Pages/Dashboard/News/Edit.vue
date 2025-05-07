@@ -51,6 +51,15 @@ const handleVideoChange = (e) => {
     form.video = e.target.files[0];
 };
 
+const handleRichTextImage = (file) => {
+    // Add file to images array
+    form.images.push(file);
+
+    // Add a default alt text using the file name without extension
+    const altText = file.name.replace(/\.[^/.]+$/, "");
+    form.alts.push(altText);
+};
+
 const submit = () => {
     if (form.updated_existing_images && form.updated_existing_images.length) {
         form.updated_existing_images = form.updated_existing_images.map(
@@ -123,6 +132,7 @@ const submit = () => {
                                     <Tiptap 
                                         v-model="form.content"
                                         class="mt-1 block w-full"
+                                        @image-added="handleRichTextImage"
                                     />
                                     <InputError :message="form.errors.content" class="mt-2" />
                                 </div>
