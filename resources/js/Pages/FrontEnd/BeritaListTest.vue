@@ -45,10 +45,11 @@
           <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/></svg>
         </button>
       </div>
-      
-      <h1 class="text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24">
-        Berita Terkini
-      </h1>
+      <!--Berita Terkini-->
+      <article>
+        <h1 class="text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24">
+          Berita Terkini
+        </h1>
 
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center items-center py-12">
@@ -59,7 +60,7 @@
         <div v-else-if="error" class="text-center py-12">
           <p class="text-red-600">{{ error }}</p>
         </div>
-        
+          
         <!-- News Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-24 -mt-20">
           <Link
@@ -68,54 +69,55 @@
             :href="`/berita-test/${item.slug}`"
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
-            <!-- Image -->
+          <!-- Image -->
             <div v-if="item.images?.length > 0" class="h-48 overflow-hidden">
               <img
                 :src="`/storage/${item.images[0].path}`"
                 :alt="item.images[0].alt"
                 class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
               >
-            </div>
-
-            <div class="p-6">
-              <!-- Category Badge -->
-              <span v-if="item.category"
-                    class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4">
-                {{ item.category.name }}
-              </span>
-
-              <!-- Title -->
-              <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                {{ item.title }}
-              </h2>
-
-              <!-- Content Preview -->
-              <p class="text-gray-600 mb-4 line-clamp-3">
-                {{ item.content }}
-              </p>
-
-              <!-- Metadata -->
-              <div class="flex items-center justify-between text-sm text-gray-500">
-                <div class="flex items-center space-x-2">
-                  <span>{{ formatDate(item.created_at) }}</span>
-                  <span>•</span>
-                  <span>{{ item.user?.name || 'Admin' }}</span>
-                </div>
-                <span>{{ item.views }} views</span>
               </div>
+
+              <div class="p-6">
+                <!-- Category Badge -->
+                <span v-if="item.category"
+                      class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4">
+                  {{ item.category.name }}
+                </span>
+
+                <!-- Title -->
+                <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                  {{ item.title }}
+                </h2>
+
+                <!-- Content Preview -->
+                <p class="text-gray-600 mb-4 line-clamp-3">
+                  {{ item.content }}
+                </p>
+
+                <!-- Metadata -->
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                  <div class="flex items-center space-x-2">
+                    <span>{{ formatDate(item.created_at) }}</span>
+                    <span>•</span>
+                    <span>{{ item.user?.name || 'Admin' }}</span>
+                  </div>
+                  <span>{{ item.views }} views</span>
+                </div>
+              </div>
+            </Link>
+
+            <!-- Empty State -->
+            <div v-if="news.length === 0" class="col-span-full text-center py-12">
+              <p class="text-gray-500 text-lg">Belum ada berita yang tersedia.</p>
             </div>
-          </Link>
-
-          <!-- Empty State -->
-          <div v-if="news.length === 0" class="col-span-full text-center py-12">
-            <p class="text-gray-500 text-lg">Belum ada berita yang tersedia.</p>
           </div>
-        </div>
 
-        <!-- Pagination (if needed) -->
-        <div v-if="pagination && pagination.last_page > 1" class="mt-8 flex justify-center">
-          <!-- Add pagination controls here -->
-        </div>
+          <!-- Pagination (if needed) -->
+          <div v-if="pagination && pagination.last_page > 1" class="mt-8 flex justify-center">
+            <!-- Add pagination controls here -->
+          </div>
+      </article> 
     </main>
   </UserLayout>
 </template>
