@@ -131,7 +131,7 @@ onMounted(() => {
                     />
                 </div>
                 <a
-                    href="/berita-test"
+                    href="/berita"
                     class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end"
                 >
                     Selengkapnya >>
