@@ -46,8 +46,8 @@
         </button>
       </div>
       <!--Berita Terkini-->
-      <article>
-        <h1 class="text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24">
+      <article class="max-w-screen-2xl">
+        <h1 class="text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24 ">
           Berita Terkini
         </h1>
 
@@ -63,49 +63,19 @@
           
         <!-- News Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-24 -mt-20">
-          <Link
+          <NewsCard
             v-for="item in news"
             :key="item.id"
+            :news="{
+              image: item.images?.[0] || { path: 'default-image.jpg', alt: 'Default Image' },
+              author: { name: item.users_id?.name || 'ANONYM' },
+              title: item.title,
+              content: item.content,
+              created_at: formatDate(item.created_at),
+              views: item.views
+            }"
             :href="`/berita-test/${item.slug}`"
-            class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-          >
-          <!-- Image -->
-            <div v-if="item.images?.length > 0" class="h-48 overflow-hidden">
-              <img
-                :src="`/storage/${item.images[0].path}`"
-                :alt="item.images[0].alt"
-                class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-              >
-              </div>
-
-              <div class="p-6">
-                <!-- Category Badge -->
-                <span v-if="item.category"
-                      class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4">
-                  {{ item.category.name }}
-                </span>
-
-                <!-- Title -->
-                <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                  {{ item.title }}
-                </h2>
-
-                <!-- Content Preview -->
-                <p class="text-gray-600 mb-4 line-clamp-3">
-                  {{ item.content }}
-                </p>
-
-                <!-- Metadata -->
-                <div class="flex items-center justify-between text-sm text-gray-500">
-                  <div class="flex items-center space-x-2">
-                    <span>{{ formatDate(item.created_at) }}</span>
-                    <span>•</span>
-                    <span>{{ item.user?.name || 'Admin' }}</span>
-                  </div>
-                  <span>{{ item.views }} views</span>
-                </div>
-              </div>
-            </Link>
+          />
 
             <!-- Empty State -->
             <div v-if="news.length === 0" class="col-span-full text-center py-12">
@@ -127,6 +97,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { ref, onMounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
+import NewsCard from '@/Components/NewsCard.vue';
 
 const news = ref([]);
 const loading = ref(true);

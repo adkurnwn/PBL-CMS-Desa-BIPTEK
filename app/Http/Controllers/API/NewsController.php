@@ -16,6 +16,7 @@ class NewsController extends Controller
         $news = News::with(['images', 'category', 'user:id,name'])
             ->where('is_draft', false)
             ->orderBy('created_at', 'desc')
+            ->withCount('comments')
             ->paginate(12);
 
         return response()->json($news);
