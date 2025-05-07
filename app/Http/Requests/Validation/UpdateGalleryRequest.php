@@ -65,7 +65,7 @@ class UpdateGalleryRequest extends FormRequest
 
                 $totalImagesAfterUpdate = $existingImagesCount + $newImagesCount - $removedImagesCount;
 
-                if ($totalImagesAfterUpdate > 5) {
+                if ($totalImagesAfterUpdate > 25) {
                     $validator->errors()->add(
                         'images',
                         'The gallery cannot have more than 25 images. Please remove some existing images before adding new ones.'
