@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { setCookie, getCookie } from '@/Helpers/cookieHelper';
 
 const props = defineProps({
     slug: {
@@ -17,16 +18,18 @@ const comments = ref([]);
 const submitting = ref(false);
 const commentForm = ref({
     nama_user: "",
+    email: "",  // Add email field
     komentar: "",
     id_berita: props.slug,
     captcha: "",
 });
 const replyForm = ref({
-    nama_user: "",
-    komentar: "",
+    nama_user: getCookie('commenter_name') || '', // Initialize with cookie value
+    email: getCookie('commenter_email') || '', // Initialize with cookie value
+    komentar: '',
     id_berita: props.slug,
     id_ref_komentar: null,
-    captcha: "",
+    captcha: '',
 });
 const activeReplyId = ref(null);
 const mainCaptchaData = ref(null);
@@ -83,6 +86,25 @@ const refreshCaptcha = async (type = 'main') => {
     }
 };
 
+onMounted(() => {
+    // Load user data from cookies
+    const savedName = getCookie('commenter_name');
+    const savedEmail = getCookie('commenter_email');
+    
+    if (savedName) {
+        commentForm.value.nama_user = savedName;
+        replyForm.value.nama_user = savedName;
+    }
+    
+    if (savedEmail) {
+        commentForm.value.email = savedEmail;
+        replyForm.value.email = savedEmail;
+    }
+    
+    refreshCaptcha('main');
+    fetchComments();
+});
+
 const submitComment = async () => {
     try {
         submitting.value = true;
@@ -91,6 +113,14 @@ const submitComment = async () => {
             captcha: commentForm.value.captcha,
             code: mainCaptchaCode.value
         });
+
+        // Save both name and email to cookies
+        if (commentForm.value.nama_user) {
+            setCookie('commenter_name', commentForm.value.nama_user);
+        }
+        if (commentForm.value.email) {
+            setCookie('commenter_email', commentForm.value.email);
+        }
 
         if (!props.news.is_moderate) {
             await fetchComments();
@@ -110,25 +140,27 @@ const submitComment = async () => {
 };
 
 const showReplyForm = (commentId) => {
-    activeReplyId.value = commentId;
     replyForm.value = {
-        nama_user: "",
-        komentar: "",
+        nama_user: getCookie('commenter_name') || '', // Use cookie value when opening reply form
+        email: getCookie('commenter_email') || '', // Use cookie value when opening reply form
+        komentar: '',
         id_berita: props.slug,
         id_ref_komentar: commentId,
-        captcha: "",
+        captcha: '',
     };
+    activeReplyId.value = commentId;
     refreshCaptcha('reply');
 };
 
 const cancelReply = () => {
     activeReplyId.value = null;
     replyForm.value = {
-        nama_user: "",
-        komentar: "",
+        nama_user: getCookie('commenter_name') || '', // Initialize with cookie value
+        email: getCookie('commenter_email') || '', // Initialize with cookie value
+        komentar: '',
         id_berita: props.slug,
         id_ref_komentar: null,
-        captcha: "",
+        captcha: '',
     };
 };
 
@@ -140,6 +172,14 @@ const submitReply = async (commentId) => {
             captcha: replyForm.value.captcha,
             code: replyCaptchaCode.value
         });
+
+        // Save both name and email to cookies
+        if (replyForm.value.nama_user) {
+            setCookie('commenter_name', replyForm.value.nama_user);
+        }
+        if (replyForm.value.email) {
+            setCookie('commenter_email', replyForm.value.email);
+        }
 
         if (!props.news.is_moderate) {
             await fetchComments();
@@ -209,10 +249,6 @@ const getAllDeeperReplies = (reply) => {
     collectReplies(reply);
     return allReplies;
 };
-
-// Initialize the component
-refreshCaptcha('main');
-fetchComments();
 </script>
 
 <template>
@@ -241,6 +277,14 @@ fetchComments();
                     placeholder="Masukkan Nama..."
                     class="w-full p-2 border rounded"
                     required
+                />
+            </div>
+            <div class="mb-4">
+                <input
+                    type="email"
+                    v-model="commentForm.email"
+                    class="w-full p-2 border rounded"
+                    placeholder="Email"
                 />
             </div>
             <div class="mb-4">
@@ -328,6 +372,14 @@ fetchComments();
                                     placeholder="Masukkan Nama..."
                                     class="w-full p-2 border rounded"
                                     required
+                                />
+                            </div>
+                            <div v-if="activeReplyId" class="mb-3">
+                                <input
+                                    type="email"
+                                    v-model="replyForm.email"
+                                    class="w-full p-2 border rounded"
+                                    placeholder="Email"
                                 />
                             </div>
                             <div>
