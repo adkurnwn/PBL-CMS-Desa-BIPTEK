@@ -9,6 +9,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import ImageEditor from "@/Components/ImageEditor.vue";
+import Tiptap from "@/Components/RichText.vue";
 
 const props = defineProps({
     news: {
@@ -34,7 +35,7 @@ const form = useForm({
         new_category_name: "",
         deleting_category_id: [],
     },
-    content: props.news.content,
+    content: props.news.content || '<p>Start writing your content here...</p>',
     images: [],
     alts: [],
     removed_images: [],
@@ -116,19 +117,14 @@ const submit = () => {
                                     :errors="form.errors"
                                 />
 
-                                <div>
+                                <!-- Replace the textarea with Tiptap -->
+                                <div class="col-span-2">
                                     <InputLabel for="content" value="Content" />
-                                    <textarea
-                                        id="content"
+                                    <Tiptap 
                                         v-model="form.content"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
+                                        class="mt-1 block w-full"
                                     />
-                                    <InputError
-                                        :message="form.errors.content"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.content" class="mt-2" />
                                 </div>
 
                                 <ImageEditor

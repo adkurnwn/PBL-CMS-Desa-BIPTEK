@@ -8,6 +8,7 @@ import CategoryInput from "@/Components/CategoryInput.vue";
 import ImageUploader from "@/Components/ImageUploader.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import { ref } from "vue";
+import Tiptap from "@/Components/RichText.vue";
 
 const props = defineProps({
     categories: {
@@ -24,7 +25,7 @@ const form = useForm({
         edit_category_id: "",
         new_category_name: "",
     },
-    content: "",
+    content: '<p>Start writing your content here...</p>',
     images: [],
     alts: [],
     video: null,
@@ -50,6 +51,7 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Create News" />
     <AuthenticatedLayout>
         <template #header>
@@ -62,109 +64,56 @@ const submit = () => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <form
-                            @submit.prevent="submit"
-                            enctype="multipart/form-data"
-                        >
+                        <form @submit.prevent="submit" enctype="multipart/form-data">
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Name Field -->
                                 <div>
                                     <InputLabel for="title" value="Title" />
-                                    <TextInput
-                                        id="title"
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
+                                    <TextInput id="title" v-model="form.title" type="text" class="mt-1 block w-full"
+                                        required />
+                                    <InputError :message="form.errors.title" class="mt-2" />
                                 </div>
 
-                                <CategoryInput
-                                    v-model="form.category"
-                                    :categories="categories"
-                                    :errors="form.errors"
-                                />
+                                <CategoryInput v-model="form.category" :categories="categories" :errors="form.errors" />
 
-                                <div>
+                                <!-- Replace the textarea with Tiptap -->
+                                <div class="col-span-2">
                                     <InputLabel for="content" value="Content" />
-                                    <textarea
-                                        id="content"
+                                    <Tiptap 
                                         v-model="form.content"
-                                        type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.content"
-                                        class="mt-2"
+                                        class="mt-1 block w-full"
                                     />
+                                    <InputError :message="form.errors.content" class="mt-2" />
                                 </div>
 
                                 <!-- Use the new ImageInput component -->
-                                <ImageUploader
-                                    v-model="form.images"
-                                    v-model:alts="form.alts"
-                                    label="Images"
-                                    :error="form.errors"
-                                    :alt-error="form.errors.alts"
-                                    :required="true"
-                                />
+                                <ImageUploader v-model="form.images" v-model:alts="form.alts" label="Images"
+                                    :error="form.errors" :alt-error="form.errors.alts" :required="true" />
 
                                 <div>
                                     <InputLabel for="video" value="Video" />
-                                    <input
-                                        id="video"
-                                        type="file"
-                                        @input="handleVideoChange"
+                                    <input id="video" type="file" @input="handleVideoChange"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="video/mp4, video/ogg, video/webm"
-                                    />
-                                    <InputError
-                                        :message="form.errors.video"
-                                        class="mt-2"
-                                    />
+                                        accept="video/mp4, video/ogg, video/webm" />
+                                    <InputError :message="form.errors.video" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <div class="flex-row items-center">
-                                        <InputLabel
-                                            for="is_moderated"
-                                            value="Is Moderated"
-                                        />
-                                        <input
-                                            id="is_moderated"
-                                            v-model="form.is_moderate"
-                                            type="checkbox"
-                                            class="rounded border-gray-300 mt-2"
-                                        />
+                                        <InputLabel for="is_moderated" value="Is Moderated" />
+                                        <input id="is_moderated" v-model="form.is_moderate" type="checkbox"
+                                            class="rounded border-gray-300 mt-2" />
                                     </div>
-                                    <InputError
-                                        :message="form.errors.is_moderate"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.is_moderate" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <div class="flex-row items-center">
-                                        <InputLabel
-                                            for="is_draft"
-                                            value="Draft"
-                                        />
-                                        <input
-                                            id="is_draft"
-                                            v-model="form.is_draft"
-                                            type="checkbox"
-                                            class="rounded border-gray-300 mt-2"
-                                        />
+                                        <InputLabel for="is_draft" value="Draft" />
+                                        <input id="is_draft" v-model="form.is_draft" type="checkbox"
+                                            class="rounded border-gray-300 mt-2" />
                                     </div>
-                                    <InputError
-                                        :message="form.errors.is_draft"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.is_draft" class="mt-2" />
                                 </div>
                             </div>
 
@@ -173,9 +122,7 @@ const submit = () => {
                                     Create News
                                 </PrimaryButton>
                                 <Link :href="route('dashboard.news.index')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
+                                <PrimaryButton type="button">Cancel</PrimaryButton>
                                 </Link>
                             </div>
                         </form>

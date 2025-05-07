@@ -13,7 +13,7 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = News::with(['images', 'category'])
+        $news = News::with(['images', 'category', 'user:id,name'])
             ->where('is_draft', false)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -34,7 +34,7 @@ class NewsController extends Controller
      */
     public function show($slug)
     {
-        $news = News::with(['images', 'category'])
+        $news = News::with(['images', 'category', 'user:id,name'])
             ->where('slug', $slug)
             ->where('is_draft', false)
             ->first();
