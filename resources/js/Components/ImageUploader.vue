@@ -33,6 +33,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    defaultAltText: {
+        type: String,
+        default: "",
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "update:alts"]);
@@ -158,7 +162,9 @@ const removeImage = (index) => {
                             @input="(e) => updateAltText(index, e.target.value)"
                             type="text"
                             class="mt-1 block w-full"
-                            :placeholder="`Describe image ${index + 1}`"
+                            :placeholder="
+                                defaultAltText || 'Describe this image'
+                            "
                         />
                     </template>
                     <InputError :message="imageErrors[index]" class="mt-2" />
