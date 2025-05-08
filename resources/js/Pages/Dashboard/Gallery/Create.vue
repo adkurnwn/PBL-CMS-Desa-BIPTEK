@@ -102,6 +102,7 @@ const submit = () => {
                                     v-model:alts="form.alts"
                                     label="Images"
                                     :error="form.errors"
+                                    :defaultAltText="form.title"
                                     :alt-error="form.errors.alts"
                                     :required="true"
                                 />

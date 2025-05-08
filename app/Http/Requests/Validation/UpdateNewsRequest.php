@@ -61,18 +61,25 @@ class UpdateNewsRequest extends FormRequest
         $validator->after(function ($validator) {
             $newsId = $this->route('news')->id ?? null;
 
-            if ($newsId && $this->hasFile('images')) {
+            if ($newsId) {
                 $news = News::findOrFail($newsId);
                 $existingImagesCount = $news->images()->count();
-                $newImagesCount = count($this->file('images'));
+                $newImagesCount = $this->hasFile('images') ? count($this->file('images')) : 0;
                 $removedImagesCount = $this->input('removed_images') ? count($this->input('removed_images')) : 0;
 
                 $totalImagesAfterUpdate = $existingImagesCount + $newImagesCount - $removedImagesCount;
 
-                if ($totalImagesAfterUpdate > 5) {
+                if ($newImagesCount > 0 && $totalImagesAfterUpdate > 5) {
                     $validator->errors()->add(
                         'images',
                         'The news cannot have more than 5 images. Please remove some existing images before adding new ones.'
+                    );
+                }
+
+                if ($totalImagesAfterUpdate < 1) {
+                    $validator->errors()->add(
+                        'images',
+                        'The news must have at least 1 image.'
                     );
                 }
             }

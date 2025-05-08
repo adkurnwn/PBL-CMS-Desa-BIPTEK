@@ -111,6 +111,7 @@ const submit = () => {
                                     label="Images"
                                     :error="form.errors"
                                     :alt-error="form.errors.alts"
+                                    :defaultAltText="form.title"
                                     :required="true"
                                 />
 

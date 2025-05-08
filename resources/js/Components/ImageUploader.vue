@@ -2,7 +2,7 @@
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import { ref, watch, computed } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps({
     modelValue: {
@@ -32,6 +32,10 @@ const props = defineProps({
     altText: {
         type: Boolean,
         default: true,
+    },
+    defaultAltText: {
+        type: String,
+        default: "",
     },
 });
 
@@ -65,14 +69,6 @@ const generalImageError = computed(() => {
         ? props.error
         : props.error?.images || "";
 });
-
-watch(
-    () => props.alts,
-    (newAlts) => {
-        localAlts.value = [...newAlts];
-    },
-    { deep: true }
-);
 
 const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
@@ -158,7 +154,9 @@ const removeImage = (index) => {
                             @input="(e) => updateAltText(index, e.target.value)"
                             type="text"
                             class="mt-1 block w-full"
-                            :placeholder="`Describe image ${index + 1}`"
+                            :placeholder="
+                                defaultAltText || 'Describe this image'
+                            "
                         />
                     </template>
                     <InputError :message="imageErrors[index]" class="mt-2" />

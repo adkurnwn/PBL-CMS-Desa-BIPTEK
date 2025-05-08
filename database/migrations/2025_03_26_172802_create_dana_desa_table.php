@@ -20,7 +20,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('title');
             $table->string('file');
-            $table->string('link');
+            $table->string('link')->nullable();
             $table->date('date');
             $table->timestamps();
         });
