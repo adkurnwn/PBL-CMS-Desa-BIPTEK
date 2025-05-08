@@ -39,16 +39,8 @@ class UserManagementController extends Controller
 
     public function store(StoreUserManagementRequest $request)
     {
-        if ($request->filled('new_position')) {
-            $position = Position::create([
-                'name' => $request->new_position,
-                'job_description' => json_encode($request->job_descriptions)
-            ]);
-            $position_id = $position->id;
-        } else {
-            $position = Position::findOrFail($request->position_id);
-            $position_id = $position->id;
-        }
+        $position = Position::findOrFail($request->position_id);
+        $position_id = $position->id;
 
         // Create user
         $userData = $request->all();
@@ -86,16 +78,8 @@ class UserManagementController extends Controller
 
     public function update(UpdateUserManagementRequest $request, User $user)
     {
-        if ($request->filled('new_position')) {
-            $position = Position::create([
-                'name' => $request->new_position,
-                'job_description' => json_encode($request->job_descriptions)
-            ]);
-            $position_id = $position->id;
-        } else {
-            $position = Position::findOrFail($request->position_id);
-            $position_id = $position->id;
-        }
+        $position = Position::findOrFail($request->position_id);
+        $position_id = $position->id;
 
         // Get all fields except password and photo_profile
         $userData = $request->except(['password', 'photo_profile']);
