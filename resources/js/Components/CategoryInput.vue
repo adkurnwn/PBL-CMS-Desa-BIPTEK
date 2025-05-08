@@ -203,6 +203,7 @@ watch(
                     v-if="!isNewCategory"
                     id="category"
                     v-model="modelValue.category_id"
+                    required
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 >
                     <option value="">Select Category</option>
@@ -275,9 +276,23 @@ watch(
             </ul>
         </div>
 
-        <InputError :message="errors.category_id" class="mt-2" />
-        <InputError :message="errors.new_category" class="mt-2" />
-        <InputError :message="errors.edit_category_id" class="mt-2" />
-        <InputError :message="errors.new_category_name" class="mt-2" />
+        <!-- Replace the existing error section with this -->
+        <div class="mt-2">
+            <!-- Category ID error -->
+            <InputError :message="errors['category.category_id']" />
+
+            <!-- New category error -->
+            <InputError :message="errors['category.new_category']" />
+
+            <!-- Edit category errors -->
+            <InputError :message="errors['category.edit_category_id']" />
+            <InputError :message="errors['category.new_category_name']" />
+
+            <!-- Delete category errors -->
+            <InputError
+                v-if="errors['category.deleting_category_id']"
+                :message="errors['category.deleting_category_id']"
+            />
+        </div>
     </div>
 </template>

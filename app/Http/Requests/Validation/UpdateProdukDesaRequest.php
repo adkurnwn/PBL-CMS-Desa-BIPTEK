@@ -25,7 +25,7 @@ class UpdateProdukDesaRequest extends FormRequest
     {
         return [
             'product_name' => 'required|string|max:255',
-            'price' => 'required|decimal:2',
+            'price' => 'required|decimal:0',
             'instagram' => 'nullable|string|max:255',
             'facebook' => 'nullable|string|max:255',
             'x' => 'nullable|string|max:255',

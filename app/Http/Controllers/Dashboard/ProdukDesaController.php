@@ -42,7 +42,7 @@ class ProdukDesaController extends Controller
         $produkDesa = ProdukDesa::create($dataProduk);
 
         if ($request->hasFile('images')) {
-            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'));
+            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'), [], 'produk-desa-images');
         }
 
         $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->title);
@@ -69,7 +69,7 @@ class ProdukDesaController extends Controller
         }
 
         if ($request->hasFile('images')) {
-            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'));
+            $this->mediaService->handleImageUploads($produkDesa, $request->file('images'), [], 'produk-desa-images');
         }
 
         $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->title);

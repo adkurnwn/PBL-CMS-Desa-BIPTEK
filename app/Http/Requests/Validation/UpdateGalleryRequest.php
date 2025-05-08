@@ -57,18 +57,25 @@ class UpdateGalleryRequest extends FormRequest
         $validator->after(function ($validator) {
             $galleryId = $this->route('gallery')->id ?? null;
 
-            if ($galleryId && $this->hasFile('images')) {
+            if ($galleryId) {
                 $gallery = Gallery::findOrFail($galleryId);
                 $existingImagesCount = $gallery->images()->count();
-                $newImagesCount = count($this->file('images'));
+                $newImagesCount = $this->hasFile('images') ? count($this->file('images')) : 0;
                 $removedImagesCount = $this->input('removed_images') ? count($this->input('removed_images')) : 0;
 
                 $totalImagesAfterUpdate = $existingImagesCount + $newImagesCount - $removedImagesCount;
 
-                if ($totalImagesAfterUpdate > 5) {
+                if ($newImagesCount > 0 && $totalImagesAfterUpdate > 25) {
                     $validator->errors()->add(
                         'images',
-                        'The gallery cannot have more than 25 images. Please remove some existing images before adding new ones.'
+                        'The gallery cannot have more than 5 images. Please remove some existing images before adding new ones.'
+                    );
+                }
+
+                if ($totalImagesAfterUpdate < 1) {
+                    $validator->errors()->add(
+                        'images',
+                        'The gallery must have at least 1 image.'
                     );
                 }
             }

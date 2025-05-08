@@ -2,7 +2,7 @@
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import { ref, watch, computed } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps({
     modelValue: {
@@ -69,14 +69,6 @@ const generalImageError = computed(() => {
         ? props.error
         : props.error?.images || "";
 });
-
-watch(
-    () => props.alts,
-    (newAlts) => {
-        localAlts.value = [...newAlts];
-    },
-    { deep: true }
-);
 
 const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);

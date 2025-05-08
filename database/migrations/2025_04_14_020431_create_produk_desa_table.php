@@ -20,7 +20,7 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->string('product_name');
             $table->string('slug')->unique();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10, 0);
             $table->string('nama_penjual');
             $table->string('alamat_penjual')->nullable();
             $table->string('kontak_penjual', 20);

@@ -26,7 +26,7 @@ class StoreGalleryRequest extends FormRequest
             'description' => 'required',
             'images' => 'required|array|max:25',
             'images.*' => 'required|image|mimes:jpg,jpeg,png|max:10000',
-            'alts.*' => 'required|string|max:255'
+            'alts.*' => 'nullable|string|max:255'
         ];
 
         if ($this->filled('category.new_category')) {

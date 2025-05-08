@@ -87,6 +87,8 @@ class ProdukHukumController extends Controller
             }
             $path = $request->file('file')->store('produk-hukum-documents', 'public');
             $data['file'] = $path;
+        } else {
+            unset($data['file']);
         }
 
         $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);

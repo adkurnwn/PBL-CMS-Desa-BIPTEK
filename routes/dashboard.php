@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
                 'as' => 'dashboard',
                 'except' => ['show']
             ]);
+            Route::delete('/news/{news}/destroy', [NewsController::class, 'destroy'])->name('dashboard.news.destroy')->withTrashed();
             Route::get('/news/archive', [NewsController::class, 'archive'])->name('dashboard.news.archive');
             Route::get('/news/{news}/restore', [NewsController::class, 'restore'])->name('dashboard.news.restore')->withTrashed();
         });
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
                 'as' => 'dashboard',
                 'except' => ['show']
             ]);
+            Route::delete('/galleries/{gallery}/destroy', [GalleryController::class, 'destroy'])->name('dashboard.galleries.destroy')->withTrashed();
             Route::get('/galleries/archive', [GalleryController::class, 'archive'])->name('dashboard.galleries.archive');
             Route::get('/galleries/{gallery}/restore', [GalleryController::class, 'restore'])->name('dashboard.galleries.restore')->withTrashed();
         });
