@@ -68,7 +68,10 @@ class UpdateUserManagementRequest extends FormRequest
             if ($isKepalaDesa) {
                 $existingKepalaDesa = User::whereHas('roles', function ($query) {
                     $query->where('name', 'Kepala Desa');
-                })->where('status', true)->first();
+                })
+                    ->where('status', true)
+                    ->where('id', '!=', $this->user->id) // Exclude the current user being updated
+                    ->first();
 
                 if ($existingKepalaDesa) {
                     $validator->errors()->add(

@@ -2,10 +2,11 @@
 
 namespace App\Mail;
 
-use App\Models\Feedback;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Feedback;
+use App\Models\Profile;
 
 class FeedbackResponse extends Mailable
 {
@@ -20,7 +21,11 @@ class FeedbackResponse extends Mailable
 
     public function build()
     {
-        return $this->subject('Tanggapan untuk Feedback Anda')
-                    ->view('emails.feedback-response');
+        $profile = Profile::first();
+        return $this->subject('Tanggapan ' . $this->feedback->kategori . ' ' . $this->feedback->created_at->format('d F Y H:i'))
+                    ->view('emails.feedback-response')->with([
+                        'feedback' => $this->feedback,
+                        'profile' => $profile
+                    ]);
     }
 }
