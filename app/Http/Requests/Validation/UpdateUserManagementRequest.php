@@ -29,14 +29,8 @@ class UpdateUserManagementRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $this->user->id,
             'phone' => 'required|string|max:20',
+            'position_id' => 'required|exists:positions,id',
         ];
-
-        if ($this->filled('new_position')) {
-            $rules['new_position'] = 'required|string|max:255';
-            $rules['job_descriptions'] = 'required|array|min:1';
-        } else {
-            $rules['position_id'] = 'required|exists:positions,id';
-        }
 
         if ($this->filled('password')) {
             $rules['password'] = ['required', Password::defaults()];
@@ -55,9 +49,7 @@ class UpdateUserManagementRequest extends FormRequest
             // Check if the position is Kepala Desa
             $isKepalaDesa = false;
 
-            if ($this->filled('new_position') && $this->new_position === 'Kepala Desa') {
-                $isKepalaDesa = true;
-            } elseif ($this->filled('position_id')) {
+            if ($this->filled('position_id')) {
                 $position = Position::find($this->position_id);
                 if ($position && $position->name === 'Kepala Desa') {
                     $isKepalaDesa = true;
@@ -70,7 +62,7 @@ class UpdateUserManagementRequest extends FormRequest
                     $query->where('name', 'Kepala Desa');
                 })
                     ->where('status', true)
-                    ->where('id', '!=', $this->user->id) // Exclude the current user being updated
+                    ->where('id', '!=', $this->user->id)
                     ->first();
 
                 if ($existingKepalaDesa) {
