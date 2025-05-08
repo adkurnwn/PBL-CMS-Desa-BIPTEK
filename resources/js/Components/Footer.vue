@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 <template>
     <div
-        class="w-full h-56 flex text-white bg-accent1 space-x-40 font-merriweather md:text-base"
+        class="w-full h-56 flex text-white bg-accent1 space-x-40 sm:space-x-64 font-merriweather sm:text-base"
     >
         <div class="grid mt-4 md:mt-10 ml-3 md:ml-28">
             <img
@@ -31,7 +31,7 @@ const props = defineProps({
             </div>
         </div>
         <div class="flex items-center -mt-28 md:-mt-20">
-            <div class="-ml-12">
+            <div class="-ml-16">
                 <h1
                     class="text-yellow-600 font-bold text-sm md:text-lg mt-16 md:mt-7 -ml-16 md:-ml-12 max-w-[200px] md:max-w-[200px]"
                 >
@@ -63,10 +63,10 @@ const props = defineProps({
                 </div>
             </div>
         </div>
-        <div class="flex items-center -mt-20">
-            <div class="-ml-20 md:-ml-9">
+        <div class="flex items-center -mt-16">
+            <div class="xl:-ml-28 sm:-ml-40">
                 <h1
-                    class="text-yellow-600 font-bold text-base md:text-lg md:mt-24 ml-10"
+                    class="text-yellow-600 font-bold text-base md:text-lg sm:mt-20 ml-10"
                 >
                     Layanan Publik
                 </h1>

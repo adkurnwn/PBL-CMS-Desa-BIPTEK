@@ -89,12 +89,13 @@ onMounted(() => {
         </h1>
 
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
-            <NewsCard
-                v-for="newsItem in home.news"
-                :key="newsItem.id"
-                :isHome="true"
-                :news="newsItem"
-            />
+          <NewsCard
+              v-for="newsItem in home.news"
+              :key="newsItem.id"
+              :href="`/berita-test/${newsItem.slug}`"
+              :isHome="true"
+              :news="newsItem"
+          />
 
         </div>
         <a href="/berita" class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">

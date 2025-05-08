@@ -379,16 +379,16 @@ onMounted(() => {
                             </div>
 
                             <!-- Image Gallery -->
-                            <!-- <div v-if="news.images?.length > 0" class="relative h-96">
+                            <div v-if="news.images?.length > 0" class="relative min-h-96">
                                 <img
                                     :src="`/storage/${news.images[0].path}`"
                                     :alt="news.images[0].alt"
                                     class="w-full h-full object-cover"
                                 />
-                            </div> -->
-                            <div class="flex relative h-full w-full p-2">
-                                <img src="../../../images/profile.jpg" alt="" class="w-full h-full object-cover rounded-xl">
                             </div>
+                            <!-- <div class="flex relative h-full w-full p-2">
+                                <img src="../../../images/profile.jpg" alt="" class="w-full h-full object-cover rounded-xl">
+                            </div> -->
                             <div class="pt-8 pb-2">
                                 <!-- Category Badge -->
                                 <!-- <span
@@ -1069,11 +1069,14 @@ onMounted(() => {
                                             :href="`/berita-test/${item.slug}`"
                                             class="flex flex-row py-3 gap-2 hover:bg-gray-200 hover:shadow-sm rounded-md transition duration-300 ease-in-out cursor-pointer"
                                         >
-                                            <img
-                                                :src="`/storage/${item.images?.[0]?.path || 'default.jpg'}`"
-                                                alt="News Image"
-                                                class="w-1/3 h-20 object-cover rounded-md"
-                                            />
+                                            <div class="flex w-1/2">
+                                                <img
+                                                    :src="`/storage/${item.images?.[0]?.path || 'default.jpg'}`"
+                                                    alt="News Image"
+                                                    class="w-full h-20 object-cover rounded-md"
+                                                />
+                                            </div>
+                                            
                                             <div class="flex flex-col w-full">
                                                 <h3 class="text-sm font-semibold text-semiBlack line-clamp-3">
                                                     {{ item.title }}

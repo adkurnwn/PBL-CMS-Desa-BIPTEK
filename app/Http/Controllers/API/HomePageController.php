@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\ProdukDesa;
+use App\Models\KomentarBerita;
 
 class HomePageController extends Controller
 {
@@ -26,10 +27,14 @@ class HomePageController extends Controller
             'hero_image' => json_decode($profile->hero_images)[0],
             'news' => $news->map(function ($item) {
                 return [
+                    'slug' => $item->slug,
                     'title' => $item->title,
                     'content' => $item->content,
                     'created_at' => Carbon::parse($item->created_at)->format('j F Y'),
                     'views' => $item->views,
+                    'comments_count' => KomentarBerita::where('id_berita', $item->id)
+                        ->where('is_approved', true)
+                        ->count(),
                     'image' => [
                         'path' => $item->images->first()->path ?? null,
                         'alt' => $item->images->first()->alt ?? null
