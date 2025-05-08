@@ -19,9 +19,10 @@ class ProdukDesaSeeder extends Seeder
         $i = 1;
         foreach ($produkDesa as $produk) {
             $produkDesa = ProdukDesa::create([
-                'name' => $produk,
+                'product_name' => $produk,
                 'slug' => Str::of($produk)->slug('-'),
                 'user_id' => 1,
+                'nama_penjual' => 'John Doe',
                 'kontak_penjual' => '08123456789',
                 'description' => 'Description for ' . $produk,
                 'price' => rand(10000, 100000),

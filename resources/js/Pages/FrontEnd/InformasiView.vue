@@ -126,6 +126,7 @@ onMounted(() => {
                 >
                     <NewsCard
                         v-for="newsItem in informasi.news"
+                        :href="`/berita-test/${newsItem.slug}`"
                         :key="newsItem.id"
                         :news="newsItem"
                     />

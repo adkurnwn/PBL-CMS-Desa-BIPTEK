@@ -28,7 +28,7 @@ const form = useForm({
     images: [],
     alts: [],
     video: null,
-    is_moderate: false,
+    is_moderate: true,
     is_draft: false,
 });
 
@@ -172,7 +172,7 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Create News
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.news')">
+                                <Link :href="route('dashboard.news.index')">
                                     <PrimaryButton type="button"
                                         >Cancel</PrimaryButton
                                     >
