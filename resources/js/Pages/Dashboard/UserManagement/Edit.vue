@@ -30,6 +30,19 @@ const form = useForm({
     _method: "PUT",
 });
 
+// Add toggle function to properly clear fields when switching modes
+const togglePositionMode = () => {
+    isNewPosition.value = !isNewPosition.value;
+
+    // Clear the appropriate field based on the new mode
+    if (isNewPosition.value) {
+        form.position_id = ""; // Clear position_id when switching to new position mode
+    } else {
+        form.new_position = ""; // Clear new_position when switching to existing position mode
+        form.job_descriptions = []; // Also clear job descriptions
+    }
+};
+
 // Parse the job description JSON if it's a string
 const parseJobDescription = (description) => {
     if (!description) return [];
@@ -240,9 +253,7 @@ const submit = () => {
                                         <button
                                             type="button"
                                             class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
-                                            @click="
-                                                isNewPosition = !isNewPosition
-                                            "
+                                            @click="togglePositionMode"
                                         >
                                             {{
                                                 isNewPosition

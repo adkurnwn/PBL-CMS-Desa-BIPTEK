@@ -20,8 +20,19 @@ class RoleManagementController extends Controller
 
     public function index()
     {
+        $roles = Role::where('name', '!=', 'Admin')->get();
+        $permissions = Permission::all();
+
+        // Create a map of role_id => [permission_names]
+        $rolePermissions = [];
+        foreach ($roles as $role) {
+            $rolePermissions[$role->id] = $role->permissions->pluck('name')->toArray();
+        }
+
         return Inertia::render('Dashboard/RoleManagement/Index', [
-            'roles' => Role::where('name', '!=', 'Admin')->get()
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'rolePermissions' => $rolePermissions
         ]);
     }
 
@@ -51,6 +62,27 @@ class RoleManagementController extends Controller
         $role->syncPermissions($request->permissions);
 
         $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses role ' . $role->name);
+        return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
+    }
+
+    public function batchUpdate(Request $request)
+    {
+        $request->validate([
+            'permissions' => 'required|array'
+        ]);
+
+        foreach ($request->permissions as $roleId => $permissionNames) {
+            $role = Role::find($roleId);
+
+            // Skip admin role for security
+            if ($role->name === 'admin') {
+                continue;
+            }
+
+            $role->syncPermissions($permissionNames);
+        }
+
+        $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses beberapa role sekaligus');
         return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
     }
 }
