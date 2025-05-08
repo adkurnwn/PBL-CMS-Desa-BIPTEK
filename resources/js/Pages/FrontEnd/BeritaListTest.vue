@@ -5,7 +5,7 @@
     <!-- Judul -->
     <h1 class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2 mt-40">Berita Desa</h1> 
     <!-- Search Bar -->
-    <div class="flex items-center max-w-7xl mx-auto">  
+    <div class="relative flex flex-grow items-center max-w-7xl mx-auto">  
       <input
         type="text"
         v-model="searchQuery"
@@ -15,7 +15,7 @@
         />
         <!-- Button Ikon Search -->
         <button
-          class="absolute right-96 mr-3 mt-6 transform text-accent1"
+          class="absolute right-24 mt-6 transform text-accent1"
           @click="handleSearch">
           <svg class="-mr-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#244031"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
         </button>
@@ -27,7 +27,7 @@
         </button> 
       </div>
       <!-- Kategori Berita -->
-      <div class="flex items-center space-x-7 mt-7 overflow-x-auto text-lg text-accent1 ">
+      <div class="flex relative items-center space-x-7 mt-7 overflow-x-auto text-lg text-accent1 ">
         <button class="hover:underline font-medium">Semua</button>
         <button class="hover:underline">Populer</button>
         <button class="hover:underline">Wisata</button>
@@ -46,11 +46,10 @@
         </button>
       </div>
       <!--Berita Terkini-->
-      <article>
-        <h1 class="text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24">
+      <h1 class="relative flex-grow items-center text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24">
           Berita Terkini
-        </h1>
-
+      </h1>
+      <article>
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center items-center py-12">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -62,7 +61,7 @@
         </div>
           
         <!-- News Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 p-24 -mt-20">
+        <div v-else class="flex flex-col gap-5 p-24 -mt-20">
           <Link
             v-for="item in news"
             :key="item.id"
