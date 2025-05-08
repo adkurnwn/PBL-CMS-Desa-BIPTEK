@@ -24,11 +24,24 @@ class UpdateProdukHukumRequest extends FormRequest
         $rules = [
             'title' => 'required',
             'description' => 'required',
-            'file' => 'nullable|file|mimes:pdf,doc,docx',
-            'link' => 'required',
-            'date' => 'required',
+            'date' => 'required|date',
             'is_moderate' => 'sometimes|boolean',
         ];
+
+        // If a new file is being uploaded, link is optional
+        if ($this->hasFile('file')) {
+            $rules['file'] = 'file|mimes:pdf,doc,docx';
+            $rules['link'] = 'nullable|url';
+        } else {
+            // If no file is uploaded and the product doesn't have a file, link is required
+            $produkHukum = $this->route('produk_hukum');
+
+            if (!$produkHukum || !$produkHukum->file) {
+                $rules['link'] = 'required|url';
+            } else {
+                $rules['link'] = 'nullable|url';
+            }
+        }
 
         // Add validation for category selection
         if ($this->filled('category.new_category')) {

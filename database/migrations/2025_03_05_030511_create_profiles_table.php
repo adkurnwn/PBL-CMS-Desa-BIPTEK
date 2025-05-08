@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('kelurahan', 50);
             $table->json('hero_images');
             $table->string('organization_image', 255);
-            $table->json('lembaga');
-            $table->json('fasilitas');
+            $table->json('lembaga')->nullable();
+            $table->json('fasilitas')->nullable();
             $table->text('history');
             $table->text('vision');
             $table->text('mission');

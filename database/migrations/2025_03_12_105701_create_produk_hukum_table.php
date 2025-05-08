@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
-            $table->string('file');
-            $table->string('link');
+            $table->string('file')->nullable();
+            $table->string('link')->nullable();
             $table->date('date');
             $table->boolean('is_moderate')->default(false);
             $table->timestamps();

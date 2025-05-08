@@ -29,7 +29,7 @@ const form = useForm({
     alts: [],
     video: null,
     is_moderate: true,
-    is_draft: false,
+    is_draft: false, // Default is not draft
 });
 
 const URL = window.URL;
@@ -40,7 +40,11 @@ const handleVideoChange = (e) => {
     form.video = e.target.files[0];
 };
 
-const submit = () => {
+// Modified submit function to handle both publish and draft
+const submit = (isDraft = false) => {
+    // Set the draft status based on the button clicked
+    form.is_draft = isDraft;
+
     form.post(route("dashboard.news.store"), {
         onSuccess: () => form.reset(),
         preserveScroll: true,
@@ -62,10 +66,7 @@ const submit = () => {
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <form
-                            @submit.prevent="submit"
-                            enctype="multipart/form-data"
-                        >
+                        <form enctype="multipart/form-data">
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Name Field -->
                                 <div>
@@ -111,6 +112,7 @@ const submit = () => {
                                     label="Images"
                                     :error="form.errors"
                                     :alt-error="form.errors.alts"
+                                    :defaultAltText="form.title"
                                     :required="true"
                                 />
 
@@ -147,35 +149,34 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
-
-                                <div>
-                                    <div class="flex-row items-center">
-                                        <InputLabel
-                                            for="is_draft"
-                                            value="Draft"
-                                        />
-                                        <input
-                                            id="is_draft"
-                                            v-model="form.is_draft"
-                                            type="checkbox"
-                                            class="rounded border-gray-300 mt-2"
-                                        />
-                                    </div>
-                                    <InputError
-                                        :message="form.errors.is_draft"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create News
+                            <div class="mt-6 flex space-x-4">
+                                <PrimaryButton
+                                    type="button"
+                                    :disabled="form.processing"
+                                    @click="submit(false)"
+                                    class="bg-green-600 hover:bg-green-700"
+                                >
+                                    Publish News
                                 </PrimaryButton>
+
+                                <PrimaryButton
+                                    type="button"
+                                    :disabled="form.processing"
+                                    @click="submit(true)"
+                                    class="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    Save as Draft
+                                </PrimaryButton>
+
                                 <Link :href="route('dashboard.news.index')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
+                                    <PrimaryButton
+                                        type="button"
+                                        class="bg-gray-600 hover:bg-gray-700"
                                     >
+                                        Cancel
+                                    </PrimaryButton>
                                 </Link>
                             </div>
                         </form>

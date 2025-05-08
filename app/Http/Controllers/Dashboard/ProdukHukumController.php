@@ -49,7 +49,13 @@ class ProdukHukumController extends Controller
         $data['category_id'] = $category_id;
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('produk-hukum-documents', 'public');
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
             $data['file'] = $path;
         }
 
@@ -82,11 +88,21 @@ class ProdukHukumController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('file')) {
+            // Delete the old file if it exists
             if ($produkHukum->file) {
                 Storage::disk('public')->delete($produkHukum->file);
             }
-            $path = $request->file('file')->store('produk-hukum-documents', 'public');
+
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
             $data['file'] = $path;
+        } else {
+            unset($data['file']);
         }
 
         $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);

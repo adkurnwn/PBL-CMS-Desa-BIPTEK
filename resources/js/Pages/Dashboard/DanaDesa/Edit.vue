@@ -74,7 +74,6 @@ const submit = () => {
                                         v-model="form.link"
                                         type="text"
                                         class="mt-1 block w-full"
-                                        required
                                     />
                                     <InputError
                                         :message="form.errors.link"

@@ -121,19 +121,6 @@ const updateExistingAlt = (imageId, newAlt) => {
     emit("update:existingImages", updatedImages);
 };
 
-// Before submission, ensure all alt texts have values
-const ensureAltTexts = () => {
-    const updatedImages = editableImages.value.map((img) => {
-        if (!img.alt || img.alt.trim() === "") {
-            return { ...img, alt: props.defaultAltText };
-        }
-        return img;
-    });
-
-    editableImages.value = updatedImages;
-    emit("update:existingImages", updatedImages);
-};
-
 // Pass through to ImageUploader component
 const updateImages = (images) => {
     emit("update:modelValue", images);

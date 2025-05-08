@@ -22,13 +22,18 @@ class StoreProdukHukumRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'title' => 'required',
+            'title' => 'required|string|max:255',
             'description' => 'required',
-            'file' => 'required|file|mimes:pdf,doc,docx',
-            'link' => 'required',
-            'date' => 'required',
+            'date' => 'required|date',
             'is_moderate' => 'sometimes|boolean',
         ];
+
+        if ($this->hasFile('file')) {
+            $rules['file'] = 'required|file|mimes:pdf,doc,docx';
+            $rules['link'] = 'nullable|url';
+        } else {
+            $rules['link'] = 'required|url';
+        }
 
         if ($this->filled('category.new_category')) {
             $rules['category.new_category'] = 'required|string|max:255';
