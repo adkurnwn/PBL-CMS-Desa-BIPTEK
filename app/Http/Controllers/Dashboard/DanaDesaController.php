@@ -39,7 +39,13 @@ class DanaDesaController extends Controller
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('dana-desa-documents', 'public');
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
             $data['file'] = $path;
         }
 
@@ -64,7 +70,14 @@ class DanaDesaController extends Controller
             if ($danaDesa->file) {
                 Storage::disk('public')->delete($danaDesa->file);
             }
-            $path = $request->file('file')->store('dana-desa-documents', 'public');
+
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
             $data['file'] = $path;
         } else {
             unset($data['file']);

@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
                 'as' => 'dashboard',
                 'only' => ['index', 'edit', 'update']
             ]);
+            Route::post('/roles/batch-update', [RoleManagementController::class, 'batchUpdate'])->name('roles.batch-update');
         });
 
         Route::middleware(['permission:manage_profiles'])->group(function () {
