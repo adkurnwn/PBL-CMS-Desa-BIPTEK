@@ -22,13 +22,20 @@ class StoreProdukDesaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'stock' => 'required|integer|min:0',
+            'product_name' => 'required|string|max:255',
             'price' => 'required|decimal:0',
+            'instagram' => 'nullable|string|max:255',
+            'facebook' => 'nullable|string|max:255',
+            'x' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
+            'youtube' => 'nullable|string|max:255',
+            'alamat_penjual' => 'required|string|max:255',
+            'nama_penjual' => 'required|string|max:255',
             'kontak_penjual' => 'required|string|max:20',
             'description' => 'required|string',
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'required|array|max:3',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:10000',
+            'status' => 'required|boolean',
         ];
     }
 }

@@ -5,7 +5,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import DangerButton from "@/Components/DangerButton.vue";
+import ImageEditor from "@/Components/ImageEditor.vue";
 import { ref } from "vue";
 
 const props = defineProps({
@@ -16,30 +16,27 @@ const props = defineProps({
 });
 
 const form = useForm({
-    name: props.produkDesa.name,
+    product_name: props.produkDesa.product_name,
     description: props.produkDesa.description,
     price: props.produkDesa.price,
-    stock: props.produkDesa.stock,
+    instagram: props.produkDesa.instagram,
+    facebook: props.produkDesa.facebook,
+    tiktok: props.produkDesa.tiktok,
+    youtube: props.produkDesa.youtube,
+    x: props.produkDesa.x,
+    nama_penjual: props.produkDesa.nama_penjual,
+    alamat_penjual: props.produkDesa.alamat_penjual,
     kontak_penjual: props.produkDesa.kontak_penjual,
+    status: props.produkDesa.status,
     images: [],
     removed_images: [],
     _method: "PUT",
 });
 
-const handleImageChange = (e) => {
-    form.images = [...e.target.files];
-};
-
-const removeImage = (imageId) => {
-    if (confirm("Are you sure you want to remove this image?")) {
-        form.removed_images.push(imageId);
-    }
-};
-
 const submit = () => {
     form.post(route("dashboard.produk-desa.update", props.produkDesa.id), {
-        preserveScroll: true,
-        forceFormData: true,
+            preserveScroll: true,
+            forceFormData: true,
     });
 };
 </script>
@@ -65,18 +62,18 @@ const submit = () => {
                                 <!-- Name Field -->
                                 <div>
                                     <InputLabel
-                                        for="name"
+                                        for="product_name"
                                         value="Nama Produk"
                                     />
                                     <TextInput
-                                        id="name"
-                                        v-model="form.name"
+                                        id="product_name"
+                                        v-model="form.product_name"
                                         type="text"
                                         class="mt-1 block w-full"
                                         required
                                     />
                                     <InputError
-                                        :message="form.errors.name"
+                                        :message="form.errors.product_name"
                                         class="mt-2"
                                     />
                                 </div>
@@ -90,28 +87,12 @@ const submit = () => {
                                     <TextInput
                                         id="price"
                                         v-model="form.price"
-                                        type="number"
+                                        type="text"
                                         class="mt-1 block w-full"
                                         required
                                     />
                                     <InputError
                                         :message="form.errors.price"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Stock Field -->
-                                <div>
-                                    <InputLabel for="stock" value="Stock" />
-                                    <TextInput
-                                        id="stock"
-                                        v-model="form.stock"
-                                        type="number"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.stock"
                                         class="mt-2"
                                     />
                                 </div>
@@ -135,65 +116,175 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Image Field -->
+                                <!-- Nama Penjual Field -->
                                 <div>
                                     <InputLabel
-                                        for="images"
-                                        value="Product Images"
+                                        for="nama_penjual"
+                                        value="Nama Penjual"
                                     />
-
-                                    <!-- Show current images if they exist -->
-                                    <div
-                                        v-if="
-                                            produkDesa.images &&
-                                            produkDesa.images.length > 0
-                                        "
-                                        class="mb-2"
-                                    >
-                                        <p class="text-sm text-gray-600">
-                                            Current images:
-                                        </p>
-                                        <div class="flex flex-wrap gap-2 mt-1">
-                                            <div
-                                                v-for="(
-                                                    image, index
-                                                ) in produkDesa.images"
-                                                :key="index"
-                                                class="relative"
-                                            >
-                                                <img
-                                                    :src="`/storage/${image.path}`"
-                                                    alt="Product image"
-                                                    class="h-32 object-cover rounded-md"
-                                                />
-                                                <DangerButton
-                                                    type="button"
-                                                    @click="
-                                                        removeImage(image.id)
-                                                    "
-                                                    class="absolute top-2 right-2"
-                                                >
-                                                    ×
-                                                </DangerButton>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <input
-                                        id="images"
-                                        type="file"
-                                        @input="handleImageChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        multiple
+                                    <TextInput
+                                        id="nama_penjual"
+                                        v-model="form.nama_penjual"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
                                     />
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        You can select multiple images
-                                    </p>
                                     <InputError
-                                        :message="form.errors.images"
+                                        :message="form.errors.nama_penjual"
                                         class="mt-2"
                                     />
+                                </div>
+
+                                <!-- Alamat Penjual Field -->
+                                <div>
+                                    <InputLabel
+                                        for="alamat_penjual"
+                                        value="Alamat Penjual"
+                                    />
+                                    <TextInput
+                                        id="alamat_penjual"
+                                        v-model="form.alamat_penjual"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.alamat_penjual"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div class="flex-row items-center">
+                                        <InputLabel
+                                            for="status"
+                                            value="Status"
+                                        />
+                                        <input
+                                            id="status"
+                                            v-model="form.status"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 mt-2"
+                                        />
+                                    </div>
+                                    <InputError
+                                        :message="form.errors.status"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <!-- Image Field -->
+                                <div>
+                                    <ImageEditor
+                                        v-model="form.images"
+                                        v-model:alts="form.alts"
+                                        :existingImages="produkDesa.images"
+                                        v-model:removedImages="
+                                            form.removed_images
+                                        "
+                                        label="Product Images"
+                                        :error="form.errors"
+                                        :required="true"
+                                        :altText="false"
+                                    />
+                                </div>
+
+                                <!-- Social Media Section - Full Width -->
+                                <div class="col-span-2 mt-4">
+                                    <h3 class="font-medium text-gray-700 mb-2">
+                                        Social Media Links
+                                    </h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- Instagram Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="instagram"
+                                                value="Instagram"
+                                            />
+                                            <TextInput
+                                                id="instagram"
+                                                v-model="form.instagram"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.instagram"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- Facebook Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="facebook"
+                                                value="Facebook"
+                                            />
+                                            <TextInput
+                                                id="facebook"
+                                                v-model="form.facebook"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.facebook"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- TikTok Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="tiktok"
+                                                value="TikTok"
+                                            />
+                                            <TextInput
+                                                id="tiktok"
+                                                v-model="form.tiktok"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.tiktok"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- YouTube Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="youtube"
+                                                value="YouTube"
+                                            />
+                                            <TextInput
+                                                id="youtube"
+                                                v-model="form.youtube"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.youtube"
+                                                class="mt-2"
+                                            />
+                                        </div>
+
+                                        <!-- X (Twitter) Field -->
+                                        <div>
+                                            <InputLabel
+                                                for="x"
+                                                value="X (Twitter)"
+                                            />
+                                            <TextInput
+                                                id="x"
+                                                v-model="form.x"
+                                                type="text"
+                                                class="mt-1 block w-full"
+                                            />
+                                            <InputError
+                                                :message="form.errors.x"
+                                                class="mt-2"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Description Field - Full Width -->
@@ -220,10 +311,12 @@ const submit = () => {
                                 <PrimaryButton :disabled="form.processing">
                                     Update Produk Desa
                                 </PrimaryButton>
-                                <Link :href="route('dashboard.produk-desa')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
+                                <Link
+                                    :href="route('dashboard.produk-desa.index')"
+                                >
+                                    <PrimaryButton type="button">
+                                        Cancel
+                                    </PrimaryButton>
                                 </Link>
                             </div>
                         </form>

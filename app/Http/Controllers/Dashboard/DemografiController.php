@@ -40,7 +40,7 @@ class DemografiController extends Controller
         Demografi::create($demografiData);
 
         $this->logHelper->logActivity('create', 'demografi', 'Menambahkan demografi ' . $request->title);
-        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Berhasil Ditambahkan');
+        return redirect()->route('dashboard.demografi.index')->with('success', 'Demografi Berhasil Ditambahkan');
     }
 
     public function edit(Demografi $demografi)
@@ -57,6 +57,6 @@ class DemografiController extends Controller
         $demografi->update($demografiData);
 
         $this->logHelper->logActivity('update', 'demografi', 'Memperbarui demografi ' . $request->title);
-        return redirect()->route('dashboard.demografi')->with('success', 'Demografi Berhasil Diperbarui');
+        return redirect()->route('dashboard.demografi.index')->with('success', 'Demografi Berhasil Diperbarui');
     }
 }

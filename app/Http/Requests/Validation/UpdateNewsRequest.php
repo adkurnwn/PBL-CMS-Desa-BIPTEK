@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Validation;
 
+use App\Models\News;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateNewsRequest extends FormRequest
 {
@@ -25,13 +27,16 @@ class UpdateNewsRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'images' => 'sometimes|array',
-            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
-            'alts.*' => 'required_with:images.*|string|max:255',
+            'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:10000',
+            'alts.*' => 'nullable|string|max:255',
             'removed_images' => 'sometimes|array',
             'removed_images.*' => 'exists:images,id',
             'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
             'is_moderate' => 'required|boolean',
             'is_draft' => 'required|boolean',
+            'updated_existing_images' => 'sometimes|array',
+            'updated_existing_images.*.id' => 'required|exists:images,id',
+            'updated_existing_images.*.alt' => 'nullable|string|max:255',
         ];
 
         // Add validation for category selection
@@ -49,5 +54,28 @@ class UpdateNewsRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            $newsId = $this->route('news')->id ?? null;
+
+            if ($newsId && $this->hasFile('images')) {
+                $news = News::findOrFail($newsId);
+                $existingImagesCount = $news->images()->count();
+                $newImagesCount = count($this->file('images'));
+                $removedImagesCount = $this->input('removed_images') ? count($this->input('removed_images')) : 0;
+
+                $totalImagesAfterUpdate = $existingImagesCount + $newImagesCount - $removedImagesCount;
+
+                if ($totalImagesAfterUpdate > 5) {
+                    $validator->errors()->add(
+                        'images',
+                        'The news cannot have more than 5 images. Please remove some existing images before adding new ones.'
+                    );
+                }
+            }
+        });
     }
 }
