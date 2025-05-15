@@ -45,7 +45,7 @@ const calculateTotalPopulation = () => {
 };
 
 const submit = () => {
-    form.post(route("dashboard.demografi.update", props.demografi.id), {
+    form.post(route("dashboard.demografi.update", props.demografi.tahun), {
         preserveScroll: true,
     });
 };

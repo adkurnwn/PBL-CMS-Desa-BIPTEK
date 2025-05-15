@@ -26,7 +26,7 @@ const handleFileChange = (e) => {
 };
 
 const submit = () => {
-    form.post(route("dashboard.dana-desa.update", props.danaDesa.id), {
+    form.post(route("dashboard.dana-desa.update", props.danaDesa.slug), {
         preserveScroll: true,
         forceFormData: true,
     });

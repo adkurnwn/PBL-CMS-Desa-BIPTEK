@@ -44,7 +44,7 @@ const handleFileChange = (e) => {
 };
 
 const submit = () => {
-    form.post(route("dashboard.produk-hukum.update", props.produkHukum.id), {
+    form.post(route("dashboard.produk-hukum.update", props.produkHukum.slug), {
         onSuccess: () => form.reset(),
         preserveScroll: true,
         forceFormData: true,

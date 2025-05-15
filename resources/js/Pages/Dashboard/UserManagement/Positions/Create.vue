@@ -63,6 +63,9 @@ const submit = () => {
                                         class="mt-1 block w-full"
                                         required
                                     />
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Position name must be unique
+                                    </p>
                                     <InputError
                                         :message="form.errors.name"
                                         class="mt-2"

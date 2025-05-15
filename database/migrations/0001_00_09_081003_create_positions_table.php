@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->tinyIncrements('id')->unsigned();
-            $table->string('name', 50);
+            $table->string('name', 50)->unique();
             $table->json('job_description');
             $table->timestamps();
         });
