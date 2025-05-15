@@ -56,6 +56,7 @@ class KomentarProdukHukumController extends Controller
         $rules = [
             'id_produk_hukum' => 'required|exists:produk_hukum,id',
             'nama_user' => 'required|string|max:50',
+            'email' => 'required|email|max:50',
             'komentar' => 'required|string',
             'id_ref_komentar' => 'nullable|exists:komentar_produk_hukum,id',
             'captcha' => 'required|captcha_api:' . $request->code . ',default'
@@ -70,6 +71,7 @@ class KomentarProdukHukumController extends Controller
         $comment = KomentarProdukHukum::create([
             'id_produk_hukum' => $request->id_produk_hukum,
             'nama_user' => $request->nama_user,
+            'email' => $request->email,
             'komentar' => $request->komentar,
             'id_ref_komentar' => $request->id_ref_komentar,
             'is_approved' => !$produkhukum->is_moderate

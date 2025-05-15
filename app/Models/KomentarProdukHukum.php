@@ -10,6 +10,7 @@ class KomentarProdukHukum extends Model
 
     protected $fillable = [
         'id_produk_hukum',
+        'email',
         'id_ref_komentar',
         'nama_user',
         'is_approved',

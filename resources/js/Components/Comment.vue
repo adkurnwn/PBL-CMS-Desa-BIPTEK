@@ -1,34 +1,36 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { setCookie, getCookie } from '@/Helpers/cookieHelper';
 
 const props = defineProps({
-    slug: {
+    type: {
         type: String,
         required: true,
+        validator: (value) => ['berita', 'produk-hukum'].includes(value)
     },
-    news: {
+    identifier: {
+        type: String,
+        required: true
+    },
+    content: {
         type: Object,
-        required: true,
+        required: true
     }
 });
 
 const comments = ref([]);
 const submitting = ref(false);
 const commentForm = ref({
-    nama_user: "",
-    email: "",  // Add email field
+    nama_user: getCookie('commenter_name') || '',
+    email: getCookie('commenter_email') || '',
     komentar: "",
-    id_berita: props.slug,
     captcha: "",
 });
 const replyForm = ref({
-    nama_user: getCookie('commenter_name') || '', // Initialize with cookie value
-    email: getCookie('commenter_email') || '', // Initialize with cookie value
+    nama_user: getCookie('commenter_name') || '',
+    email: getCookie('commenter_email') || '',
     komentar: '',
-    id_berita: props.slug,
-    id_ref_komentar: null,
     captcha: '',
 });
 const activeReplyId = ref(null);
@@ -37,17 +39,29 @@ const replyCaptchaData = ref(null);
 const mainCaptchaCode = ref('');
 const replyCaptchaCode = ref('');
 
+// Computed endpoints based on type
+const getEndpoints = () => {
+    if (props.type === 'berita') {
+        return {
+            list: `/api/comments/${props.identifier}`,
+            submit: '/api/comments',
+            replies: `/api/comments/${props.identifier}/replies/`
+        };
+    } else {
+        return {
+            list: `/api/produk-hukum-comments/${props.identifier}`,
+            submit: '/api/produk-hukum-comments',
+            replies: `/api/produk-hukum-comments/${props.identifier}/replies/`
+        };
+    }
+};
+
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString("id-ID", {
         year: "numeric",
         month: "long",
         day: "numeric",
     });
-};
-
-const truncateText = (text, length) => {
-    if (!text) return "";
-    return text.length > length ? text.substring(0, length) + "..." : text;
 };
 
 const getAvatar = (name) => {
@@ -58,7 +72,8 @@ const getAvatar = (name) => {
 
 const fetchComments = async () => {
     try {
-        const response = await axios.get(`/api/comments/${props.slug}`);
+        const endpoints = getEndpoints();
+        const response = await axios.get(endpoints.list);
         comments.value = response.data
             .filter((comment) => !comment.id_ref_komentar)
             .map((comment) => ({
@@ -87,20 +102,6 @@ const refreshCaptcha = async (type = 'main') => {
 };
 
 onMounted(() => {
-    // Load user data from cookies
-    const savedName = getCookie('commenter_name');
-    const savedEmail = getCookie('commenter_email');
-    
-    if (savedName) {
-        commentForm.value.nama_user = savedName;
-        replyForm.value.nama_user = savedName;
-    }
-    
-    if (savedEmail) {
-        commentForm.value.email = savedEmail;
-        replyForm.value.email = savedEmail;
-    }
-    
     refreshCaptcha('main');
     fetchComments();
 });
@@ -108,21 +109,28 @@ onMounted(() => {
 const submitComment = async () => {
     try {
         submitting.value = true;
-        const response = await axios.post("/api/comments", {
+        const endpoints = getEndpoints();
+        
+        const payload = {
             ...commentForm.value,
             captcha: commentForm.value.captcha,
             code: mainCaptchaCode.value
-        });
+        };
 
-        // Save both name and email to cookies
-        if (commentForm.value.nama_user) {
-            setCookie('commenter_name', commentForm.value.nama_user);
-        }
-        if (commentForm.value.email) {
-            setCookie('commenter_email', commentForm.value.email);
+        // Add type-specific fields
+        if (props.type === 'berita') {
+            payload.id_berita = props.identifier;
+        } else {
+            payload.id_produk_hukum = props.identifier;
         }
 
-        if (!props.news.is_moderate) {
+        const response = await axios.post(endpoints.submit, payload);
+
+        // Save user data to cookies
+        setCookie('commenter_name', commentForm.value.nama_user);
+        setCookie('commenter_email', commentForm.value.email);
+
+        if (!props.content.is_moderate) {
             await fetchComments();
         }
 
@@ -141,11 +149,9 @@ const submitComment = async () => {
 
 const showReplyForm = (commentId) => {
     replyForm.value = {
-        nama_user: getCookie('commenter_name') || '', // Use cookie value when opening reply form
-        email: getCookie('commenter_email') || '', // Use cookie value when opening reply form
+        nama_user: getCookie('commenter_name') || '',
+        email: getCookie('commenter_email') || '',
         komentar: '',
-        id_berita: props.slug,
-        id_ref_komentar: commentId,
         captcha: '',
     };
     activeReplyId.value = commentId;
@@ -155,11 +161,9 @@ const showReplyForm = (commentId) => {
 const cancelReply = () => {
     activeReplyId.value = null;
     replyForm.value = {
-        nama_user: getCookie('commenter_name') || '', // Initialize with cookie value
-        email: getCookie('commenter_email') || '', // Initialize with cookie value
+        nama_user: getCookie('commenter_name') || '',
+        email: getCookie('commenter_email') || '',
         komentar: '',
-        id_berita: props.slug,
-        id_ref_komentar: null,
         captcha: '',
     };
 };
@@ -167,21 +171,28 @@ const cancelReply = () => {
 const submitReply = async (commentId) => {
     try {
         submitting.value = true;
-        const response = await axios.post("/api/comments", {
+        const endpoints = getEndpoints();
+        
+        const payload = {
             ...replyForm.value,
             captcha: replyForm.value.captcha,
-            code: replyCaptchaCode.value
-        });
+            code: replyCaptchaCode.value,
+            id_ref_komentar: commentId
+        };
 
-        // Save both name and email to cookies
-        if (replyForm.value.nama_user) {
-            setCookie('commenter_name', replyForm.value.nama_user);
-        }
-        if (replyForm.value.email) {
-            setCookie('commenter_email', replyForm.value.email);
+        // Add type-specific fields
+        if (props.type === 'berita') {
+            payload.id_berita = props.identifier;
+        } else {
+            payload.id_produk_hukum = props.identifier;
         }
 
-        if (!props.news.is_moderate) {
+        const response = await axios.post(endpoints.submit, payload);
+
+        setCookie('commenter_name', replyForm.value.nama_user);
+        setCookie('commenter_email', replyForm.value.email);
+
+        if (!props.content.is_moderate) {
             await fetchComments();
         }
 
@@ -204,8 +215,9 @@ const loadReplies = async (comment) => {
     }
 
     try {
+        const endpoints = getEndpoints();
         const response = await axios.get(
-            `/api/comments/${props.slug}/replies/${comment.id}`
+            `${endpoints.replies}${comment.id}`
         );
 
         const repliesMap = new Map();
@@ -234,21 +246,10 @@ const loadReplies = async (comment) => {
     }
 };
 
-const getAllDeeperReplies = (reply) => {
-    let allReplies = [];
-
-    const collectReplies = (r) => {
-        if (r.replies?.length) {
-            r.replies.forEach((nestedReply) => {
-                allReplies.push(nestedReply);
-                collectReplies(nestedReply);
-            });
-        }
-    };
-
-    collectReplies(reply);
-    return allReplies;
-};
+// Watch for changes in identifier prop to reload comments
+watch(() => props.identifier, () => {
+    fetchComments();
+});
 </script>
 
 <template>

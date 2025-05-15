@@ -208,15 +208,16 @@ onMounted(() => {
 
                         <!-- Comments Section -->
                         <Comment 
-                            :slug="slug"
-                            :news="news"
+                            type="berita"
+                            :identifier="slug"
+                            :content="news"
                         />
                         </div>
                         <!-- Aside -->
                         <div class="flex flex-col w-full lg:w-1/3 px-4 font-merriweather">
                             <div class="flex  bg-accent1 shadow-md rounded-sm p-3 space-x-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-type1">
-                                    <path d="M160-120q-33 0-56.5-23.5T80-200v-280h80v280h360v80H160Zm160-160q-33 0-56.5-23.5T240-360v-280h80v280h360v80H320Zm160-160q-33 0-56.5-23.5T400-520v-240q0-33 23.5-56.5T480-840h320q33 0 56.5 23.5T880-760v240q0 33-23.5 56.5T800-440H480Zm0-80h320v-160H480v160Z"/>
+                                    <path d="M160-120q-33 0-56.5-23.5T80-200v-280h80v280h360v80H160Zm160-160q-33 0-56.5-23.5T240-360v-280h80v280h360v80H320Zm160-160q-33 0-56.5-23.5T400-520v-240q0-33 23.5-56.5T480-840h320q33 0 56.5 23.5T880-760v240q0 33-23.5-56.5T800-440H480Zm0-80h320v-160H480v160Z"/>
                                 </svg>
                                 <h2 class="text-lg font-semibold  text-type1">Berita Lainnya</h2>
                             </div>
