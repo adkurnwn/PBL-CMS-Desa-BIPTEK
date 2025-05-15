@@ -31,7 +31,7 @@ class RecoveryController extends Controller
     {
         try {
             // Run backup command
-            Artisan::call('backup:run', ['--only-db' => true]);
+            Artisan::call('backup:run');
 
             $this->logHelper->logActivity('create', 'backup', 'Created new database backup');
 
@@ -46,24 +46,19 @@ class RecoveryController extends Controller
     public function download($fileName)
     {
         try {
-            // Check if file exists in backup-temp directory
             $backupPath = storage_path('app/backup-temp/' . $fileName);
 
-            // If not in backup-temp, check in Laravel directory
             if (!file_exists($backupPath)) {
-                $backupPath = storage_path('app/CMS-Desa/' . $fileName);
+                $backupPath = storage_path('app/Data Recovery/' . $fileName);
             }
 
-            // Verify file exists
             if (!file_exists($backupPath)) {
                 return redirect()->route('dashboard.recovery.index')
                     ->with('error', 'Backup file not found');
             }
 
-            // Log the download activity
             $this->logHelper->logActivity('download', 'backup', 'Downloaded backup file: ' . $fileName);
 
-            // Return file as download response
             return response()->download($backupPath, $fileName);
         } catch (\Exception $e) {
             return redirect()->route('dashboard.recovery.index')
@@ -77,9 +72,9 @@ class RecoveryController extends Controller
             // Check if file exists in backup-temp directory
             $backupPath = storage_path('app/backup-temp/' . $fileName);
 
-            // If not in backup-temp, check in CMS-Desa directory
+            // If not in backup-temp, check in Data Recovery directory
             if (!file_exists($backupPath)) {
-                $backupPath = storage_path('app/CMS-Desa/' . $fileName);
+                $backupPath = storage_path('app/Data Recovery/' . $fileName);
             }
 
             // Verify file exists
@@ -93,9 +88,7 @@ class RecoveryController extends Controller
             if (!file_exists($extractPath)) {
                 mkdir($extractPath, 0755, true);
             } else {
-                // Clean up any previous extraction
                 $this->cleanupTempFiles($extractPath);
-                // mkdir($extractPath, 0755, true);
             }
 
             // Extract the zip archive
@@ -110,47 +103,49 @@ class RecoveryController extends Controller
             // Find the SQL dump file
             $sqlFiles = glob($extractPath . '/db-dumps/*.sql');
 
-            if (empty($sqlFiles)) {
-                throw new \Exception('No database dump file found in backup');
+            if (!empty($sqlFiles)) {
+                $sqlFile = $sqlFiles[0]; // Use the first SQL file found
+
+                // Get database configuration
+                $dbConnection = config('database.default');
+                $dbConfig = config('database.connections.' . $dbConnection);
+
+                $passwordFlag = $dbConfig['password'] !== ''
+                    ? "-p" . $dbConfig['password']
+                    : "";
+
+                // Import the SQL file
+                $command = sprintf(
+                    'mysql -h%s -u%s %s %s < %s',
+                    escapeshellarg($dbConfig['host']),
+                    escapeshellarg($dbConfig['username']),
+                    $passwordFlag,
+                    escapeshellarg($dbConfig['database']),
+                    escapeshellarg($sqlFile)
+                );
+
+                $output = [];
+                $returnVar = 0;
+                exec($command, $output, $returnVar);
+
+                if ($returnVar !== 0) {
+                    throw new \Exception('Database import failed: ' . implode("\n", $output));
+                }
             }
 
-            $sqlFile = $sqlFiles[0]; // Use the first SQL file found
+            // Check if public folder exists in the backup
+            $publicBackupPath = $extractPath . '/public';
+            if (is_dir($publicBackupPath)) {
+                $this->copyDirectory($publicBackupPath, public_path());
 
-            // Get database configuration
-            $dbConnection = config('database.default');
-            $dbConfig = config('database.connections.' . $dbConnection);
-
-            $passwordFlag = $dbConfig['password'] !== ''
-                ? "-p" . $dbConfig['password']
-                : "";
-
-            // Import the SQL file
-            $command = sprintf(
-                'mysql -h%s -u%s %s %s < %s',
-                escapeshellarg($dbConfig['host']),
-                escapeshellarg($dbConfig['username']),
-                $passwordFlag,
-                escapeshellarg($dbConfig['database']),
-                escapeshellarg($sqlFile)
-            );
-
-            $output = [];
-            $returnVar = 0;
-            exec($command, $output, $returnVar);
-
-            if ($returnVar !== 0) {
-                throw new \Exception('Database import failed: ' . implode("\n", $output));
+                $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
             }
-
-            // Log the restore activity
-            $this->logHelper->logActivity('restore', 'backup', 'Restored database from backup file: ' . $fileName);
 
             // Clean up temporary files
-
             $this->cleanupTempFiles($extractPath);
 
             return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Database restored successfully from backup');
+                ->with('success', 'Backup restored successfully');
         } catch (\Exception $e) {
             return redirect()->route('dashboard.recovery.index')
                 ->with('error', 'Failed to restore backup: ' . $e->getMessage());
@@ -163,7 +158,7 @@ class RecoveryController extends Controller
             $backupPath = storage_path('app/backup-temp/' . $fileName);
 
             if (!file_exists($backupPath)) {
-                $backupPath = storage_path('app/CMS-Desa/' . $fileName);
+                $backupPath = storage_path('app/Data Recovery/' . $fileName);
             }
 
             if (file_exists($backupPath) && unlink($backupPath)) {
@@ -180,22 +175,6 @@ class RecoveryController extends Controller
         }
     }
 
-    public function scheduleBackup()
-    {
-        try {
-            // Run backup command
-            Artisan::call('app:create-database-backup');
-
-            // Log the scheduled backup activity
-            $this->logHelper->logActivity('create', 'backup', 'Created scheduled weekly database backup');
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Scheduled backup failed: ' . $e->getMessage());
-            return false;
-        }
-    }
-
     private function getBackups()
     {
         $backups = [];
@@ -204,7 +183,7 @@ class RecoveryController extends Controller
         $tempFiles = glob(storage_path('app/backup-temp/*.zip'));
 
         // Also check Laravel directory (default location for spatie/laravel-backup)
-        $laravelFiles = glob(storage_path('app/CMS-Desa/*.zip'));
+        $laravelFiles = glob(storage_path('app/Data Recovery/*.zip'));
 
         $files = array_merge($tempFiles ?: [], $laravelFiles ?: []);
 
@@ -271,5 +250,29 @@ class RecoveryController extends Controller
         } catch (\Throwable $e) {
             Log::error("Exception while removing directory $path: " . $e->getMessage());
         }
+    }
+
+    private function copyDirectory($source, $destination)
+    {
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        $directory = opendir($source);
+        while (($file = readdir($directory)) !== false) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $sourcePath = $source . '/' . $file;
+            $destPath = $destination . '/' . $file;
+
+            if (is_dir($sourcePath)) {
+                $this->copyDirectory($sourcePath, $destPath);
+            } else {
+                copy($sourcePath, $destPath);
+            }
+        }
+        closedir($directory);
     }
 }

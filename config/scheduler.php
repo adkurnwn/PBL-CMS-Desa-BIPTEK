@@ -9,8 +9,5 @@ return [
         SendEventReminders::class => [
             'frequency' => 'everyMinute',
         ],
-        ScheduleBackup::class => [
-            'frequency' => 'everyMinute',
-        ],
     ],
 ];
