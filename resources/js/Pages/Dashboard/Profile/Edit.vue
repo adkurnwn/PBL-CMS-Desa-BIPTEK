@@ -73,7 +73,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route("dashboard.profiles.update", props.profile.id), {
+    form.post(route("dashboard.profiles.update", props.profile.name), {
         preserveScroll: true,
         forceFormData: true,
     });

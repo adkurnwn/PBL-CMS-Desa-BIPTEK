@@ -55,7 +55,7 @@ const props = defineProps({
                                             :href="
                                                 route(
                                                     'dashboard.produk-hukum.edit',
-                                                    produk_hukum.id
+                                                    produk_hukum.slug
                                                 )
                                             "
                                         >

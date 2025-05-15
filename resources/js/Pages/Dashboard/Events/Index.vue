@@ -52,7 +52,7 @@ const props = defineProps({
                                             :href="
                                                 route(
                                                     'dashboard.events.edit',
-                                                    event.id
+                                                event.slug
                                                 )
                                             "
                                         >

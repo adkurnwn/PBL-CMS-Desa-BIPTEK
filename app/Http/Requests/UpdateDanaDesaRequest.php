@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\DanaDesa;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDanaDesaRequest extends FormRequest
@@ -30,8 +31,8 @@ class UpdateDanaDesaRequest extends FormRequest
             $rules['file'] = 'file|mimes:pdf,doc,docx';
             $rules['link'] = 'nullable|url';
         } else {
-            // If no file is uploaded and the dana desa doesn't have a file, link is required
-            $danaDesa = $this->route('dana_desa');
+            $slug = $this->route('slug');
+            $danaDesa = DanaDesa::where('slug', $slug)->first();
 
             if (!$danaDesa || !$danaDesa->file) {
                 $rules['link'] = 'required|url';

@@ -15,9 +15,9 @@ const search = ref("");
 const sortField = ref("created_at");
 const sortDirection = ref("desc");
 
-const deleteNews = (newsId) => {
+const deleteNews = (slug) => {
     if (confirm("Are you sure you want to delete this news?")) {
-        form.delete(route("dashboard.news.destroy", newsId), {
+        form.delete(route("dashboard.news.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -187,7 +187,7 @@ const filteredNews = computed(() => {
                                             :href="
                                                 route(
                                                     'dashboard.news.edit',
-                                                    news.id
+                                                    news.slug
                                                 )
                                             "
                                         >
@@ -196,7 +196,7 @@ const filteredNews = computed(() => {
                                             </PrimaryButton>
                                         </Link>
                                         <DangerButton
-                                            @click="deleteNews(news.id)"
+                                            @click="deleteNews(news.slug)"
                                             class="ml-2"
                                         >
                                             Delete

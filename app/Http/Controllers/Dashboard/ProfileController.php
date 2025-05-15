@@ -29,15 +29,18 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function edit(Profile $profile)
+    public function edit($slug)
     {
+        $profile = Profile::where('name', $slug)->firstOrFail();
+
         return Inertia::render('Dashboard/Profile/Edit', [
             'profile' => $profile
         ]);
     }
 
-    public function update(UpdateProfileRequest $request, Profile $profile)
+    public function update(UpdateProfileRequest $request, $slug)
     {
+        $profile = Profile::where('name', $slug)->firstOrFail();
         $village = Village::find($request->kelurahan);
         if ($village) {
             $profileData['name'] = "Desa " . ucwords(strtolower($village->name));

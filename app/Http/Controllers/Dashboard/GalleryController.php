@@ -61,8 +61,9 @@ class GalleryController extends Controller
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Ditambahkan');
     }
 
-    public function edit(Gallery $gallery)
+    public function edit($slug)
     {
+        $gallery = Gallery::where('slug', $slug)->firstOrFail();
         $categories = $this->categoryService->getCategoriesWithUsageCounts(1);
         return Inertia::render('Dashboard/Gallery/Edit', [
             'gallery' => $gallery->load('images', 'category'),
@@ -71,8 +72,9 @@ class GalleryController extends Controller
         ]);
     }
 
-    public function update(UpdateGalleryRequest $request, Gallery $gallery)
+    public function update(UpdateGalleryRequest $request, $slug)
     {
+        $gallery = Gallery::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
         if (!empty($request->category['deleting_category_id'])) {
@@ -105,7 +107,7 @@ class GalleryController extends Controller
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diperbarui');
     }
 
-    public function archive(Gallery $gallery)
+    public function archive()
     {
         Gallery::onlyTrashed()->with('category')->get();
         return Inertia::render('Dashboard/Gallery/Archive', [
@@ -113,15 +115,18 @@ class GalleryController extends Controller
         ]);
     }
 
-    public function restore(Gallery $gallery)
+    public function restore($slug)
     {
+        $gallery = Gallery::withTrashed()->where('slug', $slug)->firstOrFail();
+        // Restore the gallery
         $gallery->restore();
         $this->logHelper->logActivity('restore', 'gallery', 'Memulihkan gallery ' . $gallery->title);
         return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dipulihkan');
     }
 
-    public function destroy(Gallery $gallery)
+    public function destroy($slug)
     {
+        $gallery = Gallery::withTrashed()->where('slug', $slug)->firstOrFail();
         if ($gallery->trashed()) {
             $this->mediaService->deleteAllMedia($gallery);
             $gallery->forceDelete();

@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\DanaDesa;
+use App\Helpers\SlugHelper;
 use Illuminate\Http\Request;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDanaDesaRequest;
-use App\Http\Requests\UpdateDanaDesaRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreDanaDesaRequest;
+use App\Http\Requests\UpdateDanaDesaRequest;
 
 class DanaDesaController extends Controller
 {
@@ -36,6 +37,7 @@ class DanaDesaController extends Controller
     public function store(StoreDanaDesaRequest $request)
     {
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('file')) {
@@ -55,16 +57,20 @@ class DanaDesaController extends Controller
         return redirect()->route('dashboard.dana-desa.index')->with('success', 'Dana Desa Berhasil Ditambahkan');
     }
 
-    public function edit(DanaDesa $danaDesa)
+    public function edit($slug)
     {
+        $danaDesa = DanaDesa::where('slug', $slug)->firstOrFail();
         return Inertia::render('Dashboard/DanaDesa/Edit', [
             'danaDesa' => $danaDesa
         ]);
     }
 
-    public function update(UpdateDanaDesaRequest $request, DanaDesa $danaDesa)
+    public function update(UpdateDanaDesaRequest $request, $slug)
     {
+        $danaDesa = DanaDesa::where('slug', $slug)->firstOrFail();
+
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
 
         if ($request->hasFile('file')) {
             if ($danaDesa->file) {
