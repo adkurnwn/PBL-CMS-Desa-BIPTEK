@@ -19,6 +19,7 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('cascade');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->text('description');
             $table->date('date');
             $table->time('time');

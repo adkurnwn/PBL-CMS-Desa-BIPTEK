@@ -113,17 +113,14 @@ class UserManagementController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->status === false) {
-            $user->update([
-                'status' => true
-            ]);
-        } else {
-            $user->update([
-                'status' => false
-            ]);
-        }
-
-        $this->logHelper->logActivity('delete', 'user', 'Menonaktifkan pengguna ' . $user->name);
-        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil Dinonaktifkan');
+        $newStatus = !$user->status;
+        $user->update([
+            'status' => $newStatus
+        ]);
+        $logMessage = $newStatus ? 'Mengaktifkan ' : 'Menonaktifkan ';
+        $statusMessage = $newStatus ? 'Diaktifkan' : 'Dinonaktifkan';
+        $logStatus = $newStatus ? 'restore' : 'delete';
+        $this->logHelper->logActivity($logStatus, 'user', $logMessage . 'pengguna ' . $user->name);
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil ' . $statusMessage);
     }
 }

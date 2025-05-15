@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Event;
+use App\Helpers\SlugHelper;
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class EventSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class EventSeeder extends Seeder
         foreach ($events as $event) {
             Event::create([
                 'title' => $event,
+                'slug' => SlugHelper::generateUniqueSlug(Event::class, $event),
                 'user_id' => 1,
                 'description' => 'Description for ' . $event,
                 'date' => now()->addDays(rand(1, 30)),

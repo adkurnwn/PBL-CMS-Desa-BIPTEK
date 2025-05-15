@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
+use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
@@ -64,8 +65,9 @@ class NewsController extends Controller
         return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Ditambahkan');
     }
 
-    public function edit(News $news)
+    public function edit($slug)
     {
+        $news = News::where('slug', $slug)->firstOrFail();
         $categories = $this->categoryService->getCategoriesWithUsageCounts(1);
 
         return Inertia::render('Dashboard/News/Edit', [
@@ -75,8 +77,9 @@ class NewsController extends Controller
         ]);
     }
 
-    public function update(UpdateNewsRequest $request, News $news)
+    public function update(UpdateNewsRequest $request, $slug)
     {
+        $news = News::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
         if (!empty($request->category['deleting_category_id'])) {
@@ -123,15 +126,18 @@ class NewsController extends Controller
         ]);
     }
 
-    public function restore(News $news)
+    public function restore($slug)
     {
+        $news = News::withTrashed()->where('slug', $slug)->firstOrFail();
         $news->restore();
         $this->logHelper->logActivity('restore', 'news', 'Memulihkan berita ' . $news->title);
         return redirect()->route('dashboard.news.archive')->with('success', 'Berita Berhasil Dipulihkan');
     }
 
-    public function destroy(News $news)
+    public function destroy($slug)
     {
+        $news = News::withTrashed()->where('slug', $slug)->firstOrFail();
+
         if ($news->trashed()) {
             $this->mediaService->deleteAllMedia($news);
             $news->forceDelete();

@@ -76,7 +76,7 @@ const props = defineProps({
                                                 :href="
                                                     route(
                                                         'dashboard.demografi.edit',
-                                                        demografi.id
+                                                        demografi.tahun
                                                     )
                                                 "
                                             >

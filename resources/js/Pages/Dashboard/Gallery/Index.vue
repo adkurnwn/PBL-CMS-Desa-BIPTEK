@@ -10,9 +10,9 @@ const props = defineProps({
 
 const form = useForm({});
 
-const deleteGallery = (galleryId) => {
+const deleteGallery = (slug) => {
     if (confirm("Are you sure you want to delete this gallery?")) {
-        form.delete(route("dashboard.galleries.destroy", galleryId), {
+        form.delete(route("dashboard.galleries.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -72,7 +72,7 @@ const deleteGallery = (galleryId) => {
                                             :href="
                                                 route(
                                                     'dashboard.galleries.edit',
-                                                    gallery.id
+                                                    gallery.slug
                                                 )
                                             "
                                         >
@@ -81,7 +81,7 @@ const deleteGallery = (galleryId) => {
                                             </PrimaryButton>
                                         </Link>
                                         <DangerButton
-                                            @click="deleteGallery(gallery.id)"
+                                            @click="deleteGallery(gallery.slug)"
                                         >
                                             Delete
                                         </DangerButton>

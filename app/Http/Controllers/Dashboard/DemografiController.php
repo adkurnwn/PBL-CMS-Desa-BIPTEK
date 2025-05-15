@@ -43,15 +43,17 @@ class DemografiController extends Controller
         return redirect()->route('dashboard.demografi.index')->with('success', 'Demografi Berhasil Ditambahkan');
     }
 
-    public function edit(Demografi $demografi)
+    public function edit($slug)
     {
+        $demografi = Demografi::where('tahun', $slug)->firstOrFail();
         return Inertia::render('Dashboard/Demografi/Edit', [
             'demografi' => $demografi,
         ]);
     }
 
-    public function update(UpdateDemografiRequest $request, Demografi $demografi)
+    public function update(UpdateDemografiRequest $request, $slug)
     {
+        $demografi = Demografi::where('tahun', $slug)->firstOrFail();
         $demografiData = $request->all();
 
         $demografi->update($demografiData);

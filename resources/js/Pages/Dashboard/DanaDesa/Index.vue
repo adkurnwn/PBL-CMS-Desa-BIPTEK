@@ -55,7 +55,7 @@ const props = defineProps({
                                             :href="
                                                 route(
                                                     'dashboard.dana-desa.edit',
-                                                    dana_desa.id
+                                                    dana_desa.slug
                                                 )
                                             "
                                         >

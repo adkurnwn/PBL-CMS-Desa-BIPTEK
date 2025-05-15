@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Validation;
 
+use App\Models\ProdukHukum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProdukHukumRequest extends FormRequest
@@ -34,7 +35,8 @@ class UpdateProdukHukumRequest extends FormRequest
             $rules['link'] = 'nullable|url';
         } else {
             // If no file is uploaded and the product doesn't have a file, link is required
-            $produkHukum = $this->route('produk_hukum');
+            $slug = $this->route('slug');
+            $produkHukum = ProdukHukum::where('slug', $slug)->first();
 
             if (!$produkHukum || !$produkHukum->file) {
                 $rules['link'] = 'required|url';

@@ -16,10 +16,6 @@ const props = defineProps({
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     Profile Desa
                 </h2>
-
-                <!-- <Link :href="route('dashboard.profiles.edit', profile.id)">
-                    <PrimaryButton>Update Profile</PrimaryButton>
-                </Link> -->
             </div>
         </template>
 
@@ -55,7 +51,7 @@ const props = defineProps({
                                             :href="
                                                 route(
                                                     'dashboard.profiles.edit',
-                                                    profile.id
+                                                    profile.name
                                                 )
                                             "
                                         >
