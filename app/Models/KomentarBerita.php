@@ -12,6 +12,7 @@ class KomentarBerita extends Model
         'id_berita',
         'id_ref_komentar',
         'nama_user',
+        'email',
         'is_approved',
         'komentar'
     ];

@@ -67,6 +67,7 @@ class KomentarBeritaController extends Controller
         $rules = [
             'id_berita' => 'required|string',
             'nama_user' => 'required|string|max:50',
+            'email' => 'required|email|max:50',
             'komentar' => 'required|string',
             'id_ref_komentar' => 'nullable|exists:komentar_berita,id',
             'captcha' => 'required|captcha_api:' . $request->code . ',default'

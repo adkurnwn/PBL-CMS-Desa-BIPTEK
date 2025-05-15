@@ -4,6 +4,7 @@ import Comment from "@/Components/Comment.vue";
 import { ref, onMounted, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import axios from "axios";
+import DOMPurify from 'dompurify';
 
 const props = defineProps({
     slug: {
@@ -49,6 +50,10 @@ const getAvatar = (name) => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(
         name
     )}&background=random`;
+};
+
+const sanitizeHtml = (html) => {
+    return DOMPurify.sanitize(html);
 };
 
 const activeTab = ref("terkini"); // Default to "Terkini"
@@ -145,7 +150,7 @@ onMounted(() => {
                             >
                                 <div class="flex items-center space-x-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-accent2">
-                                        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm80 240v-80h400v80H280Zm0 160v-80h280v80H280Z"/>
+                                        <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0-33-23.5-56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm80 240v-80h400v80H280Zm0 160v-80h280v80H280Z"/>
                                     </svg>
                                     <h3 class="flex -mb-1">
                                         {{ formatDate(news.created_at) }}
@@ -197,9 +202,7 @@ onMounted(() => {
                                 />
                             </div>
                             <div class="pt-8 pb-2">
-                                <div class="text-lg text-semiBlack">
-                                    {{ news.content }}
-                                </div>
+                                <div class="text-lg text-semiBlack" v-html="sanitizeHtml(news.content)"></div>
                             </div>
                         </div>
 

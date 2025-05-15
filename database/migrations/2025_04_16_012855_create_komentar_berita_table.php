@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('komentar_berita', function (Blueprint $table) {
             $table->integerIncrements('id');
-            $table->string('email', 50)->unique();
+            $table->string('email', 50);
             $table->unsignedSmallInteger('id_berita');
             $table->foreign('id_berita')
                 ->references('id')
