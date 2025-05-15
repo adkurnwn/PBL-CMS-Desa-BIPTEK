@@ -7,16 +7,6 @@ import DangerButton from "@/Components/DangerButton.vue";
 const props = defineProps({
     demografi: Array,
 });
-
-const form = useForm({});
-
-const deleteDemografi = (demografiId) => {
-    if (confirm("Are you sure you want to delete this demographic data?")) {
-        form.delete(route("dashboard.demografi.destroy", demografiId), {
-            preserveScroll: true,
-        });
-    }
-};
 </script>
 
 <template>
@@ -78,7 +68,7 @@ const deleteDemografi = (demografiId) => {
                                         {{ demografi.jumlah_penduduk }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ demografi.jumlah_kk }}
+                                        {{ demografi.jumlah_keluarga }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex gap-2">
@@ -94,15 +84,6 @@ const deleteDemografi = (demografiId) => {
                                                     Edit
                                                 </PrimaryButton>
                                             </Link>
-                                            <DangerButton
-                                                @click="
-                                                    deleteDemografi(
-                                                        demografi.id
-                                                    )
-                                                "
-                                            >
-                                                Delete
-                                            </DangerButton>
                                         </div>
                                     </td>
                                 </tr>

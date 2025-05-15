@@ -50,7 +50,13 @@ const handleVideoChange = (e) => {
     form.video = e.target.files[0];
 };
 
-const submit = () => {
+const submit = (isDraft = null) => {
+    // Only update the draft status if explicitly passed
+    if (isDraft !== null) {
+        form.is_draft = isDraft;
+    }
+
+    // Handle image alt texts
     if (form.updated_existing_images && form.updated_existing_images.length) {
         form.updated_existing_images = form.updated_existing_images.map(
             (img) => {
@@ -68,6 +74,7 @@ const submit = () => {
             alt.trim() === "" ? form.title : alt
         );
     }
+
     form.post(route("dashboard.news.update", props.news.id), {
         preserveScroll: true,
         forceFormData: true,
@@ -181,30 +188,32 @@ const submit = () => {
                                 </div>
                             </div>
 
-                            <div>
-                                <div class="flex-row items-center">
-                                    <InputLabel for="is_draft" value="Draft" />
-                                    <input
-                                        id="is_draft"
-                                        v-model="form.is_draft"
-                                        type="checkbox"
-                                        class="rounded border-gray-300 mt-2"
-                                    />
-                                </div>
-                                <InputError
-                                    :message="form.errors.is_draft"
-                                    class="mt-2"
-                                />
-                            </div>
-
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Edit News
+                            <div class="mt-6 flex space-x-4">
+                                <PrimaryButton
+                                    type="button"
+                                    :disabled="form.processing"
+                                    @click="submit(false)"
+                                    class="bg-green-600 hover:bg-green-700"
+                                >
+                                    Publish News
                                 </PrimaryButton>
+
+                                <PrimaryButton
+                                    type="button"
+                                    :disabled="form.processing"
+                                    @click="submit(true)"
+                                    class="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    Save as Draft
+                                </PrimaryButton>
+
                                 <Link :href="route('dashboard.news.index')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
+                                    <PrimaryButton
+                                        type="button"
+                                        class="bg-gray-600 hover:bg-gray-700"
                                     >
+                                        Cancel
+                                    </PrimaryButton>
                                 </Link>
                             </div>
                         </form>

@@ -20,6 +20,7 @@ class InformasiPageController extends Controller
         return response()->json([
             'news' => $news->map(function ($item) {
                 return [
+                    'slug' => $item->slug,
                     'title' => $item->title,
                     'content' => $item->content,
                     'created_at' => Carbon::parse($item->created_at)->format('j F Y'),

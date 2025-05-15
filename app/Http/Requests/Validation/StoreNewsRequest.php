@@ -25,9 +25,9 @@ class StoreNewsRequest extends FormRequest
         $rules = [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'images' => 'sometimes|array|max:5',
+            'images' => 'required|array|max:5',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10000',
-            'alts.*' => 'required_with:images.*|string|max:255',
+            'alts.*' => 'nullable|string|max:255',
             'video' => 'nullable|mimetypes:video/mp4,video/ogg,video/webm|max:102400',
             'is_moderate' => 'required|boolean',
             'is_draft' => 'required|boolean',

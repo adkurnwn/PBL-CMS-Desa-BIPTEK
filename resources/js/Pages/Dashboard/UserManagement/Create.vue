@@ -14,7 +14,6 @@ const props = defineProps({
 // Add new position toggle
 const isNewPosition = ref(false);
 const newJobDescription = ref("");
-const jobDescriptions = ref([]);
 
 const form = useForm({
     name: "",
@@ -26,6 +25,19 @@ const form = useForm({
     new_position: "",
     job_descriptions: [],
 });
+
+// Modify the toggle function to clear relevant fields when switching modes
+const togglePositionMode = () => {
+    isNewPosition.value = !isNewPosition.value;
+
+    // Clear the appropriate field based on the new mode
+    if (isNewPosition.value) {
+        form.position_id = ""; // Clear position_id when switching to new position mode
+    } else {
+        form.new_position = ""; // Clear new_position when switching to existing position mode
+        form.job_descriptions = []; // Also clear job descriptions
+    }
+};
 
 const handleFileChange = (e) => {
     form.photo_profile = e.target.files[0];
@@ -199,9 +211,7 @@ const submit = () => {
                                         <button
                                             type="button"
                                             class="mt-1 px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
-                                            @click="
-                                                isNewPosition = !isNewPosition
-                                            "
+                                            @click="togglePositionMode"
                                         >
                                             {{
                                                 isNewPosition

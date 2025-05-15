@@ -54,7 +54,7 @@ onMounted(() => {
         </h1>
     </article>
     <!--Layanan Publik-->
-    <article class="w-full xl:px-20 md:px-16 sm:px-16 px-10 flex flex-col bg-type1 font-merriweather xl:mt-10 md:mt-8 sm:mt-8 mt-5">
+    <article class="w-full xl:px-20 md:px-16 sm:px-16 px-10 flex flex-col bg-type1 font-merriweather xl:mt-10 md:mt-8 sm:mt-8 mt-5 mb-14">
         <h1 class="xl:text-3xl sm:text-xl text-md font-semibold text-accent2">Layanan Publik</h1>
         <h2 class="xl:text-xl sm:text-lg text-xs text-semiBlack xl:my-2 sm:my-2 my-1">
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>

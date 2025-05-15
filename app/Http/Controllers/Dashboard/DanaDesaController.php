@@ -7,6 +7,8 @@ use App\Models\DanaDesa;
 use Illuminate\Http\Request;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreDanaDesaRequest;
+use App\Http\Requests\UpdateDanaDesaRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,21 +33,19 @@ class DanaDesaController extends Controller
         return Inertia::render('Dashboard/DanaDesa/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreDanaDesaRequest $request)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'file' => 'required|mimes:pdf|max:2048',
-            'link' => 'required',
-            'date' => 'required'
-        ];
-
-        $request->validate($rules);
         $data = $request->all();
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('dana-desa-documents', 'public');
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
             $data['file'] = $path;
         }
 
@@ -62,24 +62,25 @@ class DanaDesaController extends Controller
         ]);
     }
 
-    public function update(Request $request, DanaDesa $danaDesa)
+    public function update(UpdateDanaDesaRequest $request, DanaDesa $danaDesa)
     {
-        $rules = [
-            'title' => 'required|string|max:255',
-            'file' => 'required|mimes:pdf|max:2048',
-            'link' => 'required',
-            'date' => 'required'
-        ];
-
-        $request->validate($rules);
         $data = $request->all();
 
         if ($request->hasFile('file')) {
             if ($danaDesa->file) {
                 Storage::disk('public')->delete($danaDesa->file);
             }
-            $path = $request->file('file')->store('dana-desa-documents', 'public');
+
+            // Generate a sanitized filename from the title
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            $extension = $request->file('file')->getClientOriginalExtension();
+            $filename = $sanitizedTitle . '.' . $extension;
+
+            // Store the file with the custom filename
+            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
             $data['file'] = $path;
+        } else {
+            unset($data['file']);
         }
 
         $danaDesa->update($data);

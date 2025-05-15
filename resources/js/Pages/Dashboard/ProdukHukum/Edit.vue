@@ -45,11 +45,10 @@ const handleFileChange = (e) => {
 
 const submit = () => {
     form.post(route("dashboard.produk-hukum.update", props.produkHukum.id), {
-            onSuccess: () => form.reset(),
-            preserveScroll: true,
-            forceFormData: true,
-        }
-    );
+        onSuccess: () => form.reset(),
+        preserveScroll: true,
+        forceFormData: true,
+    });
 };
 </script>
 
@@ -94,7 +93,6 @@ const submit = () => {
                                         v-model="form.link"
                                         type="text"
                                         class="mt-1 block w-full"
-                                        required
                                     />
                                     <InputError
                                         :message="form.errors.link"
