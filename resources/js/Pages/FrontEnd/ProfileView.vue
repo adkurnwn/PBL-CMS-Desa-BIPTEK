@@ -248,7 +248,7 @@ const parseJson = (value) => {
                     </div>
                 </div>
                 <p
-                    class="flex items-center xl:ml-96 ml-60 xl:-mr-96 pl-44 -mt-5 text-secondary text-xl"
+                    class="flex items-center xl:ml-96 ml-60 xl:-mr-96 pl-44 -mt-5 text-secondary text-lg"
                 >
                     Selengkapnya
                     <svg
@@ -269,21 +269,21 @@ const parseJson = (value) => {
                 class="flex flex-col items-center w-full font-merriweather bg-type1"
             >
                 <h1
-                    class="text-accent1 text-4xl font-bold max-w-30 pr-96 -ml-96 mr-20 mt-14"
+                    class="text-accent1 xl:text-3xl sm:text-xl font-bold max-w-30 xl:pr-96 xl:-ml-96 sm:-ml-56 mr-36 mt-14"
                 >
                     Infrastruktur Desa
                 </h1>
                 <p
-                    class="text-xl text-semiBlack max-w-7xl -ml-60 -mb-96 italic"
+                    class="xl:text-xl sm:text-md text-semiBlack max-w-7xl xl:-ml-60 sm:ml-14 xl:mr-2 sm:mr-9 -mb-96 italic"
                 >
                     Informasi tentang sarana dan prasarana yang tersedia di desa
                     yang mendukung kehidupan masyarakat.
                 </p>
                 <div
-                    class="grid grid-cols-2 gap-2 p-[340px] bg-transparant -ml-96 mr-52 mt-14"
+                    class="grid grid-cols-2 xl:gap-2 gap-1 p-80 bg-transparant xl:-ml-96 sm:-ml-64 xl:mr-56 sm:-mr-12 mt-20"
                 >
                     <!-- Card 1 -->
-                    <div class="rounded-xl">
+                    <div>
                         <img
                             src="../../../images/JEMBATAN.png"
                             alt="Gambar 1"
@@ -291,15 +291,15 @@ const parseJson = (value) => {
                         />
                     </div>
                     <!-- Card 2 -->
-                    <div class="rounded-xl">
+                    <div>
                         <img
                             src="../../../images/GEDUNG_SERBA_GUNA.png"
                             alt="Gambar 2"
-                            class="w-72 rounded-lg"
+                            class="w-72 rounded-lg infrastruktur-img"
                         />
                     </div>
                     <!-- Card 3 -->
-                    <div class="rounded-xl">
+                    <div>
                         <img
                             src="../../../images/PASAR.png"
                             alt="Gambar 2"
@@ -307,7 +307,7 @@ const parseJson = (value) => {
                         />
                     </div>
                     <!-- Card 4 -->
-                    <div class="rounded-xl">
+                    <div>
                         <img
                             src="../../../images/BALAI_DESA.png"
                             alt="Gambar 2"
@@ -316,10 +316,10 @@ const parseJson = (value) => {
                     </div>
                 </div>
                 <div
-                    class="flex flex-wrap ml-96 pr-12 -mt-96 pt-8 text-accent2"
+                    class="flex flex-wrap ml-96 sm:pl-5 xl:-mt-96 -mt-48 xl:pt-12 sm:pt-7 text-accent2"
                 >
                     <ol
-                        class="list-disc list-inside font-semibold text-xl max-w-3xl space-y-1 -mt-96"
+                        class="list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-3xl xl:space-y-2 sm:space-y-1 xl:mr-0 sm:mr-5 -mt-96"
                     >
                         <li
                             v-for="(fasilitas, index) in parseFasilitas"
@@ -335,13 +335,13 @@ const parseJson = (value) => {
                 class="flex flex-col items-center w-full font-merriweather bg-type1 mt-3"
             >
                 <h1
-                    class="font-bold text-accent1 text-4xl max-w-30 pr-96 -ml-96 mr-40 mt-20"
+                    class="font-bold text-accent1 text-3xl max-w-30 pr-96 -ml-96 mr-52 mt-20"
                 >
                     Data Geografi
                 </h1>
                 <div class="flex flex-col w-96 -ml-96 mr-96 text-lg">
                     <div class="flex w-full">
-                        <p class="w-1/3 font-bold text-accent1 -ml-2">
+                        <p class="w-1/3 font-bold text-accent1 -ml-3">
                             Koordinat
                         </p>
                         <p class="w-1/2 text-accent2 -ml-4">
@@ -349,7 +349,7 @@ const parseJson = (value) => {
                         </p>
                     </div>
                     <div class="flex w-full">
-                        <p class="w-1/3 font-bold text-accent1 -ml-2">
+                        <p class="w-1/3 font-bold text-accent1 -ml-3">
                             Luas Desa
                         </p>
                         <p class="w-1/2 text-accent2 -ml-4">: 9.300.000 m²</p>
@@ -357,7 +357,7 @@ const parseJson = (value) => {
                 </div>
                 <div class="h-96">
                     <iframe
-                        class="xl:w-[700px] w-[400px] xl:h-full h-72 xl:-ml-20 xl:mr-96 mr-40 rounded-lg mt-2"
+                        class="xl:w-[700px] w-[400px] xl:h-full h-72 xl:-ml-24 xl:mr-96 mr-40 rounded-lg mt-2"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15910.138432608619!2d119.61024555!3d-4.4971499999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbe258c1d785e89%3A0xcb84698ceea645b7!2sPao-Pao%2C%20Kec.%20Tanete%20Rilau%2C%20Kabupaten%20Barru%2C%20Sulawesi%20Selatan!5e0!3m2!1sid!2sid!4v1741847539077!5m2!1sid!2sid"
                         style="border: 0"
                         allowfullscreen=""
@@ -384,7 +384,7 @@ const parseJson = (value) => {
                 <div
                     class="xl:mt-24 mt-11 xl:-ml-80 ml-24 xl:pr-6 text-accent1 xl:text-lg text-sm"
                 >
-                    <p class="font-bold -ml-28">
+                    <p class="font-bold -ml-32">
                         GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru,
                         Sulawesi Selatan 90761
                     </p>
