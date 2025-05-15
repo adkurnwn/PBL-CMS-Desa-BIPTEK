@@ -26,7 +26,8 @@ class PermissionSeeder extends Seeder
             'comments',
             'demografi',
             'feedbacks',
-            'activity-logs'
+            'activity-logs',
+            'recovery',
         ];
 
         foreach ($features as $feature) {

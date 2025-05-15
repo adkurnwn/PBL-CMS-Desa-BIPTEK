@@ -16,6 +16,7 @@ use App\Http\Controllers\Dashboard\KomentarBeritaController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\KomentarProdukHukumController;
+use App\Http\Controllers\Dashboard\RecoveryController;
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:manage_activity-logs'])->get('/dashboard', [ActivityLogController::class, 'index'])->name('dashboard');
@@ -117,6 +118,14 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
                 'only' => ['index', 'show']
             ]);
             Route::post('/feedbacks/{feedback}/respond', [FeedbackController::class, 'respond'])->name('dashboard.feedbacks.respond');
+        });
+
+        Route::middleware(['permission:manage_recovery'])->group(function () {
+            Route::get('/recovery', [RecoveryController::class, 'index'])->name('dashboard.recovery.index');
+            Route::post('/recovery/create', [RecoveryController::class, 'create'])->name('dashboard.recovery.create');
+            Route::get('/recovery/download/{fileName}', [RecoveryController::class, 'download'])->name('dashboard.recovery.download');
+            Route::post('/recovery/restore/{fileName}', [RecoveryController::class, 'restore'])->name('dashboard.recovery.restore');
+            Route::delete('/recovery/delete/{fileName}', [RecoveryController::class, 'delete'])->name('dashboard.recovery.delete');
         });
     });
 });
