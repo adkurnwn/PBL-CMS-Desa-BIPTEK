@@ -289,6 +289,14 @@ const showAdminDropdown = ref(false);
                                         >
                                             Recovery
                                         </Link>
+                                        <Link
+                                            :href="
+                                                route('dashboard.settings.edit')
+                                            "
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Settings
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
