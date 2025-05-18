@@ -1,6 +1,6 @@
 <script setup>
 import GuestLayout from "@/Layouts/GuestLayout.vue";
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import ApplicationLogo from "@/Components/DashboardComponent/ApplicationLogo.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import { ref, onMounted } from 'vue';
 
