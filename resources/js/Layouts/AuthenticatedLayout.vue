@@ -60,20 +60,13 @@ const handleSidebarCollapse = (collapsed) => {
                 <!-- Page Heading - Fixed position relative to parent -->
                 <div class="bg-white w-full" v-if="$slots.header">
                     <div class="max-w-full mx-auto pl-[10px]">
-                        <div class="flex items-center">
-                            <!-- 40px square icon - can be overridden by page-specific icon -->
-                            <div class="w-[40px] h-[40px] bg-transparent rounded flex items-center justify-center text-selectedText">
-                                <!-- Use page-specific icon if provided -->
-                                <slot name="page-icon">
-                                    <!-- Default icon as fallback -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                    </svg>
-                                </slot>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                    <slot name="page-icon"></slot>
+                                <slot name="header"></slot>
                             </div>
-                            <!-- 10px gap provided by mr-[10px] -->
-                            <div class="ml-[10px]">
-                                <slot name="header" />
+                            <div v-if="$slots['header-actions']">
+                                <slot name="header-actions"></slot>
                             </div>
                         </div>
                     </div>
@@ -107,9 +100,12 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
+                <!-- Blank Space (nanti buat flash msg) -->
+                <div class="h-[97px]"></div>
+
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 
-                    class="flex-1 w-full py-[97px] pr-[23px]" 
+                    class="flex-1 w-full pr-[23px]" 
                     thumbColor="rgba(79, 70, 229, 0.4)" 
                     thumbHoverColor="rgba(79, 70, 229, 0.6)"
                 >
@@ -198,5 +194,10 @@ const handleSidebarCollapse = (collapsed) => {
 /* Don't apply these styles to the sidebar */
 :deep(*:not(.sidebar)::-webkit-scrollbar) {
     display: none;
+}
+
+/* Add special handling for dashboard page */
+:deep(.dashboard-page) {
+    overflow: visible !important;
 }
 </style>
