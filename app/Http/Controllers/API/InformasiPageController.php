@@ -8,6 +8,9 @@ use App\Models\Gallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NewsResource;
+use App\Http\Resources\EventResource;
+use App\Http\Resources\GalleryResource;
 
 class InformasiPageController extends Controller
 {
@@ -18,39 +21,10 @@ class InformasiPageController extends Controller
         $news = News::latest()->take(6)->get();
 
         return response()->json([
-            'news' => $news->map(function ($item) {
-                return [
-                    'slug' => $item->slug,
-                    'title' => $item->title,
-                    'content' => $item->content,
-                    'created_at' => Carbon::parse($item->created_at)->format('j F Y'),
-                    'views' => $item->views,
-                    'image' => [
-                        'path' => $item->images->first()->path ?? null,
-                        'alt' => $item->images->first()->alt ?? null
-                    ],
-                    'category' => $item->category,
-                    'author' => [
-                        'name' => $item->user->name,
-                    ],
-                ];
-            }),
-            'events' => $events->map(function ($item) {
-                return [
-                    'title' => $item->title,
-                    'date' => Carbon::parse($item->date)->format('D, j M Y'),
-                    'time' => Carbon::parse($item->time)->format('H:i'),
-                    'location' => $item->location,
-                ];
-            }),
-            'gallery' => [
-                'images' => $gallery->images->take(5)->map(function ($image) {
-                    return [
-                        'path' => $image->path,
-                        'alt' => $image->alt
-                    ];
-                }),
-            ],
+            'news' => NewsResource::collection($news),
+            'events' => EventResource::collection($events),
+            'gallery' => $gallery ? new GalleryResource($gallery) : null
+
         ]);
     }
 }
