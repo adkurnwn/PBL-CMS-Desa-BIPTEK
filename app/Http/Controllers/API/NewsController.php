@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\NewsResource;
 
 class NewsController extends Controller
 {
@@ -19,7 +20,7 @@ class NewsController extends Controller
             ->withCount('comments')
             ->paginate(12);
 
-        return response()->json($news);
+        return NewsResource::collection($news);
     }
 
     /**
