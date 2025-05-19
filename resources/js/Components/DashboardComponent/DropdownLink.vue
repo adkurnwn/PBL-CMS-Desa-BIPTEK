@@ -32,11 +32,11 @@ defineProps({
 <template>
     <div>
         <button
-            v-if="as === 'button'"
-            type="submit"
-            class="w-full text-left dropdown-item"
+            v-if="as === 'button' && method === 'get'"
+            type="button"
+            class="w-full text-left block px-4 py-2 text-sm leading-5 transition duration-150 ease-in-out"
             :class="{
-                'active': active,
+                'active': active, 
                 'danger': danger
             }"
             @click="$emit('click', $event)"
@@ -44,27 +44,33 @@ defineProps({
             <slot />
         </button>
 
+        <!-- Special case for post/put/delete methods with button rendering -->
         <Link
-            v-else-if="as === 'a'"
+            v-else-if="as === 'button' && method !== 'get'"
             :href="href"
-            class="dropdown-item"
+            :method="method"
+            :preserve-scroll="preserveScroll"
+            as="button"
+            type="button"
+            class="w-full text-left block px-4 py-2 text-sm leading-5 transition duration-150 ease-in-out dropdown-item"
             :class="{
-                'active': active,
+                'active': active, 
                 'danger': danger
             }"
         >
             <slot />
         </Link>
 
+        <!-- Regular link with get method -->
         <Link
             v-else
             :href="href"
             :method="method"
             :as="as"
             :preserve-scroll="preserveScroll"
-            class="dropdown-item"
+            class="block px-4 py-2 text-sm leading-5 transition duration-150 ease-in-out dropdown-item"
             :class="{
-                'active': active,
+                'active': active, 
                 'danger': danger
             }"
         >

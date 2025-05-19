@@ -1,15 +1,45 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
-import { ref, onMounted, computed } from "vue";
+import { Head, router } from "@inertiajs/vue3";
+import { ref, onMounted, computed, watch } from "vue";
 import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 
 const props = defineProps({
-    logs: Array,
+    logs: Object,
+    currentPage: {
+        type: Number,
+        default: 1
+    },
+    sortField: {
+        type: String,
+        default: 'time'
+    },
+    sortDirection: {
+        type: String,
+        default: 'desc'
+    }
 });
 
-const activityLogs = computed(() => props.logs || []);
+// Extract the logs data from the paginated response
+const activityLogs = computed(() => props.logs?.data || []);
+
+// Extract pagination info with more explicit debugging
+const pagination = computed(() => {
+    if (!props.logs) return null;
+    
+    const paginationData = {
+        currentPage: props.logs.current_page,
+        lastPage: props.logs.last_page,
+        perPage: props.logs.per_page,
+        total: props.logs.total,
+    };
+    
+    // Debug output
+    console.log('Pagination info:', paginationData);
+    
+    return paginationData;
+});
 
 const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("id-ID", {
@@ -21,12 +51,18 @@ const formatDate = (dateString) => {
     });
 };
 
+// Function to get avatar URL from photo_profile
+const getAvatarUrl = (user) => {
+    if (!user || !user.photo_profile) return null;
+    return `/storage/${user.photo_profile}`;
+};
+
 // Table headers configuration with custom styling for Pengguna column and avatar
 const tableHeaders = [
     {
         label: 'Pengguna',
         field: 'user',
-        sortable: true,
+        sortable: false,  // Changed to false
         nowrap: true,
         width: '270px',
         style: {
@@ -45,21 +81,21 @@ const tableHeaders = [
     {
         label: 'Aksi',
         field: 'action',
-        sortable: true,
+        sortable: false,  // Changed to false
         nowrap: true,
         width: '190px'
     },
     {
         label: 'Modul',
         field: 'module',
-        sortable: true,
+        sortable: false,  // Changed to false
         nowrap: true,
         width: '250px'
     },
     {
         label: 'Deskripsi',
         field: 'description',
-        sortable: true,
+        sortable: false,  // Changed to false
         nowrap: false,
         minWidth: '450px',
         // No fixed width to allow it to take remaining space
@@ -67,7 +103,7 @@ const tableHeaders = [
     {
         label: 'Waktu',
         field: 'time',
-        sortable: true,
+        sortable: true,   // Only this column remains sortable
         nowrap: true,
         width: '264px',
         style: {
@@ -84,8 +120,8 @@ const tableHeaders = [
 const tableItems = computed(() => {
     return activityLogs.value.map(log => ({
         user: log.user?.name || "System",
-        // Add avatarUrl field for user profile picture
-        avatarUrl: log.user?.avatar_url || null,
+        // Create avatarUrl directly without using accessor
+        avatarUrl: getAvatarUrl(log.user),
         action: log.action,
         module: log.module,
         description: log.description,
@@ -94,6 +130,69 @@ const tableItems = computed(() => {
         raw: log
     }));
 });
+
+// Handle pagination changes
+const handlePageChanged = (newPage) => {
+    if (newPage === 1) {
+        router.get(route('dashboard'), {
+            sort: props.sortField,
+            direction: props.sortDirection
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs']
+        });
+    } else {
+        router.get(route('dashboard.page', { page: newPage }), {
+            sort: props.sortField,
+            direction: props.sortDirection
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs']
+        });
+    }
+};
+
+// Handle sorting - simplified for time only
+const handleSort = (field) => {
+    // Only allow sorting on time field
+    if (field !== 'time') return;
+    
+    // Toggle sort direction
+    const sortDirection = props.sortDirection === 'asc' ? 'desc' : 'asc';
+    
+    // Navigate to the appropriate route with sort parameters
+    if (props.currentPage === 1) {
+        router.get(route('dashboard'), {
+            direction: sortDirection
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs', 'sortDirection']
+        });
+    } else {
+        router.get(route('dashboard.page', { page: props.currentPage }), {
+            direction: sortDirection
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs', 'sortDirection']
+        });
+    }
+};
+
+// Add a console log to verify pagination data
+watch(() => props.logs, (newLogs) => {
+    if (newLogs) {
+        console.log('Pagination Data:', {
+            currentPage: newLogs.current_page,
+            lastPage: newLogs.last_page,
+            perPage: newLogs.per_page,
+            total: newLogs.total
+        });
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -127,8 +226,20 @@ const tableItems = computed(() => {
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
                     <div class="text-gray-900 h-full">
-                        <Tabel :headers="tableHeaders" :items="tableItems" :pagination="true" :items-per-page="25"
-                            empty-state-message="Log aktivitas tidak ditemukan.">
+                        <Tabel 
+                            :headers="tableHeaders" 
+                            :items="tableItems" 
+                            :pagination="true" 
+                            :items-per-page="pagination?.perPage || 25"
+                            :total-items="pagination?.total || 0"
+                            empty-state-message="Log aktivitas tidak ditemukan."
+                            :current-page="pagination?.currentPage || 1"
+                            :total-pages="pagination?.lastPage || 1"
+                            @page-changed="handlePageChanged"
+                            @sort="handleSort"
+                            :sort-field="sortField"
+                            :sort-direction="sortDirection"
+                        >
                             <!-- Action column customization -->
                             <template #item.Aksi="{ item }">
                                 <span class="px-2 py-1 text-xs rounded-full" :class="{

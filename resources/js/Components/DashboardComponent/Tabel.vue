@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import Pagination from "@/Components/DashboardComponent/Pagination.vue";
 
 const props = defineProps({
@@ -47,35 +47,55 @@ const props = defineProps({
     itemsPerPage: {
         type: Number,
         default: 25  // Updated default to 25 items per page
+    },
+    // Add props for external pagination control
+    currentPage: {
+        type: Number,
+        default: 1
+    },
+    totalPages: {
+        type: Number,
+        default: 1
+    },
+    // Add props for external sorting control
+    sortField: {
+        type: String,
+        default: null
+    },
+    sortDirection: {
+        type: String,
+        default: 'asc'
     }
 });
+
+const emit = defineEmits(['page-changed', 'sort']);
 
 // Helper to get field name for a header (fallback to lowercase label if not provided)
 const getFieldName = (header) => {
     return header.field || header.label.toLowerCase();
 };
 
-// Add sort state tracking
-const sortColumn = ref(null);
-const sortDirection = ref('asc');
-
-// Function to handle sorting
+// Update sort function to emit event instead of locally sorting
 const sortBy = (column) => {
-    if (sortColumn.value === column) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortColumn.value = column;
-        sortDirection.value = 'asc';
-    }
+    const header = props.headers.find(h => h.label === column);
+    if (!header || !header.sortable) return;
     
-    // Here you would typically sort the data
-    // For now we'll just track the state for the UI
+    // Get the field name for this column
+    const field = getFieldName(header);
+    
+    // Emit the sort event to be handled by the parent
+    emit('sort', field);
 };
 
-// Helper to determine icon rotation class
+// Update the sort icon to use props instead of local state
 const getSortIconClass = (column) => {
-    if (sortColumn.value !== column) return '';
-    return sortDirection.value === 'desc' ? 'rotate-180' : '';
+    const header = props.headers.find(h => h.label === column);
+    if (!header) return '';
+    
+    const field = getFieldName(header);
+    if (props.sortField !== field) return '';
+    
+    return props.sortDirection === 'desc' ? 'rotate-180' : '';
 };
 
 // Convert style object to inline style string
@@ -90,53 +110,38 @@ const styleObjectToString = (styleObj) => {
         .join('; ');
 };
 
-// Compute sorted items
-const sortedItems = computed(() => {
-    if (!sortColumn.value) return props.items;
-    
-    return [...props.items].sort((a, b) => {
-        const sortHeader = props.headers.find(h => h.label === sortColumn.value);
-        if (!sortHeader) return 0;
-        
-        const fieldName = getFieldName(sortHeader);
-        
-        const aValue = a[fieldName];
-        const bValue = b[fieldName];
-        
-        // Handle null or undefined values
-        if (aValue === null || aValue === undefined) return 1;
-        if (bValue === null || bValue === undefined) return -1;
-        
-        // String comparison
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-            return sortDirection.value === 'asc' 
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
-        }
-        
-        // Number comparison
-        return sortDirection.value === 'asc' 
-            ? aValue - bValue
-            : bValue - aValue;
-    });
+// Use props for pagination or internal state
+const internalCurrentPage = ref(props.currentPage);
+
+// Watch for external currentPage changes
+watch(() => props.currentPage, (newValue) => {
+    internalCurrentPage.value = newValue;
 });
 
-// Pagination logic
-const currentPage = ref(1);
-const totalPages = computed(() => {
+const totalPagesComputed = computed(() => {
+    if (props.pagination && props.totalPages > 1) {
+        return props.totalPages;
+    }
     return Math.max(1, Math.ceil(props.items.length / props.itemsPerPage));
 });
 
 const paginatedItems = computed(() => {
+    // If using external pagination, just return the sorted items
+    if (props.pagination && props.totalPages > 1) {
+        return sortedItems.value;
+    }
+    
+    // Otherwise, handle pagination locally
     if (!props.pagination) return sortedItems.value;
     
-    const startIndex = (currentPage.value - 1) * props.itemsPerPage;
+    const startIndex = (internalCurrentPage.value - 1) * props.itemsPerPage;
     const endIndex = startIndex + props.itemsPerPage;
     return sortedItems.value.slice(startIndex, endIndex);
 });
 
 const handlePageChanged = (page) => {
-    currentPage.value = page;
+    internalCurrentPage.value = page;
+    emit('page-changed', page);
 };
 
 // Function to get initials from a name
@@ -229,7 +234,7 @@ const getColumnWidthStyle = (header) => {
                 </table>
             </div>
             
-            <!-- Scrollable content area - with height constraint -->
+            <!-- Scrollable content area - now uses items directly since sorting is server-side -->
             <div class="table-content">
                 <table class="min-w-full divide-y divide-gray-200 table-fixed">
                     <colgroup>
@@ -241,7 +246,7 @@ const getColumnWidthStyle = (header) => {
                     </colgroup>
                     <tbody class="bg-white divide-y divide-gray-200 text-TableText">
                         <tr
-                            v-for="(item, rowIndex) in paginatedItems"
+                            v-for="(item, rowIndex) in items"
                             :key="`row-${rowIndex}`"
                             :class="{ 'bg-menuBG': rowIndex % 2 !== 0, 'bg-white': rowIndex % 2 === 0 }"
                             class="h-[107px] text-[18px]"
@@ -302,9 +307,11 @@ const getColumnWidthStyle = (header) => {
             <div class="sticky-pagination">
                 <Pagination
                     v-if="pagination"
-                    :current-page="currentPage"
-                    :total-pages="totalPages"
+                    :current-page="internalCurrentPage"
+                    :total-pages="totalPagesComputed"
                     :max-visible-buttons="5"
+                    :total-items="items.length"
+                    :items-per-page="itemsPerPage"
                     @page-changed="handlePageChanged"
                 />
             </div>
