@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\Event;
+use App\Helpers\SlugHelper;
 use Illuminate\Http\Request;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
@@ -43,6 +44,7 @@ class EventController extends Controller
         $request->validate($rules);
 
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(Event::class, $request->title);
         $data['user_id'] = Auth::id();
 
         Event::create($data);
@@ -51,15 +53,18 @@ class EventController extends Controller
         return redirect()->route('dashboard.events.index')->with('success', 'Event Berhasil Ditambahkan');
     }
 
-    public function edit(Event $event)
+    public function edit($slug)
     {
+        $event = Event::where('slug', $slug)->firstOrFail();
+
         return Inertia::render('Dashboard/Events/Edit', [
             'event' => $event,
         ]);
     }
 
-    public function update(Request $request, Event $event)
+    public function update(Request $request, $slug)
     {
+        $event = Event::where('slug', $slug)->firstOrFail();
         $rules = [
             'title' => 'required',
             'description' => 'required',
@@ -71,6 +76,7 @@ class EventController extends Controller
         $request->validate($rules);
 
         $data = $request->all();
+        $data['slug'] = SlugHelper::generateUniqueSlug(Event::class, $request->title);
 
         $event->update($data);
 

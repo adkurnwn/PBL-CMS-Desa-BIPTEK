@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->decimal('price', 10, 0);
             $table->string('nama_penjual');
-            $table->string('alamat_penjual')->nullable();
+            $table->string('alamat_penjual');
             $table->string('kontak_penjual', 20);
             $table->string('instagram')->nullable();
             $table->string('facebook')->nullable();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('tiktok')->nullable();
             $table->string('youtube')->nullable();
             $table->text('description');
-            $table->boolean('status')->default(true)->comment('0 = inactive, 1 = active');
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

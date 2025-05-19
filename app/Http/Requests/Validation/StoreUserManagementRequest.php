@@ -31,14 +31,8 @@ class StoreUserManagementRequest extends FormRequest
             'password' => ['required', Password::defaults()],
             'phone' => 'required|string|max:20',
             'photo_profile' => 'required|image|max:1024|mimes:jpg,png,jpeg',
+            'position_id' => 'required|exists:positions,id',
         ];
-
-        if ($this->filled('new_position')) {
-            $rules['new_position'] = 'required|string|max:255';
-            $rules['job_descriptions'] = 'required|array|min:1';
-        } else {
-            $rules['position_id'] = 'required|exists:positions,id';
-        }
 
         return $rules;
     }
@@ -46,12 +40,9 @@ class StoreUserManagementRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            // Check if the position is Kepala Desa
             $isKepalaDesa = false;
 
-            if ($this->filled('new_position') && $this->new_position === 'Kepala Desa') {
-                $isKepalaDesa = true;
-            } elseif ($this->filled('position_id')) {
+            if ($this->filled('position_id')) {
                 $position = Position::find($this->position_id);
                 if ($position && $position->name === 'Kepala Desa') {
                     $isKepalaDesa = true;

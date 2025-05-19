@@ -18,8 +18,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
+            $table->string('slug')->unique();
             $table->string('title');
-            $table->string('file');
+            $table->string('file')->nullable();
             $table->string('link')->nullable();
             $table->date('date');
             $table->timestamps();

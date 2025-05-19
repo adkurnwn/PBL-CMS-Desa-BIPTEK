@@ -18,9 +18,9 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
+            $table->year('tahun')->unique();
             $table->unsignedSmallInteger('penduduk_pria');
             $table->unsignedSmallInteger('penduduk_wanita');
-            $table->year('tahun');
             $table->unsignedSmallInteger('jumlah_peserta_bpjs');
             $table->unsignedSmallInteger('jumlah_pindah_keluar');
             $table->unsignedSmallInteger('jumlah_pendatang');

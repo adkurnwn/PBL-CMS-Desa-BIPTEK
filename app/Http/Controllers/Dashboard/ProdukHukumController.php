@@ -65,8 +65,9 @@ class ProdukHukumController extends Controller
         return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum Berhasil Ditambahkan');
     }
 
-    public function edit(ProdukHukum $produkHukum)
+    public function edit($slug)
     {
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
         $categories = $this->categoryService->getCategoriesWithUsageCounts(0);
 
         return Inertia::render('Dashboard/ProdukHukum/Edit', [
@@ -76,8 +77,9 @@ class ProdukHukumController extends Controller
         ]);
     }
 
-    public function update(UpdateProdukHukumRequest $request, ProdukHukum $produkHukum)
+    public function update(UpdateProdukHukumRequest $request, $slug)
     {
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? [], 0);
 
         if (!empty($request->category['deleting_category_id'])) {

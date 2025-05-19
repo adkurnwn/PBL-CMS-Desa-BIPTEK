@@ -9,6 +9,7 @@ class DanaDesa extends Model
     protected $table = 'dana_desa';
     protected $fillable = [
         'title',
+        'slug',
         'user_id',
         'file',
         'link',

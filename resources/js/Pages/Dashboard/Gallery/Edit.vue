@@ -76,7 +76,7 @@ const submit = () => {
         );
     }
 
-    form.post(route("dashboard.galleries.update", props.gallery.id), {
+    form.post(route("dashboard.galleries.update", props.gallery.slug), {
         preserveScroll: true,
         forceFormData: true,
     });

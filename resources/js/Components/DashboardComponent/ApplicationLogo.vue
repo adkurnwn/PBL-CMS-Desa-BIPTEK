@@ -1,10 +1,17 @@
+<script>
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+    name: 'ApplicationLogo'
+});
+</script>
+
 <script setup>
-import { defineProps } from "vue";
 const props = defineProps({
-    logo: {
-        type: String,
-        default: "/images/logo.png",
-    },
+        logo: {
+                type: String,
+                default: "/images/logo.png",
+        },
 });
 </script>
 <template>

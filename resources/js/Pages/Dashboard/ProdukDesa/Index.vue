@@ -10,12 +10,10 @@ const props = defineProps({
 
 const form = useForm({});
 
-const deleteProduk = (produkId) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-        form.delete(route("dashboard.produk-desa.destroy", produkId), {
-            preserveScroll: true,
-        });
-    }
+const toggleProdukStatus = (slug) => {
+    form.delete(route("dashboard.produk-desa.destroy", slug), {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -97,7 +95,7 @@ const deleteProduk = (produkId) => {
                                                 :href="
                                                     route(
                                                         'dashboard.produk-desa.edit',
-                                                        produk.id
+                                                        produk.slug
                                                     )
                                                 "
                                             >
@@ -105,11 +103,35 @@ const deleteProduk = (produkId) => {
                                                     Edit
                                                 </PrimaryButton>
                                             </Link>
-                                            <DangerButton
-                                                @click="deleteProduk(produk.id)"
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="flex items-center">
+                                            <button
+                                                @click="
+                                                    toggleProdukStatus(
+                                                        produk.slug
+                                                    )
+                                                "
+                                                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                :class="
+                                                    produk.status
+                                                        ? 'bg-indigo-600'
+                                                        : 'bg-gray-200'
+                                                "
+                                                role="switch"
+                                                :aria-checked="produk.status"
                                             >
-                                                Delete
-                                            </DangerButton>
+                                                <span
+                                                    aria-hidden="true"
+                                                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                                    :class="
+                                                        produk.status
+                                                            ? 'translate-x-5'
+                                                            : 'translate-x-0'
+                                                    "
+                                                ></span>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

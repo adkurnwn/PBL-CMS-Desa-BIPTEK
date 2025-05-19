@@ -24,8 +24,10 @@ class ProdukDesaSeeder extends Seeder
                 'user_id' => 1,
                 'nama_penjual' => 'John Doe',
                 'kontak_penjual' => '08123456789',
+                'alamat_penjual' => 'Jl. Contoh Alamat No. 123',
                 'description' => 'Description for ' . $produk,
                 'price' => rand(10000, 100000),
+                'status' => true,
             ]);
             $produkDesa->images()->create([
                 'path' => '/produk-desa-images/' . $i . '.jpg',
