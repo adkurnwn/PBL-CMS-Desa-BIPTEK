@@ -55,6 +55,7 @@ class KomentarBeritaController extends Controller
     {
         return $replies->map(function ($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            $reply->replies_count = $reply->replies ? $reply->replies->count() : 0; // <-- add this line
             if ($reply->replies) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }

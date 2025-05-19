@@ -60,10 +60,10 @@ onUnmounted(() => {
                 <h1
                     class="text-white font-bold text-base sm:text-2xl lg:text-xl"
                 >
-                    {{ layout.name || "Desa Karanganom" }}
+                    {{ layout.name }}
                 </h1>
                 <p class="text-white text-[12px] sm:text-base lg:text-sm">
-                    {{ layout.kabupaten || "Klaten" }}
+                    {{ layout.kabupaten }}
                 </p>
             </div>
         </div>

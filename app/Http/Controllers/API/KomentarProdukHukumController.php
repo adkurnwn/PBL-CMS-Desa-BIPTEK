@@ -28,16 +28,23 @@ class KomentarProdukHukumController extends Controller
     {
         $produkhukum = ProdukHukum::findOrFail($produkhukumId);
 
-        // Only get direct replies to the comment
+        // Get ALL replies for this document (not just direct children)
         $replies = KomentarProdukHukum::where('id_produk_hukum', $produkhukumId)
-            ->where('id_ref_komentar', $commentId)
+            ->whereNotNull('id_ref_komentar')
             ->when($produkhukum->is_moderate, function($query) {
                 $query->where('is_approved', true);
             })
             ->with(['parent', 'replies'])
             ->get();
 
-        return response()->json($this->addParentUserNames($replies));
+        // Add parent_user for UI
+        $replies->transform(function($reply) {
+            $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            $reply->replies_count = $reply->replies()->count();
+            return $reply;
+        });
+
+        return response()->json($replies);
     }
 
     private function addParentUserNames($replies)

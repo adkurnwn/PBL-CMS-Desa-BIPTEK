@@ -88,7 +88,7 @@
             </div> -->
 
             <!-- Document Actions -->
-            <div class="flex space-x-4">
+            <!-- <div class="flex space-x-4">
               <a v-if="dokumen.file"
                  :href="`/storage/${dokumen.file}`"
                  target="_blank"
@@ -103,7 +103,7 @@
               >
                 View External Link
               </a>
-            </div>
+            </div> -->
 
             <!-- Back Button -->
             <!-- <div class="mt-8">
@@ -113,355 +113,9 @@
             </div> -->
         </div>
 
-        <!-- Comments Section -->
         <div class="mt-12">
-              <h2 class="text-2xl font-bold mb-6">Komentar</h2>
-              
-              <!-- Comment Form -->
-              <form @submit.prevent="submitComment" class="mb-8">
-                <div class="mb-4">
-                  <input 
-                    v-model="commentForm.nama_user"
-                    type="text"
-                    placeholder="Masukkan Nama..."
-                    class="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div class="mb-4">
-                  <textarea
-                    v-model="commentForm.komentar"
-                    placeholder="Masukkan Komentar..."
-                    rows="4"
-                    class="w-full p-2 border rounded"
-                    required
-                  ></textarea>
-                </div>
-                <div class="mb-4">
-                  <div class="flex items-center gap-4 mb-2">
-                    <img 
-                      :src="mainCaptchaData?.image" 
-                      alt="CAPTCHA" 
-                      class="h-10"
-                    />
-                    <button 
-                      type="button" 
-                      @click="() => refreshCaptcha('main')"
-                      class="text-blue-600 hover:text-blue-800"
-                    >
-                      Refresh Captcha
-                    </button>
-                  </div>
-                  <input
-                    v-model="commentForm.captcha"
-                    type="text"
-                    placeholder="Masukkan kode captcha..."
-                    class="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <button 
-                  type="submit"
-                  class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  :disabled="submitting"
-                >
-                  {{ submitting ? 'Mengirim...' : 'Kirim Komentar' }}
-                </button>
-              </form>
-
-              <!-- Comments List -->
-              <div class="space-y-6">
-                <template v-for="comment in comments" :key="comment.id">
-                  <div class="bg-gray-50 p-4 rounded">
-                    <!-- Main Comment -->
-                    <div class="flex gap-3">
-                      <img :src="getAvatar(comment.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
-                      <div class="flex-1">
-                        <div class="font-semibold">{{ comment.nama_user }}</div>
-                        <div class="text-gray-600 mt-1">{{ comment.komentar }}</div>
-                        <div class="flex items-center justify-between mt-2">
-                          <div class="flex items-center gap-4">
-                            <div class="text-sm text-gray-500">
-                              {{ formatDate(comment.created_at) }}
-                            </div>
-                            <!-- Add Show Replies button if has replies -->
-                            <button 
-                              v-if="comment.replies_count > 0"
-                              @click="loadReplies(comment)" 
-                              class="text-sm text-gray-600 hover:text-gray-800"
-                            >
-                              {{ comment.showReplies ? 'Sembunyikan' : 'Tampilkan' }} 
-                              {{ comment.replies_count }} {{ 'balasan'}}
-                            </button>
-                          </div>
-                          <button 
-                            @click="showReplyForm(comment.id)" 
-                            class="text-blue-600 text-sm hover:text-blue-800"
-                          >
-                            Balas
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Reply Form -->
-                    <div v-if="activeReplyId === comment.id" class="mt-4 ml-8">
-                      <form @submit.prevent="submitReply(comment.id)" class="space-y-4">
-                        <div>
-                          <input 
-                            v-model="replyForm.nama_user"
-                            type="text"
-                            placeholder="Masukkan Nama..."
-                            class="w-full p-2 border rounded"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <textarea
-                            v-model="replyForm.komentar"
-                            placeholder="Masukkan Balasan..."
-                            rows="3"
-                            class="w-full p-2 border rounded"
-                            required
-                          ></textarea>
-                        </div>
-                        <div class="mb-4">
-                          <div class="flex items-center gap-4 mb-2">
-                            <img 
-                              :src="replyCaptchaData?.image" 
-                              alt="CAPTCHA" 
-                              class="h-10"
-                            />
-                            <button 
-                              type="button" 
-                              @click="() => refreshCaptcha('reply')"
-                              class="text-blue-600 hover:text-blue-800"
-                            >
-                              Refresh Captcha
-                            </button>
-                          </div>
-                          <input
-                            v-model="replyForm.captcha"
-                            type="text"
-                            placeholder="Masukkan kode captcha..."
-                            class="w-full p-2 border rounded"
-                            required
-                          />
-                        </div>
-                        <div class="flex gap-2">
-                          <button 
-                            type="submit"
-                            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-                            :disabled="submitting"
-                          >
-                            {{ submitting ? 'Membalas...' : 'Kirim Balasan' }}
-                          </button>
-                          <button 
-                            type="button"
-                            @click="cancelReply"
-                            class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
-                          >
-                            Batal
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-
-                    <!-- Replies Section -->
-                    <div v-if="comment.showReplies && comment.replies?.length" class="mt-4 space-y-4">
-                      <template v-for="reply in comment.replies" :key="reply.id">
-                        <div class="ml-8 bg-white p-3 rounded border border-gray-100">
-                          <!-- Reply Content -->
-                          <div class="flex gap-3">
-                            <img :src="getAvatar(reply.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
-                            <div class="flex-1">
-                              <div class="flex items-center gap-1">
-                                <div class="font-semibold">{{ reply.nama_user }}</div>
-                                <div class="font-light italic text-gray-400">membalas</div>
-                                <div class="font-semibold">{{ reply.parent_user }}</div>
-                              </div>
-                              <div class="text-gray-600 mt-2">{{ reply.komentar }}</div>
-                              <div class="flex items-center justify-between mt-2">
-                                <div class="text-sm text-gray-500">
-                                  {{ formatDate(reply.created_at) }}
-                                </div>
-                                <button 
-                                  @click="showReplyForm(reply.id)" 
-                                  class="text-blue-600 text-sm hover:text-blue-800"
-                                >
-                                  Balas
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!-- Reply Form for Level 2 -->
-                          <div v-if="activeReplyId === reply.id" class="mt-4 ml-8">
-                            <form @submit.prevent="submitReply(reply.id)" class="space-y-4">
-                              <div>
-                                <input 
-                                  v-model="replyForm.nama_user"
-                                  type="text"
-                                  placeholder="Masukkan Nama..."
-                                  class="w-full p-2 border rounded"
-                                  required
-                                />
-                              </div>
-                              <div>
-                                <textarea
-                                  v-model="replyForm.komentar"
-                                  placeholder="Masukkan Balasan..."
-                                  rows="3"
-                                  class="w-full p-2 border rounded"
-                                  required
-                                ></textarea>
-                              </div>
-                              <div class="mb-4">
-                                <div class="flex items-center gap-4 mb-2">
-                                  <img 
-                                    :src="replyCaptchaData?.image" 
-                                    alt="CAPTCHA" 
-                                    class="h-10"
-                                  />
-                                  <button 
-                                    type="button" 
-                                    @click="() => refreshCaptcha('reply')"
-                                    class="text-blue-600 hover:text-blue-800"
-                                  >
-                                    Refresh Captcha
-                                  </button>
-                                </div>
-                                <input
-                                  v-model="replyForm.captcha"
-                                  type="text"
-                                  placeholder="Masukkan kode captcha..."
-                                  class="w-full p-2 border rounded"
-                                  required
-                                />
-                              </div>
-                              <div class="flex gap-2">
-                                <button 
-                                  type="submit"
-                                  class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-                                  :disabled="submitting"
-                                >
-                                  {{ submitting ? 'Mengirim...' : 'Kirim' }}
-                                </button>
-                                <button 
-                                  type="button"
-                                  @click="cancelReply"
-                                  class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-
-                          <!-- Nested Replies (Level 3+) -->
-                          <div v-if="reply.replies?.length" class="mt-4 space-y-4">
-                            <div v-for="deepReply in getAllDeeperReplies(reply)" :key="deepReply.id" 
-                                 class="ml-8 bg-white p-3 rounded border border-gray-100">
-                              <!-- Reply Content with Referenced Comment -->
-                              <div class="flex gap-3">
-                                <img :src="getAvatar(deepReply.nama_user)" alt="User Avatar" class="w-8 h-8 rounded-full">
-                                <div class="flex-1">
-                                  <div class="flex items-center gap-2">
-                                    <div class="flex items-center gap-1">
-                                      <div class="font-semibold">{{ deepReply.nama_user }}</div>
-                                      <div class="font-light italic text-gray-400">membalas</div>
-                                      <div class="font-semibold">{{ deepReply.parent_user }}</div>
-                                      <div class="text-gray-400 italic text-sm">
-                                        ("{{ truncateText(deepReply.parent?.komentar, 30) }}")
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="text-gray-600 mt-2">{{ deepReply.komentar }}</div>
-                                  <div class="flex items-center justify-between mt-2">
-                                    <div class="text-sm text-gray-500">
-                                      {{ formatDate(deepReply.created_at) }}
-                                    </div>
-                                    <button 
-                                      @click="showReplyForm(deepReply.id)" 
-                                      class="text-blue-600 text-sm hover:text-blue-800"
-                                    >
-                                      Balas
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <!-- Reply Form -->
-                              <div v-if="activeReplyId === deepReply.id" class="mt-4">
-                                <form @submit.prevent="submitReply(deepReply.id)" class="space-y-4">
-                                  <div>
-                                    <input 
-                                      v-model="replyForm.nama_user"
-                                      type="text"
-                                      placeholder="Masukkan Nama..."
-                                      class="w-full p-2 border rounded"
-                                      required
-                                    />
-                                  </div>
-                                  <div>
-                                    <textarea
-                                      v-model="replyForm.komentar"
-                                      placeholder="Masukkan Balasan..."
-                                      rows="3"
-                                      class="w-full p-2 border rounded"
-                                      required
-                                    ></textarea>
-                                  </div>
-                                  <div class="mb-4">
-                                    <div class="flex items-center gap-4 mb-2">
-                                      <img 
-                                        :src="replyCaptchaData?.image" 
-                                        alt="CAPTCHA" 
-                                        class="h-10"
-                                      />
-                                      <button 
-                                        type="button" 
-                                        @click="() => refreshCaptcha('reply')"
-                                        class="text-blue-600 hover:text-blue-800"
-                                      >
-                                        Refresh Captcha
-                                      </button>
-                                    </div>
-                                    <input
-                                      v-model="replyForm.captcha"
-                                      type="text"
-                                      placeholder="Masukkan kode captcha..."
-                                      class="w-full p-2 border rounded"
-                                      required
-                                    />
-                                  </div>
-                                  <div class="flex gap-2">
-                                    <button 
-                                      type="submit"
-                                      class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
-                                      :disabled="submitting"
-                                    >
-                                      {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
-                                    </button>
-                                    <button 
-                                      type="button"
-                                      @click="cancelReply"
-                                      class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
+          <Comment :slug="props.id" :news="dokumen" comment-api-base="/api/produk-hukum-comments" />
+        </div>
 
       </div>
     </div>
@@ -473,6 +127,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { ref, onMounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios';
+import Comment from '@/Components/Comment.vue';
 
 const props = defineProps({
   id: {
@@ -673,10 +328,28 @@ const loadReplies = async (comment) => {
 
   try {
     const response = await axios.get(
-      `/api/produk-hukum-comments/${props.id}/replies/${comment.id}`
+      `${props.commentApiBase}/${props.slug}/replies/${comment.id}`
     );
-    
-    comment.replies = response.data;
+
+    // Build reply tree (same as in Comment.vue)
+    comment.replies = [];
+    const repliesMap = new Map();
+    response.data.forEach((reply) => {
+      repliesMap.set(reply.id, { ...reply, replies: [] });
+    });
+
+    response.data.forEach((reply) => {
+      const replyObj = repliesMap.get(reply.id);
+      if (reply.id_ref_komentar === comment.id) {
+        comment.replies.push(replyObj);
+      } else {
+        const parentReply = repliesMap.get(reply.id_ref_komentar);
+        if (parentReply) {
+          parentReply.replies.push(replyObj);
+        }
+      }
+    });
+
     comment.showReplies = true;
   } catch (err) {
     console.error('Error loading replies:', err);
