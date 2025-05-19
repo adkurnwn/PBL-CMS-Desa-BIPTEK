@@ -59,6 +59,10 @@ Route::get('/event-test', function () {
     return Inertia::render('FrontEnd/EventListTest');
 })->name('event-test');
 
+Route::get('/laporan-dana-desa', function () {
+    return Inertia::render('FrontEnd/LaporanDana');
+});
+
 Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
