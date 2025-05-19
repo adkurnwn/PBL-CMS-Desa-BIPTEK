@@ -25,6 +25,7 @@ export default {
                 'menuText': '#868080',
                 'dangerBG': '#F6C4CE',
                 'dangerText': '#DC143C',
+                'TopTableBG': '#E4E4E4',
 
             },
             fontFamily: {

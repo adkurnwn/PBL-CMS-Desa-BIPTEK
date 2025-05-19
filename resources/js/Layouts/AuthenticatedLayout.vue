@@ -52,20 +52,35 @@ const handleSidebarCollapse = (collapsed) => {
 
             <!-- Main Content with Custom Scrollbar -->
             <div 
-                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative"
+                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative pl-[29px] justify-start w-full"
                 :style="{
                     marginLeft: sidebarCollapsed ? '80px' : '400px'
                 }"
             >
                 <!-- Page Heading - Fixed position relative to parent -->
-                <div class="bg-white shadow w-full" v-if="$slots.header">
-                    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                        <slot name="header" />
+                <div class="bg-white w-full" v-if="$slots.header">
+                    <div class="max-w-full mx-auto pl-[10px]">
+                        <div class="flex items-center">
+                            <!-- 40px square icon - can be overridden by page-specific icon -->
+                            <div class="w-[40px] h-[40px] bg-transparent rounded flex items-center justify-center text-selectedText">
+                                <!-- Use page-specific icon if provided -->
+                                <slot name="page-icon">
+                                    <!-- Default icon as fallback -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </slot>
+                            </div>
+                            <!-- 10px gap provided by mr-[10px] -->
+                            <div class="ml-[10px]">
+                                <slot name="header" />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Flash Messages -->
-                <div class="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
+                <div class="w-full px-4">
                     <div
                         v-if="$page.props.flash?.success"
                         class="mb-4 p-4 bg-green-100 text-green-700 rounded-md"
@@ -94,11 +109,11 @@ const handleSidebarCollapse = (collapsed) => {
 
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 
-                    class="flex-1" 
+                    class="flex-1 w-full py-[97px] pr-[23px]" 
                     thumbColor="rgba(79, 70, 229, 0.4)" 
                     thumbHoverColor="rgba(79, 70, 229, 0.6)"
                 >
-                    <main class="p-6">
+                    <main class="w-full">
                         <slot />
                     </main>
                 </Scrollbar>
