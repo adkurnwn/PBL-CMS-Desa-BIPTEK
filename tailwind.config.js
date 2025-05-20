@@ -37,6 +37,7 @@ export default {
                 'redLabelText': '#DC143C',
                 'searchIcon': '#A0AEC0',
                 'searchBorder': '#C2C2C2',
+                'blueBorder': '#2563EB',
 
             },
             fontFamily: {

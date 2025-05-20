@@ -10,6 +10,8 @@ import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import ImageEditor from "@/Components/ImageEditor.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+
 
 const props = defineProps({
     news: {
@@ -216,12 +218,9 @@ const submit = (isDraft = null) => {
                                 </PrimaryButton>
 
                                 <Link :href="route('dashboard.news.index')">
-                                    <PrimaryButton
-                                        type="button"
-                                        class="bg-gray-600 hover:bg-gray-700"
-                                    >
+                                    <SecondaryButton>
                                         Cancel
-                                    </PrimaryButton>
+                                    </SecondaryButton>
                                 </Link>
                             </div>
                         </form>

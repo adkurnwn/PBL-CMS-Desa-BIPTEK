@@ -100,14 +100,18 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
-                <!-- Replace blank space with a named slot for search functionality -->
-                <div class="h-[94px] pr-[23px] flex items-center justify-end">
+                <div v-if="$slots['subtitle-area']" class="px-[22px] pt-[25px] text-[22px] font-medium text-menuText">
+                    <slot name="subtitle-area"></slot>
+                </div>
+
+                <!-- Replace blank space with a named slot for search functionality - Only display if content exists -->
+                <div v-if="$slots['search-area']" class="h-[94px] pr-[23px] pl-[10px] flex items-center gap-[10px] justify-end">
                     <slot name="search-area"></slot>
                 </div>
 
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 
-                    class="flex-1 w-full pr-[23px]" 
+                    class="flex-1 w-full pr-[23px] pl-[10px]" 
                     thumbColor="rgba(79, 70, 229, 0.4)" 
                     thumbHoverColor="rgba(79, 70, 229, 0.6)"
                 >

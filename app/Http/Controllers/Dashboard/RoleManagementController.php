@@ -8,6 +8,7 @@ use App\Helpers\LogActivityHelper;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
 
 class RoleManagementController extends Controller
 {
@@ -20,51 +21,78 @@ class RoleManagementController extends Controller
 
     public function index()
     {
+        // Only get non-admin roles for the list view
         $roles = Role::where('name', '!=', 'Admin')->get();
-        $permissions = Permission::all();
-
-        // Create a map of role_id => [permission_names]
-        $rolePermissions = [];
-        foreach ($roles as $role) {
-            $rolePermissions[$role->id] = $role->permissions->pluck('name')->toArray();
-        }
 
         return Inertia::render('Dashboard/RoleManagement/Index', [
-            'roles' => $roles,
-            'permissions' => $permissions,
-            'rolePermissions' => $rolePermissions
+            'roles' => $roles
         ]);
     }
 
     public function edit(Role $role)
     {
-        if ($role->name === 'admin') {
+        // Don't allow editing admin role
+        if (strtolower($role->name) === 'admin') {
             abort(403, 'Cannot edit admin role');
         }
 
         return Inertia::render('Dashboard/RoleManagement/Edit', [
             'role' => $role,
             'permissions' => Permission::all(),
-            'rolePermissions' => $role->permissions->pluck('name')
+            'rolePermissions' => $role->permissions->pluck('name')->toArray()
         ]);
     }
 
     public function update(Request $request, Role $role)
     {
-        if ($role->name === 'admin') {
+        // Debug logging
+        Log::info('Role update request received', [
+            'role' => $role->name,
+            'permissions' => $request->permissions
+        ]);
+        
+        // Don't allow updating admin role
+        if (strtolower($role->name) === 'admin') {
             abort(403, 'Cannot modify admin role permissions');
         }
 
-        $request->validate([
-            'permissions' => 'required|array'
+        // Modified validation to allow empty array
+        $validated = $request->validate([
+            'permissions' => 'present|array', // Changed from 'required|array' to 'present|array'
+            'permissions.*' => 'string|exists:permissions,name'
+        ], [
+            'permissions.present' => 'Daftar hak akses wajib diberikan.',
+            'permissions.array' => 'Format data hak akses tidak valid.',
+            'permissions.*.exists' => 'Salah satu hak akses yang diberikan tidak valid.'
         ]);
 
-        $role->syncPermissions($request->permissions);
+        // Ensure we're getting an array even if empty
+        $permissions = $request->permissions ?? [];
+        
+        // Debug before sync
+        Log::info('Before syncing permissions', [
+            'role' => $role->name,
+            'current_permissions' => $role->permissions->pluck('name'),
+            'new_permissions' => $permissions
+        ]);
 
+        // Sync permissions and get changes
+        $role->syncPermissions($permissions);
+        
+        // Debug after sync
+        Log::info('After syncing permissions', [
+            'role' => $role->name,
+            'new_permissions' => $role->permissions->pluck('name')
+        ]);
+
+        // Log activity
         $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses role ' . $role->name);
+        
+        // Return with both flash message and JSON response for Inertia
         return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
     }
 
+    // Keeping the batch update method for future reference, but it's not used in the current UI
     public function batchUpdate(Request $request)
     {
         $request->validate([
@@ -75,7 +103,7 @@ class RoleManagementController extends Controller
             $role = Role::find($roleId);
 
             // Skip admin role for security
-            if ($role->name === 'admin') {
+            if (strtolower($role->name) === 'admin') {
                 continue;
             }
 

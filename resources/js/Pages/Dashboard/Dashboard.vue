@@ -274,7 +274,7 @@ watch(() => props.logs, (newLogs) => {
         <div class="dashboard-container">
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
-                    <div class="text-gray-900 h-full">
+                    <div class="h-full">
                         <Tabel 
                             :headers="tableHeaders" 
                             :items="tableItems" 
@@ -321,9 +321,7 @@ watch(() => props.logs, (newLogs) => {
 .dashboard-container {
     position: relative;
     height: calc(100vh - 304px);
-    /* Adjusted to provide more space for the table */
     min-height: 650px;
-    /* Increased by 30% from 500px to match the new table height */
     overflow: hidden;
 }
 </style>
