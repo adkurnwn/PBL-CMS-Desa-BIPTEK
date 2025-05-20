@@ -265,7 +265,7 @@ const transformText = (text, transform) => {
                             :style="getColumnWidthStyle(header)"
                         />
                     </colgroup>
-                    <tbody class="bg-white divide-y divide-gray-200 text-TableText">
+                    <tbody class="bg-white text-TableText">
                         <tr
                             v-for="(item, rowIndex) in items"
                             :key="`row-${rowIndex}`"
