@@ -47,6 +47,11 @@ class SettingsController extends Controller
             'favicon' => Storage::disk('public')->exists('favicon.png') ? 'favicon.png' : null,
             'primary_color' => $profile ? $profile->primary_color : '#244031',
             'secondary_color' => $profile ? $profile->secondary_color : '#3B614A',
+            // Add backup settings
+            'backup_enabled' => env('BACKUP_ENABLED', false),
+            'backup_frequency' => env('BACKUP_FREQUENCY', 'daily'),
+            'backup_time' => env('BACKUP_TIME', '00:00'),
+            'backup_retention' => (int)env('BACKUP_RETENTION', 7),
         ];
 
         // Get a list of available timezones
@@ -134,6 +139,20 @@ class SettingsController extends Controller
         }
         if ($request->filled('mail_from_name')) {
             $envContent = $this->updateEnvVariable($envContent, 'MAIL_FROM_NAME', '"' . $request->mail_from_name . '"');
+        }
+
+        // Add backup settings
+        if ($request->has('backup_enabled')) {
+            $envContent = $this->updateEnvVariable($envContent, 'BACKUP_ENABLED', $request->backup_enabled ? 'true' : 'false');
+        }
+        if ($request->filled('backup_frequency')) {
+            $envContent = $this->updateEnvVariable($envContent, 'BACKUP_FREQUENCY', $request->backup_frequency);
+        }
+        if ($request->filled('backup_time')) {
+            $envContent = $this->updateEnvVariable($envContent, 'BACKUP_TIME', $request->backup_time);
+        }
+        if ($request->filled('backup_retention')) {
+            $envContent = $this->updateEnvVariable($envContent, 'BACKUP_RETENTION', $request->backup_retention);
         }
 
         // Write content back to .env file

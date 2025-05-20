@@ -1,3 +1,96 @@
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, useForm } from "@inertiajs/vue3";
+import InputLabel from "@/Components/InputLabel.vue";
+import TextInput from "@/Components/TextInput.vue";
+import InputError from "@/Components/InputError.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { ref, computed } from "vue";
+
+const props = defineProps({
+    settings: Object,
+    timezones: Array,
+    dbConnections: Array,
+    mailDrivers: Array,
+    colorOptions: Object,
+});
+
+const activeTab = ref("general");
+const faviconPreview = ref(null);
+
+const form = useForm({
+    app_name: props.settings.app_name || "",
+    app_timezone: props.settings.app_timezone || "UTC",
+    app_url: props.settings.app_url || "",
+    db_connection: props.settings.db_connection || "",
+    db_host: props.settings.db_host || "",
+    db_port: props.settings.db_port || "",
+    db_database: props.settings.db_database || "",
+    db_username: props.settings.db_username || "",
+    db_password: "",
+    mail_mailer: props.settings.mail_mailer || "",
+    mail_host: props.settings.mail_host || "",
+    mail_port: props.settings.mail_port || "",
+    mail_username: props.settings.mail_username || "",
+    mail_password: "",
+    mail_encryption: props.settings.mail_encryption || "null",
+    mail_from_address: props.settings.mail_from_address || "",
+    mail_from_name: props.settings.mail_from_name || "",
+    favicon: null,
+    primary_color: props.settings.primary_color || "#244031",
+    secondary_color: props.settings.secondary_color || "#3B614A",
+    // Add backup settings
+    backup_enabled: props.settings.backup_enabled || false,
+    backup_frequency: props.settings.backup_frequency || "daily",
+    backup_time: props.settings.backup_time || "00:00",
+    backup_retention: props.settings.backup_retention || 7,
+});
+
+const handleFaviconChange = (e) => {
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        form.favicon = file;
+
+        // Preview the selected image
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            faviconPreview.value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const setActiveTab = (tab) => {
+    activeTab.value = tab;
+};
+
+const submit = () => {
+    form.post(route("dashboard.settings.update"), {
+        preserveScroll: true,
+        forceFormData: true,
+    });
+};
+
+// Helper function to determine if text should be white or black based on background color
+const getContrastColor = (hexColor) => {
+    // Remove # if present
+    if (hexColor.startsWith("#")) {
+        hexColor = hexColor.slice(1);
+    }
+
+    // Convert hex to RGB
+    let r = parseInt(hexColor.substring(0, 2), 16);
+    let g = parseInt(hexColor.substring(2, 4), 16);
+    let b = parseInt(hexColor.substring(4, 6), 16);
+
+    // Calculate luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return white for dark backgrounds, black for light backgrounds
+    return luminance > 0.5 ? "#000000" : "#ffffff";
+};
+</script>
+
 <template>
     <Head title="Application Settings" />
     <AuthenticatedLayout>
@@ -71,6 +164,22 @@
                                 @click.prevent="setActiveTab('theme')"
                             >
                                 Theme
+                            </a>
+                        </li>
+                        <!-- Add this after the existing tabs -->
+                        <li class="mr-2">
+                            <a
+                                href="#"
+                                :class="{
+                                    'text-blue-600 border-b-2 border-blue-600':
+                                        activeTab === 'backup',
+                                    'text-gray-500 hover:text-gray-600':
+                                        activeTab !== 'backup',
+                                }"
+                                class="inline-block p-4 rounded-t-lg"
+                                @click.prevent="setActiveTab('backup')"
+                            >
+                                Backup
                             </a>
                         </li>
                     </ul>
@@ -660,6 +769,90 @@
                                 </div>
                             </div>
 
+                            <!-- Backup Settings -->
+                            <div v-show="activeTab === 'backup'">
+                                <h3 class="mb-4 text-lg font-semibold">
+                                    Database Backup Settings
+                                </h3>
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <!-- Enable Scheduled Backups -->
+                                    <div class="col-span-2">
+                                        <div class="flex items-center">
+                                            <input
+                                                id="backup_enabled"
+                                                v-model="form.backup_enabled"
+                                                type="checkbox"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                                            />
+                                            <label
+                                                for="backup_enabled"
+                                                class="ml-2 text-sm font-medium text-gray-900"
+                                            >
+                                                Enable automatic database backups
+                                            </label>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            When enabled, the system will
+                                            automatically create database backups
+                                            according to the schedule.
+                                        </p>
+                                    </div>
+
+                                    <!-- Backup Frequency -->
+                                    <div>
+                                        <InputLabel for="backup_frequency" value="Backup Frequency" />
+                                        <select
+                                            id="backup_frequency"
+                                            v-model="form.backup_frequency"
+                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            :disabled="!form.backup_enabled"
+                                        >
+                                            <option value="hourly">Hourly</option>
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                        <InputError :message="form.errors.backup_frequency" class="mt-2" />
+                                    </div>
+
+                                    <!-- Backup Time -->
+                                    <div>
+                                        <InputLabel for="backup_time" value="Backup Time" />
+                                        <TextInput
+                                            id="backup_time"
+                                            v-model="form.backup_time"
+                                            type="time"
+                                            class="mt-1 block w-full"
+                                            :disabled="!form.backup_enabled || form.backup_frequency === 'hourly'"
+                                        />
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Set the time for daily/weekly/monthly
+                                            backups (ignored for hourly)
+                                        </p>
+                                        <InputError :message="form.errors.backup_time" class="mt-2" />
+                                    </div>
+
+                                    <!-- Backup Retention -->
+                                    <div>
+                                        <InputLabel for="backup_retention" value="Backup Retention (days)" />
+                                        <TextInput
+                                            id="backup_retention"
+                                            v-model="form.backup_retention"
+                                            type="number"
+                                            class="mt-1 block w-full"
+                                            :disabled="!form.backup_enabled"
+                                            min="1"
+                                            max="365"
+                                        />
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Number of days to keep backups (older
+                                            backups will be automatically deleted)
+                                        </p>
+                                        <InputError :message="form.errors.backup_retention" class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mt-6">
                                 <PrimaryButton :disabled="form.processing">
                                     Save Settings
@@ -672,95 +865,3 @@
         </div>
     </AuthenticatedLayout>
 </template>
-
-<script setup>
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { ref, computed } from "vue";
-
-const props = defineProps({
-    settings: Object,
-    timezones: Array,
-    dbConnections: Array,
-    mailDrivers: Array,
-    colorOptions: Object,
-});
-
-const activeTab = ref("general");
-const faviconPreview = ref(null);
-
-const form = useForm({
-    app_name: props.settings.app_name || "",
-    app_timezone: props.settings.app_timezone || "UTC",
-    app_url: props.settings.app_url || "",
-    db_connection: props.settings.db_connection || "",
-    db_host: props.settings.db_host || "",
-    db_port: props.settings.db_port || "",
-    db_database: props.settings.db_database || "",
-    db_username: props.settings.db_username || "",
-    db_password: "",
-    mail_mailer: props.settings.mail_mailer || "",
-    mail_host: props.settings.mail_host || "",
-    mail_port: props.settings.mail_port || "",
-    mail_username: props.settings.mail_username || "",
-    mail_password: "",
-    mail_encryption: props.settings.mail_encryption || "null",
-    mail_from_address: props.settings.mail_from_address || "",
-    mail_from_name: props.settings.mail_from_name || "",
-    favicon: null,
-    primary_color: props.settings.primary_color || "#244031",
-    secondary_color: props.settings.secondary_color || "#3B614A",
-});
-
-const handleFaviconChange = (e) => {
-    if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-        form.favicon = file;
-
-        // Preview the selected image
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            faviconPreview.value = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-};
-
-const setActiveTab = (tab) => {
-    activeTab.value = tab;
-};
-
-const submit = () => {
-    form.post(route("dashboard.settings.update"), {
-        preserveScroll: true,
-        forceFormData: true,
-    });
-};
-
-// Helper function to determine if text should be white or black based on background color
-const getContrastColor = (hexColor) => {
-    // Remove # if present
-    if (hexColor.startsWith("#")) {
-        hexColor = hexColor.slice(1);
-    }
-
-    // Convert hex to RGB
-    let r = parseInt(hexColor.substring(0, 2), 16);
-    let g = parseInt(hexColor.substring(2, 4), 16);
-    let b = parseInt(hexColor.substring(4, 6), 16);
-
-    // Calculate luminance
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-    // Return white for dark backgrounds, black for light backgrounds
-    return luminance > 0.5 ? "#000000" : "#ffffff";
-};
-</script>
-
-<style scoped>
-/* You can add custom CSS for the settings page here */
-</style>
