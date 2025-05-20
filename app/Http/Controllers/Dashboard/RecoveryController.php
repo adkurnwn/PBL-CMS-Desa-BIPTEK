@@ -30,13 +30,29 @@ class RecoveryController extends Controller
     public function create()
     {
         try {
-            // Run backup command
+            // Delete existing backups before creating a new one
+            $existingBackups = $this->getBackups();
+
+            foreach ($existingBackups as $backup) {
+                $backupPath = storage_path('app/backup-temp/' . $backup['path']);
+
+                if (!file_exists($backupPath)) {
+                    $backupPath = storage_path('app/Data Recovery/' . $backup['path']);
+                }
+
+                if (file_exists($backupPath)) {
+                    unlink($backupPath);
+                    $this->logHelper->logActivity('delete', 'backup', 'Automatically deleted old backup file: ' . $backup['path']);
+                }
+            }
+
+            // Create new backup
             Artisan::call('backup:run');
 
             $this->logHelper->logActivity('create', 'backup', 'Created new database backup');
 
             return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Backup created successfully');
+                ->with('success', 'Backup created successfully (previous backups were automatically deleted)');
         } catch (\Exception $e) {
             return redirect()->route('dashboard.recovery.index')
                 ->with('error', 'Failed to create backup: ' . $e->getMessage());
