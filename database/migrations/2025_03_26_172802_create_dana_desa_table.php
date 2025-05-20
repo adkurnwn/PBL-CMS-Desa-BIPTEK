@@ -22,7 +22,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('file')->nullable();
             $table->string('link')->nullable();
-            $table->
+            $table->integer('views')->default(0);
+            $table->integer('downloads')->default(0);
             $table->date('date');
             $table->timestamps();
         });

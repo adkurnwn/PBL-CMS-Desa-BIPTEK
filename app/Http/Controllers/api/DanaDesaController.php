@@ -13,21 +13,29 @@ class DanaDesaController extends Controller
      */
     public function index()
     {
-        $danaDesa = DanaDesa::with(['images', 'category'])
-            ->orderBy('created_at', 'desc')
+        $danaDesa = DanaDesa::orderBy('created_at', 'desc')
             ->paginate(12);
 
         return response()->json([
-            'danaDesa' => $danaDesa->map(function ($item) {
+            'data' => $danaDesa->map(function ($item) {
                 return [
                     'id' => $item->id,
+                    'slug' => $item->slug,
                     'title' => $item->title,
-                    'images' => $item->images->map(function ($image) {
-                        return asset('storage/' . $image->path);
-                    }),
-                    'created_at' => $item->created_at,
+                    'views' => $item->views,
+                    'downloads' => $item->downloads,
+                    'date' => $item->date,
+                    'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                 ];
             }),
+            'pagination' => [
+                'total' => $danaDesa->total(),
+                'per_page' => $danaDesa->perPage(),
+                'current_page' => $danaDesa->currentPage(),
+                'last_page' => $danaDesa->lastPage(),
+                'from' => $danaDesa->firstItem(),
+                'to' => $danaDesa->lastItem(),
+            ]
         ]);
     }
 
@@ -42,9 +50,18 @@ class DanaDesaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DanaDesa $danaDesa)
+    public function show($slug)
     {
-        //
+        $danaDesa = DanaDesa::where('slug', $slug)->first();
+
+        if (!$danaDesa) {
+            return response()->json(['message' => 'Dana Desa not found'], 404);
+        }
+
+        // Increment view count
+        $danaDesa->increment('views');
+
+        return response()->json($danaDesa);
     }
 
     /**

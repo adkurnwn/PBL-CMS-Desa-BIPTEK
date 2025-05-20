@@ -6,6 +6,7 @@ use App\Http\Controllers\api\NewsController;
 use App\Http\Controllers\api\EventController;
 use App\Http\Controllers\api\LayoutController;
 use App\Http\Controllers\api\RegionController;
+use App\Http\Controllers\api\DanaDesaController;
 use App\Http\Controllers\api\FeedbackController;
 use App\Http\Controllers\api\HomePageController;
 use App\Http\Controllers\api\LayananPageController;
@@ -32,6 +33,11 @@ Route::get('layanan', [LayananPageController::class, 'index']);
 Route::prefix('news')->group(function () {
     Route::get('/', [NewsController::class, 'index']);
     Route::get('/{slug}', [NewsController::class, 'show']);
+});
+
+Route::prefix('dana-desa')->group(function () {
+    Route::get('/', [DanaDesaController::class, 'index']);
+    Route::get('/{slug}', [DanaDesaController::class, 'show']);
 });
 
 Route::prefix('comments')->group(function () {
