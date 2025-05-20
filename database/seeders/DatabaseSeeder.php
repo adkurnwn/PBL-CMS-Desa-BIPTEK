@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\DanaDesa;
+use App\Models\Demografi;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
                 NewsSeeder::class,
                 ProdukDesaSeeder::class,
                 DanaDesaSeeder::class,
+                DemografiSeeder::class,
             ]
         );
     }
