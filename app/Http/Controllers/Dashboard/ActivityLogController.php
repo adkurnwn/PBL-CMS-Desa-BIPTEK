@@ -11,7 +11,7 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request, $page = 1)
     {
-        $perPage = 1; // Show a reasonable amount of records per page
+        $perPage = 25; // Show a reasonable amount of records per page
         $sortField = 'time'; // Always sort by time/created_at
         $sortDirection = $request->input('direction', 'desc'); // Default direction is descending
         

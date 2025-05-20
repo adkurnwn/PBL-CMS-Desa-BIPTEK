@@ -4,6 +4,7 @@ import { Head, router } from "@inertiajs/vue3";
 import { ref, onMounted, computed, watch } from "vue";
 import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import Labels from "@/Components/DashboardComponent/Labels.vue";
 
 const props = defineProps({
     logs: Object,
@@ -90,7 +91,8 @@ const tableHeaders = [
         field: 'module',
         sortable: false,  // Changed to false
         nowrap: true,
-        width: '250px'
+        width: '250px',
+        transform: 'capitalize'  // Add this to capitalize the module column
     },
     {
         label: 'Deskripsi',
@@ -116,14 +118,15 @@ const tableHeaders = [
     },
 ];
 
-// Transform logs to match the table format
+// Transform logs to match the table format - remove capitalization here since we're doing it in the table
 const tableItems = computed(() => {
     return activityLogs.value.map(log => ({
         user: log.user?.name || "System",
         // Create avatarUrl directly without using accessor
         avatarUrl: getAvatarUrl(log.user),
         action: log.action,
-        module: log.module,
+        // No need to capitalize here anymore, using the transform property instead
+        module: log.module || "",
         description: log.description,
         time: log.created_at,
         // Keep the original data for reference
@@ -242,14 +245,15 @@ watch(() => props.logs, (newLogs) => {
                         >
                             <!-- Action column customization -->
                             <template #item.Aksi="{ item }">
-                                <span class="px-2 py-1 text-xs rounded-full" :class="{
-                                    'bg-green-100 text-green-800': item.action === 'create',
-                                    'bg-blue-100 text-blue-800': item.action === 'update',
-                                    'bg-red-100 text-red-800': item.action === 'delete',
-                                    'bg-gray-100 text-gray-800': !['create', 'update', 'delete'].includes(item.action),
-                                }">
-                                    {{ item.action }}
-                                </span>
+                                <Labels 
+                                    :type="['create', 'update', 'delete', 'login', 'logout', 'edit'].includes(item.action) ? item.action : 'other'" 
+                                    :text="item.action"
+                                />
+                            </template>
+                            <template #item.Modul="{ item }">
+                                <div class="italic">
+                                    {{ (item.module).toUpperCase() }}
+                                </div>
                             </template>
 
                             <!-- Time column customization -->

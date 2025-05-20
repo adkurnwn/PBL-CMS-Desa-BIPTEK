@@ -27,6 +27,14 @@ export default {
                 'dangerText': '#DC143C',
                 'TopTableBG': '#E4E4E4',
                 'TableText': '#111827',
+                'greenLabel': '#D1E7DD',
+                'greenLabelText': '#198754',
+                'yellowLabel': '#FFF3CD',
+                'yellowLabelText': '#FFC107',
+                'blueLabel': '#E7F1FF',
+                'blueLabelText': '#0D6EFD',
+                'redLabel': '#F8D7DA',
+                'redLabelText': '#DC3545',
 
             },
             fontFamily: {

@@ -28,7 +28,8 @@ const props = defineProps({
         //   },
         //   width: '200px',              // Column width (CSS value: px, %, fr, etc.)
         //   minWidth: '150px',           // Minimum column width
-        //   maxWidth: '300px'            // Maximum column width
+        //   maxWidth: '300px',           // Maximum column width
+        //   transform: 'capitalize'      // Text transformation: 'capitalize', 'uppercase', 'lowercase', 'titlecase'
         // }]
     },
     items: {
@@ -173,6 +174,26 @@ const getColumnWidthStyle = (header) => {
     
     return styleObjectToString(styles);
 };
+
+// Function to transform text based on header transform property
+const transformText = (text, transform) => {
+    if (!text || typeof text !== 'string') return text;
+    
+    switch (transform) {
+        case 'capitalize':
+            return text.charAt(0).toUpperCase() + text.slice(1);
+        case 'uppercase':
+            return text.toUpperCase();
+        case 'lowercase':
+            return text.toLowerCase();
+        case 'titlecase':
+            return text.replace(/\w\S*/g, (word) => {
+                return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+            });
+        default:
+            return text;
+    }
+};
 </script>
 
 <template>
@@ -291,10 +312,10 @@ const getColumnWidthStyle = (header) => {
                                                 class="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <span>{{ item[getFieldName(header)] }}</span>
+                                        <span>{{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}</span>
                                     </div>
                                     <template v-else>
-                                        {{ item[getFieldName(header)] }}
+                                        {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
                                     </template>
                                 </slot>
                             </td>
