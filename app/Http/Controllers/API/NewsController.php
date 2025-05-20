@@ -42,12 +42,6 @@ class NewsController extends Controller
             ->where('is_draft', false)
             ->first();
 
-        $category = Category::with(['news' => function ($query) {
-            $query->where('is_draft', false)
-                ->orderBy('created_at', 'desc')
-                ->take(3);
-        }])->find($news->category_id);
-
         if (!$news) {
             return response()->json(['message' => 'News not found'], 404);
         }
