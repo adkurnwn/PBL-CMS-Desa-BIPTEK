@@ -41,6 +41,9 @@ export default {
                 '10xl': '1440px', 
                 '12xl': '1600px', 
               },
+            fontSize: {
+                'xxs': '0.700rem', // 10px
+            },
         },
     },
 
