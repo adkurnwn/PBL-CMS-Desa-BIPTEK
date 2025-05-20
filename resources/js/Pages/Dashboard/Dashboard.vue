@@ -5,6 +5,7 @@ import { ref, onMounted, computed, watch } from "vue";
 import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import Labels from "@/Components/DashboardComponent/Labels.vue";
+import Search from "@/Components/DashboardComponent/Search.vue";
 
 const props = defineProps({
     logs: Object,
@@ -19,6 +20,10 @@ const props = defineProps({
     sortDirection: {
         type: String,
         default: 'desc'
+    },
+    search: {
+        type: String,
+        default: ''
     }
 });
 
@@ -134,22 +139,49 @@ const tableItems = computed(() => {
     }));
 });
 
+// Update search functionality
+const searchQuery = ref(props.search || '');
+
+const handleSearch = (query) => {
+    // Reset to first page when searching
+    router.get(route('dashboard'), {
+        search: query,
+        sort: props.sortField,
+        direction: props.sortDirection
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['logs', 'search', 'currentPage']
+    });
+};
+
+// Watch for external search changes (from props)
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
 // Handle pagination changes
 const handlePageChanged = (newPage) => {
+    const routeParams = {
+        sort: props.sortField,
+        direction: props.sortDirection
+    };
+    
+    // Add search parameter if it exists
+    if (searchQuery.value) {
+        routeParams.search = searchQuery.value;
+    }
+    
     if (newPage === 1) {
-        router.get(route('dashboard'), {
-            sort: props.sortField,
-            direction: props.sortDirection
-        }, {
+        router.get(route('dashboard'), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs']
         });
     } else {
-        router.get(route('dashboard.page', { page: newPage }), {
-            sort: props.sortField,
-            direction: props.sortDirection
-        }, {
+        router.get(route('dashboard.page', { page: newPage }), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs']
@@ -165,19 +197,24 @@ const handleSort = (field) => {
     // Toggle sort direction
     const sortDirection = props.sortDirection === 'asc' ? 'desc' : 'asc';
     
-    // Navigate to the appropriate route with sort parameters
+    // Build route params including search if it exists
+    const routeParams = {
+        direction: sortDirection
+    };
+    
+    if (searchQuery.value) {
+        routeParams.search = searchQuery.value;
+    }
+    
+    // Navigate to the appropriate route with parameters
     if (props.currentPage === 1) {
-        router.get(route('dashboard'), {
-            direction: sortDirection
-        }, {
+        router.get(route('dashboard'), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs', 'sortDirection']
         });
     } else {
-        router.get(route('dashboard.page', { page: props.currentPage }), {
-            direction: sortDirection
-        }, {
+        router.get(route('dashboard.page', { page: props.currentPage }), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs', 'sortDirection']
@@ -221,6 +258,15 @@ watch(() => props.logs, (newLogs) => {
                 <template #right-content>
                 </template>
             </HeadingMenu>
+        </template>
+
+        <!-- Add the search component in the search-area slot -->
+        <template #search-area>
+            <Search 
+                v-model="searchQuery"
+                placeholder="Cari aktivitas..."
+                @search="handleSearch"
+            />
         </template>
 
         <!-- Disable scrollbar from parent by adding special class -->

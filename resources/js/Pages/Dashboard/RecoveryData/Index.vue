@@ -4,7 +4,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({

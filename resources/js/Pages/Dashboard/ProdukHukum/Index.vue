@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import { Head, Link } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 const props = defineProps({
     produkHukum: Array,
 });

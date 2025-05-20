@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 

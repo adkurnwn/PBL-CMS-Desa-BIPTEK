@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 
 const props = defineProps({
     role: Object,

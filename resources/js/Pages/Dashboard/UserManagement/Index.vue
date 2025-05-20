@@ -6,7 +6,7 @@ import { ref } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({

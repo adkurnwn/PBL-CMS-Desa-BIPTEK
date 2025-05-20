@@ -100,8 +100,10 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
-                <!-- Blank Space (nanti buat flash msg) -->
-                <div class="h-[97px]"></div>
+                <!-- Replace blank space with a named slot for search functionality -->
+                <div class="h-[94px] pr-[23px] flex items-center justify-end">
+                    <slot name="search-area"></slot>
+                </div>
 
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 

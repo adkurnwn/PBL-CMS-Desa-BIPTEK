@@ -33,8 +33,10 @@ export default {
                 'yellowLabelText': '#FFC107',
                 'blueLabel': '#E7F1FF',
                 'blueLabelText': '#0D6EFD',
-                'redLabel': '#F8D7DA',
-                'redLabelText': '#DC3545',
+                'redLabel': 'rgba(220, 20, 60, 0.25)',
+                'redLabelText': '#DC143C',
+                'searchIcon': '#A0AEC0',
+                'searchBorder': '#C2C2C2',
 
             },
             fontFamily: {
