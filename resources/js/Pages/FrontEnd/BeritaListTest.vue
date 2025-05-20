@@ -1,7 +1,7 @@
 <!-- BeritaList.vue -->
 <template>
   <UserLayout>
-    <main class="flex flex-col items-center justify-center min-h-screen bg-type1  font-merriweather">
+    <main class="flex flex-col items-center justify-center min-h-screen bg-type1  font-merriweather mx-auto max-w-screen-2xl">
     <!-- Judul -->
     <h1 class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2 mt-40">Berita Desa</h1> 
     <!-- Search Bar -->
@@ -61,8 +61,8 @@
         </div>
           
         <!-- News Grid -->
-        <div v-else class="flex flex-col gap-5 p-24 -mt-20">
-          <Link
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-24">
+          <NewsCard
             v-for="item in news"
             :key="item.id"
             :news="{
