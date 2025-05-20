@@ -29,6 +29,32 @@ class UserManagementController extends Controller
         // Get search query parameter
         $search = $request->input('search', '');
         
+        // Get filter parameters
+        $positionFilter = $request->input('position_id');
+        $statusFilter = $request->has('status') ? (int)$request->input('status') : null;
+        
+        // Get sorting parameters
+        $sortField = $request->input('sort', 'name');
+        $sortDirection = $request->input('direction', 'asc');
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['name', 'email', 'status', 'position_id', 'created_at'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'name'; // Default to name if invalid
+        }
+        
+        // Validate sort direction
+        $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
+        
+        // Prepare filters for front-end
+        $filters = [];
+        if ($positionFilter) {
+            $filters['position_id'] = $positionFilter;
+        }
+        if ($statusFilter !== null) {
+            $filters['status'] = $statusFilter;
+        }
+        
         // Paginate the users query
         $usersQuery = User::with(['roles', 'position'])
             ->whereDoesntHave('roles', function ($query) {
@@ -43,12 +69,29 @@ class UserManagementController extends Controller
             });
         }
         
+        // Apply position filter if provided
+        if ($positionFilter) {
+            $usersQuery->where('position_id', $positionFilter);
+        }
+        
+        // Apply status filter if provided
+        if ($statusFilter !== null) {
+            $usersQuery->where('status', $statusFilter);
+        }
+        
+        // Apply sorting
+        $usersQuery->orderBy($sortField, $sortDirection);
+        
         // Execute query with pagination
         $users = $usersQuery->paginate($perPage);
         
         return Inertia::render('Dashboard/UserManagement/Index', [
             'users' => $users,
-            'search' => $search // Pass the search term back to the view
+            'search' => $search,
+            'filters' => $filters,
+            'positions' => Position::all(),
+            'sort' => $sortField,
+            'direction' => $sortDirection
         ]);
     }
 

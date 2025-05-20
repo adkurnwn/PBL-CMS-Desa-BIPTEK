@@ -12,11 +12,28 @@ import Labels from "@/Components/DashboardComponent/Labels.vue";
 import SwitchToggle from "@/Components/DashboardComponent/SwitchToggle.vue";
 
 const props = defineProps({
-    users: Object, // Change from Array to Object to match the paginated response format
+    users: Object,
     flash: Object,
     search: {
         type: String,
         default: ''
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
+    },
+    positions: {
+        type: Array,
+        default: () => []
+    },
+    // Add props for sorting
+    sort: {
+        type: String,
+        default: 'name'
+    },
+    direction: {
+        type: String, 
+        default: 'asc'
     }
 });
 
@@ -45,12 +62,14 @@ const form = useForm({});
 // Update searchQuery to use the prop
 const searchQuery = ref(props.search || '');
 
-const toggleUserStatus = (userId) => {
-    form.delete(route("dashboard.users.destroy", userId), {
-        preserveScroll: true,
-    });
-};
+// Add filter state
+const filterState = ref(props.filters || {});
 
+// Add sort state
+const sortField = ref(props.sort || 'name');
+const sortDirection = ref(props.direction || 'asc');
+
+// Table headers with filter configuration
 const tableHeaders = [
     {
         label: 'Pengguna',
@@ -78,19 +97,27 @@ const tableHeaders = [
         width: '400px'
     },
     {
-        label: 'Position',
+        label: 'Posisi', // Changed from Position to Posisi
         field: 'position.name',
-        sortable: true,
+        filterField: 'position_id',
+        sortable: false,
+        filterable: true,
+        filterOptions: props.positions.map(pos => ({ id: pos.id, name: pos.name })),
         width: '300px'
     },
     {
         label: 'Status',
         field: 'status',
-        sortable: true,
+        sortable: false,
+        filterable: true,
+        filterOptions: [
+            { id: 1, name: 'Aktif' },
+            { id: 0, name: 'Nonaktif' }
+        ],
         width: '264px'
     },
     {
-        label: 'Actions',
+        label: 'Aksi', // Changed from Actions to Aksi
         field: 'actions',
         sortable: false,
         width: '140px'
@@ -108,6 +135,52 @@ const handleSearch = (query) => {
     });
 };
 
+// Add filter handling
+const handleFilterChange = (filters) => {
+    filterState.value = filters;
+    
+    router.get(route('dashboard.users.index'), {
+        search: searchQuery.value,
+        ...filters,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['users']
+    });
+};
+
+// Add sort handling
+const handleSort = (field) => {
+    // If clicking on the same field, toggle direction
+    if (field === sortField.value) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        // New field, default to ascending
+        sortField.value = field;
+        sortDirection.value = 'asc';
+    }
+    
+    // Navigate with updated sort params
+    router.get(route('dashboard.users.index'), {
+        search: searchQuery.value,
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['users']
+    });
+};
+
+const toggleUserStatus = (userId) => {
+    form.delete(route("dashboard.users.destroy", userId), {
+        preserveScroll: true,
+    });
+};
+
 const getAvatarUrl = (user) => {
     if (!user || !user.photo_profile) return null;
     return `/storage/${user.photo_profile}`;
@@ -117,6 +190,23 @@ const getAvatarUrl = (user) => {
 watch(() => props.search, (newValue) => {
     if (newValue !== searchQuery.value) {
         searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
+// Watch for external filter changes
+watch(() => props.filters, (newValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(filterState.value)) {
+        filterState.value = { ...newValue };
+    }
+}, { deep: true });
+
+// Watch for external sort changes
+watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
+    if (newSort !== sortField.value) {
+        sortField.value = newSort;
+    }
+    if (newDirection !== sortDirection.value) {
+        sortDirection.value = newDirection;
     }
 }, { immediate: true });
 </script>
@@ -169,10 +259,21 @@ watch(() => props.search, (newValue) => {
         <div class="dashboard-container">
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
-                    <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
-                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
-                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
-                        empty-state-message="No users found">
+                    <Tabel 
+                        :headers="tableHeaders" 
+                        :items="userItems" 
+                        :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" 
+                        :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" 
+                        :total-items="pagination?.total || 0"
+                        :filters="filterState"
+                        :sort-field="sortField"
+                        :sort-direction="sortDirection"
+                        empty-state-message="No users found"
+                        @filter-changed="handleFilterChange"
+                        @sort="handleSort"
+                    >
                         <!-- Add a template for the Kontak column -->
                         <template #['item.Kontak']="{ item }">
                             <div class="flex flex-col">
@@ -181,8 +282,8 @@ watch(() => props.search, (newValue) => {
                             </div>
                         </template>
 
-                        <!-- Fix the Position column template -->
-                        <template #['item.Position']="{ item }">
+                        <!-- Fixed Position column template to match the header label 'Posisi' -->
+                        <template #['item.Posisi']="{ item }">
                             <Labels
                                 v-if="item.position"
                                 :type="item.position.name.toLowerCase().includes('kepala') ? 'kepala desa' : 
@@ -203,8 +304,8 @@ watch(() => props.search, (newValue) => {
                             </div>
                         </template>
 
-                        <!-- Fix the slot syntax for Actions column -->
-                        <template #['item.Actions']="{ item }">
+                        <!-- Fixed Actions column template to match the header label 'Aksi' -->
+                        <template #['item.Aksi']="{ item }">
                             <div class="flex gap-x-2 justify-center">
                                 <Link :href="route('dashboard.users.edit', item.id)">
                                 <button class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
