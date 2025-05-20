@@ -91,6 +91,7 @@ const fetchComments = async () => {
         const response = await axios.get(`${props.commentApiBase}/${props.slug}`);
         comments.value = response.data
             .filter((comment) => !comment.id_ref_komentar)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort newest first
             .map((comment) => ({
                 ...comment,
                 showReplies: false,
@@ -227,17 +228,27 @@ const loadReplies = async (comment) => {
                 }
             }
         });
-
         comment.showReplies = true;
+        comment.replies.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        // Sort nested replies recursively
+        const sortRepliesRecursively = (replies) => {
+            replies.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            replies.forEach(r => {
+                if (r.replies && r.replies.length > 0) {
+                    sortRepliesRecursively(r.replies);
+                }
+            });
+        };
+        sortRepliesRecursively(comment.replies);
+        
     } catch (err) {
         console.error("Error loading replies:", err);
         alert("Failed to load replies");
     }
 };
 
-const getAllDeeperReplies = (reply) => {
+const getAllDeeperRepliesSorted = (reply) => {
     let allReplies = [];
-
     const collectReplies = (r) => {
         if (r.replies?.length) {
             r.replies.forEach((nestedReply) => {
@@ -246,9 +257,9 @@ const getAllDeeperReplies = (reply) => {
             });
         }
     };
-
     collectReplies(reply);
-    return allReplies;
+    // Sort all replies by created_at DESC
+    return allReplies.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 };
 
 // Initialize the component
@@ -257,23 +268,31 @@ fetchComments();
 </script>
 
 <template>
-    <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden p-8 font-merriweather">
+    <div class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden p-4 lg:p-8 font-merriweather">
         <!-- Share Form -->
-        <div v-if="showShare">
-            <h2 class="text-lg text-accent2 font-bold">
-                Bagikan Artikel Ini:
+        <div class="flex flex-col w-full justify-between" v-if="showShare">
+            <h2 class="flex lg:text-lg mt-2 lg:mt-0 text-accent2 font-bold">
+                Bagikan Artikel Ini
             </h2>
-            <div class="my-4 flex items-center">
+            <div class="ml-1 my-2 lg:my-4 flex items-center">
                 <i class="bi bi-instagram md:text-xl relative mr-4 text-accent2"></i>
                 <i class="bi bi-twitter-x md:text-xl relative mr-4 text-accent2"></i>
                 <i class="bi bi-facebook md:text-xl relative mr-4 text-accent2"></i>
                 <i class="bi bi-whatsapp md:text-xl relative mr-4 text-accent2"></i>
             </div>
         </div>
-        <div class="flex flex-col border-gray-300 mb-6">
-            <h2 class="flex text-2xl text-accent1 font-medium mb-6">Kirim Komentar</h2>
+        <div class="flex flex-col border-gray-300 mt-2 lg:mt-0 mb-2 lg:mb-6">
+            <h2 
+                class="flex text-lg lg:text-2xl text-accent1 font-medium"
+                :class="{ 'mb-6': props.news.is_moderate }"
+                >
+                    Kirim Komentar
+            </h2>
             <div class="flex border-l-accent2 border-l-4 bg-accent2/25">
-                <p class="text-accent1 opacity-100 px-4 py-2">
+                <p
+                    v-if="props.news.is_moderate"
+                    class="text-accent1 opacity-100 pl-2 lg:pl-4 py-2 text-xxs lg:text-base"
+                    >
                     Komentar Anda akan ditampilkan setelah moderasi.
                 </p>
             </div>
@@ -281,36 +300,36 @@ fetchComments();
         
 
         <!-- Comment Form -->
-        <form @submit.prevent="submitComment" class="mb-8">
-            <div class="mb-4 shadow-inner ">
+        <form @submit.prevent="submitComment" class="mb-6 lg:mb-8">
+            <div class="mb-2 lg:mb-4 shadow-inner ">
                 <input 
                     v-model="commentForm.nama_user"
                     type="text"
                     placeholder="Masukkan Nama..."
-                    class="w-full p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
+                    class="w-full text-xs lg:text-base  p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
                     required
                 />
             </div>
-            <div class="mb-4">
+            <div class="mb-0 lg:mb-4 shadow-inner ">
                 <textarea
                     v-model="commentForm.komentar"
                     placeholder="Masukkan Komentar..."
-                    rows="4"
-                    class="w-full p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
+                    rows="6"
+                    class="w-full text-xs lg:text-base  p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
                     required
                 ></textarea>
             </div>
-            <div class="mb-4">
+            <div class="mb-2 lg:mb-4">
                 <div class="flex items-center gap-4 mb-2">
                     <img 
                         :src="mainCaptchaData?.image" 
                         alt="CAPTCHA" 
-                        class="h-10"
+                        class="h-7 lg:h-10"
                     />
                     <button 
                         type="button" 
                         @click="() => refreshCaptcha('main')"
-                        class="text-blue-600 hover:text-blue-800"
+                        class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                     >
                         Refresh Captcha
                     </button>
@@ -319,64 +338,68 @@ fetchComments();
                     v-model="commentForm.captcha"
                     type="text"
                     placeholder="Masukkan kode captcha..."
-                    class="w-1/2 p-2  border-1 border-zinc-300  rounded shadow-inner bg-type1"
+                    class="w-full lg:w-1/2 text-xs lg:text-base  p-2   border-1 border-zinc-300  rounded shadow-inner bg-type1"
                     required
                 />
             </div>
             <button 
                 type="submit"
-                class="flex bg-secondary text-white px-4 py-2 gap-1 rounded text-sm hover:bg-secondary/75"
+                class="flex bg-secondary text-white px-2 lg:px-4 py-2 gap-1 rounded text-xs lg:text-sm hover:bg-secondary/75"
                 :disabled="submitting"
             >
                 {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5 lg:w-6 lg:h-6">
                     <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
             </button>
         </form>
 
+        
         <!-- Comments List -->
-        <div class="space-y-4">
+        <div class="space-y-2 lg:space-y-4">
             <template v-for="comment in comments" :key="comment.id">
-                <div class="bg-type1 shadow-md p-4 py-6 rounded">
+                <div class="bg-type1 shadow-md p-2 lg:p-4 py-4 lg:py-6 rounded">
                     <!-- Main Comment -->
-                    <div class="flex gap-3">
-                        <img :src="getAvatar(comment.nama_user)" alt="User Avatar" class="w-10 h-10 rounded-full">
+                    <div class="flex gap-2 lg:gap-3">
+                        <img :src="getAvatar(comment.nama_user)" alt="User Avatar" class="w-7 h-7 lg:w-10 lg:h-10 rounded-full">
                         <div class="flex flex-col w-full">
-                            <div class="flex items-center gap-4 mt-1.5">
-                                <div class="flex font-semibold text-lg">
+                            <div class="flex flex-row items-start sm:items-center gap-2 sm:gap-4 mt-1 lg:mt-1.5">
+                                <div class="font-semibold text-sm lg:text-lg">
                                     <p>{{ comment.nama_user }}</p>
                                 </div>
-                                <div class="flex text-sm text-zinc-400  font-normalmt-0.5">
+                                <div class="text-xs lg:text-sm text-zinc-400 mt-0.5 lg:mt-0">
                                     <p>{{ timeAgo(comment.created_at) }}</p>
                                 </div>
                             </div>
-                            <div class="flex text-gray-600 mt-3 font-medium">{{ comment.komentar }}</div>
-                            <div class="flex items-center w-full justify-between mt-2">
-                                <div class="flex items-center gap-4 mt-2">
-                                    <div class="text-sm text-zinc-400 ">
+                            <div class="text-gray-600 mt-2 text-xs lg:text-sm font-medium break-words">
+                                {{ comment.komentar }}
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center w-full justify-between mt-2">
+                                <div class="flex flex-col lg:flex-row items-start gap-2 lg:gap-4 mt-2">
+                                    <div class="text-xs lg:text-sm text-zinc-400">
                                         {{ formatDate(comment.created_at) }}
                                     </div>
                                     <button 
                                         v-if="comment.replies_count > 0"
                                         @click="loadReplies(comment)" 
-                                        class="text-sm text-zinc-400  hover:text-gray-800"
+                                        class="text-xs lg:text-sm  text-zinc-500 hover:text-gray-800"
                                     >
                                         {{ comment.showReplies ? 'Sembunyikan' : 'Tampilkan' }} 
-                                        {{ comment.replies_count }} {{ 'balasan'}}
+                                        {{ comment.replies_count }} balasan
                                     </button>
                                 </div>
-                                <button 
-                                    @click="showReplyForm(comment.id)" 
-                                    class="text-blue-600 text-sm hover:text-blue-800 mt-2 mr-9"
+                                <button
+                                    @click="activeReplyId === comment.id ? cancelReply() : showReplyForm(comment.id)"
+                                    class="text-xs lg:text-sm mt-2 mr-2 lg:mr-10"
+                                    :class="activeReplyId === comment.id ? 'text-red-600 hover:text-red-800' : 'text-blue-600 hover:text-blue-800'"
                                 >
-                                    Balas
+                                    {{ activeReplyId === comment.id ? 'Batal' : 'Balas' }}
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Reply Form -->
-                    <div v-if="activeReplyId === comment.id" class="mt-4 ml-12">
+                    <!-- Reply Form
+                    <div v-if="activeReplyId === comment.id" class="mt-4  lg:ml-12">
                         <form @submit.prevent="submitReply(comment.id)" class="space-y-4">
                             <div>
                                 <input 
@@ -436,213 +459,288 @@ fetchComments();
                                 </button>
                             </div>
                         </form>
+                    </div> -->
+
+                    <!-- Reply Form (Level 2 or 3+) -->
+                    <div v-if="activeReplyId === comment.id" class="mt-4  ml-2 lg:ml-12">
+                        <form @submit.prevent="submitReply(comment.id)" class="space-y-4">
+                            <div>
+                                <input 
+                                    v-model="replyForm.nama_user"
+                                    type="text"
+                                    placeholder="Masukkan Nama..."
+                                    class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <textarea
+                                    v-model="replyForm.komentar"
+                                    placeholder="Masukkan Balasan..."
+                                    rows="3"
+                                    class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                    required
+                                ></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex items-center gap-4 mb-2">
+                                    <img 
+                                        :src="replyCaptchaData?.image" 
+                                        alt="CAPTCHA" 
+                                        class="h-7 lg:h-10"
+                                    />
+                                    <button 
+                                        type="button" 
+                                        @click="() => refreshCaptcha('reply')"
+                                        class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
+                                    >
+                                        Refresh Captcha
+                                    </button>
+                                </div>
+                                <input
+                                    v-model="replyForm.captcha"
+                                    type="text"
+                                    placeholder="Masukkan kode captcha..."
+                                    class="w-full lg:w-1/2 text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                    required
+                                />
+                            </div>
+                            <div class="flex gap-2">
+                                <button 
+                                    type="submit"
+                                    class="flex bg-secondary text-white px-2 lg:px-4 py-2 gap-1 rounded text-xs lg:text-sm hover:bg-secondary/75"
+                                    :disabled="submitting"
+                                >
+                                    {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5 lg:w-6 lg:h-6">
+                                        <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+                                    </svg>
+                                </button>
+                                <!-- <button 
+                                    type="button"
+                                    @click="cancelReply"
+                                    class="text-gray-600 px-4 py-2 rounded text-xs lg:text-sm hover:bg-gray-100"
+                                >
+                                    Batal
+                                </button> -->
+                            </div>
+                        </form>
                     </div>
 
                     <!-- Replies Section -->
                     <div v-if="comment.showReplies && comment.replies?.length" class="mt-4 space-y-4">
                         <template v-for="reply in comment.replies" :key="reply.id">
-                            <div class="ml-8 bg-white p-4 py-6 rounded border border-gray-100 shadow-inner">
+                            <div class="lg:ml-8 bg-white p-4 py-6 rounded border border-gray-100 shadow-inner">
                                 <!-- Reply Content Level 2 -->
-                                <div class="flex gap-3">
-                                    <img :src="getAvatar(reply.nama_user)" alt="User Avatar" class="w-10 h-10 rounded-full">
-                                        <div class="flex flex-col w-full">
-                                            <div class="flex items-center gap-4 mt-1.5">
-                                                <div class="flex font-semibold text-lg">
-                                                    <p>{{ reply.nama_user }}</p>
-                                                </div>
-                                                <div class="flex text-sm text-zinc-400  font-normalmt-0.5">
-                                                    <p>{{ timeAgo(reply.created_at) }}</p>
-                                                </div>
+                                <div class="flex gap-2 lg:gap-3">
+                                    <img :src="getAvatar(reply.nama_user)" alt="User Avatar" class="w-7 h-7 lg:w-10 lg:h-10 rounded-full">
+                                    <div class="flex flex-col w-full">
+                                        <div class="flex flex-row items-start sm:items-center gap-2 sm:gap-4 mt-1 lg:mt-1.5">
+                                            <div class="font-semibold text-sm lg:text-lg">
+                                                <p>{{ reply.nama_user }}</p>
                                             </div>
-                                            <div class="flex text-gray-600 mt-3 font-medium">{{ reply.komentar }}</div>
-                                            <div class="flex w-full items-center justify-between mt-2">
-                                                <div class="flex items-center gap-4 mt-2">
-                                                    <div class="text-sm text-zinc-400 ">
-                                                        {{ formatDate(reply.created_at) }}
-                                                    </div>
-                                                    <button 
-                                                        v-if="reply.replies_count > 0"
-                                                        @click="loadReplies(reply)" 
-                                                        class="text-sm text-zinc-400 hover:text-gray-800"
-                                                    >
-                                                        {{ reply.showReplies ? 'Sembunyikan' : 'Tampilkan' }} 
-                                                        {{ reply.replies_count }} balasan
-                                                    </button>
-                                                </div>
-                                                <button 
-                                                    @click="showReplyForm(reply.id)" 
-                                                    class="text-blue-600 text-sm hover:text-blue-800 mt-2 mr-4"
-                                                >
-                                                    Balas
-                                                </button>
+                                            <div class="text-xs lg:text-sm text-zinc-400 mt-0.5 lg:mt-0">
+                                                <p>{{ timeAgo(reply.created_at) }}</p>
                                             </div>
                                         </div>
+                                        <div class="text-gray-600 mt-2 text-xs lg:text-sm font-medium break-words">
+                                            {{ reply.komentar }}
+                                        </div>
+                                        <div class="flex flex-col sm:flex-row items-start sm:items-center w-full justify-between mt-2">
+                                            <div class="flex flex-col lg:flex-row items-start gap-2 lg:gap-4 mt-2">
+                                                <div class="text-xs lg:text-sm text-zinc-400">
+                                                    {{ formatDate(reply.created_at) }}
+                                                </div>
+                                                <button 
+                                                    v-if="reply.replies_count > 0"
+                                                    @click="loadReplies(reply)" 
+                                                    class="text-xs lg:text-sm  text-zinc-500 hover:text-gray-800"
+                                                >
+                                                    {{ reply.showReplies ? 'Sembunyikan' : 'Tampilkan' }} 
+                                                    {{ reply.replies_count }} balasan
+                                                </button>
+                                            </div>
+                                            <button
+                                                @click="activeReplyId === reply.id ? cancelReply() : showReplyForm(reply.id)"
+                                                class="text-xs lg:text-sm mt-2 mr-2 lg:mr-6
+                                                "
+                                                :class="activeReplyId === reply.id ? 'text-red-600 hover:text-red-800' : 'text-blue-600 hover:text-blue-800'"
+                                            >
+                                                {{ activeReplyId === reply.id ? 'Batal' : 'Balas' }}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- Reply Form for Level 2 -->
-                                <div v-if="activeReplyId === reply.id" class="mt-4 ml-12">
+                                <div v-if="activeReplyId === reply.id" class="mt-4 lg:ml-12">
                                 <form @submit.prevent="submitReply(reply.id)" class="space-y-4">
                                     <div>
                                     <input 
                                         v-model="replyForm.nama_user"
                                         type="text"
                                         placeholder="Masukkan Nama..."
-                                        class="w-full p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
+                                        class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                         required
                                     />
                                     </div>
                                     <div>
-                                    <textarea
-                                        v-model="replyForm.komentar"
-                                        placeholder="Masukkan Balasan..."
-                                        rows="3"
-                                        class="w-full p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
-                                        required
-                                    ></textarea>
-                                    </div>
-                                    <div class="mb-4">
-                                    <div class="flex items-center gap-4 mb-2">
-                                        <img 
-                                        :src="replyCaptchaData?.image" 
-                                        alt="CAPTCHA" 
-                                        class="h-10"
-                                        />
-                                        <button 
-                                        type="button" 
-                                        @click="() => refreshCaptcha('reply')"
-                                        class="text-blue-600 hover:text-blue-800"
-                                        >
-                                        Refresh Captcha
-                                        </button>
-                                    </div>
-                                    <input
-                                        v-model="replyForm.captcha"
-                                        type="text"
-                                        placeholder="Masukkan kode captcha..."
-                                        class="w-1/2 p-2 border-1 border-zinc-300  rounded shadow-inner bg-type1"
-                                        required
-                                    />
-                                    </div>
-                                    <div class="flex gap-2">
-                                    <button 
-                                        type="submit"
-                                        class="flex bg-secondary text-white px-4 py-2 gap-1 rounded text-sm hover:bg-secondary/75"
-                                        :disabled="submitting"
-                                    >
-                                        {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5">
-                                            <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
-                                    </button>
-                                    <button 
-                                        type="button"
-                                        @click="cancelReply"
-                                        class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
-                                    >
-                                        Cancel
-                                    </button>
-                                    </div>
-                                </form>
-                                </div>
-
-                            <!-- Nested Replies (Level 3+) -->
-                            <div v-if="reply.showReplies && reply.replies?.length" class="mt-4 space-y-4">
-                            <div v-for="deepReply in getAllDeeperReplies(reply)" :key="deepReply.id" 
-                                    class="ml-12 bg-white p-3 rounded border border-gray-100 shadow-[inset_0px_0px_4px_0px_rgba(0,0,0,0.15)]">
-                                    <!-- Reply Content Level 2 -->
-                                    <div class="flex gap-3">
-                                        <img :src="getAvatar(deepReply.nama_user)" alt="User Avatar" class="w-10 h-10 rounded-full">
-                                            <div class="w-full flex flex-col">
-                                                <div class="flex items-center gap-4 mt-1.5">
-                                                    <div class="flex font-semibold text-lg">
-                                                        <p>{{ deepReply.nama_user }}</p>
-                                                    </div>
-                                                    <div class="flex text-sm text-zinc-400  font-normalmt-0.5">
-                                                        <p>{{ timeAgo(deepReply.created_at) }}</p>
-                                                    </div>
-                                                </div>
-                                                <div class="w-full border-l-accent2 border-l-4 bg-accent2/25 pl-6 pr-2 py-2 my-2">
-                                                    <div class="flex  text-gray-600 font-medium">{{ deepReply.parent_user }}</div>
-                                                    <div class="line-clamp-1 text-gray-600 italic " >"{{ truncateText(deepReply.parent?.komentar) }}"</div>
-                                                </div>
-                                                <div class="flex text-gray-600 mt-2 font-medium">{{ deepReply.komentar }}</div>
-                                                <div class="flex items-center justify-between mt-2">
-                                                    <div class="flex items-center gap-4 mt-2">
-                                                        <div class="text-sm text-zinc-400 ">
-                                                            {{ formatDate(deepReply.created_at) }}
-                                                        </div>
-                                                        
-                                                    </div>
-                                                    <button 
-                                                        @click="showReplyForm(deepReply.id)" 
-                                                        class="text-blue-600 text-sm hover:text-blue-800 mt-2"
-                                                    >
-                                                        Balas
-                                                    </button>
-                                                </div>
-                                            </div>
-                                    </div>
-
-                                    <!-- Reply Form -->
-                                    <div v-if="activeReplyId === deepReply.id" class="mt-4 ml-12">
-                                    <form @submit.prevent="submitReply(deepReply.id)" class="space-y-4">
-                                        <div>
-                                        <input 
-                                            v-model="replyForm.nama_user"
-                                            type="text"
-                                            placeholder="Masukkan Nama..."
-                                            class="w-full p-2 border rounded"
-                                            required
-                                        />
-                                        </div>
-                                        <div>
                                         <textarea
                                             v-model="replyForm.komentar"
                                             placeholder="Masukkan Balasan..."
                                             rows="3"
-                                            class="w-full p-2 border rounded"
+                                            class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                             required
                                         ></textarea>
-                                        </div>
-                                        <div class="mb-4">
+                                    </div>
+                                    <div class="mb-4">
                                         <div class="flex items-center gap-4 mb-2">
                                             <img 
-                                            :src="replyCaptchaData?.image" 
-                                            alt="CAPTCHA" 
-                                            class="h-10"
+                                                :src="replyCaptchaData?.image" 
+                                                alt="CAPTCHA" 
+                                                class="h-7 lg:h-10"
                                             />
                                             <button 
-                                            type="button" 
-                                            @click="() => refreshCaptcha('reply')"
-                                            class="text-blue-600 hover:text-blue-800"
+                                                type="button" 
+                                                @click="() => refreshCaptcha('reply')"
+                                                class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                                             >
-                                            Refresh Captcha
+                                                Refresh Captcha
                                             </button>
                                         </div>
                                         <input
                                             v-model="replyForm.captcha"
                                             type="text"
                                             placeholder="Masukkan kode captcha..."
-                                            class="w-full p-2 border rounded"
+                                            class="w-full lg:w-1/2 text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                             required
                                         />
-                                        </div>
-                                        <div class="flex gap-2">
+                                    </div>
+                                    <div class="flex gap-2">
                                         <button 
                                             type="submit"
-                                            class="flex bg-secondary text-white px-4 py-2 gap-1 rounded text-sm hover:bg-secondary/75"
+                                            class="flex bg-secondary text-white px-2 lg:px-4 py-2 gap-1 rounded text-xs lg:text-sm hover:bg-secondary/75"
                                             :disabled="submitting"
                                         >
                                             {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5">
-                                                <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5 lg:w-6 lg:h-6">
+                                                <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+                                            </svg>
                                         </button>
                                         <button 
                                             type="button"
                                             @click="cancelReply"
-                                            class="text-gray-600 px-4 py-2 rounded text-sm hover:bg-gray-100"
+                                            class="text-gray-600 px-4 py-2 rounded text-xs lg:text-sm hover:bg-gray-100"
                                         >
-                                            Cancel
+                                            Batal
                                         </button>
+                                    </div>
+                                </form>
+                                </div>
+
+                            <!-- Nested Replies (Level 3+) -->
+                            <div v-if="reply.showReplies && reply.replies?.length" class="mt-4 space-y-4">
+                            <div v-for="deepReply in getAllDeeperRepliesSorted(reply)" :key="deepReply.id" 
+                                class="lg:ml-12 bg-white p-2 lg:p-3 py-4 lg:py-3 rounded border border-gray-100 shadow-[inset_0px_0px_4px_0px_rgba(0,0,0,0.15)]">
+                                <!-- Reply Content Level 2 -->
+                                <div class="flex gap-2 lg:gap-3">
+                                <img :src="getAvatar(deepReply.nama_user)" alt="User Avatar" class="w-7 h-7 lg:w-10 lg:h-10 rounded-full">
+                                <div class="flex flex-col w-full">
+                                    <div class="flex flex-col lg:flex-row items-start sm:items-center sm:gap-4 mt-1 lg:mt-1.5">
+                                        <div class="font-semibold text-sm lg:text-lg">
+                                            <p>{{ deepReply.nama_user }}</p>
                                         </div>
+                                        <div class="text-xs lg:text-sm text-zinc-400 mt-0.5 lg:mt-0">
+                                            <p>{{ timeAgo(deepReply.created_at) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col w-full border-l-accent2 border-l-4 bg-accent2/25 pl-3 lg:pl-6   pr-2 py-3 my-3" v-if="deepReply.parent_user">
+                                        <div class="line-clamp-1 text-gray-600 font-semibold text-xs lg:text-sm">{{ deepReply.parent_user }}</div>
+                                        <div class="line-clamp-2 lg:line-clamp-1 text-gray-600 italic text-xs lg:text-sm break-words">"{{ truncateText(deepReply.parent?.komentar) }}"</div>
+                                    </div>
+                                    <div class="text-gray-600 lg:mt-2 text-xs lg:text-sm font-medium break-words">
+                                        {{ deepReply.komentar }}
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center w-full justify-between mt-2">
+                                        <div class="flex flex-col lg:flex-row items-start gap-2 lg:gap-4 mt-2">
+                                            <div class="text-xs lg:text-sm text-zinc-400">
+                                                {{ formatDate(deepReply.created_at) }}
+                                            </div>
+                                            
+                                        </div>
+                                        <button
+                                            @click="activeReplyId === deepReply.id ? cancelReply() : showReplyForm(deepReply.id)"
+                                            class="text-xs lg:text-sm mt-2 mr-2 "
+                                            :class="activeReplyId === deepReply.id ? 'text-red-600 hover:text-red-800' : 'text-blue-600 hover:text-blue-800'"
+                                        >
+                                            {{ activeReplyId === deepReply.id ? 'Batal' : 'Balas' }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                                    <!-- Reply Form -->
+                                    <div v-if="activeReplyId === deepReply.id" class="mt-4 ml-2 lg:ml-12">
+                                    <form @submit.prevent="submitReply(deepReply.id)" class="space-y-4">
+                                        <div>
+                                        <input 
+                                            v-model="replyForm.nama_user"
+                                            type="text"
+                                            placeholder="Masukkan Nama..."
+                                            class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <textarea
+                                            v-model="replyForm.komentar"
+                                            placeholder="Masukkan Balasan..."
+                                            rows="3"
+                                            class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                            required
+                                        ></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <div class="flex items-center gap-4 mb-2">
+                                            <img 
+                                                :src="replyCaptchaData?.image" 
+                                                alt="CAPTCHA" 
+                                                class="h-7 lg:h-10"
+                                            />
+                                            <button 
+                                                type="button" 
+                                                @click="() => refreshCaptcha('reply')"
+                                                class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
+                                            >
+                                                Refresh Captcha
+                                            </button>
+                                        </div>
+                                        <input
+                                            v-model="replyForm.captcha"
+                                            type="text"
+                                            placeholder="Masukkan kode captcha..."
+                                            class="w-full lg:w-1/2 text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                            required
+                                        />
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button 
+                                            type="submit"
+                                            class="flex bg-secondary text-white px-2 lg:px-4 py-2 gap-1 rounded text-xs lg:text-sm hover:bg-secondary/75"
+                                            :disabled="submitting"
+                                        >
+                                            {{ submitting ? 'Mengirim...' : 'Kirim Balasan' }}
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="16px" fill="#FFFFFF" class=" -mt-0.5 lg:w-6 lg:h-6">
+                                                <path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/>
+                                            </svg>
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            @click="cancelReply"
+                                            class="text-gray-600 px-4 py-2 rounded text-xs lg:text-sm hover:bg-gray-100"
+                                        >
+                                            Batal
+                                        </button>
+                                    </div>
                                     </form>
                                     </div>
                                 </div>

@@ -28,7 +28,6 @@ class KomentarProdukHukumController extends Controller
     {
         $produkhukum = ProdukHukum::findOrFail($produkhukumId);
 
-        // Get ALL replies for this document (not just direct children)
         $replies = KomentarProdukHukum::where('id_produk_hukum', $produkhukumId)
             ->whereNotNull('id_ref_komentar')
             ->when($produkhukum->is_moderate, function($query) {
@@ -37,20 +36,27 @@ class KomentarProdukHukumController extends Controller
             ->with(['parent', 'replies'])
             ->get();
 
-        // Add parent_user for UI
-        $replies->transform(function($reply) {
-            $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
-            $reply->replies_count = $reply->replies()->count();
-            return $reply;
-        });
+        $replies = $this->addParentUserNames($replies);
 
         return response()->json($replies);
     }
 
+    private function countAllReplies($reply)
+    {
+        $count = $reply->replies ? $reply->replies->count() : 0;
+        if ($reply->replies) {
+            foreach ($reply->replies as $child) {
+                $count += $this->countAllReplies($child);
+            }
+        }
+        return $count;
+    }
+    
     private function addParentUserNames($replies)
     {
         return $replies->map(function($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            $reply->replies_count = $this->countAllReplies($reply); // gunakan rekursif
             if ($reply->replies && $reply->replies->count() > 0) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }
