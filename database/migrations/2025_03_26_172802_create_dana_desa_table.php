@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('file')->nullable();
             $table->string('link')->nullable();
+            $table->
             $table->date('date');
             $table->timestamps();
         });

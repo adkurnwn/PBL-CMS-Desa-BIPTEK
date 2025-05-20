@@ -9,6 +9,8 @@ const news = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const pagination = ref(null);
+const searchQuery = ref("");
+const selectedCategory = ref("Semua");
 
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString("id-ID", {
@@ -31,6 +33,61 @@ const fetchNews = async () => {
     } catch (err) {
         error.value = "Gagal memuat berita";
         console.error("Error fetching news:", err);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const handleSearch = async () => {
+    try {
+        loading.value = true;
+        const response = await axios.get("/api/news", {
+            params: {
+                search: searchQuery.value,
+                category:
+                    selectedCategory.value === "Semua"
+                        ? null
+                        : selectedCategory.value,
+                sort: selectedCategory.value === "Populer" ? "views" : "latest",
+            },
+        });
+        news.value = response.data.data;
+        pagination.value = {
+            current_page: response.data.current_page,
+            last_page: response.data.last_page,
+            total: response.data.total,
+        };
+    } catch (err) {
+        error.value = "Gagal memuat berita";
+        console.error("Error searching news:", err);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const goToPage = async (page) => {
+    try {
+        loading.value = true;
+        const response = await axios.get(`/api/news?page=${page}`, {
+            params: {
+                search: searchQuery.value,
+                category:
+                    selectedCategory.value === "Semua"
+                        ? null
+                        : selectedCategory.value,
+                sort: selectedCategory.value === "Populer" ? "views" : "latest",
+            },
+        });
+        news.value = response.data.data;
+        pagination.value = {
+            current_page: response.data.current_page,
+            last_page: response.data.last_page,
+            total: response.data.total,
+        };
+        window.scrollTo(0, 0);
+    } catch (err) {
+        error.value = "Gagal memuat berita";
+        console.error("Error fetching news page:", err);
     } finally {
         loading.value = false;
     }
@@ -70,7 +127,7 @@ onMounted(() => {
                         class="-mr-2"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
-                        viewBox="0 -960 960 960"
+                        viewBox="http://www.w3.org/2000/svg"
                         width="24px"
                         fill="#244031"
                     >
@@ -182,9 +239,21 @@ onMounted(() => {
                 <!-- Pagination (if needed) -->
                 <div
                     v-if="pagination && pagination.last_page > 1"
-                    class="mt-8 flex justify-center"
+                    class="mt-8 flex justify-center space-x-2"
                 >
-                    <!-- Add pagination controls here -->
+                    <button
+                        v-for="page in pagination.last_page"
+                        :key="page"
+                        @click="goToPage(page)"
+                        class="px-3 py-1 rounded"
+                        :class="
+                            page === pagination.current_page
+                                ? 'bg-accent1 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        "
+                    >
+                        {{ page }}
+                    </button>
                 </div>
             </article>
         </main>
