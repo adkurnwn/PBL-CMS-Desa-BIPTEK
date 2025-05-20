@@ -16,6 +16,7 @@ class ProdukDesaResource extends JsonResource
     {
         return [
             'name' => $this->product_name,
+            'slug' => $this->slug,
             'price' => 'Rp ' . number_format($this->price, 0, ',', '.'),
             'image' => [
                 'path' => $this->images->first()->path ?? null,

@@ -21,6 +21,7 @@ class GalleryResource extends JsonResource
                     'alt' => $image->alt
                 ];
             }),
+            'slug' => $this->slug,
         ];
     }
 }
