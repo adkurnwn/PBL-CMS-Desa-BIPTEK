@@ -94,7 +94,7 @@ const isDashboardActive = computed(() => {
            /^\/dashboard\?.*$/.test(path);
 });
 
-const isUsersActive = computed(() => urlIncludes('/dashboard/users'));
+const isUsersActive = computed(() => urlIncludes('/dashboard/users') || urlIncludes('/dashboard/positions'));
 const isRolesActive = computed(() => urlIncludes('/dashboard/roles'));
 const isProfilesActive = computed(() => urlIncludes('/dashboard/profiles'));
 const isDemografiActive = computed(() => urlIncludes('/dashboard/demografi'));

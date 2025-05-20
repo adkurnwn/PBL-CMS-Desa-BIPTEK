@@ -1,22 +1,49 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
-import { ref } from "vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
+import { Head, useForm, Link, router } from "@inertiajs/vue3";
+import { ref, computed, watch } from "vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
-import DangerButton from "@/Components/DangerButton.vue";
 import Search from "@/Components/DashboardComponent/Search.vue";
+import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import TopButton from "@/Components/DashboardComponent/TopButton.vue";
+import Labels from "@/Components/DashboardComponent/Labels.vue";
+import SwitchToggle from "@/Components/DashboardComponent/SwitchToggle.vue";
 
 const props = defineProps({
-    users: Array,
-    positions: Array,
+    users: Object, // Change from Array to Object to match the paginated response format
     flash: Object,
+    search: {
+        type: String,
+        default: ''
+    }
+});
+
+// Extract pagination info from the users object
+const pagination = computed(() => {
+    if (!props.users) return null;
+
+    return {
+        currentPage: props.users.current_page,
+        lastPage: props.users.last_page,
+        perPage: props.users.per_page,
+        total: props.users.total,
+    };
+});
+
+// Extract the user data from the paginated response
+const userItems = computed(() => {
+    const users = props.users?.data || [];
+    return users.map(user => ({
+        ...user,
+        avatarUrl: getAvatarUrl(user)
+    }));
 });
 
 const form = useForm({});
+// Update searchQuery to use the prop
+const searchQuery = ref(props.search || '');
 
 const toggleUserStatus = (userId) => {
     form.delete(route("dashboard.users.destroy", userId), {
@@ -24,32 +51,79 @@ const toggleUserStatus = (userId) => {
     });
 };
 
-// Add delete position function
-const deletePosition = (positionId) => {
-    if (confirm("Are you sure you want to delete this position?")) {
-        form.delete(route("dashboard.positions.destroy", positionId), {
-            preserveScroll: true,
-        });
-    }
+const tableHeaders = [
+    {
+        label: 'Pengguna',
+        field: 'name',
+        sortable: true,
+        nowrap: true,
+        width: '320px',
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal'
+        },
+        avatar: {
+            field: 'avatarUrl',
+            size: 24,
+            gap: 12,
+            fallback: 'initials'
+        }
+    },
+    {
+        label: 'Kontak',
+        field: 'email',
+        sortable: false,
+        width: '400px'
+    },
+    {
+        label: 'Position',
+        field: 'position.name',
+        sortable: true,
+        width: '300px'
+    },
+    {
+        label: 'Status',
+        field: 'status',
+        sortable: true,
+        width: '264px'
+    },
+    {
+        label: 'Actions',
+        field: 'actions',
+        sortable: false,
+        width: '140px'
+    },
+];
+
+// Implement search functionality
+const handleSearch = (query) => {
+    router.get(route('dashboard.users.index'), {
+        search: query
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['users']
+    });
 };
 
-// Function to parse JSON job descriptions
-const parseJobDescription = (description) => {
-    if (!description) return [];
-    if (Array.isArray(description)) return description;
-
-    try {
-        return JSON.parse(description);
-    } catch (e) {
-        return [];
-    }
+const getAvatarUrl = (user) => {
+    if (!user || !user.photo_profile) return null;
+    return `/storage/${user.photo_profile}`;
 };
+
+// Watch for external search changes
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
 </script>
 
 <template>
 
     <Head title="Manajemen Pengguna" />
-
     <AuthenticatedLayout>
         <template #header>
             <HeadingMenu title="Manajemen Pengguna" :hasRightContent="false">
@@ -64,184 +138,101 @@ const parseJobDescription = (description) => {
         </template>
 
         <template #search-area>
-            <Search 
-                v-model="searchQuery"
-                placeholder="Cari pengguna..."
-                @search="handleSearch"
-            />
+            <Search v-model="searchQuery" placeholder="Cari pengguna..." @search="handleSearch" />
             <Link :href="route('dashboard.users.create')">
-                    <PrimaryButton :icon="true">
-                        <template #icon>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20"
-                                fill="none">
-                                <mask id="mask0_1642_3445" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0"
-                                    y="0" width="21" height="20">
-                                    <rect x="0.5" width="20" height="20" fill="#D9D9D9" />
-                                </mask>
-                                <g mask="url(#mask0_1642_3445)">
-                                    <path
-                                        d="M9.6665 10.8337H4.6665V9.16699H9.6665V4.16699H11.3332V9.16699H16.3332V10.8337H11.3332V15.8337H9.6665V10.8337Z"
-                                        fill="white" />
-                                </g>
-                            </svg>
-                        </template>
-                        Create
-                    </PrimaryButton>
-                    </Link>
+            <TopButton :icon="true">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
+                        <mask id="mask0_1642_3445" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
+                            width="21" height="20">
+                            <rect x="0.5" width="20" height="20" fill="#D9D9D9" />
+                        </mask>
+                        <g mask="url(#mask0_1642_3445)">
+                            <path
+                                d="M9.6665 10.8337H4.6665V9.16699H9.6665V4.16699H11.3332V9.16699H16.3332V10.8337H11.3332V15.8337H9.6665V10.8337Z"
+                                fill="white" />
+                        </g>
+                    </svg>
+                </template>
+                Create
+            </TopButton>
+            </Link>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <!-- Users Table -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg mb-8">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">
-                            Users
-                        </h3>
-                        <table class="min-w-full dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Position</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="user in users" :key="user.id">
-                                    <td>{{ user.name }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>
-                                        {{
-                                            user.position?.name ||
-                                            "Not assigned"
-                                        }}
-                                    </td>
-                                    <td class="flex justify-center">
-                                        {{
-                                            user.status ? "Active" : "Inactive"
-                                        }}
-                                    </td>
-                                    <td>
-                                        <div class="flex gap-x-2 justify-center">
-                                            <Link :href="route(
-                                                'dashboard.users.edit',
-                                                user.id
-                                            )
-                                                ">
-                                            <PrimaryButton :icon="false">  
-                                                Edit
-                                            </PrimaryButton>
-                                            </Link>
-                                            <div class="flex items-center">
-                                                <button @click="
-                                                    toggleUserStatus(
-                                                        user.id
-                                                    )
-                                                    "
-                                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                    :class="user.status
-                                                        ? 'bg-indigo-600'
-                                                        : 'bg-gray-200'
-                                                        " role="switch" :aria-checked="user.status">
-                                                    <span aria-hidden="true"
-                                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                                        :class="user.status
-                                                            ? 'translate-x-5'
-                                                            : 'translate-x-0'
-                                                            "></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <template #tab-devider>
+            <TabDevider :tabs="[
+                { name: 'Pengguna', href: route('dashboard.users.index'), active: true },
+                { name: 'Posisi', href: route('dashboard.positions.index'), active: false },
+            ]" />
+        </template>
 
-                <!-- Positions Table -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">
-                                Positions
-                            </h3>
-                            <Link :href="route('dashboard.positions.create')">
-                            <PrimaryButton :icon="true">
-                                <template #icon>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
-                                        fill="none">
-                                        <path
-                                            d="M9.16667 15.8333H10.8333V10.8333H15.8333V9.16667H10.8333V4.16667H9.16667V9.16667H4.16667V10.8333H9.16667V15.8333Z"
-                                            fill="white" />
+        <div class="dashboard-container">
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                    <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
+                        empty-state-message="No users found">
+                        <!-- Add a template for the Kontak column -->
+                        <template #['item.Kontak']="{ item }">
+                            <div class="flex flex-col">
+                                <span class="text-[18px] italic text-TableText">{{ item.phone || '-' }}</span>
+                                <span class="italic text-[18px] text-emailText">{{ item.email }}</span>
+                            </div>
+                        </template>
+
+                        <!-- Fix the Position column template -->
+                        <template #['item.Position']="{ item }">
+                            <Labels
+                                v-if="item.position"
+                                :type="item.position.name.toLowerCase().includes('kepala') ? 'kepala desa' : 
+                                       item.position.name.toLowerCase().includes('sekretaris') ? 'sekretaris desa' : 
+                                       item.position.name.toLowerCase().includes('bendahara') ? 'bendahara desa' : 'other'"
+                                :text="item.position.name"
+                            />
+                            <span v-else>-</span>
+                        </template>
+
+                        <!-- Fix the slot syntax for Status column -->
+                        <template #['item.Status']="{ item }">
+                            <div @click.stop="toggleUserStatus(item.id)" class="cursor-pointer">
+                                <SwitchToggle 
+                                    :type="item.status"
+                                    :text="item.status ? 'Aktif' : 'Nonaktif'"
+                                />
+                            </div>
+                        </template>
+
+                        <!-- Fix the slot syntax for Actions column -->
+                        <template #['item.Actions']="{ item }">
+                            <div class="flex gap-x-2 justify-center">
+                                <Link :href="route('dashboard.users.edit', item.id)">
+                                <button class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="22" viewBox="0 0 21 22" fill="none">
+                                        <mask id="mask0_1659_4389" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="21" height="22">
+                                            <rect y="0.5" width="21" height="21" fill="#D9D9D9"/>
+                                        </mask>
+                                        <g mask="url(#mask0_1659_4389)">
+                                            <path d="M1.75 21.5V18H19.25V21.5H1.75ZM5.25 14.5H6.475L13.3 7.69688L12.0531 6.45L5.25 13.275V14.5ZM3.5 16.25V12.5312L13.3 2.75313C13.4604 2.59271 13.6464 2.46875 13.8578 2.38125C14.0693 2.29375 14.2917 2.25 14.525 2.25C14.7583 2.25 14.9844 2.29375 15.2031 2.38125C15.4219 2.46875 15.6188 2.6 15.7938 2.775L16.9969 4C17.1719 4.16042 17.2995 4.35 17.3797 4.56875C17.4599 4.7875 17.5 5.01354 17.5 5.24688C17.5 5.46563 17.4599 5.68073 17.3797 5.89219C17.2995 6.10365 17.1719 6.29688 16.9969 6.47188L7.21875 16.25H3.5Z" fill="#FFC107"/>
+                                        </g>
                                     </svg>
-                                </template>
-                                Create Position
-                            </PrimaryButton>
-                            </Link>
-                        </div>
-                        <table class="min-w-full dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Job Description</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="position in positions" :key="position.id">
-                                    <td>{{ position.name }}</td>
-                                    <td>
-                                        <ul class="list-disc ml-5">
-                                            <li v-for="(
-duty, index
-                                                ) in parseJobDescription(
-    position.job_description
-)" :key="index" class="text-gray-700 truncate" v-show="index < 2">
-                                                {{ duty }}
-                                            </li>
-                                            <li v-if="
-                                                parseJobDescription(
-                                                    position.job_description
-                                                ).length > 2
-                                            " class="text-gray-500">
-                                                ... and
-                                                {{
-                                                    parseJobDescription(
-                                                        position.job_description
-                                                    ).length - 2
-                                                }}
-                                                more
-                                            </li>
-                                        </ul>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex gap-x-2 justify-center">
-                                            <Link :href="route(
-                                                'dashboard.positions.edit',
-                                                position.id
-                                            )
-                                                ">
-                                            <PrimaryButton>Edit</PrimaryButton>
-                                            </Link>
-                                            <DangerButton @click="
-                                                deletePosition(position.id)
-                                                " v-if="
-                                                    position.name !==
-                                                    'Kepala Desa'
-                                                ">
-                                                Delete
-                                            </DangerButton>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                </button>
+                                </Link>
+                            </div>
+                        </template>
+                    </Tabel>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Dashboard specific styles to manage scrolling */
+.dashboard-container {
+    position: relative;
+    height: calc(100vh - 348px);
+    min-height: 650px;
+    overflow: hidden;
+}
+</style>

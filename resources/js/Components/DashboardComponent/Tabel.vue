@@ -66,7 +66,12 @@ const props = defineProps({
     sortDirection: {
         type: String,
         default: 'asc'
-    }
+    },
+    // Add totalItems prop to receive the total count from parent
+    totalItems: {
+        type: Number,
+        default: 0
+    },
 });
 
 const emit = defineEmits(['page-changed', 'sort']);
@@ -283,6 +288,7 @@ const transformText = (text, transform) => {
                                     ]"
                                 :style="styleObjectToString(header.style)"
                             >
+                                <!-- Use format that matches how it's used in Dashboard.vue and elsewhere -->
                                 <slot :name="`item.${header.label}`" :item="item" :header="header">
                                     <div v-if="header.avatar" class="flex items-center">
                                         <div 
@@ -331,7 +337,7 @@ const transformText = (text, transform) => {
                     :current-page="internalCurrentPage"
                     :total-pages="totalPagesComputed"
                     :max-visible-buttons="5"
-                    :total-items="items.length"
+                    :total-items="props.totalItems"
                     :items-per-page="itemsPerPage"
                     @page-changed="handlePageChanged"
                 />

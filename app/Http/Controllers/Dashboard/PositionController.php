@@ -75,4 +75,11 @@ class PositionController extends Controller
         $this->logHelper->logActivity('delete', 'position', 'Menghapus posisi ' . $position->name);
         return back()->with('success', 'Posisi Berhasil Dihapus');
     }
+
+    public function index()
+    {
+        return Inertia::render('Dashboard/UserManagement/Positions/Index', [
+            'positions' => Position::all()
+        ]);
+    }
 }

@@ -38,6 +38,7 @@ export default {
                 'searchIcon': '#A0AEC0',
                 'searchBorder': '#C2C2C2',
                 'blueBorder': '#2563EB',
+                'emailText': '#404DBD',
 
             },
             fontFamily: {

@@ -100,6 +100,10 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
+                <div v-if="$slots['tab-devider']" class="h-[48px] pt-[11px]">
+                    <slot name="tab-devider"></slot>
+                </div>
+
                 <div v-if="$slots['subtitle-area']" class="px-[22px] pt-[25px] text-[22px] font-medium text-menuText">
                     <slot name="subtitle-area"></slot>
                 </div>

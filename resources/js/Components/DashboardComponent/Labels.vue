@@ -28,6 +28,12 @@ const labelClass = computed(() => {
             return 'bg-redLabel text-redLabelText';
         case 'login':
             return 'bg-blueLabel text-blueLabelText';
+        case 'kepala desa':
+            return 'bg-[#C7AE2B]/25 text-[#C7AE2B]';
+        case 'sekretaris desa':
+            return 'bg-[#00BFFF]/25 text-[#00BFFF]';
+        case 'bendahara desa':
+            return 'bg-[#32CD32]/25 text-[#32CD32]';
         default:
             return 'bg-gray-100 text-gray-800';
     }

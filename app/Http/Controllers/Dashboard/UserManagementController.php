@@ -20,13 +20,35 @@ class UserManagementController extends Controller
     {
         $this->logHelper = new LogActivityHelper();
     }
-    public function index()
+    
+    public function index(Request $request)
     {
-        return Inertia::render('Dashboard/UserManagement/Index', [
-            'users' => User::with(['roles', 'position'])->whereDoesntHave('roles', function ($query) {
+        // Get the number of items per page from request or use default of 25
+        $perPage = $request->input('per_page', 25);
+        
+        // Get search query parameter
+        $search = $request->input('search', '');
+        
+        // Paginate the users query
+        $usersQuery = User::with(['roles', 'position'])
+            ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })->get(),
-            'positions' => Position::all()
+            });
+            
+        // Add search functionality if a search term is provided
+        if (!empty($search)) {
+            $usersQuery->where(function($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Execute query with pagination
+        $users = $usersQuery->paginate($perPage);
+        
+        return Inertia::render('Dashboard/UserManagement/Index', [
+            'users' => $users,
+            'search' => $search // Pass the search term back to the view
         ]);
     }
 
