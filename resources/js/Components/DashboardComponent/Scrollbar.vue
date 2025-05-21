@@ -29,6 +29,10 @@ const props = defineProps({
   hideScrollbar: {
     type: Boolean,
     default: false
+  },
+  scrollbarWidth: {
+    type: String,
+    default: '8px'
   }
 });
 
@@ -77,7 +81,9 @@ onUnmounted(() => {
       width,
       '--thumb-color': thumbColor, 
       '--thumb-hover-color': thumbHoverColor,
-      '--scrollbar-display': hideScrollbar ? 'none' : 'block'
+      '--track-color': trackColor,
+      '--scrollbar-width': scrollbarWidth,
+      '--scrollbar-display': hideScrollbar ? 'none' : 'block' 
     }"
   >
     <slot></slot>
@@ -89,16 +95,18 @@ onUnmounted(() => {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  scrollbar-width: var(--scrollbar-display);
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--thumb-color) var(--track-color); /* Firefox */
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: var(--scrollbar-width);
   display: var(--scrollbar-display);
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--track-color);
+  border-radius: 20px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -117,6 +125,18 @@ onUnmounted(() => {
 
 .custom-scrollbar.auto-hide.is-scrolling::-webkit-scrollbar-thumb,
 .custom-scrollbar.auto-hide:hover::-webkit-scrollbar-thumb {
-  background-color: v-bind(thumbColor);
+  background-color: var(--thumb-color);
+}
+
+/* Fix for Firefox to ensure scrollbar is visible when needed */
+@supports (scrollbar-width: thin) {
+  .custom-scrollbar.auto-hide {
+    scrollbar-width: var(--scrollbar-display);
+  }
+  
+  .custom-scrollbar.auto-hide:hover,
+  .custom-scrollbar.auto-hide.is-scrolling {
+    scrollbar-width: thin;
+  }
 }
 </style>

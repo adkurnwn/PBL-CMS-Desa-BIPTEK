@@ -183,8 +183,8 @@ const handleSidebarCollapse = (collapsed) => {
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 
                     class="flex-1 w-full pr-[23px] pl-[10px]" 
-                    thumbColor="rgba(79, 70, 229, 0.4)" 
-                    thumbHoverColor="rgba(79, 70, 229, 0.6)"
+                    :hideScrollbar="false"
+                    :autoHide="false"
                 >
                     <main class="w-full">
                         <slot />
