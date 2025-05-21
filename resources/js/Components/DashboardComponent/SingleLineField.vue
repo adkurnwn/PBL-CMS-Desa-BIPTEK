@@ -3,13 +3,15 @@
     <div class="field-name text-selectedText">{{ fieldName }}</div>
     <div class="relative">
       <input 
-        class="field-box text-TableText bg-menuBG border border-selectedText border-solid" 
+        class="field-box text-TableText bg-menuBG border border-selectedText border-solid focus:outline-none focus:border-2 focus:border-selectedText" 
         :type="showPassword ? 'text' : type" 
         :value="modelValue" 
         @input="$emit('update:modelValue', $event.target.value)" 
         :placeholder="placeholder"
         :required="required"
+        :disabled="disabled"
         :id="id"
+        :class="{ 'opacity-75 cursor-not-allowed': disabled }"
       />
       <div 
         v-if="type === 'password'" 
@@ -59,6 +61,10 @@ export default {
       type: Boolean,
       default: false
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     id: {
       type: String,
       default: ''
@@ -95,5 +101,19 @@ export default {
   width: 100%;
   box-sizing: border-box;
   border-radius: 5px;
+  transition: border 0.2s ease;
+}
+
+/* Remove all focus styling to prevent browser defaults */
+.field-box:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  /* The focus:border-2 and focus:border-selectedText classes in the template will handle the focus style */
+}
+
+/* Keep disabled styling */
+.field-box:disabled {
+  background-color: #C2C2C2;
+  cursor: not-allowed;
 }
 </style>

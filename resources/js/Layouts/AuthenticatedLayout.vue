@@ -6,11 +6,17 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import Sidebar from "@/Components/DashboardComponent/Sidebar.vue";
 import Header from "@/Components/DashboardComponent/Header.vue";
 import Scrollbar from "@/Components/DashboardComponent/Scrollbar.vue";
-import { Link } from "@inertiajs/vue3";
+import ToastNotification from "@/Components/DashboardComponent/ToastNotification.vue";
+import { Link, usePage } from "@inertiajs/vue3";
 
+const page = usePage();
 const showingNavigationDropdown = ref(false);
 const sidebarOpen = ref(true);
 const sidebarCollapsed = ref(false);
+
+// Toast notifications state
+const toasts = ref([]);
+const toastId = ref(0);
 
 // Get sidebar collapsed state from localStorage on mount
 onMounted(() => {
@@ -18,7 +24,54 @@ onMounted(() => {
     if (storedCollapsedState !== null) {
         sidebarCollapsed.value = storedCollapsedState === 'true';
     }
+    
+    checkForFlashMessages();
 });
+
+// Watch for changes to flash messages - important for SPA navigation
+watch(() => page.props.flash, (newVal, oldVal) => {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+        checkForFlashMessages();
+    }
+}, { deep: true });
+
+// Check for flash messages and convert them to toasts
+const checkForFlashMessages = () => {
+    if (page.props.flash) {
+        Object.entries(page.props.flash).forEach(([type, message]) => {
+            if (message && ['success', 'error', 'warning', 'info'].includes(type)) {
+                addToast(message, type);
+            }
+        });
+    }
+};
+
+// Add a new toast notification
+const addToast = (message, type = 'info', duration = 5000) => {
+    const id = toastId.value++;
+    toasts.value.push({ id, message, type, duration, show: true });
+    
+    // Auto-remove toast from array after it's closed (plus animation time)
+    if (duration > 0) {
+        setTimeout(() => {
+            removeToast(id);
+        }, duration + 500); // 500ms total for the animations
+    }
+};
+
+// Remove a toast when closed
+const removeToast = (id) => {
+    // First set show to false to trigger the leave animation
+    const toastIndex = toasts.value.findIndex(toast => toast.id === id);
+    if (toastIndex !== -1) {
+        toasts.value[toastIndex].show = false;
+        
+        // Then remove from array after animation completes
+        setTimeout(() => {
+            toasts.value = toasts.value.filter(toast => toast.id !== id);
+        }, 300); // 300ms for the fade out animation
+    }
+};
 
 // Calculate sidebar width based on collapsed state
 const sidebarWidth = computed(() => {
@@ -39,6 +92,19 @@ const handleSidebarCollapse = (collapsed) => {
     <div class="flex flex-col h-screen bg-white overflow-hidden">
         <!-- Header -->
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
+        
+        <!-- Toast Notifications Container - Positioned for SPA -->
+        <div class="fixed top-[120px] right-4 z-50 w-[26rem] space-y-2">
+            <ToastNotification
+                v-for="toast in toasts"
+                :key="toast.id"
+                :type="toast.type"
+                :message="toast.message"
+                :duration="toast.duration"
+                :show="toast.show"
+                @close="removeToast(toast.id)"
+            />
+        </div>
         
         <div class="mt-[160px] flex flex-row h-[calc(100vh-110px)] overflow-hidden">
             <!-- Sidebar with collapse functionality -->
@@ -62,7 +128,7 @@ const handleSidebarCollapse = (collapsed) => {
                     <div class="max-w-full mx-auto pl-[10px]">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                    <slot name="page-icon"></slot>
+                                <slot name="page-icon"></slot>
                                 <slot name="header"></slot>
                             </div>
                             <div v-if="$slots['header-actions']">
@@ -72,8 +138,9 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
-                <!-- Flash Messages -->
-                <div class="w-full px-4">
+                <!-- Keep the Flash Messages section but hide it visually -->
+                <!-- This maintains backward compatibility with pages that expect these elements -->
+                <div class="w-full px-4 hidden">
                     <div
                         v-if="$page.props.flash?.success"
                         class="mb-4 p-4 bg-green-100 text-green-700 rounded-md"

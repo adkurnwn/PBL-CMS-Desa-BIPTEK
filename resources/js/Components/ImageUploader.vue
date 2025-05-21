@@ -1,7 +1,7 @@
 <script setup>
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
 import { ref, computed } from "vue";
 
 const props = defineProps({

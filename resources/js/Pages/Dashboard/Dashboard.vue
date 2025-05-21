@@ -96,7 +96,7 @@ const tableHeaders = [
         field: 'module',
         sortable: false,
         nowrap: true,
-        width: '15%',  // Changed from '250px' to percentage
+        width: '14%',  // Changed from '250px' to percentage
         transform: 'capitalize'
     },
     {
@@ -106,14 +106,14 @@ const tableHeaders = [
         nowrap: false,
         truncate: false,
         multiline: true,
-        width: '38%',  // Changed from minWidth: '450px' to percentage width
+        width: '36%',  // Changed from minWidth: '450px' to percentage width
     },
     {
         label: 'Waktu',
         field: 'time',
         sortable: true,
         nowrap: true,
-        width: '15%',  // Changed from '264px' to percentage
+        width: '18%',  // Changed from '264px' to percentage
         style: {
             fontSize: '18px',
             fontStyle: 'normal',

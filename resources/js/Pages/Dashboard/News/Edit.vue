@@ -4,7 +4,7 @@ import { ref, computed, onUnmounted, watch } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";

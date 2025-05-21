@@ -1,5 +1,5 @@
 <script setup>
-import InputError from '@/Components/InputError.vue';
+import InputError from '@/Components/DashboardComponent/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/DashboardComponent/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';

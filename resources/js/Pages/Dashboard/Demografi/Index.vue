@@ -1,13 +1,220 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import Search from "@/Components/DashboardComponent/Search.vue";
+import TopButton from "@/Components/DashboardComponent/TopButton.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import { ref, computed, watch } from "vue";
+import IconAksi from "@/Components/DashboardComponent/IconAksi.vue";
+import DropdownFilter from "@/Components/DashboardComponent/DropdownFilter.vue";
 
 const props = defineProps({
     demografi: Array,
+    search: {
+        type: String,
+        default: ''
+    },
+    sort: {
+        type: String,
+        default: 'tahun'
+    },
+    direction: {
+        type: String,
+        default: 'desc'
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
+    },
+    years: {
+        type: Array,
+        default: () => []
+    }
 });
+
+// State for search and sort
+const searchQuery = ref(props.search || '');
+const sortField = ref(props.sort || 'tahun');
+const sortDirection = ref(props.direction || 'desc');
+// Initialize filter state with empty object but watch for changes
+const filterState = ref({});  // Empty object instead of using props.filters
+
+// Get unique years from demografi data for filter options
+const availableYears = computed(() => {
+    if (props.years && props.years.length > 0) {
+        return props.years;
+    }
+
+    // Extract unique years from demografi data if not provided
+    const years = [...new Set(props.demografi?.map(item => item.tahun) || [])];
+    return years.map(year => ({ id: year, name: year.toString() }));
+});
+
+// Filter fields configuration
+const filterFields = computed(() => [
+    {
+        id: 'tahun',
+        name: 'Tahun',
+        options: availableYears.value
+    }
+]);
+
+// Pagination information
+const pagination = computed(() => {
+    return {
+        currentPage: 1,
+        lastPage: 1,
+        perPage: 25,
+        total: props.demografi?.length || 0
+    };
+});
+
+// Format demografi items for table
+const demografiItems = computed(() => {
+    return props.demografi || [];
+});
+
+// Table headers configuration
+const tableHeaders = [
+    {
+        label: 'Tahun',
+        field: 'tahun',
+        sortable: true,
+        nowrap: true,
+        width: '150px',
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal'
+        }
+    },
+    {
+        label: 'Jumlah Penduduk',
+        field: 'jumlah_penduduk',
+        sortable: true,
+        nowrap: true,
+        width: '200px'
+    },
+    {
+        label: 'Jumlah KK',
+        field: 'jumlah_keluarga',
+        sortable: true,
+        nowrap: true,
+        width: '200px'
+    },
+    {
+        label: 'Pendatang',
+        field: 'jumlah_pendatang',
+        sortable: true,
+        nowrap: true,
+        width: '200px'
+    },
+    {
+        label: 'Pindah Keluar',
+        field: 'jumlah_pindah_keluar',
+        sortable: true,
+        nowrap: true,
+        width: '200px'
+    },
+    {
+        label: 'Aksi',
+        field: 'actions',
+        sortable: false,
+        width: '100px'
+    },
+];
+
+// Handle search
+const handleSearch = (query) => {
+    router.get(route('dashboard.demografi.index'), {
+        search: query,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        ...filterState.value
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    });
+};
+
+// Handle filter changes
+const handleFilterChange = (newFilters) => {
+    // Check if filters were cleared
+    const wasCleared = Object.keys(filterState.value).length > 0 && Object.keys(newFilters).length === 0;
+    
+    filterState.value = newFilters;
+    
+    // If filters were cleared, make a request without tahun parameter
+    router.get(route('dashboard.demografi.index'), {
+        search: searchQuery.value,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        ...(Object.keys(newFilters).length > 0 ? newFilters : {})
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    });
+};
+
+// Handle sort
+const handleSort = (field) => {
+    if (field === sortField.value) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortField.value = field;
+        sortDirection.value = 'asc';
+    }
+
+    router.get(route('dashboard.demografi.index'), {
+        search: searchQuery.value,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        ...filterState.value
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    });
+};
+
+// Watch for external props changes
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
+watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
+    if (newSort !== sortField.value) {
+        sortField.value = newSort;
+    }
+    if (newDirection !== sortDirection.value) {
+        sortDirection.value = newDirection;
+    }
+}, { immediate: true });
+
+// Watch for external filter changes - update to handle empty filters properly
+watch(() => props.filters, (newValue) => {
+    // Only update if there's a meaningful difference
+    const currentEmpty = !filterState.value || Object.keys(filterState.value).length === 0;
+    const newEmpty = !newValue || Object.keys(newValue).length === 0 || 
+                    (newValue.tahun === '' || newValue.tahun === undefined);
+    
+    if (currentEmpty && newEmpty) {
+        // Both empty, no need to update
+        return;
+    }
+    
+    // Otherwise update the filter state
+    if (newEmpty) {
+        filterState.value = {};
+    } else {
+        filterState.value = { ...newValue };
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -16,7 +223,7 @@ const props = defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <HeadingMenu title="Demografi" :hasRightContent="true">
+            <HeadingMenu title="Demografi" :hasRightContent="false">
                 <template #icon>
                     <svg width="37" height="38" viewBox="0 0 37 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <mask id="mask0_1439_7132" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
@@ -29,82 +236,68 @@ const props = defineProps({
                                 fill="#4C7660" />
                         </g>
                     </svg>
-
-                </template>
-                <template #right-content>
-                    <Link :href="route('dashboard.demografi.create')">
-                    <PrimaryButton>Create New Demografi</PrimaryButton>
-                    </Link>
                 </template>
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <!-- Flash Message will be handled by AuthenticatedLayout -->
+        <template #search-area>
+            <Search v-model="searchQuery" placeholder="Cari data demografi..." @search="handleSearch" />
+            <DropdownFilter placeholder="Filter..." :filter-fields="filterFields" v-model:filters="filterState"
+                @filter-changed="handleFilterChange" width="250px" dropdownTitle="Filter berdasarkan"
+                activeFiltersTitle="Filter yang aktif" :close-on-select="false" />
+            <Link :href="route('dashboard.demografi.create')">
+            <TopButton :icon="true">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
+                        <mask id="mask0_1642_3445" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
+                            width="21" height="20">
+                            <rect x="0.5" width="20" height="20" fill="#D9D9D9" />
+                        </mask>
+                        <g mask="url(#mask0_1642_3445)">
+                            <path
+                                d="M9.6665 10.8337H4.6665V9.16699H9.6665V4.16699H11.3332V9.16699H16.3332V10.8337H11.3332V15.8337H9.6665V10.8337Z"
+                                fill="white" />
+                        </g>
+                    </svg>
+                </template>
+                Create
+            </TopButton>
+            </Link>
+        </template>
 
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tahun
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Jumlah Penduduk
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Jumlah KK
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="demografi in demografi" :key="demografi.id">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ demografi.tahun }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ demografi.jumlah_penduduk }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ demografi.jumlah_keluarga }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex gap-2">
-                                            <Link
-                                                :href="
-                                                    route(
-                                                        'dashboard.demografi.edit',
-                                                        demografi.tahun
-                                                    )
-                                                "
-                                            >
-                                                <PrimaryButton>
-                                                    Edit
-                                                </PrimaryButton>
-                                            </Link>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr v-if="demografi.length === 0">
-                                    <td class="px-6 py-4 text-center text-gray-500" colspan="4">
-                                        No demographic data found. Create new
-                                        demographic data to get started.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="dashboard-container">
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                    <Tabel :headers="tableHeaders" :items="demografiItems" :pagination="true"
+                        :items-per-page="pagination.perPage" :current-page="pagination.currentPage"
+                        :total-pages="pagination.lastPage" :total-items="pagination.total" :sort-field="sortField"
+                        :sort-direction="sortDirection"
+                        empty-state-message="Tidak ada data demografi ditemukan. Buat data baru untuk memulai."
+                        @sort="handleSort">
+                        <!-- Custom rendering for Aksi column -->
+                        <template #['item.Aksi']="{ item }">
+                            <div class="flex justify-left">
+                                <Link :href="route('dashboard.demografi.edit', item.tahun)">
+                                <button
+                                    class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <IconAksi type="edit" />
+                                </button>
+                                </Link>
+                            </div>
+                        </template>
+                    </Tabel>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Dashboard specific styles to manage scrolling */
+.dashboard-container {
+    position: relative;
+    height: calc(100vh - 348px);
+    min-height: 650px;
+    overflow: hidden;
+}
+</style>

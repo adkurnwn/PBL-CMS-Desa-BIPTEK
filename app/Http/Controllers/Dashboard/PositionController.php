@@ -63,11 +63,11 @@ class PositionController extends Controller
     public function destroy(Position $position)
     {
         if (in_array($position->name, ['Admin Sistem', 'Kepala Desa'])) {
-            return back()->with('error', 'Cannot delete core positions');
+            return back()->with('error', 'Tidak dapat menghapus posisi ini');
         }
 
         if ($position->users()->count() > 0) {
-            return back()->with('error', 'Cannot delete position that is assigned to users');
+            return back()->with('error', 'Tidak dapat menghapus posisi yang sedang digunakan oleh pengguna');
         }
 
         $position->delete();

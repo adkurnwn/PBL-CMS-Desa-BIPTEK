@@ -386,7 +386,7 @@ const isMultiline = (header) => {
                                                 v-if="item[header.avatar.field]" 
                                                 :src="item[header.avatar.field]" 
                                                 :alt="`${item[getFieldName(header)]} avatar`"
-                                                class="w-full h-full object-cover"
+                                                class="w-full h-full object-cover object-top"
                                             />
                                             <span 
                                                 v-else-if="header.avatar.fallback === 'initials'"
@@ -398,7 +398,7 @@ const isMultiline = (header) => {
                                                 v-else-if="header.avatar.fallbackUrl"
                                                 :src="header.avatar.fallbackUrl"
                                                 :alt="`${item[getFieldName(header)]} avatar`"
-                                                class="w-full h-full object-cover"
+                                                class="w-full h-full object-cover object-top"
                                             />
                                         </div>
                                         <span 

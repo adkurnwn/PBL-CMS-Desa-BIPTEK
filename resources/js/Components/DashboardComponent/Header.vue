@@ -75,7 +75,7 @@ const dropdownStyles = {
                                         class="h-[45px] w-[45px] rounded-full overflow-hidden border-2 border-white">
                                         <img :src="'/storage/' + $page.props.auth.user.photo_profile"
                                             :alt="$page.props.auth.user.name" 
-                                            class="h-full w-full object-cover" />
+                                            class="h-full w-full object-cover object-top" />
                                     </div>
                                     <div v-else 
                                         class="h-[45px] w-[45px] rounded-full bg-white text-accent1 flex items-center justify-center border-2 border-white font-medium">
