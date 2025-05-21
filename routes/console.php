@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Dashboard\RecoveryController;
 use Illuminate\Support\Facades\Schedule;
 
 
 $frequency = env('BACKUP_FREQUENCY', 'daily');
 $time = env('BACKUP_TIME', '00:00');
 
-$backupCommand = Schedule::command('backup:run --only-db');
+$backupCommand = Schedule::call(function () {
+    $recoveryController = new RecoveryController();
+    $recoveryController->create();
+});
 
 switch ($frequency) {
     case 'hourly':

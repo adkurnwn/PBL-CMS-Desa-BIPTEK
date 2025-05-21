@@ -30,7 +30,6 @@ class RecoveryController extends Controller
     public function create()
     {
         try {
-            // Delete existing backups before creating a new one
             $existingBackups = $this->getBackups();
 
             foreach ($existingBackups as $backup) {
@@ -46,7 +45,6 @@ class RecoveryController extends Controller
                 }
             }
 
-            // Create new backup
             Artisan::call('backup:run');
 
             $this->logHelper->logActivity('create', 'backup', 'Created new database backup');
