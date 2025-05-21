@@ -42,8 +42,16 @@ class ProfileController extends Controller
     {
         $profile = Profile::where('name', $slug)->firstOrFail();
 
-        // Initialize profileData with all fields from the request
-        $profileData = $request->except(['logo', 'organization_image', 'hero_images', 'hero_image_1', 'hero_image_2', 'hero_image_3', 'lembaga', 'fasilitas']);
+        $profileData = $request->except([
+            'logo',
+            'organization_image',
+            'hero_images',
+            'hero_image_1',
+            'hero_image_2',
+            'hero_image_3',
+            'lembaga',
+            'fasilitas'
+        ]);
 
         // Get the village name for the profile name
         $village = Village::find($request->kelurahan);
