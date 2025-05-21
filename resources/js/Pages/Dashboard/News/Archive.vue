@@ -11,9 +11,9 @@ const props = defineProps({
 
 const form = useForm({});
 
-const deleteNews = (newsId) => {
+const deleteNews = (slug) => {
     if (confirm("Are you sure you want to delete this news?")) {
-        form.delete(route("dashboard.news.destroy", newsId), {
+        form.delete(route("dashboard.news.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -68,7 +68,7 @@ const deleteNews = (newsId) => {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <DangerButton
-                                            @click="deleteNews(news.id)"
+                                            @click="deleteNews(news.slug)"
                                         >
                                             Delete
                                         </DangerButton>
@@ -78,7 +78,7 @@ const deleteNews = (newsId) => {
                                             :href="
                                                 route(
                                                     'dashboard.news.restore',
-                                                    news.id
+                                                    news.slug
                                                 )
                                             "
                                         >

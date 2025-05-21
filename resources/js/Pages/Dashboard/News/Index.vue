@@ -16,9 +16,9 @@ const search = ref("");
 const sortField = ref("created_at");
 const sortDirection = ref("desc");
 
-const deleteNews = (newsId) => {
+const deleteNews = (slug) => {
     if (confirm("Are you sure you want to delete this news?")) {
-        form.delete(route("dashboard.news.destroy", newsId), {
+        form.delete(route("dashboard.news.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -175,16 +175,22 @@ const filteredNews = computed(() => {
                                         }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link :href="route(
-                                            'dashboard.news.edit',
-                                            news.id
-                                        )
-                                            ">
-                                        <PrimaryButton>
-                                            Edit News
-                                        </PrimaryButton>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.news.edit',
+                                                    news.slug
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton>
+                                                Edit News
+                                            </PrimaryButton>
                                         </Link>
-                                        <DangerButton @click="deleteNews(news.id)" class="ml-2">
+                                        <DangerButton
+                                            @click="deleteNews(news.slug)"
+                                            class="ml-2"
+                                        >
                                             Delete
                                         </DangerButton>
                                     </td>

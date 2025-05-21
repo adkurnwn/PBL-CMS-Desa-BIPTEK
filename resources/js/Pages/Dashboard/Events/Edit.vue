@@ -27,7 +27,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.put(route("dashboard.events.update", props.event.id), {
+    form.put(route("dashboard.events.update", props.event.slug), {
         preserveScroll: true,
     });
 };

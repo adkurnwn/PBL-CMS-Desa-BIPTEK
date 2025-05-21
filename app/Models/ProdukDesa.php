@@ -22,6 +22,7 @@ class ProdukDesa extends Model
         'nama_penjual',
         'kontak_penjual',
         'description',
+        'status',
     ];
 
     public function user()

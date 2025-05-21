@@ -54,14 +54,17 @@ const props = defineProps({
                                         {{ event.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link :href="route(
-                                            'dashboard.events.edit',
-                                            event.id
-                                        )
-                                            ">
-                                        <PrimaryButton>
-                                            Edit Event
-                                        </PrimaryButton>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.events.edit',
+                                                event.slug
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton>
+                                                Edit Event
+                                            </PrimaryButton>
                                         </Link>
                                     </td>
                                 </tr>

@@ -79,14 +79,17 @@ const props = defineProps({
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex gap-2">
-                                            <Link :href="route(
-                                                'dashboard.demografi.edit',
-                                                demografi.id
-                                            )
-                                                ">
-                                            <PrimaryButton>
-                                                Edit
-                                            </PrimaryButton>
+                                            <Link
+                                                :href="
+                                                    route(
+                                                        'dashboard.demografi.edit',
+                                                        demografi.tahun
+                                                    )
+                                                "
+                                            >
+                                                <PrimaryButton>
+                                                    Edit
+                                                </PrimaryButton>
                                             </Link>
                                         </div>
                                     </td>

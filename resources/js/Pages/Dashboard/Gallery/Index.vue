@@ -11,9 +11,9 @@ const props = defineProps({
 
 const form = useForm({});
 
-const deleteGallery = (galleryId) => {
+const deleteGallery = (slug) => {
     if (confirm("Are you sure you want to delete this gallery?")) {
-        form.delete(route("dashboard.galleries.destroy", galleryId), {
+        form.delete(route("dashboard.galleries.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -71,16 +71,21 @@ const deleteGallery = (galleryId) => {
                                         {{ gallery.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link :href="route(
-                                            'dashboard.galleries.edit',
-                                            gallery.id
-                                        )
-                                            ">
-                                        <PrimaryButton>
-                                            Edit Gallery
-                                        </PrimaryButton>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.galleries.edit',
+                                                    gallery.slug
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton>
+                                                Edit Gallery
+                                            </PrimaryButton>
                                         </Link>
-                                        <DangerButton @click="deleteGallery(gallery.id)">
+                                        <DangerButton
+                                            @click="deleteGallery(gallery.slug)"
+                                        >
                                             Delete
                                         </DangerButton>
                                     </td>

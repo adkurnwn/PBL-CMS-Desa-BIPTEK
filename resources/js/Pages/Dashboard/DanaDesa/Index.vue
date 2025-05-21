@@ -60,14 +60,17 @@ const props = defineProps({
                                         {{ dana_desa.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link :href="route(
-                                            'dashboard.dana-desa.edit',
-                                            dana_desa.id
-                                        )
-                                            ">
-                                        <PrimaryButton>
-                                            Edit Dana Desa
-                                        </PrimaryButton>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.dana-desa.edit',
+                                                    dana_desa.slug
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton>
+                                                Edit Dana Desa
+                                            </PrimaryButton>
                                         </Link>
                                     </td>
                                 </tr>

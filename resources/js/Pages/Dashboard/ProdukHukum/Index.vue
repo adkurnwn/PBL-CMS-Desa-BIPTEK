@@ -52,14 +52,17 @@ const props = defineProps({
                                         {{ produk_hukum.title }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link :href="route(
-                                            'dashboard.produk-hukum.edit',
-                                            produk_hukum.id
-                                        )
-                                            ">
-                                        <PrimaryButton>
-                                            Edit Produk Hukum
-                                        </PrimaryButton>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'dashboard.produk-hukum.edit',
+                                                    produk_hukum.slug
+                                                )
+                                            "
+                                        >
+                                            <PrimaryButton>
+                                                Edit Produk Hukum
+                                            </PrimaryButton>
                                         </Link>
                                     </td>
                                 </tr>

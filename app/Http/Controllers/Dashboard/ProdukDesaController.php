@@ -49,18 +49,23 @@ class ProdukDesaController extends Controller
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Ditambahkan');
     }
 
-    public function edit(ProdukDesa $produkDesa)
+    public function edit($slug)
     {
+        $produkDesa = ProdukDesa::where('slug', $slug)->firstOrFail();
+
+        $this->logHelper->logActivity('view', 'produk_desa', 'Melihat produk desa ' . $produkDesa->title);
         return Inertia::render('Dashboard/ProdukDesa/Edit', [
             'produkDesa' => $produkDesa->load('images'),
 
         ]);
     }
 
-    public function update(UpdateProdukDesaRequest $request, ProdukDesa $produkDesa)
+    public function update(UpdateProdukDesaRequest $request, $slug)
     {
+        $produkDesa = ProdukDesa::where('slug', $slug)->firstOrFail();
+
         $dataProduk = $request->all();
-        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->title);
+        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->product_name);
 
         $produkDesa->update($dataProduk);
 
@@ -72,16 +77,23 @@ class ProdukDesaController extends Controller
             $this->mediaService->handleImageUploads($produkDesa, $request->file('images'), [], 'produk-desa-images');
         }
 
-        $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->title);
+        $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->product_name);
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Diperbarui');
     }
 
-    public function destroy(ProdukDesa $produkDesa)
+    public function destroy($slug)
     {
-        $this->mediaService->deleteAllMedia($produkDesa);
-        $produkDesa->delete();
+        $produkDesa = ProdukDesa::where('slug', $slug)->firstOrFail();
 
-        $this->logHelper->logActivity('delete', 'produk_desa', 'Menghapus produk desa ' . $produkDesa->title);
-        return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Dihapus');
+        $newStatus = !(bool)$produkDesa->status;
+        $produkDesa->update([
+            'status' => $newStatus
+        ]);
+
+        $logMessage = $newStatus ? 'Mengaktifkan' : 'Menonaktifkan';
+        $statusMessage = $newStatus ? 'Diaktifkan' : 'Dinonaktifkan';
+        $logStatus = $newStatus ? 'restore' : 'delete';
+        $this->logHelper->logActivity($logStatus, 'produk_desa', $logMessage . ' produk desa ' . $produkDesa->product_name);
+        return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil ' . $statusMessage);
     }
 }

@@ -78,7 +78,7 @@ const submit = (isDraft = null) => {
         );
     }
 
-    form.post(route("dashboard.news.update", props.news.id), {
+    form.post(route("dashboard.news.update", props.news.slug), {
         preserveScroll: true,
         forceFormData: true,
     });

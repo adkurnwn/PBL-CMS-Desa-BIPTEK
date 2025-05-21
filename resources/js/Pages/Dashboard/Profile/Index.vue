@@ -56,7 +56,7 @@ const props = defineProps({
                                             :href="
                                                 route(
                                                     'dashboard.profiles.edit',
-                                                    profile.id
+                                                    profile.name
                                                 )
                                             "
                                         >

@@ -11,9 +11,9 @@ const props = defineProps({
 
 const form = useForm({});
 
-const deleteGallery = (galleryId) => {
+const deleteGallery = (slug) => {
     if (confirm("Are you sure you want to delete this gallery?")) {
-        form.delete(route("dashboard.galleries.destroy", galleryId), {
+        form.delete(route("dashboard.galleries.destroy", slug), {
             preserveScroll: true,
         });
     }
@@ -71,7 +71,7 @@ const deleteGallery = (galleryId) => {
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <DangerButton
-                                            @click="deleteGallery(gallery.id)"
+                                            @click="deleteGallery(gallery.slug)"
                                         >
                                             Delete
                                         </DangerButton>
@@ -81,7 +81,7 @@ const deleteGallery = (galleryId) => {
                                             :href="
                                                 route(
                                                     'dashboard.galleries.restore',
-                                                    gallery.id
+                                                    gallery.slug
                                                 )
                                             "
                                         >
