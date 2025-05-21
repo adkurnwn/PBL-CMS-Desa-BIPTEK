@@ -1,12 +1,16 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import DropdownFieldInput from "@/Components/DashboardComponent/DropdownFieldInput.vue";
+import PhotoProfileUpload from "@/Components/DashboardComponent/PhotoProfileUpload.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
     positions: Array,
@@ -21,8 +25,45 @@ const form = useForm({
     position_id: "",
 });
 
-const handleFileChange = (e) => {
-    form.photo_profile = e.target.files[0];
+// Format positions for dropdown
+const positionOptions = computed(() => {
+    return props.positions.map((position) => ({
+        value: position.id,
+        label: position.name,
+    }));
+});
+
+// Parse the job description JSON if it's a string
+const parseJobDescription = (description) => {
+    if (!description) return [];
+    if (Array.isArray(description)) return description;
+
+    try {
+        return JSON.parse(description);
+    } catch (e) {
+        console.error("Error parsing job description:", e);
+        return [];
+    }
+};
+
+// Get selected position's job description
+const selectedPosition = computed(() => {
+    const position = props.positions?.find(
+        (position) => position.id === form.position_id
+    );
+
+    if (position) {
+        return {
+            ...position,
+            job_description: parseJobDescription(position.job_description),
+        };
+    }
+
+    return null;
+});
+
+const handlePhotoProfileChange = (file) => {
+    form.photo_profile = file;
 };
 
 const submit = () => {
@@ -49,24 +90,27 @@ const submit = () => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <form
-                            @submit.prevent="submit"
-                            enctype="multipart/form-data"
-                        >
-                            <div class="grid grid-cols-2 gap-4">
+        <template #subtitle-area>
+            Tambah Pengguna
+        </template>
+
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white sm:rounded-lg">
+                <div class="">
+                    <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column: Name, Email, Position, Job Description -->
+                                
                                 <!-- Name Field -->
                                 <div>
-                                    <InputLabel for="name" value="Name" />
-                                    <TextInput
+                                    <SingleLineField
                                         id="name"
                                         v-model="form.name"
                                         type="text"
-                                        class="mt-1 block w-full"
+                                        fieldName="Nama"
                                         required
+                                        custom-width="100%"
                                     />
                                     <InputError
                                         :message="form.errors.name"
@@ -76,13 +120,13 @@ const submit = () => {
 
                                 <!-- Email Field -->
                                 <div>
-                                    <InputLabel for="email" value="Email" />
-                                    <TextInput
+                                    <SingleLineField
                                         id="email"
                                         v-model="form.email"
                                         type="email"
-                                        class="mt-1 block w-full"
+                                        fieldName="Email"
                                         required
+                                        custom-width="100%"
                                     />
                                     <InputError
                                         :message="form.errors.email"
@@ -90,33 +134,53 @@ const submit = () => {
                                     />
                                 </div>
 
-                                <!-- Password Field -->
+                                <!-- Position Field -->
                                 <div>
-                                    <InputLabel
-                                        for="password"
-                                        value="Password"
-                                    />
-                                    <TextInput
-                                        id="password"
-                                        v-model="form.password"
-                                        type="password"
-                                        class="mt-1 block w-full"
+                                    <DropdownFieldInput
+                                        id="position_id"
+                                        v-model="form.position_id"
+                                        fieldName="Posisi"
+                                        placeholder="Select Position"
+                                        :options="positionOptions"
                                         required
+                                        custom-width="100%"
                                     />
                                     <InputError
-                                        :message="form.errors.password"
+                                        :message="form.errors.position_id"
                                         class="mt-2"
                                     />
                                 </div>
-
+                                
+                                <!-- Job Description Display (if position selected) -->
+                                <!-- Job Description Display (if position selected) -->
+                                <div class="px-[24px]" :style="{ minHeight: '150px' }">
+                                    <template v-if="selectedPosition">
+                                        <h3 class="font-bold text-[15px] text-menuText italic">
+                                            Deskripsi Pekerjaan
+                                        </h3>
+                                        <ul class="list-disc ml-5 mt-[5px]">
+                                            <li
+                                                v-for="(duty, index) in selectedPosition.job_description"
+                                                :key="index"
+                                                class="text-menuText italic font-light"
+                                            >
+                                                {{ duty }}
+                                            </li>
+                                        </ul>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <!-- Second column: Phone, Password, Photo Profile -->
+                            <div class="flex flex-col gap-y-[15px]">
                                 <!-- Phone Field -->
                                 <div>
-                                    <InputLabel for="phone" value="Phone" />
-                                    <TextInput
+                                    <SingleLineField
                                         id="phone"
                                         v-model="form.phone"
                                         type="text"
-                                        class="mt-1 block w-full"
+                                        fieldName="Nomor Telepon"
+                                        custom-width="100%"
                                     />
                                     <InputError
                                         :message="form.errors.phone"
@@ -124,18 +188,29 @@ const submit = () => {
                                     />
                                 </div>
 
+                                <!-- Password Field -->
+                                <div>
+                                    <SingleLineField
+                                        id="password"
+                                        v-model="form.password"
+                                        type="password"
+                                        fieldName="Password"
+                                        required
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors.password"
+                                        class="mt-2"
+                                    />
+                                </div>
+                                
                                 <!-- Photo Profile Field -->
                                 <div>
-                                    <InputLabel
-                                        for="photo_profile"
-                                        value="Profile Photo"
-                                    />
-                                    <input
+                                    <PhotoProfileUpload
                                         id="photo_profile"
-                                        type="file"
-                                        @input="handleFileChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="image/png, image/jpeg, image/jpg"
+                                        :model-value="form.photo_profile"
+                                        @update:model-value="handlePhotoProfileChange"
+                                        custom-width="100%"
                                         required
                                     />
                                     <InputError
@@ -143,44 +218,18 @@ const submit = () => {
                                         class="mt-2"
                                     />
                                 </div>
-
-                                <!-- Position Field -->
-                                <div>
-                                    <InputLabel
-                                        for="position"
-                                        value="Position"
-                                    />
-                                    <select
-                                        id="position_id"
-                                        v-model="form.position_id"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    >
-                                        <option value="">
-                                            Select Position
-                                        </option>
-                                        <option
-                                            v-for="position in positions"
-                                            :key="position.id"
-                                            :value="position.id"
-                                        >
-                                            {{ position.name }}
-                                        </option>
-                                    </select>
-                                    <InputError
-                                        :message="form.errors.position_id"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
+                        </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create User
-                                </PrimaryButton>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="mt-[15px] flex flex-row justify-end">
+                            <Link :href="route('dashboard.users.index')" class="mr-[15px]">
+                                <SecondaryButton>BATAL</SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                SIMPAN
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -1,12 +1,15 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, Link } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
 import { ref } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const newJobDescription = ref("");
 
@@ -40,7 +43,7 @@ const submit = () => {
     <Head title="Buat Posisi Baru" />
     <AuthenticatedLayout>
         <template #header>
-            <HeadingMenu title="Buat Posisi Baru" :hasRightContent="false">
+            <HeadingMenu title="Pengguna" :hasRightContent="false">
                 <template #icon>
                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="26" viewBox="0 0 25 26" fill="none">
                         <path
@@ -53,102 +56,75 @@ const submit = () => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <form @submit.prevent="submit">
-                            <div class="grid grid-cols-1 gap-4">
-                                <!-- Position Name Field -->
-                                <div>
-                                    <InputLabel
-                                        for="name"
-                                        value="Position Name"
-                                    />
-                                    <TextInput
-                                        id="name"
-                                        v-model="form.name"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        Position name must be unique
-                                    </p>
-                                    <InputError
-                                        :message="form.errors.name"
-                                        class="mt-2"
-                                    />
-                                </div>
+        <template #subtitle-area>
+            Buat Posisi Baru
+        </template>
 
-                                <!-- Job Description Field -->
-                                <div>
-                                    <InputLabel
-                                        for="job_description"
-                                        value="Job Description"
-                                    />
-                                    <div class="flex mt-1">
-                                        <TextInput
-                                            id="job_description"
-                                            v-model="newJobDescription"
-                                            type="text"
-                                            class="block w-full"
-                                            placeholder="Enter job description item"
-                                        />
-                                        <PrimaryButton
-                                            type="button"
-                                            class="ml-2"
-                                            @click="addJobDescription"
-                                        >
-                                            Add
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white sm:rounded-lg">
+                <div class="">
+                    <form @submit.prevent="submit">
+                        <div class="grid grid-cols-1 gap-y-[15px]">
+                            <!-- Position Name Field -->
+                            <div>
+                                <SingleLineField id="name" v-model="form.name" type="text" fieldName="Nama Posisi" placeholder="Masukkan nama posisi"
+                                    required custom-width="100%" />
+                                <InputError :message="form.errors.name" class="mt-2" />
+                            </div>
+
+                            <!-- Job Description Field -->
+                            <div>
+                                <div class="flex items-center pr-[12px]">
+                                    <div class="flex-grow">
+                                        <SingleLineField id="job_description" v-model="newJobDescription" type="text"
+                                            fieldName="Deskripsi Pekerjaan" placeholder="Masukkan item deskripsi pekerjaan"
+                                            custom-width="100%" />
+                                    </div>
+                                    <div class="py-[12px] mt-[37px]">
+                                        <PrimaryButton type="button" @click="addJobDescription">
+                                            ADD
                                         </PrimaryButton>
                                     </div>
-
-                                    <!-- Display job descriptions as tags -->
-                                    <div
-                                        class="mt-2 flex flex-wrap gap-2"
-                                        v-if="form.job_descriptions.length > 0"
-                                    >
-                                        <div
-                                            v-for="(
-                                                description, index
-                                            ) in form.job_descriptions"
-                                            :key="index"
-                                            class="bg-gray-100 px-2 py-1 rounded-md flex items-center gap-1"
-                                        >
-                                            <span>{{ description }}</span>
-                                            <button
-                                                type="button"
-                                                class="text-red-500 hover:text-red-700 focus:outline-none"
-                                                @click="
-                                                    removeJobDescription(index)
-                                                "
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <p
-                                        class="text-sm text-gray-500 mt-1"
-                                        v-else
-                                    >
-                                        Add at least one job description for
-                                        this position
-                                    </p>
-                                    <InputError
-                                        :message="form.errors.job_descriptions"
-                                        class="mt-2"
-                                    />
                                 </div>
-                            </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create Position
-                                </PrimaryButton>
+                                <!-- Display job descriptions as tags -->
+                                <div class="mt-2 flex flex-wrap gap-[15px]" v-if="form.job_descriptions.length > 0">
+                                    <div v-for="(description, index) in form.job_descriptions" 
+                                        :key="index"
+                                        class="bg-[#f3f4f6] h-[42px] px-3 rounded-[5px] flex items-center gap-2 shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]">
+                                        <span class="text-[18px]">{{ description }}</span>
+                                        <button type="button" 
+                                            class="w-[20px] h-[20px] flex items-center justify-center focus:outline-none"
+                                            @click="removeJobDescription(index)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                <mask id="mask0_1715_7284" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20">
+                                                    <rect width="20" height="20" fill="#D9D9D9"/>
+                                                </mask>
+                                                <g mask="url(#mask0_1715_7284)">
+                                                    <path d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z" fill="#DC3545"/>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-menuText text-[14px] ml-[12px]" v-else>
+                                    Tambahkan minimal satu deskripsi pekerjaan untuk posisi ini
+                                </p>
+                                <InputError :message="form.errors.job_descriptions" class="mt-2" />
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.positions.index')" class="mr-[15px]">
+                            <SecondaryButton type="button">
+                                BATAL
+                            </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                SIMPAN
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

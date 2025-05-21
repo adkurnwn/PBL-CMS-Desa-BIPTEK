@@ -221,6 +221,41 @@ const parseJobDescription = (description) => {
     }
 };
 
+// Modify truncation approach - replace the existing functions with these
+const isTextTruncated = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    return true; // Always provide title for consistent hover behavior
+};
+
+// Remove character-based truncation function, 
+// we'll rely on CSS for truncation instead
+const truncateText = (text) => {
+    if (!text || typeof text !== 'string') return text;
+    return text; // Return full text, CSS will handle truncation
+};
+
+// Add to the props headers documentation:
+// Expected format: [{ 
+//   // ...existing properties...
+//   truncate: true,           // Whether to truncate text (default: true)
+//   multiline: false,         // Whether to allow multiple lines (default: false)
+// }]
+
+// Modify this function to check if text should be truncated
+// Default to true if not specified
+const shouldTruncate = (header) => {
+    // If truncate property is explicitly set to false, don't truncate
+    // Otherwise, truncate by default (if truncate is undefined or true)
+    return header.truncate !== false;
+};
+
+// Check if cell should allow multiple lines
+const isMultiline = (header) => {
+    // If multiline is true, allow multiple lines
+    // Default to false if not specified
+    return header.multiline === true;
+};
+
 </script>
 
 <template>
@@ -309,7 +344,7 @@ const parseJobDescription = (description) => {
                                 class="px-6 py-4 text-TableText"
                                 :class="
                                     [
-                                        { 'whitespace-nowrap': header.nowrap },
+                                        { 'whitespace-nowrap': header.nowrap && !isMultiline(header) },
                                         header.cellClass
                                     ]"
                                 :style="styleObjectToString(header.style)"
@@ -320,7 +355,14 @@ const parseJobDescription = (description) => {
                                     <div v-if="getFieldName(header) === 'job_description'">
                                         <ul class="list-disc ml-5">
                                             <template v-for="(desc, index) in parseJobDescription(item[getFieldName(header)]).slice(0, 2)" :key="index">
-                                                <li>{{ desc }}</li>
+                                                <li>
+                                                    <span 
+                                                        :title="shouldTruncate(header) ? desc : ''"
+                                                        :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                                    >
+                                                        {{ desc }}
+                                                    </span>
+                                                </li>
                                             </template>
                                             <li v-if="parseJobDescription(item[getFieldName(header)]).length > 2" 
                                                 class="text-menuText cursor-pointer mt-1 list-none">
@@ -359,10 +401,20 @@ const parseJobDescription = (description) => {
                                                 class="w-full h-full object-cover"
                                             />
                                         </div>
-                                        <span>{{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}</span>
+                                        <span 
+                                            :title="shouldTruncate(header) ? item[getFieldName(header)] : ''"
+                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                        >
+                                            {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
+                                        </span>
                                     </div>
                                     <template v-else>
-                                        {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
+                                        <span 
+                                            :title="shouldTruncate(header) ? item[getFieldName(header)] : ''"
+                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                        >
+                                            {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
+                                        </span>
                                     </template>
                                 </slot>
                             </td>
@@ -486,5 +538,34 @@ table.table-fixed {
 /* Filter Styles */
 .filter-badge {
     @apply inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800;
+}
+
+/* Truncated text styling */
+.truncate-text-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    display: block;
+}
+
+/* Multiline text styling */
+.multiline-text-cell {
+    white-space: normal;
+    overflow: visible;
+    word-break: break-word;
+    line-height: 1.5;
+    display: block;
+}
+
+/* Ensure tooltip displays properly */
+[title] {
+    position: relative;
+}
+
+/* Make sure cursor shows it's hoverable */
+[title]:not([title=""]) {
+    cursor: help;
 }
 </style>

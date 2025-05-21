@@ -135,7 +135,12 @@ const deleteBackup = (path) => {
                                         :key="index"
                                     >
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ backup.date }}
+                                            <div>
+                                                <span v-if="backup.date">
+                                                    {{ backup.date }}
+                                                </span>
+                                                <span v-else>Unknown date</span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             {{ backup.size }}

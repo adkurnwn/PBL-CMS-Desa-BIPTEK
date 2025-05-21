@@ -63,14 +63,14 @@ const getAvatarUrl = (user) => {
     return `/storage/${user.photo_profile}`;
 };
 
-// Table headers configuration with custom styling for Pengguna column and avatar
+// Table headers configuration with percentage-based widths for better responsiveness
 const tableHeaders = [
     {
         label: 'Pengguna',
         field: 'user',
-        sortable: false,  // Changed to false
+        sortable: false,
         nowrap: true,
-        width: '270px',
+        width: '20%',  // Changed from '270px' to percentage
         style: {
             fontSize: '18px',
             fontStyle: 'normal',
@@ -87,32 +87,33 @@ const tableHeaders = [
     {
         label: 'Aksi',
         field: 'action',
-        sortable: false,  // Changed to false
+        sortable: false,
         nowrap: true,
-        width: '190px'
+        width: '12%',  // Changed from '190px' to percentage
     },
     {
         label: 'Modul',
         field: 'module',
-        sortable: false,  // Changed to false
+        sortable: false,
         nowrap: true,
-        width: '250px',
-        transform: 'capitalize'  // Add this to capitalize the module column
+        width: '15%',  // Changed from '250px' to percentage
+        transform: 'capitalize'
     },
     {
         label: 'Deskripsi',
         field: 'description',
-        sortable: false,  // Changed to false
+        sortable: false,
         nowrap: false,
-        minWidth: '450px',
-        // No fixed width to allow it to take remaining space
+        truncate: false,
+        multiline: true,
+        width: '38%',  // Changed from minWidth: '450px' to percentage width
     },
     {
         label: 'Waktu',
         field: 'time',
-        sortable: true,   // Only this column remains sortable
+        sortable: true,
         nowrap: true,
-        width: '264px',
+        width: '15%',  // Changed from '264px' to percentage
         style: {
             fontSize: '18px',
             fontStyle: 'normal',

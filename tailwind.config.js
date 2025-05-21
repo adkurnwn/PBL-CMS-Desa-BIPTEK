@@ -13,7 +13,7 @@ export default {
     theme: {
         extend: {
             colors: {
-                'accent1': '#244031',
+                'accent1': '#244031', 
                 'accent2': '#3B614A',
                 'type1': '#F6F5F1',
                 'type2': '#40483D',
