@@ -1,18 +1,92 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import { Head, useForm, Link, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
 import Search from "@/Components/DashboardComponent/Search.vue";
 import TopButton from "@/Components/DashboardComponent/TopButton.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import { ref, computed, watch } from "vue";
+import IconAksi from "@/Components/DashboardComponent/IconAksi.vue";
 
 const props = defineProps({
-    positions: Array,
+    positions: Object,
+    flash: Object,
+    sort: {
+        type: String,
+        default: "name",
+    },
+    search: {
+        type: String,
+        default: "",
+    },
+    direction: {
+        type: String,
+        default: "asc",
+    },
 });
 
+// Extract pagination info from the positions object
+const pagination = computed(() => {
+    if (!props.positions) return null;
+
+    return {
+        currentPage: props.positions.current_page,
+        lastPage: props.positions.last_page,
+        perPage: props.positions.per_page,
+        total: props.positions.total,
+    };
+});
+
+// Extract the position data from the paginated response
+const positionItems = computed(() => {
+    return props.positions?.data || [];
+});
+
+const searchQuery = ref(props.search || '');
+const sortField = ref(props.sort || 'name');
+const sortDirection = ref(props.direction || 'asc');
+const filterState = ref({});
+
 const form = useForm({});
+
+const tableHeaders = [
+    {
+        label: 'Nama Posisi',
+        field: 'name',
+        sortable: true,
+        filterable: true,
+        width: '350px',
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal'
+        },
+    },
+    {
+        label: 'Deskripsi Pekerjaan',
+        field: 'job_description',
+        sortable: false,
+        filterable: true,
+        width: '934px',
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal'
+        },
+    },
+    {
+        label: 'Aksi',
+        field: 'actions',
+        sortable: false,
+        filterable: false,
+        width: '140px',
+    }
+];
 
 // Delete position function
 const deletePosition = (positionId) => {
@@ -34,6 +108,72 @@ const parseJobDescription = (description) => {
         return [];
     }
 };
+
+// Handle search functionality
+const handleSearch = () => {
+    router.get(route('dashboard.positions.index'), {
+        search: searchQuery.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['positions']
+    });
+};
+
+// Handle page change
+const handlePageChanged = (page) => {
+    router.get(route('dashboard.positions.index'), {
+        page,
+        search: searchQuery.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['positions']
+    });
+};
+
+// Handle sort
+const handleSort = (field) => {
+    // If clicking on the same field, toggle direction
+    if (field === sortField.value) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        // New field, default to ascending
+        sortField.value = field;
+        sortDirection.value = 'asc';
+    }
+
+    router.get(route('dashboard.positions.index'), {
+        search: searchQuery.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['positions']
+    });
+};
+
+// Watch for external search changes
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
+// Watch for external sort changes
+watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
+    if (newSort !== sortField.value) {
+        sortField.value = newSort;
+    }
+    if (newDirection !== sortDirection.value) {
+        sortDirection.value = newDirection;
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -80,63 +220,74 @@ const parseJobDescription = (description) => {
 
         <template #tab-devider>
             <TabDevider
-                :tabs="[
+                :tabs=" [
                     { name: 'Pengguna', href: route('dashboard.users.index'), active: false },
                     { name: 'Posisi', href: route('dashboard.positions.index'), active: true },
                 ]"
             />
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <!-- Positions Table -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <table class="min-w-full dashboard-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Job Description</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="position in positions" :key="position.id">
-                                    <td>{{ position.name }}</td>
-                                    <td>
-                                        <ul class="list-disc ml-5">
-                                            <li v-for="(duty, index) in parseJobDescription(position.job_description)" 
-                                                :key="index" 
-                                                class="text-gray-700 truncate" 
-                                                v-show="index < 2">
-                                                {{ duty }}
-                                            </li>
-                                            <li v-if="parseJobDescription(position.job_description).length > 2" 
-                                                class="text-gray-500">
-                                                ... and
-                                                {{ parseJobDescription(position.job_description).length - 2 }}
-                                                more
-                                            </li>
-                                        </ul>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex gap-x-2 justify-center">
-                                            <Link :href="route('dashboard.positions.edit', position.id)">
-                                                <PrimaryButton>Edit</PrimaryButton>
-                                            </Link>
-                                            <DangerButton 
-                                                @click="deletePosition(position.id)" 
-                                                v-if="position.name !== 'Kepala Desa'">
-                                                Delete
-                                            </DangerButton>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="dashboard-container">
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                    <Tabel 
+                        :headers="tableHeaders" 
+                        :items="positionItems" 
+                        :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" 
+                        :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" 
+                        :total-items="pagination?.total || 0"
+                        :filters="filterState" 
+                        :sort-field="sortField" 
+                        :sort-direction="sortDirection"
+                        empty-state-message="No positions found"
+                        @page-changed="handlePageChanged"
+                        @sort="handleSort"
+                    >
+                        <!-- Custom template for job description column -->
+                        <template #['item.Deskripsi_Pekerjaan']="{ item }">
+                            <div>
+                                <ul class="list-disc ml-5">
+                                    <template v-for="(desc, index) in parseJobDescription(item.job_description).slice(0, 2)" :key="index">
+                                        <li>{{ desc }}</li>
+                                    </template>
+                                    <li v-if="parseJobDescription(item.job_description).length > 2" 
+                                        class="text-menuText cursor-pointer mt-1 list-none">
+                                        <Link :href="route('dashboard.positions.edit', item.id)">
+                                            Lihat Selengkapnya
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </template>
+                        
+                        <!-- Custom template for actions column -->
+                        <template #['item.Aksi']="{ item }">
+                            <div class="flex justify-left gap-[10px]">
+                                <Link :href="route('dashboard.positions.edit', item.id)" class="">
+                                    <IconAksi type="edit" />
+                                </Link>
+                                
+                                <button @click="deletePosition(item.id)" class="" 
+                                    :disabled="['Admin Sistem', 'Kepala Desa'].includes(item.name)">
+                                    <IconAksi type="delete" />
+                                </button>
+                            </div>
+                        </template>
+                    </Tabel>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
+
+<style scoped>
+/* Dashboard specific styles to manage scrolling */
+.dashboard-container {
+    position: relative;
+    height: calc(100vh - 348px);
+    min-height: 650px;
+    overflow: hidden;
+}
+</style>

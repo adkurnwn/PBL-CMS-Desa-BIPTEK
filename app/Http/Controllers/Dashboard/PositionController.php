@@ -76,10 +76,36 @@ class PositionController extends Controller
         return back()->with('success', 'Posisi Berhasil Dihapus');
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $perPage = $request->input('per_page', 25);
+        
+        $positionsQuery = Position::query();
+        
+        // Apply search if provided
+        if (!empty($search)) {
+            $positionsQuery->where('name', 'like', "%{$search}%")
+                ->orWhere('job_description', 'like', "%{$search}%");
+        }
+        
+        // Apply sorting
+        $positionsQuery->orderBy($sort, $direction);
+        
+        // Get paginated results
+        $positions = $positionsQuery->paginate($perPage)->withQueryString();
+        
         return Inertia::render('Dashboard/UserManagement/Positions/Index', [
-            'positions' => Position::all()
+            'positions' => $positions,
+            'search' => $search,
+            'sort' => $sort,
+            'direction' => $direction,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error')
+            ]
         ]);
     }
 }

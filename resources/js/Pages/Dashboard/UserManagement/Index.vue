@@ -10,6 +10,8 @@ import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 import TopButton from "@/Components/DashboardComponent/TopButton.vue";
 import Labels from "@/Components/DashboardComponent/Labels.vue";
 import SwitchToggle from "@/Components/DashboardComponent/SwitchToggle.vue";
+import DropdownFilter from "@/Components/DashboardComponent/DropdownFilter.vue";
+import IconAksi from "@/Components/DashboardComponent/IconAksi.vue";
 
 const props = defineProps({
     users: Object,
@@ -32,7 +34,7 @@ const props = defineProps({
         default: 'name'
     },
     direction: {
-        type: String, 
+        type: String,
         default: 'asc'
     }
 });
@@ -97,7 +99,7 @@ const tableHeaders = [
         width: '400px'
     },
     {
-        label: 'Posisi', // Changed from Position to Posisi
+        label: 'Posisi',
         field: 'position.name',
         filterField: 'position_id',
         sortable: false,
@@ -135,13 +137,31 @@ const handleSearch = (query) => {
     });
 };
 
-// Add filter handling
-const handleFilterChange = (filters) => {
-    filterState.value = filters;
-    
+// Unified filter fields configuration for user management
+const filterFields = computed(() => [
+    {
+        id: 'position_id',
+        name: 'Posisi',
+        options: props.positions.map(pos => ({ id: pos.id, name: pos.name }))
+    },
+    {
+        id: 'status',
+        name: 'Status',
+        options: [
+            { id: 1, name: 'Aktif' },
+            { id: 0, name: 'Nonaktif' }
+        ]
+    }
+    // More filter fields can be added here for future use
+]);
+
+// Handle filter changes from the unified dropdown filter
+const handleFilterChange = (newFilters) => {
+    filterState.value = newFilters;
+
     router.get(route('dashboard.users.index'), {
         search: searchQuery.value,
-        ...filters,
+        ...filterState.value,
         sort: sortField.value,
         direction: sortDirection.value
     }, {
@@ -161,7 +181,7 @@ const handleSort = (field) => {
         sortField.value = field;
         sortDirection.value = 'asc';
     }
-    
+
     // Navigate with updated sort params
     router.get(route('dashboard.users.index'), {
         search: searchQuery.value,
@@ -229,6 +249,9 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 
         <template #search-area>
             <Search v-model="searchQuery" placeholder="Cari pengguna..." @search="handleSearch" />
+            <DropdownFilter placeholder="Filter..." :filter-fields="filterFields" v-model:filters="filterState"
+                @filter-changed="handleFilterChange" width="250px" dropdownTitle="Filter berdasarkan"
+                activeFiltersTitle="Filter yang aktif" :close-on-select="false" />
             <Link :href="route('dashboard.users.create')">
             <TopButton :icon="true">
                 <template #icon>
@@ -259,21 +282,11 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
         <div class="dashboard-container">
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
-                    <Tabel 
-                        :headers="tableHeaders" 
-                        :items="userItems" 
-                        :pagination="true"
-                        :items-per-page="pagination?.perPage || 25" 
-                        :current-page="pagination?.currentPage || 1"
-                        :total-pages="pagination?.lastPage || 1" 
-                        :total-items="pagination?.total || 0"
-                        :filters="filterState"
-                        :sort-field="sortField"
-                        :sort-direction="sortDirection"
-                        empty-state-message="No users found"
-                        @filter-changed="handleFilterChange"
-                        @sort="handleSort"
-                    >
+                    <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
+                        :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
+                        empty-state-message="No users found" @filter-changed="handleFilterChange" @sort="handleSort">
                         <!-- Add a template for the Kontak column -->
                         <template #['item.Kontak']="{ item }">
                             <div class="flex flex-col">
@@ -284,39 +297,28 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 
                         <!-- Fixed Position column template to match the header label 'Posisi' -->
                         <template #['item.Posisi']="{ item }">
-                            <Labels
-                                v-if="item.position"
-                                :type="item.position.name.toLowerCase().includes('kepala') ? 'kepala desa' : 
-                                       item.position.name.toLowerCase().includes('sekretaris') ? 'sekretaris desa' : 
-                                       item.position.name.toLowerCase().includes('bendahara') ? 'bendahara desa' : 'other'"
-                                :text="item.position.name"
-                            />
+                            <Labels v-if="item.position"
+                                :type="item.position.name.toLowerCase().includes('kepala') ? 'kepala desa' :
+                                    item.position.name.toLowerCase().includes('sekretaris') ? 'sekretaris desa' :
+                                        item.position.name.toLowerCase().includes('bendahara') ? 'bendahara desa' : 'other'"
+                                :text="item.position.name" />
                             <span v-else>-</span>
                         </template>
 
                         <!-- Fix the slot syntax for Status column -->
                         <template #['item.Status']="{ item }">
                             <div @click.stop="toggleUserStatus(item.id)" class="cursor-pointer">
-                                <SwitchToggle 
-                                    :type="item.status"
-                                    :text="item.status ? 'Aktif' : 'Nonaktif'"
-                                />
+                                <SwitchToggle :type="item.status" :text="item.status ? 'Aktif' : 'Nonaktif'" />
                             </div>
                         </template>
 
                         <!-- Fixed Actions column template to match the header label 'Aksi' -->
                         <template #['item.Aksi']="{ item }">
-                            <div class="flex gap-x-2 justify-center">
+                            <div class="flex justify-left">
                                 <Link :href="route('dashboard.users.edit', item.id)">
-                                <button class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="22" viewBox="0 0 21 22" fill="none">
-                                        <mask id="mask0_1659_4389" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="21" height="22">
-                                            <rect y="0.5" width="21" height="21" fill="#D9D9D9"/>
-                                        </mask>
-                                        <g mask="url(#mask0_1659_4389)">
-                                            <path d="M1.75 21.5V18H19.25V21.5H1.75ZM5.25 14.5H6.475L13.3 7.69688L12.0531 6.45L5.25 13.275V14.5ZM3.5 16.25V12.5312L13.3 2.75313C13.4604 2.59271 13.6464 2.46875 13.8578 2.38125C14.0693 2.29375 14.2917 2.25 14.525 2.25C14.7583 2.25 14.9844 2.29375 15.2031 2.38125C15.4219 2.46875 15.6188 2.6 15.7938 2.775L16.9969 4C17.1719 4.16042 17.2995 4.35 17.3797 4.56875C17.4599 4.7875 17.5 5.01354 17.5 5.24688C17.5 5.46563 17.4599 5.68073 17.3797 5.89219C17.2995 6.10365 17.1719 6.29688 16.9969 6.47188L7.21875 16.25H3.5Z" fill="#FFC107"/>
-                                        </g>
-                                    </svg>
+                                <button
+                                    class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
+                                    <IconAksi type="edit" />
                                 </button>
                                 </Link>
                             </div>

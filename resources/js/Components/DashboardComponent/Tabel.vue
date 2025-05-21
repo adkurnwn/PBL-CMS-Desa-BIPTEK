@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import Pagination from "@/Components/DashboardComponent/Pagination.vue";
+import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     headers: {
@@ -208,153 +209,22 @@ const transformText = (text, transform) => {
     }
 };
 
-// Active filters state
-const activeFilters = ref({});
+// Function to parse JSON job descriptions
+const parseJobDescription = (description) => {
+    if (!description) return [];
+    if (Array.isArray(description)) return description;
 
-// Initialize activeFilters from props
-onMounted(() => {
-    if (props.filters) {
-        activeFilters.value = { ...props.filters };
-    }
-});
-
-// Watch for external filter changes
-watch(() => props.filters, (newFilters) => {
-    if (newFilters) {
-        activeFilters.value = { ...newFilters };
-    }
-}, { deep: true });
-
-// Filter UI state
-const openFilterDropdown = ref(null);
-
-// Toggle filter dropdown
-const toggleFilterDropdown = (headerLabel) => {
-    if (openFilterDropdown.value === headerLabel) {
-        openFilterDropdown.value = null;
-    } else {
-        openFilterDropdown.value = headerLabel;
+    try {
+        return JSON.parse(description);
+    } catch (e) {
+        return [];
     }
 };
 
-// Close any open filter dropdown
-const closeFilterDropdown = () => {
-    openFilterDropdown.value = null;
-};
-
-// Apply a filter
-const applyFilter = (headerLabel, value) => {
-    const header = props.headers.find(h => h.label === headerLabel);
-    if (!header) return;
-    
-    // Get filter field (either specified or use the normal field)
-    const filterField = header.filterField || getFieldName(header);
-    
-    // Update active filters
-    activeFilters.value = {
-        ...activeFilters.value,
-        [filterField]: value
-    };
-    
-    // Emit filter changed event
-    emit('filter-changed', activeFilters.value);
-    
-    // Close dropdown
-    closeFilterDropdown();
-};
-
-// Clear a specific filter
-const clearFilter = (headerLabel) => {
-    const header = props.headers.find(h => h.label === headerLabel);
-    if (!header) return;
-    
-    const filterField = header.filterField || getFieldName(header);
-    
-    // Create new filters object without this filter
-    const newFilters = { ...activeFilters.value };
-    delete newFilters[filterField];
-    
-    // Update active filters
-    activeFilters.value = newFilters;
-    
-    // Emit filter changed event
-    emit('filter-changed', activeFilters.value);
-    
-    // Close dropdown
-    closeFilterDropdown();
-};
-
-// Extract available filter options from items for a header
-const getFilterOptions = (header) => {
-    // If options are provided, use those
-    if (header.filterOptions && header.filterOptions.length) {
-        return header.filterOptions;
-    }
-    
-    // Otherwise, extract unique values from items
-    const field = header.filterField || getFieldName(header);
-    
-    // Handle nested fields (e.g., 'position.name')
-    const getNestedValue = (item, path) => {
-        return path.split('.').reduce((obj, key) => {
-            return obj && obj[key] !== undefined ? obj[key] : null;
-        }, item);
-    };
-    
-    // Get unique values
-    const uniqueValues = [...new Set(
-        props.items
-            .map(item => getNestedValue(item, field))
-            .filter(val => val !== null && val !== undefined)
-    )];
-    
-    // Format values as options
-    return uniqueValues.map(val => ({
-        id: val,
-        name: val.toString()
-    }));
-};
-
-// Check if a filter is active
-const isFilterActive = (headerLabel) => {
-    const header = props.headers.find(h => h.label === headerLabel);
-    if (!header) return false;
-    
-    const filterField = header.filterField || getFieldName(header);
-    return activeFilters.value[filterField] !== undefined;
-};
-
-// Get currently selected filter value
-const getActiveFilterValue = (headerLabel) => {
-    const header = props.headers.find(h => h.label === headerLabel);
-    if (!header) return null;
-    
-    const filterField = header.filterField || getFieldName(header);
-    return activeFilters.value[filterField];
-};
-
-// Get display name for active filter
-const getActiveFilterName = (headerLabel) => {
-    const header = props.headers.find(h => h.label === headerLabel);
-    if (!header) return '';
-    
-    const filterField = header.filterField || getFieldName(header);
-    const value = activeFilters.value[filterField];
-    
-    if (value === undefined) return '';
-    
-    // Find matching option if filterOptions is provided
-    if (header.filterOptions && header.filterOptions.length) {
-        const option = header.filterOptions.find(opt => opt.id === value);
-        return option ? option.name : value.toString();
-    }
-    
-    return value.toString();
-};
 </script>
 
 <template>
-    <div class="table-wrapper" @click="closeFilterDropdown">
+    <div class="table-wrapper">
         <!-- Empty state -->
         <div v-if="items.length === 0" class="text-gray-500 text-center py-4">
             {{ emptyStateMessage }}
@@ -409,52 +279,6 @@ const getActiveFilterName = (headerLabel) => {
                                             </g>
                                         </svg>
                                     </div>
-                                    
-                                    <!-- Filter dropdown button -->
-                                    <div v-if="header.filterable" class="relative" @click.stop="toggleFilterDropdown(header.label)">
-                                        <div class="flex items-center cursor-pointer hover:opacity-80">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="ml-2">
-                                                <path d="M10 18H14V16H10V18ZM3 6V8H21V6H3ZM6 13H18V11H6V13Z" :fill="isFilterActive(header.label) ? '#0D6EFD' : '#4C7660'"/>
-                                            </svg>
-                                        </div>
-                                        
-                                        <!-- Filter dropdown menu -->
-                                        <div 
-                                            v-if="openFilterDropdown === header.label" 
-                                            class="absolute right-0 top-full mt-1 bg-menuBG rounded-md shadow-lg z-50 min-w-[200px] "
-                                        >
-                                            <div class="p-3">
-                                                <div class="font-semibold text-selectedText mb-2 text-base flex justify-between items-center">
-                                                    <span>Filter berdasarkan {{ header.label }}</span>
-                                                    <button 
-                                                        v-if="isFilterActive(header.label)"
-                                                        @click.stop="clearFilter(header.label)" 
-                                                        class="text-xs text-red-500 hover:text-red-700"
-                                                    >
-                                                        Clear
-                                                    </button>
-                                                </div>
-                                                
-                                                <!-- Selected filter indicator -->
-                                                <div v-if="isFilterActive(header.label)" class="mb-2 bg-selectedBG border border-selectedText p-2 rounded text-sm">
-                                                    Filter : {{ getActiveFilterName(header.label) }}
-                                                </div>
-                                                
-                                                <!-- Filter options -->
-                                                <div class="max-h-[200px] overflow-y-auto">
-                                                    <div 
-                                                        v-for="option in getFilterOptions(header)" 
-                                                        :key="option.id"
-                                                        @click.stop="applyFilter(header.label, option.id)"
-                                                        class="p-2 hover:bg-selectedBG cursor-pointer text-sm rounded"
-                                                        :class="{'bg-blue-50 font-medium': getActiveFilterValue(header.label) === option.id}"
-                                                    >
-                                                        {{ option.name }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </th>
                         </tr>
@@ -462,7 +286,7 @@ const getActiveFilterName = (headerLabel) => {
                 </table>
             </div>
             
-            <!-- Scrollable content area - now uses items directly since sorting is server-side -->
+            <!-- Scrollable content area -->
             <div class="table-content">
                 <table class="min-w-full divide-y divide-gray-200 table-fixed">
                     <colgroup>
@@ -492,7 +316,22 @@ const getActiveFilterName = (headerLabel) => {
                             >
                                 <!-- Use format that matches how it's used in Dashboard.vue and elsewhere -->
                                 <slot :name="`item.${header.label}`" :item="item" :header="header">
-                                    <div v-if="header.avatar" class="flex items-center">
+                                    <!-- Add special handling for job_description field -->
+                                    <div v-if="getFieldName(header) === 'job_description'">
+                                        <ul class="list-disc ml-5">
+                                            <template v-for="(desc, index) in parseJobDescription(item[getFieldName(header)]).slice(0, 2)" :key="index">
+                                                <li>{{ desc }}</li>
+                                            </template>
+                                            <li v-if="parseJobDescription(item[getFieldName(header)]).length > 2" 
+                                                class="text-menuText cursor-pointer mt-1 list-none">
+                                                <Link :href="route('dashboard.positions.edit', item.id)">
+                                                    Lihat Selengkapnya
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Normal avatar handling -->
+                                    <div v-else-if="header.avatar" class="flex items-center">
                                         <div 
                                             :style="{
                                                 width: `${header.avatar.size || 24}px`,

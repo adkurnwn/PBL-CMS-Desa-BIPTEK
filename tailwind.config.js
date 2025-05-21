@@ -39,6 +39,7 @@ export default {
                 'searchBorder': '#C2C2C2',
                 'blueBorder': '#2563EB',
                 'emailText': '#404DBD',
+                'filterBorder': '#6B7280',
 
             },
             fontFamily: {
