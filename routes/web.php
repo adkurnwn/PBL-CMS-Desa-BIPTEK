@@ -5,12 +5,6 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
-Route::get('/install', [App\Http\Controllers\InstallController::class, 'index'])
-    ->name('install.index');
-
-Route::post('/install', [App\Http\Controllers\InstallController::class, 'store'])
-    ->name('install.store');
-
 Route::get('/', function () {
     return Inertia::render('FrontEnd/HomeView');
 })->name('home');
