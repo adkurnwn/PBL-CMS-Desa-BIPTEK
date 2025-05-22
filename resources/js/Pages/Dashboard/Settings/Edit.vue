@@ -39,11 +39,8 @@ const form = useForm({
     favicon: null,
     primary_color: props.settings.primary_color || "#244031",
     secondary_color: props.settings.secondary_color || "#3B614A",
-    // Add backup settings
     backup_enabled: props.settings.backup_enabled || false,
     backup_frequency: props.settings.backup_frequency || "daily",
-    backup_time: props.settings.backup_time || "00:00",
-    backup_retention: props.settings.backup_retention || 7,
 });
 
 const handleFaviconChange = (e) => {
@@ -774,7 +771,9 @@ const getContrastColor = (hexColor) => {
                                 <h3 class="mb-4 text-lg font-semibold">
                                     Database Backup Settings
                                 </h3>
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div
+                                    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+                                >
                                     <!-- Enable Scheduled Backups -->
                                     <div class="col-span-2">
                                         <div class="flex items-center">
@@ -788,67 +787,43 @@ const getContrastColor = (hexColor) => {
                                                 for="backup_enabled"
                                                 class="ml-2 text-sm font-medium text-gray-900"
                                             >
-                                                Enable automatic database backups
+                                                Enable automatic database
+                                                backups
                                             </label>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-500">
                                             When enabled, the system will
-                                            automatically create database backups
-                                            according to the schedule.
+                                            automatically create database
+                                            backups according to the schedule.
                                         </p>
                                     </div>
 
                                     <!-- Backup Frequency -->
                                     <div>
-                                        <InputLabel for="backup_frequency" value="Backup Frequency" />
+                                        <InputLabel
+                                            for="backup_frequency"
+                                            value="Backup Frequency"
+                                        />
                                         <select
                                             id="backup_frequency"
                                             v-model="form.backup_frequency"
                                             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                             :disabled="!form.backup_enabled"
                                         >
-                                            <option value="hourly">Hourly</option>
                                             <option value="daily">Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
+                                            <option value="weekly">
+                                                Weekly
+                                            </option>
+                                            <option value="monthly">
+                                                Monthly
+                                            </option>
                                         </select>
-                                        <InputError :message="form.errors.backup_frequency" class="mt-2" />
-                                    </div>
-
-                                    <!-- Backup Time -->
-                                    <div>
-                                        <InputLabel for="backup_time" value="Backup Time" />
-                                        <TextInput
-                                            id="backup_time"
-                                            v-model="form.backup_time"
-                                            type="time"
-                                            class="mt-1 block w-full"
-                                            :disabled="!form.backup_enabled || form.backup_frequency === 'hourly'"
+                                        <InputError
+                                            :message="
+                                                form.errors.backup_frequency
+                                            "
+                                            class="mt-2"
                                         />
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Set the time for daily/weekly/monthly
-                                            backups (ignored for hourly)
-                                        </p>
-                                        <InputError :message="form.errors.backup_time" class="mt-2" />
-                                    </div>
-
-                                    <!-- Backup Retention -->
-                                    <div>
-                                        <InputLabel for="backup_retention" value="Backup Retention (days)" />
-                                        <TextInput
-                                            id="backup_retention"
-                                            v-model="form.backup_retention"
-                                            type="number"
-                                            class="mt-1 block w-full"
-                                            :disabled="!form.backup_enabled"
-                                            min="1"
-                                            max="365"
-                                        />
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Number of days to keep backups (older
-                                            backups will be automatically deleted)
-                                        </p>
-                                        <InputError :message="form.errors.backup_retention" class="mt-2" />
                                     </div>
                                 </div>
                             </div>

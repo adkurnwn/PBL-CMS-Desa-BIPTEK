@@ -13,9 +13,6 @@ $backupCommand = Schedule::call(function () {
 });
 
 switch ($frequency) {
-    case 'hourly':
-        $backupCommand->hourly();
-        break;
     case 'daily':
         $backupCommand->dailyAt($time);
         break;
