@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
+import Map from "@/Components/FrontendComponent/Map.vue";
 
 // Define reactive variables
 const profile = ref({});
@@ -355,16 +356,11 @@ const parseJson = (value) => {
                         <p class="w-1/2 text-accent2 -ml-4">: 9.300.000 m²</p>
                     </div>
                 </div>
-                <div class="h-96">
-                    <iframe
-                        class="xl:w-[700px] w-[400px] xl:h-full h-72 xl:-ml-24 xl:mr-96 mr-40 rounded-lg mt-2"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15910.138432608619!2d119.61024555!3d-4.4971499999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dbe258c1d785e89%3A0xcb84698ceea645b7!2sPao-Pao%2C%20Kec.%20Tanete%20Rilau%2C%20Kabupaten%20Barru%2C%20Sulawesi%20Selatan!5e0!3m2!1sid!2sid!4v1741847539077!5m2!1sid!2sid"
-                        style="border: 0"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    >
-                    </iframe>
+                <!-- Pass location data to Map component if available -->
+                <div
+                    class="h-96 xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2"
+                >
+                    <Map :location-name="profile.name" />
                 </div>
                 <div
                     class="xl:ml-72 sm:ml-96 xl:-mr-80 -mr-10 -mt-96 pt-2 text-accent1 xl:text-lg text-sm"
@@ -435,7 +431,7 @@ const parseJson = (value) => {
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -458,7 +454,7 @@ const parseJson = (value) => {
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -481,7 +477,7 @@ const parseJson = (value) => {
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -505,7 +501,7 @@ const parseJson = (value) => {
                     <svg
                         class="mt-0 w-6 h-6"
                         xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 -960 960 960"
+                        viewBox="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
                         width="24px"
                         fill="#DEA521"
                     >

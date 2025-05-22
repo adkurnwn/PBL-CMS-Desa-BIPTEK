@@ -49,6 +49,17 @@ const currentUrl = computed(() => page.url);
 
 console.log('Current URL:', currentUrl.value);
 
+// Get user permissions from Inertia shared data
+const auth = computed(() => page.props.auth);
+const hasPermission = (permission) => {
+    // Always show for admin users
+    if (auth.value.user?.roles?.some(role => role.name.toLowerCase() === 'admin')) {
+        return true;
+    }
+    // Check if user has the specific permission
+    return auth.value.user?.permissions?.includes(permission);
+};
+
 // Check if the current URL includes a specific path segment
 const urlIncludes = (segment) => {
     return currentUrl.value.includes(segment);
@@ -77,10 +88,13 @@ const documentCommentIcon = `<path stroke-linecap="round" stroke-linejoin="round
 // Define active state for each menu item based on URL segments
 const isDashboardActive = computed(() => {
     const path = currentUrl.value;
-    return path === '/' || path === '/dashboard';
+    return path === '/' || 
+           path === '/dashboard' || 
+           /^\/dashboard\/\d+(\?.*)?$/.test(path) ||
+           /^\/dashboard\?.*$/.test(path);
 });
 
-const isUsersActive = computed(() => urlIncludes('/dashboard/users'));
+const isUsersActive = computed(() => urlIncludes('/dashboard/users') || urlIncludes('/dashboard/positions'));
 const isRolesActive = computed(() => urlIncludes('/dashboard/roles'));
 const isProfilesActive = computed(() => urlIncludes('/dashboard/profiles'));
 const isDemografiActive = computed(() => urlIncludes('/dashboard/demografi'));
@@ -175,6 +189,7 @@ const toggleCommentModerator = () => {
                 <div 
                     class="transition-all duration-300"
                     :class="sidebarCollapsed ? '' : 'pl-[48px] pr-[12px]'"
+                    v-if="hasPermission('manage_activity-logs')"
                 >
                     <MenuBox 
                         :href="route('dashboard')" 
@@ -191,61 +206,129 @@ const toggleCommentModerator = () => {
             <!-- Scrollable content with padding to account for the fixed Dashboard -->
             <Scrollbar 
                 height="calc(100vh - 110px)" 
-                thumbColor="rgba(255, 255, 255, 0.2)" 
-                thumbHoverColor="rgba(255, 255, 255, 0.3)"
-                hideScrollbar
-                class="pt-[113px]"
+                :hideScrollbar="true"
+                :autoHide="false"
+                class="pt-[113px] sidebar-scrollbar"
             >
                 <div class="p-5 pt-0 pb-[100px]" :class="sidebarCollapsed ? 'pr-5' : 'pr-0'">
                     <div class="space-y-[20px]" :class="sidebarCollapsed ? '' : 'pr-[12px]'">
-                        <!-- Regular menu sections - Keep same markup but pass collapsed state -->
-                        <!-- 1. Manajemen Pengguna -->
-                        <MenuSection title="Manajemen Pengguna" :active="isUserSectionActive" :collapsed="sidebarCollapsed">
-                            <MenuBox :href="route('dashboard.users.index')" :active="isUsersActive" :icon="userIcon" :collapsed="sidebarCollapsed">
+                        <!-- User Management Section - Only show if user has user or role permissions -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_users') || hasPermission('manage_roles')"
+                            title="Manajemen Pengguna" 
+                            :active="isUserSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
+                            <MenuBox 
+                                v-if="hasPermission('manage_users')"
+                                :href="route('dashboard.users.index')" 
+                                :active="isUsersActive" 
+                                :icon="userIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Pengguna
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox :href="route('dashboard.roles.index')" :active="isRolesActive" :icon="roleIcon" :collapsed="sidebarCollapsed">
+                            <MenuBox 
+                                v-if="hasPermission('manage_roles')"
+                                :href="route('dashboard.roles.index')" 
+                                :active="isRolesActive" 
+                                :icon="roleIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Hak Akses
                             </MenuBox>
                             {{ getNextMenuIndex() }}
                         </MenuSection>
 
-                        <!-- 2. Informasi Desa -->
-                        <MenuSection title="Informasi Desa" :active="isInfoSectionActive" :collapsed="sidebarCollapsed">
-                            <MenuBox :href="route('dashboard.profiles.index')" :active="isProfilesActive" :icon="profileIcon" :collapsed="sidebarCollapsed">
+                        <!-- Information Section - Only show if user has profile or demografi permissions -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_profiles') || hasPermission('manage_demografi')"
+                            title="Informasi Desa" 
+                            :active="isInfoSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
+                            <MenuBox 
+                                v-if="hasPermission('manage_profiles')"
+                                :href="route('dashboard.profiles.index')" 
+                                :active="isProfilesActive" 
+                                :icon="profileIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Profil Desa
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox :href="route('dashboard.demografi.index')" :active="isDemografiActive" :icon="demografiIcon" :collapsed="sidebarCollapsed">
+                            <MenuBox 
+                                v-if="hasPermission('manage_demografi')"
+                                :href="route('dashboard.demografi.index')" 
+                                :active="isDemografiActive" 
+                                :icon="demografiIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Demografi
                             </MenuBox>
                             {{ getNextMenuIndex() }}
                         </MenuSection>
 
-                        <!-- 3. Konten & Publikasi -->
-                        <MenuSection title="Konten & Publikasi" :active="isContentSectionActive" :collapsed="sidebarCollapsed">
-                            <MenuBox :href="route('dashboard.news.index')" :active="isNewsActive" :icon="newsIcon" :collapsed="sidebarCollapsed">
+                        <!-- Content Section - Only show if user has relevant permissions -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_news') || hasPermission('manage_galleries') || 
+                                 hasPermission('manage_events') || hasPermission('manage_produk-desa')"
+                            title="Konten & Publikasi" 
+                            :active="isContentSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
+                            <MenuBox 
+                                v-if="hasPermission('manage_news')"
+                                :href="route('dashboard.news.index')" 
+                                :active="isNewsActive" 
+                                :icon="newsIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Berita
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox :href="route('dashboard.galleries.index')" :active="isGalleriesActive" :icon="galleryIcon" :collapsed="sidebarCollapsed">
+                            <MenuBox 
+                                v-if="hasPermission('manage_galleries')"
+                                :href="route('dashboard.galleries.index')" 
+                                :active="isGalleriesActive" 
+                                :icon="galleryIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Galeri
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox :href="route('dashboard.events.index')" :active="isEventsActive" :icon="eventIcon" :collapsed="sidebarCollapsed">
+                            <MenuBox 
+                                v-if="hasPermission('manage_events')"
+                                :href="route('dashboard.events.index')" 
+                                :active="isEventsActive" 
+                                :icon="eventIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 Agenda
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox :href="route('dashboard.produk-desa.index')" :active="isProdukDesaActive" :icon="produkDesaIcon" :collapsed="sidebarCollapsed">
+                            <MenuBox 
+                                v-if="hasPermission('manage_produk-desa')"
+                                :href="route('dashboard.produk-desa.index')" 
+                                :active="isProdukDesaActive" 
+                                :icon="produkDesaIcon" 
+                                :collapsed="sidebarCollapsed"
+                            >
                                 UMKM/Produk Unggulan
                             </MenuBox>
                             {{ getNextMenuIndex() }}
                         </MenuSection>
 
-                        <!-- 4. Regulasi Desa -->
-                        <MenuSection title="Regulasi Desa" :active="isRegulationSectionActive" :collapsed="sidebarCollapsed">
+                        <!-- Regulation Section - Only show if user has relevant permissions -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_produk-hukum') || hasPermission('manage_dana-desa')"
+                            title="Regulasi Desa" 
+                            :active="isRegulationSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
                             <MenuBox 
+                                v-if="hasPermission('manage_produk-hukum')"
                                 :href="route('dashboard.produk-hukum.index')" 
                                 :active="isProdukHukumActive"
                                 :icon="produkHukumIcon"
@@ -255,6 +338,7 @@ const toggleCommentModerator = () => {
                             </MenuBox>
                             {{ getNextMenuIndex() }}
                             <MenuBox 
+                                v-if="hasPermission('manage_dana-desa')"
                                 :href="route('dashboard.dana-desa.index')" 
                                 :active="isDanaDesaActive" 
                                 :icon="danaDesaIcon"
@@ -265,123 +349,131 @@ const toggleCommentModerator = () => {
                             {{ getNextMenuIndex() }}
                         </MenuSection>
 
-                        <!-- 5. Interaksi Pengguna -->
-                        <MenuSection title="Interaksi Pengguna" :active="isInteractionSectionActive" :collapsed="sidebarCollapsed">
-                            <!-- In collapsed state, show only the comment icon as a menu item -->
-                            <div v-if="!sidebarCollapsed" class="moderation-container">
-                                <!-- Custom comment moderation box -->
-                                <div class="moderation-container ">
-                                    <div 
-                                        class="w-full mb-[15px] rounded-[10px] overflow-hidden bg-menuBG"
-                                        
-                                    >
-                                        <!-- Header - highlight if any of the submenu items are active -->
-                                        <button 
-                                            @click="toggleCommentModerator"
-                                            class="w-full flex items-center justify-between py-3 px-[12px] transition-colors duration-200"
-                                            :class="{ 
-                                                'text-selectedText font-medium': isCommentsActive || isProdukHukumCommentsActive,
-                                                'text-menuText hover:text-selectedText': !isCommentsActive && !isProdukHukumCommentsActive 
-                                            }"
+                        <!-- Interaction Section - Only show if user has comments or feedback permissions -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_comments') || hasPermission('manage_feedbacks')"
+                            title="Interaksi Pengguna" 
+                            :active="isInteractionSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
+                            <!-- Comments section with permission check -->
+                            <div v-if="hasPermission('manage_comments')">
+                                <!-- In non-collapsed state, show the dropdown menu -->
+                                <div v-if="!sidebarCollapsed" class="moderation-container">
+                                    <!-- Custom comment moderation box -->
+                                    <div class="moderation-container ">
+                                        <div 
+                                            class="w-full mb-[15px] rounded-[10px] overflow-hidden bg-menuBG"
                                         >
-                                            <div class="flex items-center">
-                                                <svg 
-                                                    class="h-[24px] w-[24px] ml-[12px] mr-[10px]"
-                                                    fill="none" 
-                                                    viewBox="0 0 24 24" 
-                                                    stroke="currentColor" 
-                                                    v-html="commentIcon"
-                                                ></svg>
-                                                <span class="text-[18px]">Moderasi Komentar</span>
-                                            </div>
-                                            <svg
-                                                class="h-5 w-5 transform transition-transform duration-200"
-                                                :class="{ 'rotate-180': commentModeratorExpanded }"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
+                                            <!-- Header - highlight if any of the submenu items are active -->
+                                            <button 
+                                                @click="toggleCommentModerator"
+                                                class="w-full flex items-center justify-between py-3 px-[12px] transition-colors duration-200"
+                                                :class="{ 
+                                                    'text-selectedText font-medium': isCommentsActive || isProdukHukumCommentsActive,
+                                                    'text-menuText hover:text-selectedText': !isCommentsActive && !isProdukHukumCommentsActive 
+                                                }"
                                             >
+                                                <div class="flex items-center">
+                                                    <svg 
+                                                        class="h-[24px] w-[24px] ml-[12px] mr-[10px]"
+                                                        fill="none" 
+                                                        viewBox="0 0 24 24" 
+                                                        stroke="currentColor" 
+                                                        v-html="commentIcon"
+                                                    ></svg>
+                                                    <span class="text-[18px]">Moderasi Komentar</span>
+                                                </div>
+                                                <svg
+                                                    class="h-5 w-5 transform transition-transform duration-200"
+                                                    :class="{ 'rotate-180': commentModeratorExpanded }"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                >
                                                 <path
                                                     fill-rule="evenodd"
                                                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
                                                     clip-rule="evenodd"
                                                 />
-                                            </svg>
-                                        </button>
-                                        
-                                        <!-- Submenu content with transition -->
-                                        <div 
-                                            v-show="commentModeratorExpanded"
-                                            class="transition-all duration-300 ease-out overflow-hidden "
-                                        >
-                                            <div class="submenu-wrapper rounded-[10px] overflow-hidden">
-                                                <!-- Berita submenu with proper MenuBox styling -->
-                                                <Link
-                                                    :href="route('dashboard.comments')"
-                                                    class="submenu-box w-full flex items-center rounded-[10px] transition-all duration-200"
-                                                    :class="{ 
-                                                        'bg-selectedBG text-selectedText border border-selectedText': isCommentsActive,
-                                                        'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isCommentsActive
-                                                    }"
-                                                >
-                                                    <svg 
-                                                        class="h-[24px] w-[24px] ml-[24px] mr-[10px]"
-                                                        fill="none" 
-                                                        viewBox="0 0 24 24" 
-                                                        stroke="currentColor" 
-                                                        v-html="newsCommentIcon"
-                                                    ></svg>
-                                                    <span class="text-[16px]">Berita</span>
-                                                </Link>
-                                                
-                                                <!-- Produk Hukum submenu - Make sure this gets highlighted correctly -->
-                                                <Link 
-                                                    :href="route('dashboard.produk-hukum.index-comments')"
-                                                    class="submenu-box w-full flex items-center rounded-[10px] transition-all duration-200"
-                                                    :class="{ 
-                                                        'bg-selectedBG text-selectedText border border-selectedText': isProdukHukumCommentsActive,
-                                                        'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isProdukHukumCommentsActive
-                                                    }"
-                                                >
-                                                    <svg 
-                                                        class="h-[24px] w-[24px] ml-[24px] mr-[10px]"
-                                                        fill="none" 
-                                                        viewBox="0 0 24 24" 
-                                                        stroke="currentColor" 
-                                                        v-html="documentCommentIcon"
-                                                    ></svg>
-                                                    <span class="text-[16px]">Produk Hukum</span>
-                                                </Link>
+                                                </svg>
+                                            </button>
+                                            
+                                            <!-- Submenu content with transition -->
+                                            <div 
+                                                v-show="commentModeratorExpanded"
+                                                class="transition-all duration-300 ease-out overflow-hidden "
+                                            >
+                                                <div class="submenu-wrapper rounded-[10px] overflow-hidden">
+                                                    <!-- Berita submenu with proper MenuBox styling -->
+                                                    <Link
+                                                        :href="route('dashboard.comments')"
+                                                        class="submenu-box w-full flex items-center rounded-[10px] transition-all duration-200"
+                                                        :class="{ 
+                                                            'bg-selectedBG text-selectedText border border-selectedText': isCommentsActive,
+                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isCommentsActive
+                                                        }"
+                                                    >
+                                                        <svg 
+                                                            class="h-[24px] w-[24px] ml-[24px] mr-[10px]"
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            stroke="currentColor" 
+                                                            v-html="newsCommentIcon"
+                                                        ></svg>
+                                                        <span class="text-[16px]">Berita</span>
+                                                    </Link>
+                                                    
+                                                    <!-- Produk Hukum submenu - Make sure this gets highlighted correctly -->
+                                                    <Link 
+                                                        :href="route('dashboard.produk-hukum.index-comments')"
+                                                        class="submenu-box w-full flex items-center rounded-[10px] transition-all duration-200"
+                                                        :class="{ 
+                                                            'bg-selectedBG text-selectedText border border-selectedText': isProdukHukumCommentsActive,
+                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isProdukHukumCommentsActive
+                                                        }"
+                                                    >
+                                                        <svg 
+                                                            class="h-[24px] w-[24px] ml-[24px] mr-[10px]"
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            stroke="currentColor" 
+                                                            v-html="documentCommentIcon"
+                                                        ></svg>
+                                                        <span class="text-[16px]">Produk Hukum</span>
+                                                    </Link>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- In collapsed state, show individual comment menu items -->
+                                <template v-if="sidebarCollapsed">
+                                    <MenuBox 
+                                        :href="route('dashboard.comments')"
+                                        :active="isCommentsActive"
+                                        :icon="newsCommentIcon"
+                                        :collapsed="sidebarCollapsed"
+                                    >
+                                        Berita
+                                    </MenuBox>
+                                    {{ getNextMenuIndex() }}
+                                    <MenuBox 
+                                        :href="route('dashboard.produk-hukum.index-comments')"
+                                        :active="isProdukHukumCommentsActive"
+                                        :icon="documentCommentIcon"
+                                        :collapsed="sidebarCollapsed"
+                                    >
+                                        Produk Hukum
+                                    </MenuBox>
+                                    {{ getNextMenuIndex() }}
+                                </template>
                             </div>
-                            
-                            <!-- In collapsed state, show individual comment menu items -->
-                            <template v-if="sidebarCollapsed">
-                                <MenuBox 
-                                    :href="route('dashboard.comments')"
-                                    :active="isCommentsActive"
-                                    :icon="newsCommentIcon"
-                                    :collapsed="sidebarCollapsed"
-                                >
-                                    Berita
-                                </MenuBox>
-                                {{ getNextMenuIndex() }}
-                                <MenuBox 
-                                    :href="route('dashboard.produk-hukum.index-comments')"
-                                    :active="isProdukHukumCommentsActive"
-                                    :icon="documentCommentIcon"
-                                    :collapsed="sidebarCollapsed"
-                                >
-                                    Produk Hukum
-                                </MenuBox>
-                                {{ getNextMenuIndex() }}
-                            </template>
 
-                            <!-- Normal MenuBox for Feedback -->
+                            <!-- Normal MenuBox for Feedback with permission check -->
                             <MenuBox 
+                                v-if="hasPermission('manage_feedbacks')"
                                 :href="route('dashboard.feedbacks.index')" 
                                 :active="isFeedbacksActive" 
                                 :icon="feedbackIcon"
@@ -392,9 +484,15 @@ const toggleCommentModerator = () => {
                             {{ getNextMenuIndex() }}
                         </MenuSection>
 
-                        <!-- 6. Sistem & Konfigurasi -->
-                        <MenuSection title="Sistem & Konfigurasi" :active="isConfigSectionActive" :collapsed="sidebarCollapsed">
+                        <!-- System & Configuration Section -->
+                        <MenuSection 
+                            v-if="hasPermission('manage_recovery')"
+                            title="Sistem & Konfigurasi" 
+                            :active="isConfigSectionActive" 
+                            :collapsed="sidebarCollapsed"
+                        >
                             <MenuBox 
+                                v-if="hasPermission('manage_recovery')"
                                 :href="route('dashboard.recovery.index')" 
                                 :active="isRecoveryActive" 
                                 :icon="settingsIcon"
@@ -424,14 +522,16 @@ const toggleCommentModerator = () => {
 
 <style>
 /* Hide default scrollbars but keep functionality */
-:global(.sidebar .scrollbar-container) {
-    scrollbar-width: none; /* Firefox */
+:global(.sidebar-scrollbar) {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
 }
 
-:global(.sidebar .scrollbar-container::-webkit-scrollbar) {
-    width: 0;
-    height: 0;
-    display: none;
+:global(.sidebar-scrollbar::-webkit-scrollbar),
+:global(.sidebar-scrollbar .custom-scrollbar::-webkit-scrollbar) {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
 }
 
 /* Ensure consistent padding for all menu sections */

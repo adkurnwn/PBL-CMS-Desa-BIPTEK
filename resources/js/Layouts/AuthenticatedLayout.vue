@@ -6,11 +6,17 @@ import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import Sidebar from "@/Components/DashboardComponent/Sidebar.vue";
 import Header from "@/Components/DashboardComponent/Header.vue";
 import Scrollbar from "@/Components/DashboardComponent/Scrollbar.vue";
-import { Link } from "@inertiajs/vue3";
+import ToastNotification from "@/Components/DashboardComponent/ToastNotification.vue";
+import { Link, usePage } from "@inertiajs/vue3";
 
+const page = usePage();
 const showingNavigationDropdown = ref(false);
 const sidebarOpen = ref(true);
 const sidebarCollapsed = ref(false);
+
+// Toast notifications state
+const toasts = ref([]);
+const toastId = ref(0);
 
 // Get sidebar collapsed state from localStorage on mount
 onMounted(() => {
@@ -18,7 +24,54 @@ onMounted(() => {
     if (storedCollapsedState !== null) {
         sidebarCollapsed.value = storedCollapsedState === 'true';
     }
+    
+    checkForFlashMessages();
 });
+
+// Watch for changes to flash messages - important for SPA navigation
+watch(() => page.props.flash, (newVal, oldVal) => {
+    if (newVal && JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+        checkForFlashMessages();
+    }
+}, { deep: true });
+
+// Check for flash messages and convert them to toasts
+const checkForFlashMessages = () => {
+    if (page.props.flash) {
+        Object.entries(page.props.flash).forEach(([type, message]) => {
+            if (message && ['success', 'error', 'warning', 'info'].includes(type)) {
+                addToast(message, type);
+            }
+        });
+    }
+};
+
+// Add a new toast notification
+const addToast = (message, type = 'info', duration = 5000) => {
+    const id = toastId.value++;
+    toasts.value.push({ id, message, type, duration, show: true });
+    
+    // Auto-remove toast from array after it's closed (plus animation time)
+    if (duration > 0) {
+        setTimeout(() => {
+            removeToast(id);
+        }, duration + 500); // 500ms total for the animations
+    }
+};
+
+// Remove a toast when closed
+const removeToast = (id) => {
+    // First set show to false to trigger the leave animation
+    const toastIndex = toasts.value.findIndex(toast => toast.id === id);
+    if (toastIndex !== -1) {
+        toasts.value[toastIndex].show = false;
+        
+        // Then remove from array after animation completes
+        setTimeout(() => {
+            toasts.value = toasts.value.filter(toast => toast.id !== id);
+        }, 300); // 300ms for the fade out animation
+    }
+};
 
 // Calculate sidebar width based on collapsed state
 const sidebarWidth = computed(() => {
@@ -40,6 +93,19 @@ const handleSidebarCollapse = (collapsed) => {
         <!-- Header -->
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
         
+        <!-- Toast Notifications Container - Positioned for SPA -->
+        <div class="fixed top-[120px] inset-x-0 sm:top-[120px] sm:right-4 sm:inset-x-auto z-50 flex flex-col items-center sm:items-end max-w-full sm:w-[26rem] space-y-2 px-0">
+            <ToastNotification
+                v-for="toast in toasts"
+                :key="toast.id"
+                :type="toast.type"
+                :message="toast.message"
+                :duration="toast.duration"
+                :show="toast.show"
+                @close="removeToast(toast.id)"
+            />
+        </div>
+        
         <div class="mt-[160px] flex flex-row h-[calc(100vh-110px)] overflow-hidden">
             <!-- Sidebar with collapse functionality -->
             <Sidebar @toggle="toggleSidebar" @collapse="handleSidebarCollapse">
@@ -60,58 +126,38 @@ const handleSidebarCollapse = (collapsed) => {
                 <!-- Page Heading - Fixed position relative to parent -->
                 <div class="bg-white w-full" v-if="$slots.header">
                     <div class="max-w-full mx-auto pl-[10px]">
-                        <div class="flex items-center">
-                            <!-- 40px square icon - can be overridden by page-specific icon -->
-                            <div class="w-[40px] h-[40px] bg-transparent rounded flex items-center justify-center text-selectedText">
-                                <!-- Use page-specific icon if provided -->
-                                <slot name="page-icon">
-                                    <!-- Default icon as fallback -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                    </svg>
-                                </slot>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <slot name="page-icon"></slot>
+                                <slot name="header"></slot>
                             </div>
-                            <!-- 10px gap provided by mr-[10px] -->
-                            <div class="ml-[10px]">
-                                <slot name="header" />
+                            <div v-if="$slots['header-actions']">
+                                <slot name="header-actions"></slot>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Flash Messages -->
-                <div class="w-full px-4">
-                    <div
-                        v-if="$page.props.flash?.success"
-                        class="mb-4 p-4 bg-green-100 text-green-700 rounded-md"
-                    >
-                        {{ $page.props.flash.success }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.error"
-                        class="mb-4 p-4 bg-red-100 text-red-700 rounded-md"
-                    >
-                        {{ $page.props.flash.error }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.warning"
-                        class="mb-4 p-4 bg-yellow-100 text-yellow-700 rounded-md"
-                    >
-                        {{ $page.props.flash.warning }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.info"
-                        class="mb-4 p-4 bg-blue-100 text-blue-700 rounded-md"
-                    >
-                        {{ $page.props.flash.info }}
-                    </div>
+                
+
+                <div v-if="$slots['tab-devider']" class="h-[48px] pt-[11px]">
+                    <slot name="tab-devider"></slot>
+                </div>
+
+                <div v-if="$slots['subtitle-area']" class="px-[22px] pt-[25px] text-[22px] font-medium text-menuText">
+                    <slot name="subtitle-area"></slot>
+                </div>
+
+                <!-- Replace blank space with a named slot for search functionality - Only display if content exists -->
+                <div v-if="$slots['search-area']" class="h-[94px] pr-[23px] pl-[10px] flex items-center gap-[10px] justify-end">
+                    <slot name="search-area"></slot>
                 </div>
 
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
                 <Scrollbar 
-                    class="flex-1 w-full py-[97px] pr-[23px]" 
-                    thumbColor="rgba(79, 70, 229, 0.4)" 
-                    thumbHoverColor="rgba(79, 70, 229, 0.6)"
+                    class="flex-1 w-full pr-[23px] pl-[10px]" 
+                    :hideScrollbar="false"
+                    :autoHide="false"
                 >
                     <main class="w-full">
                         <slot />
@@ -198,5 +244,10 @@ const handleSidebarCollapse = (collapsed) => {
 /* Don't apply these styles to the sidebar */
 :deep(*:not(.sidebar)::-webkit-scrollbar) {
     display: none;
+}
+
+/* Add special handling for dashboard page */
+:deep(.dashboard-page) {
+    overflow: visible !important;
 }
 </style>

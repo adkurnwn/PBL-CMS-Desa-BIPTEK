@@ -9,15 +9,48 @@ use App\Http\Controllers\Controller;
 
 class ActivityLogController extends Controller
 {
-    public function index()
+    public function index(Request $request, $page = 1)
     {
-        $logs = ActivityLog::with('user')
-            ->orderBy('created_at', 'desc')
-            ->take(50)
-            ->get();
+        $perPage = 25; // Show a reasonable amount of records per page
+        $sortField = 'time'; // Always sort by time/created_at
+        $sortDirection = $request->input('direction', 'desc'); // Default direction is descending
+        $searchQuery = $request->input('search', ''); // Get search query from request
+        
+        // Create query with sorting and ensure user relationship includes photo_profile
+        $query = ActivityLog::with(['user' => function($query) {
+            $query->select('id', 'name', 'photo_profile'); // Include photo_profile
+        }]);
+        
+        // Apply search if provided
+        if (!empty($searchQuery)) {
+            $query->where(function($q) use ($searchQuery) {
+                // Search in activity log fields
+                $q->where('action', 'like', "%{$searchQuery}%")
+                  ->orWhere('module', 'like', "%{$searchQuery}%")
+                  ->orWhere('description', 'like', "%{$searchQuery}%")
+                  // Search in related user name
+                  ->orWhereHas('user', function($userQuery) use ($searchQuery) {
+                      $userQuery->where('name', 'like', "%{$searchQuery}%");
+                  });
+            });
+        }
+        
+        // Apply sorting
+        $query->orderBy('created_at', $sortDirection);
+        
+        // Count total records (for debugging)
+        $totalRecords = $query->count();
+        
+        // Paginate results
+        $logs = $query->paginate($perPage, ['*'], 'page', $page);
+        
 
         return Inertia::render('Dashboard/Dashboard', [
             'logs' => $logs,
+            'currentPage' => (int)$page,
+            'sortField' => $sortField,
+            'sortDirection' => $sortDirection,
+            'search' => $searchQuery, // Pass search query back to component
         ]);
     }
 }

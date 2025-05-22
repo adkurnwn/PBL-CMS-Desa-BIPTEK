@@ -20,13 +20,78 @@ class UserManagementController extends Controller
     {
         $this->logHelper = new LogActivityHelper();
     }
-    public function index()
+    
+    public function index(Request $request)
     {
-        return Inertia::render('Dashboard/UserManagement/Index', [
-            'users' => User::with(['roles', 'position'])->whereDoesntHave('roles', function ($query) {
+        // Get the number of items per page from request or use default of 25
+        $perPage = $request->input('per_page', 25);
+        
+        // Get search query parameter
+        $search = $request->input('search', '');
+        
+        // Get filter parameters
+        $positionFilter = $request->input('position_id');
+        $statusFilter = $request->has('status') ? (int)$request->input('status') : null;
+        
+        // Get sorting parameters
+        $sortField = $request->input('sort', 'name');
+        $sortDirection = $request->input('direction', 'asc');
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['name', 'email', 'status', 'position_id', 'created_at'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'name'; // Default to name if invalid
+        }
+        
+        // Validate sort direction
+        $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
+        
+        // Prepare filters for front-end
+        $filters = [];
+        if ($positionFilter) {
+            $filters['position_id'] = $positionFilter;
+        }
+        if ($statusFilter !== null) {
+            $filters['status'] = $statusFilter;
+        }
+        
+        // Paginate the users query
+        $usersQuery = User::with(['roles', 'position'])
+            ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })->get(),
-            'positions' => Position::all()
+            });
+            
+        // Add search functionality if a search term is provided
+        if (!empty($search)) {
+            $usersQuery->where(function($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Apply position filter if provided
+        if ($positionFilter) {
+            $usersQuery->where('position_id', $positionFilter);
+        }
+        
+        // Apply status filter if provided
+        if ($statusFilter !== null) {
+            $usersQuery->where('status', $statusFilter);
+        }
+        
+        // Apply sorting
+        $usersQuery->orderBy($sortField, $sortDirection);
+        
+        // Execute query with pagination
+        $users = $usersQuery->paginate($perPage);
+        
+        return Inertia::render('Dashboard/UserManagement/Index', [
+            'users' => $users,
+            'search' => $search,
+            'filters' => $filters,
+            'positions' => Position::all(),
+            'sort' => $sortField,
+            'direction' => $sortDirection
         ]);
     }
 

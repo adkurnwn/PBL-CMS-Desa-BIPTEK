@@ -4,6 +4,7 @@ use App\Models\News;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     return Inertia::render('FrontEnd/HomeView');

@@ -24,7 +24,7 @@ class StoreDemografiRequest extends FormRequest
         return [
             'penduduk_pria' => 'required',
             'penduduk_wanita' => 'required',
-            'tahun' => 'required',
+            'tahun' => 'required|unique:demografi,tahun',
             'jumlah_peserta_bpjs' => 'required',
             'jumlah_pindah_keluar' => 'required',
             'jumlah_pendatang' => 'required',
@@ -38,6 +38,18 @@ class StoreDemografiRequest extends FormRequest
             'jumlah_anak' => 'required',
             'jumlah_penduduk' => 'required',
             'jumlah_keluarga' => 'required',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'tahun.unique' => 'Data demografi untuk tahun ini sudah ada.',
         ];
     }
 }

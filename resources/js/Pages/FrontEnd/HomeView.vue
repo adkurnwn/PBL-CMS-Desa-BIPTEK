@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';

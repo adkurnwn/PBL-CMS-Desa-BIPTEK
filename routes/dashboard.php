@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
                 'as' => 'dashboard',
                 'only' => ['index', 'edit', 'update']
             ]);
-            Route::post('/roles/batch-update', [RoleManagementController::class, 'batchUpdate'])->name('roles.batch-update');
+            Route::post('/roles/batch-update', [RoleManagementController::class, 'batchUpdate'])->name('dashboard.roles.batch-update');
         });
 
         Route::middleware(['permission:manage_profiles'])->group(function () {
@@ -135,5 +135,9 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             Route::post('/recovery/restore/{fileName}', [RecoveryController::class, 'restore'])->name('dashboard.recovery.restore');
             Route::delete('/recovery/delete/{fileName}', [RecoveryController::class, 'delete'])->name('dashboard.recovery.delete');
         });
+
+        // Dashboard route with page parameter
+        Route::get('/', [ActivityLogController::class, 'index'])->name('dashboard');
+        Route::get('/{page}', [ActivityLogController::class, 'index'])->name('dashboard.page');
     });
 });

@@ -17,6 +17,8 @@ class ProdukHukum extends Model
         'file',
         'date',
         'is_moderate',
+        'views',
+        'downloads',
     ];
 
     public function category()

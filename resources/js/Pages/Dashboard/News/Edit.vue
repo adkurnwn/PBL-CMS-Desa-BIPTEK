@@ -4,11 +4,14 @@ import { ref, computed, onUnmounted, watch } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import CategoryInput from "@/Components/CategoryInput.vue";
 import ImageEditor from "@/Components/ImageEditor.vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+
 
 const props = defineProps({
     news: {
@@ -83,12 +86,19 @@ const submit = (isDraft = null) => {
 </script>
 
 <template>
-    <Head title="Edit News" />
+    <Head title="Edit Berita" />
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Edit News
-            </h2>
+            <HeadingMenu title="Edit Berita" :hasRightContent="false">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="31" height="28" viewBox="0 0 31 28" fill="none">
+                        <path
+                            d="M3.16634 27.875C2.31842 27.875 1.59256 27.5731 0.988737 26.9693C0.384918 26.3655 0.0830078 25.6396 0.0830078 24.7917V3.20833C0.0830078 2.36042 0.384918 1.63455 0.988737 1.03073C1.59256 0.42691 2.31842 0.125 3.16634 0.125H27.833C28.6809 0.125 29.4068 0.42691 30.0106 1.03073C30.6144 1.63455 30.9163 2.36042 30.9163 3.20833V24.7917C30.9163 25.6396 30.6144 26.3655 30.0106 26.9693C29.4068 27.5731 28.6809 27.875 27.833 27.875H3.16634ZM6.24967 21.7083H24.7497V18.625H6.24967V21.7083ZM6.24967 15.5417H12.4163V6.29167H6.24967V15.5417ZM15.4997 15.5417H24.7497V12.4583H15.4997V15.5417ZM15.4997 9.375H24.7497V6.29167H15.4997V9.375Z"
+                            fill="#4C7660" />
+                    </svg>
+
+                </template>
+            </HeadingMenu>
         </template>
 
         <div class="py-12">
@@ -208,12 +218,9 @@ const submit = (isDraft = null) => {
                                 </PrimaryButton>
 
                                 <Link :href="route('dashboard.news.index')">
-                                    <PrimaryButton
-                                        type="button"
-                                        class="bg-gray-600 hover:bg-gray-700"
-                                    >
+                                    <SecondaryButton>
                                         Cancel
-                                    </PrimaryButton>
+                                    </SecondaryButton>
                                 </Link>
                             </div>
                         </form>

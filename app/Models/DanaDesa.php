@@ -13,6 +13,8 @@ class DanaDesa extends Model
         'user_id',
         'file',
         'link',
-        'date'
+        'date',
+        'views',
+        'downloads',
     ];
 }

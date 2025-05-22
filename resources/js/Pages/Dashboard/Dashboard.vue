@@ -1,13 +1,51 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head } from "@inertiajs/vue3";
-import { ref, onMounted, computed } from "vue";
+import { Head, router } from "@inertiajs/vue3";
+import { ref, onMounted, computed, watch } from "vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import Labels from "@/Components/DashboardComponent/Labels.vue";
+import Search from "@/Components/DashboardComponent/Search.vue";
 
 const props = defineProps({
-    logs: Array,
+    logs: Object,
+    currentPage: {
+        type: Number,
+        default: 1
+    },
+    sortField: {
+        type: String,
+        default: 'time'
+    },
+    sortDirection: {
+        type: String,
+        default: 'desc'
+    },
+    search: {
+        type: String,
+        default: ''
+    }
 });
 
-const activityLogs = computed(() => props.logs || []);
+// Extract the logs data from the paginated response
+const activityLogs = computed(() => props.logs?.data || []);
+
+// Extract pagination info with more explicit debugging
+const pagination = computed(() => {
+    if (!props.logs) return null;
+    
+    const paginationData = {
+        currentPage: props.logs.current_page,
+        lastPage: props.logs.last_page,
+        perPage: props.logs.per_page,
+        total: props.logs.total,
+    };
+    
+    // Debug output
+    console.log('Pagination info:', paginationData);
+    
+    return paginationData;
+});
 
 const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("id-ID", {
@@ -19,246 +57,259 @@ const formatDate = (dateString) => {
     });
 };
 
-// Add sort state tracking
-const sortColumn = ref(null);
-const sortDirection = ref('asc');
+// Function to get avatar URL from photo_profile
+const getAvatarUrl = (user) => {
+    if (!user || !user.photo_profile) return null;
+    return `/storage/${user.photo_profile}`;
+};
 
-// Function to handle sorting
-const sortBy = (column) => {
-    if (sortColumn.value === column) {
-        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortColumn.value = column;
-        sortDirection.value = 'asc';
+// Table headers configuration with percentage-based widths for better responsiveness
+const tableHeaders = [
+    {
+        label: 'Pengguna',
+        field: 'user',
+        sortable: false,
+        nowrap: true,
+        width: '20%',  // Changed from '270px' to percentage
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal'
+        },
+        avatar: {
+            field: 'avatarUrl',
+            size: 24,
+            gap: 12,
+            fallback: 'initials'
+        }
+    },
+    {
+        label: 'Aksi',
+        field: 'action',
+        sortable: false,
+        nowrap: true,
+        width: '12%',  // Changed from '190px' to percentage
+    },
+    {
+        label: 'Modul',
+        field: 'module',
+        sortable: false,
+        nowrap: true,
+        width: '14%',  // Changed from '250px' to percentage
+        transform: 'capitalize'
+    },
+    {
+        label: 'Deskripsi',
+        field: 'description',
+        sortable: false,
+        nowrap: false,
+        truncate: false,
+        multiline: true,
+        width: '36%',  // Changed from minWidth: '450px' to percentage width
+    },
+    {
+        label: 'Waktu',
+        field: 'time',
+        sortable: true,
+        nowrap: true,
+        width: '18%',  // Changed from '264px' to percentage
+        style: {
+            fontSize: '18px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: 'normal',
+            color: '#6B86B5'
+        }
+    },
+];
+
+// Transform logs to match the table format - remove capitalization here since we're doing it in the table
+const tableItems = computed(() => {
+    return activityLogs.value.map(log => ({
+        user: log.user?.name || "System",
+        // Create avatarUrl directly without using accessor
+        avatarUrl: getAvatarUrl(log.user),
+        action: log.action,
+        // No need to capitalize here anymore, using the transform property instead
+        module: log.module || "",
+        description: log.description,
+        time: log.created_at,
+        // Keep the original data for reference
+        raw: log
+    }));
+});
+
+// Update search functionality
+const searchQuery = ref(props.search || '');
+
+const handleSearch = (query) => {
+    // Reset to first page when searching
+    router.get(route('dashboard'), {
+        search: query,
+        sort: props.sortField,
+        direction: props.sortDirection
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['logs', 'search', 'currentPage']
+    });
+};
+
+// Watch for external search changes (from props)
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
+// Handle pagination changes
+const handlePageChanged = (newPage) => {
+    const routeParams = {
+        sort: props.sortField,
+        direction: props.sortDirection
+    };
+    
+    // Add search parameter if it exists
+    if (searchQuery.value) {
+        routeParams.search = searchQuery.value;
     }
     
-    // Here you would typically sort the data
-    // For now we'll just track the state for the UI
+    if (newPage === 1) {
+        router.get(route('dashboard'), routeParams, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs']
+        });
+    } else {
+        router.get(route('dashboard.page', { page: newPage }), routeParams, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs']
+        });
+    }
 };
 
-// Helper to determine icon rotation class
-const getSortIconClass = (column) => {
-    if (sortColumn.value !== column) return '';
-    return sortDirection.value === 'desc' ? 'rotate-180' : '';
+// Handle sorting - simplified for time only
+const handleSort = (field) => {
+    // Only allow sorting on time field
+    if (field !== 'time') return;
+    
+    // Toggle sort direction
+    const sortDirection = props.sortDirection === 'asc' ? 'desc' : 'asc';
+    
+    // Build route params including search if it exists
+    const routeParams = {
+        direction: sortDirection
+    };
+    
+    if (searchQuery.value) {
+        routeParams.search = searchQuery.value;
+    }
+    
+    // Navigate to the appropriate route with parameters
+    if (props.currentPage === 1) {
+        router.get(route('dashboard'), routeParams, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs', 'sortDirection']
+        });
+    } else {
+        router.get(route('dashboard.page', { page: props.currentPage }), routeParams, {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['logs', 'sortDirection']
+        });
+    }
 };
+
+// Add a console log to verify pagination data
+watch(() => props.logs, (newLogs) => {
+    if (newLogs) {
+        console.log('Pagination Data:', {
+            currentPage: newLogs.current_page,
+            lastPage: newLogs.last_page,
+            perPage: newLogs.per_page,
+            total: newLogs.total
+        });
+    }
+}, { immediate: true });
 </script>
 
 <template>
-    <Head title="Dashboard" />
+
+    <Head title="Aktivitas Terbaru" />
 
     <AuthenticatedLayout>
-        <template #page-icon>
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 41" class="text-selectedText">
-                
-                <g mask="url(#mask0_1244_5243)">
-                    <path d="M24.9996 33.8317C21.2774 33.8317 18.1246 32.54 15.5413 29.9567C12.9579 27.3734 11.6663 24.2206 11.6663 20.4984C11.6663 16.8039 12.9579 13.6581 15.5413 11.0609C18.1246 8.46365 21.2774 7.16504 24.9996 7.16504C28.694 7.16504 31.8399 8.46365 34.4371 11.0609C37.0343 13.6581 38.3329 16.8039 38.3329 20.4984C38.3329 24.2206 37.0343 27.3734 34.4371 29.9567C31.8399 32.54 28.694 33.8317 24.9996 33.8317ZM24.9996 30.4984C27.7774 30.4984 30.1385 29.5261 32.0829 27.5817C34.0274 25.6373 34.9996 23.2761 34.9996 20.4984C34.9996 17.7206 34.0274 15.3595 32.0829 13.415C30.1385 11.4706 27.7774 10.4984 24.9996 10.4984C22.2218 10.4984 19.8607 11.4706 17.9163 13.415C15.9718 15.3595 14.9996 17.7206 14.9996 20.4984C14.9996 23.2761 15.9718 25.6373 17.9163 27.5817C19.8607 29.5261 22.2218 30.4984 24.9996 30.4984ZM28.7913 26.7067L31.1663 24.3317L26.6663 19.8317V13.8317H23.3329V21.2067L28.7913 26.7067ZM3.33293 15.4984V12.165H9.99959V15.4984H3.33293ZM1.66626 22.165V18.8317H9.99959V22.165H1.66626ZM3.33293 28.8317V25.4984H9.99959V28.8317H3.33293Z" fill="currentColor"/>
-                </g>
-            </svg>
-        </template>
-        
         <template #header>
-            <h2 class="text-[37px] font-semibold leading-tight text-selectedText">
-            Aktivitas Terbaru
-            </h2>
+            <HeadingMenu title="Aktivitas Terbaru" :hasRightContent="false">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="41" viewBox="0 0 40 41" fill="none">
+                        <mask id="mask0_1244_5243" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
+                            width="40" height="41">
+                            <rect y="0.5" width="40" height="40" fill="#D9D9D9" />
+                        </mask>
+                        <g mask="url(#mask0_1244_5243)">
+                            <path
+                                d="M24.9996 33.8317C21.2774 33.8317 18.1246 32.54 15.5413 29.9567C12.9579 27.3734 11.6663 24.2206 11.6663 20.4984C11.6663 16.8039 12.9579 13.6581 15.5413 11.0609C18.1246 8.46365 21.2774 7.16504 24.9996 7.16504C28.694 7.16504 31.8399 8.46365 34.4371 11.0609C37.0343 13.6581 38.3329 16.8039 38.3329 20.4984C38.3329 24.2206 37.0343 27.3734 34.4371 29.9567C31.8399 32.54 28.694 33.8317 24.9996 33.8317ZM24.9996 30.4984C27.7774 30.4984 30.1385 29.5261 32.0829 27.5817C34.0274 25.6373 34.9996 23.2761 34.9996 20.4984C34.9996 17.7206 34.0274 15.3595 32.0829 13.415C30.1385 11.4706 27.7774 10.4984 24.9996 10.4984C22.2218 10.4984 19.8607 11.4706 17.9163 13.415C15.9718 15.3595 14.9996 17.7206 14.9996 20.4984C14.9996 23.2761 15.9718 25.6373 17.9163 27.5817C19.8607 29.5261 22.2218 30.4984 24.9996 30.4984ZM28.7913 26.7067L31.1663 24.3317L26.6663 19.8317V13.8317H23.3329V21.2067L28.7913 26.7067ZM3.33293 15.4984V12.165H9.99959V15.4984H3.33293ZM1.66626 22.165V18.8317H9.99959V22.165H1.66626ZM3.33293 28.8317V25.4984H9.99959V28.8317H3.33293Z"
+                                fill="#4C7660" />
+                        </g>
+                    </svg>
+                </template>
+                <template #right-content>
+                </template>
+            </HeadingMenu>
         </template>
 
-        <div class="">
-            <div class="">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="text-gray-900">
+        <!-- Add the search component in the search-area slot -->
+        <template #search-area>
+            <Search 
+                v-model="searchQuery"
+                placeholder="Cari aktivitas..."
+                @search="handleSearch"
+            />
+        </template>
 
-                        <!-- Empty state -->
-                        <div
-                            v-if="activityLogs.length === 0"
-                            class="text-gray-500 text-center py-4"
+        <!-- Disable scrollbar from parent by adding special class -->
+        <!-- Add height constraint to container to ensure all elements fit -->
+        <div class="dashboard-container">
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                    <div class="h-full">
+                        <Tabel 
+                            :headers="tableHeaders" 
+                            :items="tableItems" 
+                            :pagination="true" 
+                            :items-per-page="pagination?.perPage || 25"
+                            :total-items="pagination?.total || 0"
+                            empty-state-message="Log aktivitas tidak ditemukan."
+                            :current-page="pagination?.currentPage || 1"
+                            :total-pages="pagination?.lastPage || 1"
+                            @page-changed="handlePageChanged"
+                            @sort="handleSort"
+                            :sort-field="sortField"
+                            :sort-direction="sortDirection"
                         >
-                            Log aktivitas tidak ditemukan.
-                        </div>
+                            <!-- Action column customization -->
+                            <template #item.Aksi="{ item }">
+                                <Labels 
+                                    :type="['create', 'update', 'delete', 'login', 'logout', 'edit'].includes(item.action) ? item.action : 'other'" 
+                                    :text="item.action"
+                                />
+                            </template>
+                            <template #item.Modul="{ item }">
+                                <div class="italic">
+                                    {{ (item.module).toUpperCase() }}
+                                </div>
+                            </template>
 
-                        <!-- Activity logs table with fixed header -->
-                        <div v-else class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-TopTableBG sticky top-0 z-10">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-[22px] font-medium text-gray-900 tracking-normal cursor-pointer"
-                                            @click="sortBy('user')"
-                                        >
-                                            <div class="flex items-center">
-                                                <span>Pengguna</span>
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    width="24" 
-                                                    height="24" 
-                                                    viewBox="0 0 24 25" 
-                                                    fill="none"
-                                                    class="ml-2 transform transition-transform duration-200"
-                                                    :class="getSortIconClass('user')"
-                                                >
-                                                    <mask id="mask0_1249_5047" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="25">
-                                                        <rect y="0.5" width="24" height="24" fill="#D9D9D9"/>
-                                                    </mask>
-                                                    <g mask="url(#mask0_1249_5047)">
-                                                        <path d="M7 14.5L12 9.5L17 14.5H7Z" fill="#111827"/>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-[22px] font-medium text-gray-900 tracking-normal cursor-pointer"
-                                            @click="sortBy('action')"
-                                        >
-                                            <div class="flex items-center">
-                                                <span>Aksi</span>
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    width="24" 
-                                                    height="24" 
-                                                    viewBox="0 0 24 25" 
-                                                    fill="none"
-                                                    class="ml-2 transform transition-transform duration-200"
-                                                    :class="getSortIconClass('action')"
-                                                >
-                                                    <mask id="mask0_1249_5047" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="25">
-                                                        <rect y="0.5" width="24" height="24" fill="#D9D9D9"/>
-                                                    </mask>
-                                                    <g mask="url(#mask0_1249_5047)">
-                                                        <path d="M7 14.5L12 9.5L17 14.5H7Z" fill="#111827"/>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-[22px] font-medium text-gray-900 tracking-normal cursor-pointer"
-                                            @click="sortBy('module')"
-                                        >
-                                            <div class="flex items-center">
-                                                <span>Modul</span>
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    width="24" 
-                                                    height="24" 
-                                                    viewBox="0 0 24 25" 
-                                                    fill="none"
-                                                    class="ml-2 transform transition-transform duration-200"
-                                                    :class="getSortIconClass('module')"
-                                                >
-                                                    <mask id="mask0_1249_5047" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="25">
-                                                        <rect y="0.5" width="24" height="24" fill="#D9D9D9"/>
-                                                    </mask>
-                                                    <g mask="url(#mask0_1249_5047)">
-                                                        <path d="M7 14.5L12 9.5L17 14.5H7Z" fill="#111827"/>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-[22px] font-medium text-gray-900 tracking-normal cursor-pointer"
-                                            @click="sortBy('description')"
-                                        >
-                                            <div class="flex items-center">
-                                                <span>Deskripsi</span>
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    width="24" 
-                                                    height="24" 
-                                                    viewBox="0 0 24 25" 
-                                                    fill="none"
-                                                    class="ml-2 transform transition-transform duration-200"
-                                                    :class="getSortIconClass('description')"
-                                                >
-                                                    <mask id="mask0_1249_5047" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="25">
-                                                        <rect y="0.5" width="24" height="24" fill="#D9D9D9"/>
-                                                    </mask>
-                                                    <g mask="url(#mask0_1249_5047)">
-                                                        <path d="M7 14.5L12 9.5L17 14.5H7Z" fill="#111827"/>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-6 py-3 text-left text-[22px] font-medium text-gray-900 tracking-normal cursor-pointer"
-                                            @click="sortBy('time')"
-                                        >
-                                            <div class="flex items-center">
-                                                <span>Waktu</span>
-                                                <svg 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    width="24" 
-                                                    height="24" 
-                                                    viewBox="0 0 24 25" 
-                                                    fill="none"
-                                                    class="ml-2 transform transition-transform duration-200"
-                                                    :class="getSortIconClass('time')"
-                                                >
-                                                    <mask id="mask0_1249_5047" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="25">
-                                                        <rect y="0.5" width="24" height="24" fill="#D9D9D9"/>
-                                                    </mask>
-                                                    <g mask="url(#mask0_1249_5047)">
-                                                        <path d="M7 14.5L12 9.5L17 14.5H7Z" fill="#111827"/>
-                                                    </g>
-                                                </svg>
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr
-                                        v-for="log in activityLogs"
-                                        :key="log.id"
-                                    >
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ log.user?.name || "System" }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                class="px-2 py-1 text-xs rounded-full"
-                                                :class="{
-                                                    'bg-green-100 text-green-800':
-                                                        log.action === 'create',
-                                                    'bg-blue-100 text-blue-800':
-                                                        log.action === 'update',
-                                                    'bg-red-100 text-red-800':
-                                                        log.action === 'delete',
-                                                    'bg-gray-100 text-gray-800':
-                                                        ![
-                                                            'create',
-                                                            'update',
-                                                            'delete',
-                                                        ].includes(log.action),
-                                                }"
-                                            >
-                                                {{ log.action }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">
-                                                {{ log.module }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900">
-                                                {{ log.description }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500">
-                                                {{ formatDate(log.created_at) }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                            <!-- Time column customization -->
+                            <template #item.Waktu="{ item }">
+                                <div class="text-[#6B86B5] text-[18px] font-normal">
+                                    {{ formatDate(item.time) }}
+                                </div>
+                            </template>
+                        </Tabel>
                     </div>
                 </div>
             </div>
@@ -266,42 +317,12 @@ const getSortIconClass = (column) => {
     </AuthenticatedLayout>
 </template>
 
-<style>
-/* Add this to ensure proper rotation and transition */
-.rotate-180 {
-    transform: rotate(180deg);
-}
-
-/* Make the thead sticky at the top */
-thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: var(--TopTableBG-color, #F9FAFB);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Hide scrollbar in Firefox */
-.overflow-y-auto {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(203, 213, 225, 0.5) transparent;
-}
-
-/* Style scrollbar for webkit browsers */
-.overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background-color: rgba(203, 213, 225, 0.5);
-    border-radius: 20px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(203, 213, 225, 0.8);
+<style scoped>
+/* Dashboard specific styles to manage scrolling */
+.dashboard-container {
+    position: relative;
+    height: calc(100vh - 304px);
+    min-height: 650px;
+    overflow: hidden;
 }
 </style>

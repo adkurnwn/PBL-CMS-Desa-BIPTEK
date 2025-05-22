@@ -13,7 +13,7 @@ export default {
     theme: {
         extend: {
             colors: {
-                'accent1': '#244031',
+                'accent1': '#244031', 
                 'accent2': '#3B614A',
                 'type1': '#F6F5F1',
                 'type2': '#40483D',
@@ -26,6 +26,20 @@ export default {
                 'dangerBG': '#F6C4CE',
                 'dangerText': '#DC143C',
                 'TopTableBG': '#E4E4E4',
+                'TableText': '#111827',
+                'greenLabel': '#D1E7DD',
+                'greenLabelText': '#198754',
+                'yellowLabel': '#FFF3CD',
+                'yellowLabelText': '#FFC107',
+                'blueLabel': '#E7F1FF',
+                'blueLabelText': '#0D6EFD',
+                'redLabel': 'rgba(220, 20, 60, 0.25)',
+                'redLabelText': '#DC143C',
+                'searchIcon': '#A0AEC0',
+                'searchBorder': '#C2C2C2',
+                'blueBorder': '#2563EB',
+                'emailText': '#404DBD',
+                'filterBorder': '#6B7280',
 
             },
             fontFamily: {

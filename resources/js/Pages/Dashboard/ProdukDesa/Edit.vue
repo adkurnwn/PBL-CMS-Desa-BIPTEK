@@ -3,10 +3,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import ImageEditor from "@/Components/ImageEditor.vue";
 import { ref } from "vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 
 const props = defineProps({
     produkDesa: {
@@ -42,12 +43,18 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Edit Produk Desa" />
+    <Head title="Edit UMKM/Produk Unggulan" />
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Edit Produk Desa
-            </h2>
+            <HeadingMenu title="Edit UMKM/Produk Unggulan" :hasRightContent="false">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="30" viewBox="0 0 35 30" fill="none">
+                        <path
+                            d="M26.7493 29.9587V25.3337H22.1243V22.2503H26.7493V17.6253H29.8327V22.2503H34.4577V25.3337H29.8327V29.9587H26.7493ZM2.08268 25.3337V16.0837H0.541016V13.0003L2.08268 5.29199H25.2077L26.7493 13.0003V16.0837H25.2077V20.7087H22.1243V16.0837H15.9577V25.3337H2.08268ZM5.16602 22.2503H12.8743V16.0837H5.16602V22.2503ZM2.08268 3.75033V0.666992H25.2077V3.75033H2.08268Z"
+                            fill="#4C7660" />
+                    </svg>
+                </template>
+            </HeadingMenu>
         </template>
 
         <div class="py-12">

@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from "vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 
 const props = defineProps({
@@ -61,9 +62,13 @@ const deleteBackup = (path) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Data Recovery
-            </h2>
+            <HeadingMenu title="Data Recovery">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" class="text-selectedText">
+                        <path d="M20 36.6667C17.2222 36.6667 14.6389 36.0556 12.25 34.8333C9.86111 33.6111 7.80556 31.9722 6.08333 29.9167C4.36111 27.8611 3.05556 25.5 2.16667 22.8333C1.27778 20.1667 0.833333 17.3333 0.833333 14.3333C0.833333 11.7778 1.25 9.30556 2.08333 6.91667C2.91667 4.52778 4.11111 2.41667 5.66667 0.583336H14.1667L17.5 7.25H31.6667C33.0556 7.25 34.2361 7.75 35.2083 8.75C36.1806 9.75 36.6667 10.9444 36.6667 12.3333V15.6667H33.3333V12.3333C33.3333 11.8889 33.1944 11.5 32.9167 11.1667C32.6389 10.8333 32.2222 10.6667 31.6667 10.6667H15.8333L12.5 4H7.41667C6.27778 5.55556 5.41667 7.27778 4.83333 9.16667C4.25 11.0556 3.95833 12.9722 3.95833 14.9167C3.95833 19.6389 5.375 23.7778 8.20833 27.3333C11.0417 30.8889 14.6667 33.1111 19.0833 34H23.3333V28.3333L33.3333 36.6667L23.3333 45V39.1667H18.75C15.5556 39.1667 12.5556 38.5 9.75 37.1667C6.94444 35.8333 4.55556 33.9722 2.58333 31.5833C0.611111 29.1944 -0.305555 26.5556 0.0833334 23.6667L3.08333 24.3333C2.86111 26.2778 3.45833 28.0278 4.875 29.5833C6.29167 31.1389 8.05556 32.3611 10.1667 33.25C12.2778 34.1389 14.4722 34.5833 16.75 34.5833H20V31.3333H14.9167C11.5556 30.6111 8.77778 28.8889 6.58333 26.1667C4.38889 23.4444 3.33333 20.2222 3.41667 16.5L6.5 16.1667C6.5 18.9167 7.33333 21.3333 9 23.4167C10.6667 25.5 12.8333 26.8333 15.5 27.4167H20.0833V37.0833H20Z" fill="currentColor"/>
+                    </svg>
+                </template>
+            </HeadingMenu>
         </template>
 
         <div class="py-12">
@@ -93,7 +98,7 @@ const deleteBackup = (path) => {
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 dashboard-table">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
@@ -130,7 +135,12 @@ const deleteBackup = (path) => {
                                         :key="index"
                                     >
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ backup.date }}
+                                            <div>
+                                                <span v-if="backup.date">
+                                                    {{ backup.date }}
+                                                </span>
+                                                <span v-else>Unknown date</span>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             {{ backup.size }}
