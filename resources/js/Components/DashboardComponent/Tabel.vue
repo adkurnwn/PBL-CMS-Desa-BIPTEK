@@ -423,7 +423,7 @@ const isMultiline = (header) => {
                 </table>
             </div>
             
-            <!-- Fixed pagination at bottom with consistent height -->
+            <!-- Fixed pagination at bottom with adaptive height -->
             <div class="sticky-pagination">
                 <Pagination
                     v-if="pagination"
@@ -447,7 +447,7 @@ const isMultiline = (header) => {
     height: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 500px; /* Ensure minimum height to show all elements */
+    min-height: 400px; /* Reduced minimum height */
 }
 
 /* Fixed header styling */
@@ -460,17 +460,16 @@ const isMultiline = (header) => {
     flex-shrink: 0; /* Prevent header from shrinking */
 }
 
-/* Scrollable content area with calculated height */
+/* Scrollable content area */
 .table-content {
     position: relative;
     flex: 1;
     overflow-y: auto;
     overflow-x: auto;
-    min-height: 200px; /* Ensure minimum height for content */
-    height: calc(100% - 161px); /* Subtract header (63px) and pagination (98px) heights */
+    min-height: 200px;
 }
 
-/* Fixed pagination at bottom with explicit height */
+/* Fixed pagination at bottom */
 .sticky-pagination {
     position: sticky;
     bottom: 0;
@@ -479,8 +478,11 @@ const isMultiline = (header) => {
     z-index: 30;
     background-color: white;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
-    height: 98px; /* Explicit height for pagination */
-    flex-shrink: 0; /* Prevent pagination from shrinking */
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    margin-top: auto; /* Push to bottom when content is not enough */
 }
 
 /* Add this to ensure proper rotation and transition */

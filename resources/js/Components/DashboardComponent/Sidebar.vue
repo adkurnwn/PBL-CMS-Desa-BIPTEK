@@ -179,7 +179,7 @@ const toggleCommentModerator = () => {
             <!-- Fixed Dashboard Menu at the top with 50px padding -->
             <div 
                 class="fixed bg-white pt-[50px] pb-[15px] z-10"
-                :class="sidebarCollapsed ? 'pl-[20px]' : 'pl-[20px] pr-[12px]'"
+                :class="sidebarCollapsed ? 'pl-[12px] sm:pl-[20px]' : 'pl-[12px] sm:pl-[20px] pr-[12px]'"
                 :style="{ 
                     width: sidebarCollapsed ? '80px' : '400px',
                     transition: 'width 300ms ease-in-out'
@@ -210,7 +210,7 @@ const toggleCommentModerator = () => {
                 :autoHide="false"
                 class="pt-[113px] sidebar-scrollbar"
             >
-                <div class="p-5 pt-0 pb-[100px]" :class="sidebarCollapsed ? 'pr-5' : 'pr-0'">
+                <div class="p-3 pt-0 pb-[100px] sm:p-5 sm:pt-0 sm:pb-[100px]" :class="sidebarCollapsed ? 'pr-3 sm:pr-5' : 'pr-0'">
                     <div class="space-y-[20px]" :class="sidebarCollapsed ? '' : 'pr-[12px]'">
                         <!-- User Management Section - Only show if user has user or role permissions -->
                         <MenuSection 

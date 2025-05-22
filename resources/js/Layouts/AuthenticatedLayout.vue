@@ -153,8 +153,15 @@ const handleSidebarCollapse = (collapsed) => {
                     <slot name="search-area"></slot>
                 </div>
 
+                <!-- Special Table Content slot - Only render if used -->
+                <div v-if="$slots['table-content']" class="flex-1 w-full pr-[23px] pl-[10px] table-container-slot">
+                    <slot name="table-content"></slot>
+                </div>
+
                 <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
+                <!-- Only render if table-content slot is not used -->
                 <Scrollbar 
+                    v-if="!$slots['table-content']"
                     class="flex-1 w-full pr-[23px] pl-[10px]" 
                     :hideScrollbar="false"
                     :autoHide="false"
@@ -249,5 +256,27 @@ const handleSidebarCollapse = (collapsed) => {
 /* Add special handling for dashboard page */
 :deep(.dashboard-page) {
     overflow: visible !important;
+}
+
+/* Special container for table content to ensure proper positioning */
+.table-container-slot {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 254px); /* Adjust for header height and search area */
+    min-height: 400px;
+    overflow: hidden;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-height: 800px) {
+    .table-container-slot {
+        height: calc(100vh - 220px);
+    }
+}
+
+@media (max-height: 600px) {
+    .table-container-slot {
+        height: calc(100vh - 190px);
+    }
 }
 </style>

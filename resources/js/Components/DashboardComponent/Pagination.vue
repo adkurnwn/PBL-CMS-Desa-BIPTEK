@@ -92,9 +92,9 @@ const currentItemsRange = computed(() => {
     <div class="pagination-container">
         <!-- Pagination controls container -->
         <div class="pagination-controls">
-            <!-- First page button with TopTableBG -->
+            <!-- First page button with TopTableBG - hidden on small screens -->
             <button 
-                class="pagination-button navigation-button"
+                class="pagination-button navigation-button first-last-button"
                 :disabled="isFirstPage"
                 @click="changePage(1)"
                 :class="{ 'disabled': isFirstPage }"
@@ -146,9 +146,9 @@ const currentItemsRange = computed(() => {
                 &rsaquo;
             </button>
 
-            <!-- Last page button with TopTableBG -->
+            <!-- Last page button with TopTableBG - hidden on small screens -->
             <button 
-                class="pagination-button navigation-button"
+                class="pagination-button navigation-button first-last-button"
                 :disabled="isLastPage"
                 @click="changePage(totalPages)"
                 :class="{ 'disabled': isLastPage }"
@@ -156,27 +156,27 @@ const currentItemsRange = computed(() => {
             >
                 &raquo;
             </button>
+        </div>
 
-            <!-- Manual page input with spacing -->
-            <div class="manual-page-input-container">
-                <input
-                    type="text"
-                    class="manual-page-input"
-                    v-model="manualPage"
-                    placeholder="#"
-                    @keyup.enter="goToManualPage"
-                    title="Go to page"
-                    aria-label="Go to page"
-                />
-                
-                <button
-                    class="go-button hover:bg-selectedBG hover:text-selectedText hover:border-selectedText"
-                    @click="goToManualPage"
-                    title="Go to page"
-                >
-                    GO &gt;
-                </button>
-            </div>
+        <!-- Manual page input with spacing - moved below on small screens -->
+        <div class="manual-page-input-container">
+            <input
+                type="text"
+                class="manual-page-input"
+                v-model="manualPage"
+                placeholder="#"
+                @keyup.enter="goToManualPage"
+                title="Go to page"
+                aria-label="Go to page"
+            />
+            
+            <button
+                class="go-button hover:bg-selectedBG hover:text-selectedText hover:border-selectedText"
+                @click="goToManualPage"
+                title="Go to page"
+            >
+                <span class="inline-flex items-center">GO <span class="ml-1">&gt;</span></span>
+            </button>
         </div>
         
         <!-- Items count display with corrected calculation -->
@@ -192,12 +192,13 @@ const currentItemsRange = computed(() => {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: 98px; /* Fixed height as specified */
-    width: 407px; /* Fixed width as specified */
+    height: auto; /* Changed from fixed height to auto for responsiveness */
+    max-width: 407px; /* Changed from fixed width to max-width */
+    width: 100%; /* Make it fill available space */
     padding-top: 12px;
-    padding-bottom: 36px; /* Bottom padding as specified */
-    margin: 0 auto; /* Center horizontally */
-    gap: 10px; /* Add gap between pagination controls and item count */
+    padding-bottom: 12px;
+    margin: 0 auto;
+    gap: 10px;
 }
 
 .pagination-controls {
@@ -206,6 +207,7 @@ const currentItemsRange = computed(() => {
     justify-content: center;
     gap: 5px;
     width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
 .pagination-button {
@@ -253,8 +255,8 @@ const currentItemsRange = computed(() => {
 .manual-page-input-container {
     display: flex;
     align-items: center;
-    margin-left: 23px;
     gap: 5px;
+    margin: 5px 0; /* Add vertical margin */
 }
 
 .manual-page-input {
@@ -275,7 +277,7 @@ const currentItemsRange = computed(() => {
 
 .go-button {
     height: 25px;
-    padding: 0 8px;
+    padding: 0 08px;
     border-radius: 4px;
     background-color: white;
     color: #6B7280;
@@ -310,5 +312,22 @@ const currentItemsRange = computed(() => {
     background-color: theme('colors.selectedBG');
     color: theme('colors.selectedText');
     border-color: theme('colors.selectedText');
+}
+
+/* Media query for small screens */
+@media (max-width: 480px) {
+    .first-last-button {
+        display: none; /* Hide first/last buttons on small screens */
+    }
+    
+    .manual-page-input-container {
+        margin-left: 0; /* Remove left margin on small screens */
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pagination-container {
+        min-height: 120px; /* Ensure enough height for stacked elements */
+    }
 }
 </style>

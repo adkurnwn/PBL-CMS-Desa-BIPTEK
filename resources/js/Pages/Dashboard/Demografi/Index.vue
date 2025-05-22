@@ -252,7 +252,7 @@ watch(() => props.filters, (newValue) => {
             </Link>
         </template>
 
-        <div class="dashboard-container">
+        <template #table-content>
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
                     <Tabel :headers="tableHeaders" :items="demografiItems" :pagination="true"
@@ -275,7 +275,7 @@ watch(() => props.filters, (newValue) => {
                     </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 

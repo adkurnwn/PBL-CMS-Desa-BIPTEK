@@ -232,7 +232,6 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 </script>
 
 <template>
-
     <Head title="Manajemen Pengguna" />
     <AuthenticatedLayout>
         <template #header>
@@ -266,14 +265,26 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
             ]" />
         </template>
 
-        <div class="dashboard-container">
+        <!-- Use the new table-content slot instead of default slot -->
+        <template #table-content>
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
-                    <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
-                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
-                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
-                        :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        empty-state-message="No users found" @filter-changed="handleFilterChange" @sort="handleSort">
+                    <Tabel 
+                        :headers="tableHeaders" 
+                        :items="userItems" 
+                        :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" 
+                        :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" 
+                        :total-items="pagination?.total || 0"
+                        :filters="filterState" 
+                        :sort-field="sortField" 
+                        :sort-direction="sortDirection"
+                        empty-state-message="No users found" 
+                        @filter-changed="handleFilterChange" 
+                        @sort="handleSort"
+                    >
+                        <!-- Add slot templates for different columns -->
                         <!-- Add a template for the Kontak column -->
                         <template #['item.Kontak']="{ item }">
                             <div class="flex flex-col">
@@ -313,16 +324,10 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                     </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 
 <style scoped>
-/* Dashboard specific styles to manage scrolling */
-.dashboard-container {
-    position: relative;
-    height: calc(100vh - 348px);
-    min-height: 650px;
-    overflow: hidden;
-}
+/* Remove the dashboard-container styles since we're using the table-content slot now */
 </style>

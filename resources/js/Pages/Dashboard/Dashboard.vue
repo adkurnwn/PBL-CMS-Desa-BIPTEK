@@ -237,7 +237,6 @@ watch(() => props.logs, (newLogs) => {
 </script>
 
 <template>
-
     <Head title="Aktivitas Terbaru" />
 
     <AuthenticatedLayout>
@@ -270,9 +269,8 @@ watch(() => props.logs, (newLogs) => {
             />
         </template>
 
-        <!-- Disable scrollbar from parent by adding special class -->
-        <!-- Add height constraint to container to ensure all elements fit -->
-        <div class="dashboard-container">
+        <!-- Use the new table-content slot instead of default slot -->
+        <template #table-content>
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
                     <div class="h-full">
@@ -313,16 +311,10 @@ watch(() => props.logs, (newLogs) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 
 <style scoped>
-/* Dashboard specific styles to manage scrolling */
-.dashboard-container {
-    position: relative;
-    height: calc(100vh - 304px);
-    min-height: 650px;
-    overflow: hidden;
-}
+/* Remove the dashboard-container styles since we're using the table-content slot now */
 </style>

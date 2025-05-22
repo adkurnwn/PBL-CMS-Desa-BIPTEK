@@ -208,7 +208,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
             ]" />
         </template>
 
-        <div class="dashboard-container">
+        <template #table-content>
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
                     <Tabel :headers="tableHeaders" :items="positionItems" :pagination="true"
@@ -251,7 +251,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                     </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 
