@@ -358,7 +358,7 @@ const parseJson = (value) => {
                 </div>
                 <!-- Pass location data to Map component if available -->
                 <div
-                    class="h-96 xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2"
+                    class="h-96 xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2 z-0"
                 >
                     <Map :location-name="profile.name" />
                 </div>
