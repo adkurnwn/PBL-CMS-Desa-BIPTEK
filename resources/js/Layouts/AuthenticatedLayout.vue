@@ -94,7 +94,7 @@ const handleSidebarCollapse = (collapsed) => {
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
         
         <!-- Toast Notifications Container - Positioned for SPA -->
-        <div class="fixed top-[120px] right-4 z-50 w-[26rem] space-y-2">
+        <div class="fixed top-[120px] inset-x-0 sm:top-[120px] sm:right-4 sm:inset-x-auto z-50 flex flex-col items-center sm:items-end max-w-full sm:w-[26rem] space-y-2 px-0">
             <ToastNotification
                 v-for="toast in toasts"
                 :key="toast.id"
@@ -138,34 +138,7 @@ const handleSidebarCollapse = (collapsed) => {
                     </div>
                 </div>
 
-                <!-- Keep the Flash Messages section but hide it visually -->
-                <!-- This maintains backward compatibility with pages that expect these elements -->
-                <div class="w-full px-4 hidden">
-                    <div
-                        v-if="$page.props.flash?.success"
-                        class="mb-4 p-4 bg-green-100 text-green-700 rounded-md"
-                    >
-                        {{ $page.props.flash.success }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.error"
-                        class="mb-4 p-4 bg-red-100 text-red-700 rounded-md"
-                    >
-                        {{ $page.props.flash.error }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.warning"
-                        class="mb-4 p-4 bg-yellow-100 text-yellow-700 rounded-md"
-                    >
-                        {{ $page.props.flash.warning }}
-                    </div>
-                    <div
-                        v-if="$page.props.flash?.info"
-                        class="mb-4 p-4 bg-blue-100 text-blue-700 rounded-md"
-                    >
-                        {{ $page.props.flash.info }}
-                    </div>
-                </div>
+                
 
                 <div v-if="$slots['tab-devider']" class="h-[48px] pt-[11px]">
                     <slot name="tab-devider"></slot>

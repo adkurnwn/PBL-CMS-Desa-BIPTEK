@@ -206,10 +206,9 @@ const toggleCommentModerator = () => {
             <!-- Scrollable content with padding to account for the fixed Dashboard -->
             <Scrollbar 
                 height="calc(100vh - 110px)" 
-                thumbColor="rgba(255, 255, 255, 0.2)" 
-                thumbHoverColor="rgba(255, 255, 255, 0.3)"
-                hideScrollbar
-                class="pt-[113px]"
+                :hideScrollbar="true"
+                :autoHide="false"
+                class="pt-[113px] sidebar-scrollbar"
             >
                 <div class="p-5 pt-0 pb-[100px]" :class="sidebarCollapsed ? 'pr-5' : 'pr-0'">
                     <div class="space-y-[20px]" :class="sidebarCollapsed ? '' : 'pr-[12px]'">
@@ -523,14 +522,16 @@ const toggleCommentModerator = () => {
 
 <style>
 /* Hide default scrollbars but keep functionality */
-:global(.sidebar .scrollbar-container) {
-    scrollbar-width: none; /* Firefox */
+:global(.sidebar-scrollbar) {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
 }
 
-:global(.sidebar .scrollbar-container::-webkit-scrollbar) {
-    width: 0;
-    height: 0;
-    display: none;
+:global(.sidebar-scrollbar::-webkit-scrollbar),
+:global(.sidebar-scrollbar .custom-scrollbar::-webkit-scrollbar) {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
 }
 
 /* Ensure consistent padding for all menu sections */

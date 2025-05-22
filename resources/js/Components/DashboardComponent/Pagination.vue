@@ -181,7 +181,7 @@ const currentItemsRange = computed(() => {
         
         <!-- Items count display with corrected calculation -->
         <div class="items-count" v-if="totalItems > 0">
-            Showing {{ currentItemsRange.start }}-{{ currentItemsRange.end }} items out of {{ totalItems }}
+            Menampilkan item {{ currentItemsRange.start }}-{{ currentItemsRange.end }} dari {{ totalItems }}
         </div>
     </div>
 </template>

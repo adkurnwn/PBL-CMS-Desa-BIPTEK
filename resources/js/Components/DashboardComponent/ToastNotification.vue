@@ -204,10 +204,11 @@ onBeforeUnmount(() => {
             role="alert" 
             @mouseenter="handleMouseEnter" 
             @mouseleave="handleMouseLeave"
+            class="max-w-[95%] sm:max-w-[400px] md:max-w-[500px]"
         >
-            <!-- Icon - increased size by 30% (from w-6 h-6 to w-8 h-8) -->
+            <!-- Icon - responsive sizing -->
             <svg 
-                class="flex-shrink-0 w-8 h-8 mr-4" 
+                class="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 mr-2 sm:mr-3 md:mr-4" 
                 aria-hidden="true" 
                 xmlns="http://www.w3.org/2000/svg" 
                 :fill="icon.fill" 
@@ -217,21 +218,21 @@ onBeforeUnmount(() => {
                 v-html="icon.svg"
             ></svg>
             
-            <!-- Text - increased size by 30% (from text-sm to text-base) -->
-            <div class="ms-3 text-base font-medium">
+            <!-- Text - responsive sizing -->
+            <div class="ms-2 sm:ms-3 text-sm sm:text-base font-medium">
                 {{ message }}
             </div>
             
-            <!-- Close button - increased size by 30% -->
+            <!-- Close button - responsive sizing -->
             <button 
                 type="button"
-                class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-2 inline-flex items-center justify-center h-10 w-10 hover:bg-gray-100"
+                class="ms-auto -mx-1 sm:-mx-1.5 -my-1 sm:-my-1.5 rounded-lg focus:ring-2 p-1 sm:p-1.5 md:p-2 inline-flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 hover:bg-gray-100"
                 @click="closeNotification" 
                 aria-label="Close"
             >
                 <span class="sr-only">Close</span>
                 <svg 
-                    class="w-4 h-4" 
+                    class="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" 
                     aria-hidden="true" 
                     xmlns="http://www.w3.org/2000/svg" 
                     fill="none"
@@ -247,8 +248,8 @@ onBeforeUnmount(() => {
                 </svg>
             </button>
             
-            <!-- Progress bar - increased height by 30% (from h-1 to h-[5px]) -->
-            <div class="absolute bottom-0 mx-[3px] left-0 right-0 h-[4px] overflow-hidden rounded-b-[13px]">
+            <!-- Progress bar -->
+            <div class="absolute bottom-0 mx-[3px] left-0 right-0 h-[3px] sm:h-[3.5px] md:h-[4px] overflow-hidden rounded-b-[13px]">
                 <div 
                     :class="progressColor" 
                     :style="{ width: `${progressWidth}%` }"

@@ -75,7 +75,11 @@ onUnmounted(() => {
   <div 
     ref="scrollContainer"
     class="custom-scrollbar"
-    :class="{ 'auto-hide': autoHide, 'is-scrolling': isScrolling }"
+    :class="{ 
+      'auto-hide': autoHide, 
+      'is-scrolling': isScrolling,
+      'hide-scrollbar': hideScrollbar
+    }"
     :style="{ 
       height, 
       width,
@@ -97,6 +101,18 @@ onUnmounted(() => {
   position: relative;
   scrollbar-width: thin; /* Firefox */
   scrollbar-color: var(--thumb-color) var(--track-color); /* Firefox */
+}
+
+/* Complete scrollbar hiding for all browsers when hideScrollbar is true */
+.hide-scrollbar {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

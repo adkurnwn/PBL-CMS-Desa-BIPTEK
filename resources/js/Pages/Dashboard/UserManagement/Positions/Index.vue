@@ -177,6 +177,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 </script>
 
 <template>
+
     <Head title="Manajemen Posisi" />
     <AuthenticatedLayout>
         <template #header>
@@ -192,84 +193,56 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
         </template>
 
         <template #search-area>
-            <Search 
-                v-model="searchQuery"
-                placeholder="Cari posisi..."
-                @search="handleSearch"
-            />
+            <Search v-model="searchQuery" placeholder="Cari posisi..." @search="handleSearch" />
             <Link :href="route('dashboard.positions.create')">
-                <TopButton :icon="true">
-                    <template #icon>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20"
-                            fill="none">
-                            <mask id="mask0_1642_3445" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0"
-                                y="0" width="21" height="20">
-                                <rect x="0.5" width="20" height="20" fill="#D9D9D9" />
-                            </mask>
-                            <g mask="url(#mask0_1642_3445)">
-                                <path
-                                    d="M9.6665 10.8337H4.6665V9.16699H9.6665V4.16699H11.3332V9.16699H16.3332V10.8337H11.3332V15.8337H9.6665V10.8337Z"
-                                    fill="white" />
-                            </g>
-                        </svg>
-                    </template>
-                    Create
-                </TopButton>
+            <TopButton>
+
+            </TopButton>
             </Link>
         </template>
 
         <template #tab-devider>
-            <TabDevider
-                :tabs=" [
-                    { name: 'Pengguna', href: route('dashboard.users.index'), active: false },
-                    { name: 'Posisi', href: route('dashboard.positions.index'), active: true },
-                ]"
-            />
+            <TabDevider :tabs="[
+                { name: 'Pengguna', href: route('dashboard.users.index'), active: false },
+                { name: 'Posisi', href: route('dashboard.positions.index'), active: true },
+            ]" />
         </template>
 
         <div class="dashboard-container">
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
-                    <Tabel 
-                        :headers="tableHeaders" 
-                        :items="positionItems" 
-                        :pagination="true"
-                        :items-per-page="pagination?.perPage || 25" 
-                        :current-page="pagination?.currentPage || 1"
-                        :total-pages="pagination?.lastPage || 1" 
-                        :total-items="pagination?.total || 0"
-                        :filters="filterState" 
-                        :sort-field="sortField" 
-                        :sort-direction="sortDirection"
-                        empty-state-message="No positions found"
-                        @page-changed="handlePageChanged"
-                        @sort="handleSort"
-                    >
+                    <Tabel :headers="tableHeaders" :items="positionItems" :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
+                        :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
+                        empty-state-message="No positions found" @page-changed="handlePageChanged" @sort="handleSort">
                         <!-- Custom template for job description column -->
                         <template #['item.Deskripsi_Pekerjaan']="{ item }">
                             <div>
                                 <ul class="list-disc ml-5">
-                                    <template v-for="(desc, index) in parseJobDescription(item.job_description).slice(0, 2)" :key="index">
+                                    <template
+                                        v-for="(desc, index) in parseJobDescription(item.job_description).slice(0, 2)"
+                                        :key="index">
                                         <li>{{ desc }}</li>
                                     </template>
-                                    <li v-if="parseJobDescription(item.job_description).length > 2" 
+                                    <li v-if="parseJobDescription(item.job_description).length > 2"
                                         class="text-menuText cursor-pointer mt-1 list-none">
                                         <Link :href="route('dashboard.positions.edit', item.id)">
-                                            Lihat Selengkapnya
+                                        Lihat Selengkapnya
                                         </Link>
                                     </li>
                                 </ul>
                             </div>
                         </template>
-                        
+
                         <!-- Custom template for actions column -->
                         <template #['item.Aksi']="{ item }">
                             <div class="flex justify-left gap-[10px]">
                                 <Link :href="route('dashboard.positions.edit', item.id)" class="">
-                                    <IconAksi type="edit" />
+                                <IconAksi type="edit" />
                                 </Link>
-                                
-                                <button @click="deletePosition(item.id)" class="" 
+
+                                <button @click="deletePosition(item.id)" class=""
                                     :disabled="['Admin Sistem', 'Kepala Desa'].includes(item.name)">
                                     <IconAksi type="delete" />
                                 </button>

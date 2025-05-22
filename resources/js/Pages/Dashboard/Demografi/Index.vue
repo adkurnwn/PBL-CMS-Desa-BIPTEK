@@ -246,21 +246,8 @@ watch(() => props.filters, (newValue) => {
                 @filter-changed="handleFilterChange" width="250px" dropdownTitle="Filter berdasarkan"
                 activeFiltersTitle="Filter yang aktif" :close-on-select="false" />
             <Link :href="route('dashboard.demografi.create')">
-            <TopButton :icon="true">
-                <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
-                        <mask id="mask0_1642_3445" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
-                            width="21" height="20">
-                            <rect x="0.5" width="20" height="20" fill="#D9D9D9" />
-                        </mask>
-                        <g mask="url(#mask0_1642_3445)">
-                            <path
-                                d="M9.6665 10.8337H4.6665V9.16699H9.6665V4.16699H11.3332V9.16699H16.3332V10.8337H11.3332V15.8337H9.6665V10.8337Z"
-                                fill="white" />
-                        </g>
-                    </svg>
-                </template>
-                Create
+            <TopButton>
+                
             </TopButton>
             </Link>
         </template>

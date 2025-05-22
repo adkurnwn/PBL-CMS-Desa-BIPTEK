@@ -126,7 +126,7 @@ const submit = () => {
             <div class="overflow-hidden bg-white sm:rounded-lg">
                 <div class="">
                     <form @submit.prevent="submit" enctype="multipart/form-data">
-                        <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
                             <div class="flex flex-col gap-y-[15px]">
                                 <!-- First column: Name, Email, Position, Job Description -->
                                 
