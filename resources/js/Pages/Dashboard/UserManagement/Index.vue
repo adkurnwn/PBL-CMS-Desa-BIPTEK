@@ -269,7 +269,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
         <!-- Use the new table-content slot instead of default slot -->
         <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
                         :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"

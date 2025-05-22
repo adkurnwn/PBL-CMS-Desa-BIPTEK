@@ -152,7 +152,7 @@ const submit = () => {
         </template>
 
         <div class="h-full pb-[48px]">
-            <div class="overflow-hidden bg-white sm:rounded-lg">
+            <div class="overflow-hidden bg-white  ">
                 <div class="pl-[22px]">
                     <!-- Show validation errors if any -->
                     <div v-if="Object.keys(form.errors).length > 0"

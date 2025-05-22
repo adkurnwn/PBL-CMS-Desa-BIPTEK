@@ -79,7 +79,7 @@ const submit = () => {
         </template>
 
         <div class="h-full pb-[48px] pt-[27px]">
-            <div class="overflow-hidden bg-white sm:rounded-lg">
+            <div class="overflow-hidden bg-white  ">
                 <div class="">
                     <form @submit.prevent="submit">
                         <div class="grid grid-cols-1 gap-y-[15px]">

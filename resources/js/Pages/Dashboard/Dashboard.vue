@@ -265,7 +265,7 @@ watch(() => props.logs, (newLogs) => {
         <!-- Use the new table-content slot instead of default slot -->
         <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <div class="h-full">
                         <Tabel 
                             :headers="tableHeaders" 

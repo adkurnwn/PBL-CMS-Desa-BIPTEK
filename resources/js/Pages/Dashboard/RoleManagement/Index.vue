@@ -73,7 +73,7 @@ const tableItems = computed(() => {
         </template>
 
         <div class="h-full">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+            <div class="overflow-hidden bg-white shadow-sm   h-full">
                 <div class="h-full">
                     <Tabel :headers="tableHeaders" :items="tableItems" :pagination="false"
                         empty-state-message="Tidak ada data role ditemukan.">

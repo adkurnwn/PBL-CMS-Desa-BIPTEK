@@ -112,7 +112,7 @@ defineProps({
             :method="method"
             :as="as"
             :preserve-scroll="preserveScroll"
-            class="block group flex items-center transition duration-300 text-menuText hover:bg-selectedBG hover:text-selectedText h-[24px] sm:h-[24px] md:h-[24px] xl:h-[32px] 2xl:h-[36px] 3xl:h-[42px] 4xl:h-[48px] px-[10px] sm:px-[10px] md:px-[11px] xl:px-[10px] 2xl:px-[11px] 3xl:px-[11px] 4xl:px-[12px]"
+            class="group flex items-center transition duration-300 text-menuText hover:bg-selectedBG hover:text-selectedText h-[24px] sm:h-[24px] md:h-[24px] xl:h-[32px] 2xl:h-[36px] 3xl:h-[42px] 4xl:h-[48px] px-[10px] sm:px-[10px] md:px-[11px] xl:px-[10px] 2xl:px-[11px] 3xl:px-[11px] 4xl:px-[12px]"
             :class="{
                 'bg-selectedBG text-selectedText': active, 
                 'hover:bg-dangerBG hover:text-dangerText': danger

@@ -254,7 +254,7 @@ watch(() => props.filters, (newValue) => {
 
         <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <Tabel :headers="tableHeaders" :items="demografiItems" :pagination="true"
                         :items-per-page="pagination.perPage" :current-page="pagination.currentPage"
                         :total-pages="pagination.lastPage" :total-items="pagination.total" :sort-field="sortField"
