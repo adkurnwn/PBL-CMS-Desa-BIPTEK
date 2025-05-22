@@ -106,26 +106,23 @@ const handleSidebarCollapse = (collapsed) => {
             />
         </div>
         
-        <div class="mt-[160px] flex flex-row h-[calc(100vh-110px)] overflow-hidden">
+        <div class="mt-[70px] sm:mt-[80px] md:mt-[90px] xl:mt-[107px] 2xl:mt-[120px] 3xl:mt-[140px] 4xl:mt-[160px] flex flex-row h-[calc(100vh-70px)] sm:h-[calc(100vh-80px)] md:h-[calc(100vh-90px)] xl:h-[calc(100vh-107px)] 2xl:h-[calc(100vh-120px)] 3xl:h-[calc(100vh-140px)] 4xl:h-[calc(100vh-160px)] overflow-hidden">
             <!-- Sidebar with collapse functionality -->
             <Sidebar @toggle="toggleSidebar" @collapse="handleSidebarCollapse">
-                <template #logo>
-                    <slot name="logo">
-                        <ApplicationLogo class="h-12 w-12" />
-                    </slot>
-                </template>
             </Sidebar>
 
             <!-- Main Content with Custom Scrollbar -->
             <div 
-                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative pl-[29px] justify-start w-full"
-                :style="{
-                    marginLeft: sidebarCollapsed ? '80px' : '400px'
-                }"
+                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative pl-[22px] 4xl:pl-[29px] justify-start w-full"
+                :class="
+                    sidebarCollapsed 
+                    ? 'ml-[64px] xl:ml-[64px] 2xl:ml-[72px] 3xl:ml-[76px] 4xl:ml-[80px] w-[calc(100%-64px)] xl:w-[calc(100%-64px)] 2xl:w-[calc(100%-72px)] 3xl:w-[calc(100%-76px)] 4xl:w-[calc(100%-80px)]' 
+                    : 'ml-[230px] sm:ml-[250px] md:ml-[266px] xl:ml-[266px] 2xl:ml-[300px] 3xl:ml-[350px] 4xl:ml-[400px] w-[calc(100%-230px)] sm:w-[calc(100%-250px)] md:w-[calc(100%-266px)] xl:w-[calc(100%-266px)] 2xl:w-[calc(100%-300px)] 3xl:w-[calc(100%-350px)] 4xl:w-[calc(100%-400px)]'
+                "
             >
                 <!-- Page Heading - Fixed position relative to parent -->
                 <div class="bg-white w-full" v-if="$slots.header">
-                    <div class="max-w-full mx-auto pl-[10px]">
+                    <div class="max-w-full mx-auto pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px]">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <slot name="page-icon"></slot>
@@ -140,21 +137,21 @@ const handleSidebarCollapse = (collapsed) => {
 
                 
 
-                <div v-if="$slots['tab-devider']" class="h-[48px] pt-[11px]">
+                <div v-if="$slots['tab-devider']" class="h-[31px] sm:h-[35px] md:h-[39px] xl:h-[31px] 2xl:h-[36px] 3xl:h-[42px] 4xl:h-[48px] pt-[7px] sm:pt-[8px] md:pt-[9px] xl:pt-[7px] 2xl:pt-[8px] 3xl:pt-[10px] 4xl:pt-[11px]">
                     <slot name="tab-devider"></slot>
                 </div>
 
-                <div v-if="$slots['subtitle-area']" class="px-[22px] pt-[25px] text-[22px] font-medium text-menuText">
+                <div v-if="$slots['subtitle-area']" class="px-[12px] sm:px-[15px] md:px-[18px] xl:px-[14px] 2xl:px-[18px] 3xl:px-[20px] 4xl:px-[22px] pt-[6.7px] sm:pt-[7.5px] md:pt-[8.3px] lg:pt-[9.2px] xl:pt-[10px] 2xl:pt-[11.7px] 3xl:pt-[13.3px] 4xl:pt-[15px] text-[9.3px] sm:text-[10.6px] md:text-[12px] lg:text-[13.3px] xl:text-[14.6px] 2xl:text-[16.7px] 3xl:text-[19.4px] 4xl:text-[22px] font-medium text-menuText">
                     <slot name="subtitle-area"></slot>
                 </div>
 
                 <!-- Replace blank space with a named slot for search functionality - Only display if content exists -->
-                <div v-if="$slots['search-area']" class="h-[94px] pr-[23px] pl-[10px] flex items-center gap-[10px] justify-end">
+                <div v-if="$slots['search-area']" class="h-[62px] sm:h-[62px] md:h-[62px] xl:h-[62px] 2xl:h-[70px] 3xl:h-[76px] 4xl:h-[94px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
                     <slot name="search-area"></slot>
                 </div>
 
                 <!-- Special Table Content slot - Only render if used -->
-                <div v-if="$slots['table-content']" class="flex-1 w-full pr-[23px] pl-[10px] table-container-slot">
+                <div v-if="$slots['table-content']" class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] table-container-slot">
                     <slot name="table-content"></slot>
                 </div>
 
@@ -162,7 +159,7 @@ const handleSidebarCollapse = (collapsed) => {
                 <!-- Only render if table-content slot is not used -->
                 <Scrollbar 
                     v-if="!$slots['table-content']"
-                    class="flex-1 w-full pr-[23px] pl-[10px]" 
+                    class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px]" 
                     :hideScrollbar="false"
                     :autoHide="false"
                 >

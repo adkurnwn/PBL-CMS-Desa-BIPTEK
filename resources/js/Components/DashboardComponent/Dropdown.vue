@@ -30,9 +30,14 @@ onMounted(() => document.addEventListener('keydown', closeOnEscape));
 onUnmounted(() => document.removeEventListener('keydown', closeOnEscape));
 
 const widthClass = computed(() => {
+    // If width is 'auto', don't apply a width class - let contentClasses handle it
+    if (props.width === 'auto') {
+        return '';
+    }
+    
     return {
         '48': 'w-48',
-    }[props.width.toString()];
+    }[props.width.toString()] || '';
 });
 
 const alignmentClasses = computed(() => {
@@ -70,11 +75,11 @@ const open = ref(false);
         >
             <div
                 v-show="open"
-                class="dropdown-content absolute z-50 mt-2 shadow-lg"
+                class="dropdown-content absolute z-50 mt-1 sm:mt-1.5 xl:mt-1.5 2xl:mt-1.5 3xl:mt-1.5 4xl:mt-2 shadow-lg rounded-lg sm:rounded-[9px] xl:rounded-[8px] 2xl:rounded-[9px] 3xl:rounded-[9px] 4xl:rounded-[10px] overflow-hidden shadow-[0px_3px_8px_rgba(0,0,0,0.08)] sm:shadow-[0px_3px_9px_rgba(0,0,0,0.08)] xl:shadow-[0px_3px_8px_rgba(0,0,0,0.09)] 2xl:shadow-[0px_3px_10px_rgba(0,0,0,0.09)] 3xl:shadow-[0px_4px_10px_rgba(0,0,0,0.09)] 4xl:shadow-[0px_4px_12px_rgba(0,0,0,0.1)] bg-menuBG"
                 :class="[widthClass, alignmentClasses, contentClasses]"
                 :style="[
                     typeof width === 'number' ? { width: width + 'px' } : {}, 
-                    { transformOrigin: 'top', borderRadius: '10px', overflow: 'hidden' },
+                    { transformOrigin: 'top' },
                     customStyles
                 ]"
                 @click="open = false"
@@ -84,64 +89,3 @@ const open = ref(false);
         </transition>
     </div>
 </template>
-
-<style scoped>
-/* Match MenuBox styling */
-.dropdown-content {
-    background-color: theme('colors.menuBG');
-    border-radius: 10px !important;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Style dropdown items similar to menu items */
-:deep(.dropdown-item) {
-    display: flex;
-    align-items: center;
-    height: 48px;
-    padding: 0 12px;
-    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    color: theme('colors.menuText');
-}
-
-:deep(.dropdown-item:hover) {
-    background-color: theme('colors.selectedBG');
-    color: theme('colors.selectedText');
-}
-
-:deep(.dropdown-item.active) {
-    background-color: theme('colors.selectedBG');
-    color: theme('colors.selectedText');
-}
-
-/* Add danger styling for logout button */
-:deep(.dropdown-item.danger:hover) {
-    background-color: theme('colors.dangerBG');
-    color: theme('colors.dangerText');
-}
-
-:deep(.dropdown-item.danger:hover svg) {
-    color: theme('colors.dangerText');
-}
-
-/* Match text styling */
-:deep(.dropdown-item span) {
-    font-size: 18px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-/* Match icon styling */
-:deep(.dropdown-item svg) {
-    height: 24px;
-    width: 24px;
-    margin-right: 10px;
-    flex-shrink: 0;
-    color: currentColor;
-}
-
-/* Style for dropdown content */
-:deep(.dropdown-item svg:hover) {
-    color: inherit;
-}
-</style>

@@ -42,7 +42,12 @@ const labelClass = computed(() => {
 
 <template>
     <span 
-        class="h-[19px] px-[6px] py-[2px] text-[12px] font-bold rounded-[2px] inline-flex items-center justify-center" 
+        class="h-[8.4px] sm:h-[9.6px] md:h-[10.8px] lg:h-[11.7px] xl:h-[12.6px] 2xl:h-[14.4px] 3xl:h-[16.2px] 4xl:h-[19px] 
+               px-[4px] sm:px-[4.5px] md:px-[5px] lg:px-[5.5px] xl:px-[6px] 2xl:px-[7px] 3xl:px-[8px] 4xl:px-[9px] 
+               py-[1.3px] sm:py-[1.5px] md:py-[1.7px] lg:py-[1.8px] xl:py-[2px] 2xl:px-[2.3px] 3xl:px-[2.6px] 4xl:py-[3px] 
+               text-[5.3px] sm:text-[6px] md:text-[6.7px] lg:text-[7.3px] xl:text-[8px] 2xl:text-[9.3px] 3xl:text-[10.7px] 4xl:text-[12px] 
+               rounded-[0.9px] sm:rounded-[1px] md:rounded-[1.1px] lg:rounded-[1.2px] xl:rounded-[1.33px] 2xl:rounded-[1.6px] 3xl:rounded-[1.8px] 4xl:rounded-[2px] 
+               font-bold inline-flex items-center justify-center" 
         :class="labelClass"
     >
         {{ text.toUpperCase() }}

@@ -114,13 +114,6 @@ const tableHeaders = [
         sortable: true,
         nowrap: true,
         width: '18%',  // Changed from '264px' to percentage
-        style: {
-            fontSize: '18px',
-            fontStyle: 'normal',
-            fontWeight: '400',
-            lineHeight: 'normal',
-            color: '#6B86B5'
-        }
     },
 ];
 
@@ -288,6 +281,7 @@ watch(() => props.logs, (newLogs) => {
                             :sort-field="sortField"
                             :sort-direction="sortDirection"
                         >
+                           
                             <!-- Action column customization -->
                             <template #item.Aksi="{ item }">
                                 <Labels 
@@ -300,10 +294,15 @@ watch(() => props.logs, (newLogs) => {
                                     {{ (item.module).toUpperCase() }}
                                 </div>
                             </template>
+                            <template #item.Deskripsi="{ item }">
+                                <div class="italic">
+                                    {{ item.description }}
+                                </div>
+                            </template>
 
                             <!-- Time column customization -->
                             <template #item.Waktu="{ item }">
-                                <div class="text-[#6B86B5] text-[18px] font-normal">
+                                <div class="text-[#6B86B5] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
                                     {{ formatDate(item.time) }}
                                 </div>
                             </template>

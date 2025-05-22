@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import Pagination from "@/Components/DashboardComponent/Pagination.vue";
 import { Link } from "@inertiajs/vue3";
 
@@ -209,6 +209,78 @@ const transformText = (text, transform) => {
     }
 };
 
+
+// Update getCurrentBreakpoint function to use window measurement when available
+const getCurrentBreakpoint = () => {
+    // Client-side only
+    if (typeof window !== 'undefined') {
+        const width = window.innerWidth;
+        if (width >= 2560) return '4xl';
+        if (width >= 1920) return '3xl';
+        if (width >= 1536) return '2xl';
+        if (width >= 1280) return 'xl';
+        if (width >= 1024) return 'lg';
+        if (width >= 768) return 'md';
+        if (width >= 640) return 'sm';
+        return 'xs';
+    }
+    // Server-side default
+    return 'xl';
+};
+
+let currentBreakpoint = ref('xl');
+
+// Update the breakpoint on component mount and window resize
+onMounted(() => {
+    currentBreakpoint.value = getCurrentBreakpoint();
+    
+    const updateBreakpoint = () => {
+        currentBreakpoint.value = getCurrentBreakpoint();
+    };
+    
+    window.addEventListener('resize', updateBreakpoint);
+    
+    // Clean up the event listener when component is unmounted
+    onUnmounted(() => {
+        window.removeEventListener('resize', updateBreakpoint);
+    });
+});
+
+// Update avatar size function to use the currentBreakpoint reactive reference
+const getAvatarSize = (baseSize) => {
+    // Use fixed sizes for each breakpoint
+    const sizes = {
+        'xs': 10,  // ~40% of 24px
+        'sm': 12,  // 50% of 24px
+        'md': 14,  // ~60% of 24px
+        'lg': 17,  // ~70% of 24px
+        'xl': 16,  // Exact 16px for xl breakpoint
+        '2xl': 19, // ~80% of 24px
+        '3xl': 22, // ~90% of 24px
+        '4xl': 24  // Full 24px for 4xl breakpoint
+    };
+    
+    // Return the size for the current breakpoint or the base size
+    return sizes[currentBreakpoint.value] || baseSize;
+};
+
+const getAvatarGap = (baseGap) => {
+    // Use fixed sizes for each breakpoint
+    const gaps = {
+        'xs': 5,   // ~40% of 12px
+        'sm': 6,   // 50% of 12px
+        'md': 7,   // ~60% of 12px
+        'lg': 8,   // ~70% of 12px
+        'xl': 8,   // Exact 8px for xl breakpoint
+        '2xl': 10, // ~80% of 12px
+        '3xl': 11, // ~90% of 12px
+        '4xl': 12  // Full 12px for 4xl breakpoint
+    };
+    
+    // Return the gap for the current breakpoint or the base gap
+    return gaps[currentBreakpoint.value] || baseGap;
+};
+
 // Function to parse JSON job descriptions
 const parseJobDescription = (description) => {
     if (!description) return [];
@@ -277,12 +349,12 @@ const isMultiline = (header) => {
                         />
                     </colgroup>
                     <thead class="bg-TopTableBG">
-                        <tr class="h-[63px]">
+                        <tr class="h-[28px] sm:h-[32px] md:h-[36px] lg:h-[38px] xl:h-[42px] 2xl:h-[50px] 3xl:h-[56px] 4xl:h-[63px]">
                             <th
                                 v-for="(header, index) in headers"
                                 :key="`header-${index}`"
                                 scope="col"
-                                class="px-6 text-left text-[22px] font-medium text-gray-900 tracking-normal"
+                                class="text-left text-gray-900 tracking-normal px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 lg:px-5 lg:py-2 xl:px-6 xl:py-4 2xl:px-7 2xl:py-4 3xl:px-8 3xl:py-5 4xl:px-10 4xl:py-6 text-[9.3px] sm:text-[10.6px] md:text-[12px] lg:text-[13.3px] xl:text-[14.6px] 2xl:text-[16.7px] 3xl:text-[19.4px] 4xl:text-[22px] font-medium"
                                 :class="
                                     [
                                         { 'cursor-pointer': header.sortable || header.filterable },
@@ -298,11 +370,9 @@ const isMultiline = (header) => {
                                         <svg 
                                             v-if="header.sortable"
                                             xmlns="http://www.w3.org/2000/svg" 
-                                            width="24" 
-                                            height="24" 
                                             viewBox="0 0 24 25" 
                                             fill="none"
-                                            class="ml-2 transform transition-transform duration-200"
+                                            class="ml-1 sm:ml-1 md:ml-1 lg:ml-2 xl:ml-2 2xl:ml-2 3xl:ml-2 4xl:ml-2 transform transition-transform duration-200 w-3 h-3 sm:w-3 sm:h-3 md:w-3 md:h-3 lg:w-4 lg:h-4 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-5 3xl:h-5 4xl:w-6 4xl:h-6"
                                             :class="getSortIconClass(header.label)"
                                             @click.stop="header.sortable ? sortBy(header.label) : null"
                                         >
@@ -336,17 +406,19 @@ const isMultiline = (header) => {
                             v-for="(item, rowIndex) in items"
                             :key="`row-${rowIndex}`"
                             :class="{ 'bg-menuBG': rowIndex % 2 !== 0, 'bg-white': rowIndex % 2 === 0 }"
-                            class="h-[107px] text-[18px]"
+                            class="h-[35px] sm:h-[40px] md:h-[45px] lg:h-[50px] xl:h-[54px] 2xl:h-[70px] 3xl:h-[90px] 4xl:h-[107px] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
                         >
                             <td 
                                 v-for="(header, colIndex) in headers" 
                                 :key="`cell-${rowIndex}-${colIndex}`"
-                                class="px-6 py-4 text-TableText"
                                 :class="
                                     [
                                         { 'whitespace-nowrap': header.nowrap && !isMultiline(header) },
-                                        header.cellClass
+                                        header.cellClass,
+                                        // Match thead padding for all cells
+                                        'px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 lg:px-5 lg:py-2 xl:px-6 xl:py-4 2xl:px-7 2xl:py-4 3xl:px-8 3xl:py-5 4xl:px-10 4xl:py-6'
                                     ]"
+                                class="text-TableText"
                                 :style="styleObjectToString(header.style)"
                             >
                                 <!-- Use format that matches how it's used in Dashboard.vue and elsewhere -->
@@ -358,14 +430,15 @@ const isMultiline = (header) => {
                                                 <li>
                                                     <span 
                                                         :title="shouldTruncate(header) ? desc : ''"
-                                                        :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                                        :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header), 'text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal': true}"
                                                     >
                                                         {{ desc }}
                                                     </span>
                                                 </li>
                                             </template>
                                             <li v-if="parseJobDescription(item[getFieldName(header)]).length > 2" 
-                                                class="text-menuText cursor-pointer mt-1 list-none">
+                                                class="text-menuText cursor-pointer mt-1 list-none text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                            >
                                                 <Link :href="route('dashboard.positions.edit', item.id)">
                                                     Lihat Selengkapnya
                                                 </Link>
@@ -376,9 +449,9 @@ const isMultiline = (header) => {
                                     <div v-else-if="header.avatar" class="flex items-center">
                                         <div 
                                             :style="{
-                                                width: `${header.avatar.size || 24}px`,
-                                                height: `${header.avatar.size || 24}px`,
-                                                marginRight: `${header.avatar.gap || 12}px`
+                                                width: `${getAvatarSize(header.avatar.size || 24)}px`,
+                                                height: `${getAvatarSize(header.avatar.size || 24)}px`,
+                                                marginRight: `${getAvatarGap(header.avatar.gap || 12)}px`
                                             }"
                                             class="rounded-full overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center"
                                         >
@@ -403,7 +476,7 @@ const isMultiline = (header) => {
                                         </div>
                                         <span 
                                             :title="shouldTruncate(header) ? item[getFieldName(header)] : ''"
-                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header), 'text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-medium': true}"
                                         >
                                             {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
                                         </span>
@@ -411,7 +484,7 @@ const isMultiline = (header) => {
                                     <template v-else>
                                         <span 
                                             :title="shouldTruncate(header) ? item[getFieldName(header)] : ''"
-                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header)}"
+                                            :class="{'truncate-text-cell': shouldTruncate(header), 'multiline-text-cell': isMultiline(header), 'text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-medium': true}"
                                         >
                                             {{ header.transform ? transformText(item[getFieldName(header)], header.transform) : item[getFieldName(header)] }}
                                         </span>

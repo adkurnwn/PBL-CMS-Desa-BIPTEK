@@ -48,8 +48,13 @@ export default {
                 'merriweather-sans': ['Merriweather Sans', ...defaultTheme.fontFamily.sans],
             },
             screens: {
+                'sm': '640px',
                 md: '800px', // Mengubah md dari 768px menjadi 800px
                 lg: '1025px', // Mengubah lg dari 1024px menjadi 1025px
+                xl: '1280px',
+                '2xl': '1440px',
+                '3xl': '1536px',
+                '4xl': '1920px', // Your default design width
             },
             maxWidth: {
                 '10xl': '1440px', 

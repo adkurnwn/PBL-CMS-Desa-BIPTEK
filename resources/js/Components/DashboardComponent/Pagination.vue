@@ -156,27 +156,27 @@ const currentItemsRange = computed(() => {
             >
                 &raquo;
             </button>
-        </div>
-
-        <!-- Manual page input with spacing - moved below on small screens -->
-        <div class="manual-page-input-container">
-            <input
-                type="text"
-                class="manual-page-input"
-                v-model="manualPage"
-                placeholder="#"
-                @keyup.enter="goToManualPage"
-                title="Go to page"
-                aria-label="Go to page"
-            />
             
-            <button
-                class="go-button hover:bg-selectedBG hover:text-selectedText hover:border-selectedText"
-                @click="goToManualPage"
-                title="Go to page"
-            >
-                <span class="inline-flex items-center">GO <span class="ml-1">&gt;</span></span>
-            </button>
+            <!-- Manual page input with spacing - moved inline with other buttons -->
+            <div class="manual-page-input-container">
+                <input
+                    type="text"
+                    class="manual-page-input"
+                    v-model="manualPage"
+                    placeholder="#"
+                    @keyup.enter="goToManualPage"
+                    title="Go to page"
+                    aria-label="Go to page"
+                />
+                
+                <button
+                    class="go-button hover:bg-selectedBG hover:text-selectedText hover:border-selectedText"
+                    @click="goToManualPage"
+                    title="Go to page"
+                >
+                    <span class="inline-flex items-center">GO <span class="ml-1">&gt;</span></span>
+                </button>
+            </div>
         </div>
         
         <!-- Items count display with corrected calculation -->
@@ -192,34 +192,34 @@ const currentItemsRange = computed(() => {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: auto; /* Changed from fixed height to auto for responsiveness */
-    max-width: 407px; /* Changed from fixed width to max-width */
-    width: 100%; /* Make it fill available space */
-    padding-top: 12px;
-    padding-bottom: 12px;
+    height: auto;
+    max-width: 407px;
+    width: 100%;
+    padding-top: 5.33px;
+    padding-bottom: 5.33px;
     margin: 0 auto;
-    gap: 10px;
+    gap: 6.67px;
 }
 
 .pagination-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 3.33px;
     width: 100%;
-    flex-wrap: wrap; /* Allow wrapping on small screens */
+    flex-wrap: wrap;
 }
 
 .pagination-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
-    border-radius: 4px;
-    font-size: 14px;
+    width: 16.67px;
+    height: 16.67px;
+    border-radius: 2.67px;
+    font-size: 9.33px;
     font-weight: 500;
-    border: 1px solid #E5E7EB;
+    border: 0.67px solid #E5E7EB;
     cursor: pointer;
     transition: all 0.2s;
     padding: 0;
@@ -246,26 +246,26 @@ const currentItemsRange = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
+    width: 16.67px;
+    height: 16.67px;
     color: #6B7280;
-    font-size: 14px;
+    font-size: 9.33px;
 }
 
 .manual-page-input-container {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 5px 0; /* Add vertical margin */
+    gap: 3.33px;
+    margin-left: 3.33px; /* Add margin to separate from pagination buttons */
 }
 
 .manual-page-input {
-    width: 25px;
-    height: 25px;
-    border-radius: 4px;
-    border: 1px solid #E5E7EB;
+    width: 16.67px;
+    height: 16.67px;
+    border-radius: 2.67px;
+    border: 0.67px solid #E5E7EB;
     text-align: center;
-    font-size: 14px;
+    font-size: 9.33px;
     color: #6B7280;
     padding: 0;
 }
@@ -276,14 +276,14 @@ const currentItemsRange = computed(() => {
 }
 
 .go-button {
-    height: 25px;
-    padding: 0 08px;
-    border-radius: 4px;
+    height: 16.67px;
+    padding: 0 5.33px;
+    border-radius: 2.67px;
     background-color: white;
     color: #6B7280;
-    font-size: 11px;
+    font-size: 7.33px;
     font-weight: 500;
-    border: 1px solid #E5E7EB;
+    border: 0.67px solid #E5E7EB;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -294,40 +294,240 @@ const currentItemsRange = computed(() => {
 }
 
 .items-count {
-    font-size: 12px;
+    font-size: 8px;
     color: #6B7280;
     text-align: center;
     width: 100%;
 }
 
-/* Add important flag to ensure these styles take precedence */
-.pagination-button.active {
-    background-color: theme('colors.selectedBG') !important;
-    color: theme('colors.selectedText') !important;
-    border-color: theme('colors.selectedText') !important;
+/* Add responsive sizes using media queries */
+@media (min-width: 640px) { /* sm */
+    .pagination-button {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        border-radius: 3px;
+    }
+    .pagination-ellipsis {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+    .manual-page-input {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
+    .go-button {
+        height: 18px;
+        font-size: 8px;
+    }
+    .items-count {
+        font-size: 9px;
+    }
 }
 
-/* Add hover styles that don't apply to active or disabled buttons */
-.pagination-button:not(.active):not(.disabled):hover {
-    background-color: theme('colors.selectedBG');
-    color: theme('colors.selectedText');
-    border-color: theme('colors.selectedText');
+@media (min-width: 768px) { /* md */
+    .pagination-button {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+        border-radius: 3px;
+    }
+    .pagination-ellipsis {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+    .manual-page-input {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+    .go-button {
+        height: 20px;
+        font-size: 9px;
+    }
+    .items-count {
+        font-size: 10px;
+    }
 }
 
-/* Media query for small screens */
+@media (min-width: 1024px) { /* lg */
+    .pagination-button {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+        border-radius: 3.5px;
+    }
+    .pagination-ellipsis {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+    .manual-page-input {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+    .go-button {
+        height: 22px;
+        font-size: 10px;
+    }
+    .items-count {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 1280px) { /* xl */
+    .pagination-container {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        gap: 6.67px;
+    }
+    .pagination-controls {
+        gap: 3.33px;
+    }
+    .pagination-button {
+        width: 16.67px;
+        height: 16.67px;
+        font-size: 9.33px;
+        border-radius: 2.67px;
+        border-width: 0.67px;
+    }
+    .pagination-ellipsis {
+        width: 16.67px;
+        height: 16.67px;
+        font-size: 9.33px;
+    }
+    .manual-page-input {
+        width: 16.67px;
+        height: 16.67px;
+        font-size: 9.33px;
+        border-radius: 2.67px;
+        border-width: 0.67px;
+    }
+    .manual-page-input-container {
+        gap: 3.33px;
+    }
+    .go-button {
+        height: 16.67px;
+        font-size: 7.33px;
+        padding: 0 5.33px;
+        border-radius: 2.67px;
+        border-width: 0.67px;
+    }
+    .items-count {
+        font-size: 8px;
+    }
+}
+
+@media (min-width: 1536px) { /* 2xl */
+    .pagination-button {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+        border-radius: 3px;
+    }
+    .pagination-ellipsis {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+    .manual-page-input {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+    }
+    .go-button {
+        height: 20px;
+        font-size: 9px;
+    }
+    .items-count {
+        font-size: 10px;
+    }
+}
+
+@media (min-width: 1920px) { /* 3xl */
+    .pagination-button {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+        border-radius: 3.5px;
+    }
+    .pagination-ellipsis {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+    .manual-page-input {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+    }
+    .go-button {
+        height: 22px;
+        font-size: 10px;
+    }
+    .items-count {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 2560px) { /* 4xl */
+    .pagination-button {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+        border-radius: 4px;
+        border-width: 1px;
+    }
+    .pagination-ellipsis {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+    }
+    .manual-page-input {
+        width: 25px;
+        height: 25px;
+        font-size: 14px;
+        border-radius: 4px;
+        border-width: 1px;
+    }
+    .go-button {
+        height: 25px;
+        font-size: 11px;
+        padding: 0 8px;
+        border-radius: 4px;
+        border-width: 1px;
+    }
+    .items-count {
+        font-size: 12px;
+    }
+    .pagination-container {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        gap: 10px;
+    }
+    .pagination-controls, .manual-page-input-container {
+        gap: 5px;
+    }
+}
+
+/* Media query adjustments */
 @media (max-width: 480px) {
     .first-last-button {
         display: none; /* Hide first/last buttons on small screens */
     }
     
-    .manual-page-input-container {
-        margin-left: 0; /* Remove left margin on small screens */
-        width: 100%;
+    .pagination-controls {
+        flex-wrap: wrap;
         justify-content: center;
     }
     
-    .pagination-container {
-        min-height: 120px; /* Ensure enough height for stacked elements */
+    .manual-page-input-container {
+        margin-top: 3.33px; /* Add margin top for small screens */
+        margin-left: 0;     /* Reset left margin for small screens */
     }
 }
 </style>

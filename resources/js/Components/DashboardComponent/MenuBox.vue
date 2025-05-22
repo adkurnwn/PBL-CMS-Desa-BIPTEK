@@ -48,8 +48,10 @@ onMounted(() => {
     <Link
         :href="href"
         :class="[
-            'menu-box flex items-center rounded-[10px]',
-            collapsed ? 'w-[48px] h-[48px] justify-center p-0' : 'w-full h-[48px] pl-[12px] pr-[12px]',
+            'menu-box flex items-center rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px]',
+            collapsed ? 'w-[32px] sm:w-[32px] md:w-[32px] xl:w-[32px] 2xl:w-[40px] 3xl:w-[44px] 4xl:w-[48px] justify-center p-0' : 'w-full',
+            'h-[32px] sm:h-[32px] md:h-[32px] xl:h-[32px] 2xl:h-[40px] 3xl:h-[44px] 4xl:h-[48px]',
+            !collapsed ? 'pr-[10px] sm:pr-[10px] md:pr-[11px] xl:pr-[10px] 2xl:pr-[11px] 3xl:pr-[11px] 4xl:pr-[12px]' : '',
             isActive
                 ? 'bg-selectedBG text-selectedText border border-selectedText'
                 : 'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText',
@@ -60,8 +62,8 @@ onMounted(() => {
         <!-- Keep icon at left position -->
         <svg 
             v-if="icon" 
-            class="icon-fixed h-[24px] w-[24px] flex-shrink-0" 
-            :class="collapsed ? '' : 'ml-[12px] mr-[10px]'"
+            class="icon-fixed flex-shrink-0 h-[16px] w-[16px] sm:h-[16px] sm:w-[16px] md:h-[16px] md:w-[16px] xl:h-[16px] xl:w-[16px] 2xl:h-[18px] 2xl:w-[18px] 3xl:h-[21px] 3xl:w-[21px] 4xl:h-[24px] 4xl:w-[24px]" 
+            :class="collapsed ? '' : 'ml-[8px] sm:ml-[9px] md:ml-[10px] xl:ml-[8px] 2xl:ml-[10px] 3xl:ml-[11px] 4xl:ml-[12px] mr-[8px] sm:mr-[8px] md:mr-[9px] xl:mr-[8px] 2xl:mr-[9px] 3xl:mr-[9px] 4xl:mr-[10px]'"
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor" 
@@ -71,7 +73,7 @@ onMounted(() => {
         <!-- Text that fades out but doesn't shift right -->
         <span 
             v-if="!collapsed" 
-            class="text-[18px] truncate overflow-hidden max-w-[280px] menu-text"
+            class="truncate overflow-hidden max-w-[280px] menu-text text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
         >
             <slot></slot>
         </span>
