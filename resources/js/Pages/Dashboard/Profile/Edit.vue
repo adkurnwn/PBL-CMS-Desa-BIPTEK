@@ -271,29 +271,6 @@ onMounted(async () => {
                                         placeholder="Masukkan nama lembaga desa" :error="form.errors.lembaga" />
                                 </div>
 
-                                <!-- Colors -->
-                                <div>
-                                    <InputLabel for="primary_color" value="Primary Color" />
-                                    <select id="primary_color" v-model="form.primary_color"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required>
-                                        <option value="#000000">Black</option>
-                                        <option value="#ffffff">White</option>
-                                    </select>
-                                    <InputError :message="form.errors.primary_color" class="mt-2" />
-                                </div>
-
-                                <div>
-                                    <InputLabel for="secondary_color" value="Secondary Color" />
-                                    <select id="secondary_color" v-model="form.secondary_color"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required>
-                                        <option value="#000000">Black</option>
-                                        <option value="#ffffff">White</option>
-                                    </select>
-                                    <InputError :message="form.errors.secondary_color" class="mt-2" />
-                                </div>
-
                                 <div class="col-span-2">
                                     <InputLabel for="vision" value="Vision" />
                                     <TextInput id="vision" v-model="form.vision" type="text" class="mt-1 block w-full"

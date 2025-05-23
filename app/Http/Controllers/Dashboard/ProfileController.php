@@ -41,6 +41,8 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request, $slug)
     {
         $profile = Profile::where('name', $slug)->firstOrFail();
+        $profileData = $request->except(['lembaga', 'fasilitas', 'logo', 'organization_image', 'hero_images', 'hero_image_1', 'hero_image_2', 'hero_image_3']);
+
         $village = Village::find($request->kelurahan);
         if ($village) {
             $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
@@ -55,7 +57,7 @@ class ProfileController extends Controller
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
             $profileData['logo'] = $logoPath;
 
-            $this->updateFaviconFromLogo($logoPath);
+            // Favicon is now handled in SettingsController
         }
 
         if ($request->hasFile('organization_image')) {
@@ -84,10 +86,5 @@ class ProfileController extends Controller
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
         return redirect()->route('dashboard.profiles.index')->with('success', 'Profil Berhasil Diperbarui');
-    }
-
-    protected function updateFaviconFromLogo(string $logoPath)
-    {
-        Storage::disk('public')->put('favicon.png', Storage::disk('public')->get($logoPath));
     }
 }

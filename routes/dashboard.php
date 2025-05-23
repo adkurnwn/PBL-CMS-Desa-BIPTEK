@@ -17,6 +17,7 @@ use App\Http\Controllers\Dashboard\KomentarBeritaController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\KomentarProdukHukumController;
+use App\Http\Controllers\Dashboard\SettingsController;
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
     Route::middleware(['permission:manage_activity-logs'])->get('/dashboard', [ActivityLogController::class, 'index'])->name('dashboard');
@@ -139,5 +140,9 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         // Dashboard route with page parameter
         Route::get('/', [ActivityLogController::class, 'index'])->name('dashboard');
         Route::get('/{page}', [ActivityLogController::class, 'index'])->name('dashboard.page');
+        Route::middleware(['permission:manage_settings'])->group(function () {
+            Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
+            Route::post('settings', [SettingsController::class, 'update'])->name('dashboard.settings.update');
+        });
     });
 });
