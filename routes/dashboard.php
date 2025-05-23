@@ -12,15 +12,19 @@ use App\Http\Controllers\Dashboard\RecoveryController;
 use App\Http\Controllers\Dashboard\DemografiController;
 use App\Http\Controllers\Dashboard\ProdukDesaController;
 use App\Http\Controllers\Dashboard\ActivityLogController;
+use App\Http\Controllers\Dashboard\HomeController;
 use App\Http\Controllers\Dashboard\ProdukHukumController;
 use App\Http\Controllers\Dashboard\KomentarBeritaController;
 use App\Http\Controllers\Dashboard\RoleManagementController;
 use App\Http\Controllers\Dashboard\UserManagementController;
 use App\Http\Controllers\Dashboard\KomentarProdukHukumController;
 use App\Http\Controllers\Dashboard\SettingsController;
+use App\Http\Controllers\Dashboard\StatisticsController;
 
 Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
-    Route::middleware(['permission:manage_activity-logs'])->get('/dashboard', [ActivityLogController::class, 'index'])->name('dashboard');
+    Route::middleware(['permission:manage_home'])->get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::middleware(['permission:manage_activity-logs'])->get('/dashboard/aktivitas-terbaru', [ActivityLogController::class, 'index'])->name('dashboard.activity-logs');
+    Route::middleware(['permission:manage_statistics'])->get('/dashboard/statistik', [StatisticsController::class, 'index'])->name('dashboard.statistics');
     Route::prefix('dashboard')->group(function () {
         // User management routes
         Route::middleware(['permission:manage_users'])->group(function () {
@@ -137,9 +141,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             Route::delete('/recovery/delete/{fileName}', [RecoveryController::class, 'delete'])->name('dashboard.recovery.delete');
         });
 
-        // Dashboard route with page parameter
-        Route::get('/', [ActivityLogController::class, 'index'])->name('dashboard');
-        Route::get('/{page}', [ActivityLogController::class, 'index'])->name('dashboard.page');
         Route::middleware(['permission:manage_settings'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
             Route::post('settings', [SettingsController::class, 'update'])->name('dashboard.settings.update');

@@ -19,9 +19,9 @@ const form = useForm({
 
 // Permission name-to-display mapping
 const permissionDisplayMap = {
+    'Home Manage': 'Beranda',
     'Users Manage': 'Manajemen pengguna',
     'Positions Manage': 'Manajemen Posisi',
-    'Dashboard Manage': 'Manajemen Dasbor',
     'Profiles Manage': 'Manajemen Profil',
     'Demografi Manage': 'Manajemen Demografi',
     'News Manage': 'Manajemen Berita',
@@ -30,18 +30,19 @@ const permissionDisplayMap = {
     'Produk-desa Manage': 'Manajemen UMKM/Produk Unggulan',
     'Produk-hukum Manage': 'Manajemen Produk Hukum',
     'Dana-desa Manage': 'Manajemen Laporan Dana Desa',
-    'Comments Manage': 'Manajemen Komentar',
-    'Feedbacks Manage': 'Manajemen Saran & Keluhan',
-    'Activity-logs Manage': 'Manajemen Riwayat Aktivitas'
+    'Comments Manage': 'Moderasi Komentar',
+    'Feedbacks Manage': 'Tanggapi Saran & Keluhan',
+    'Statistics Manage': 'Lihat Statistik',
 };
 
 // Section definitions
 const sections = {
-    'Manajemen Pengguna': ['Users Manage', 'Positions Manage', 'Dashboard Manage'],
+    'Manajemen Pengguna': ['Users Manage', 'Positions Manage'],
     'Informasi Desa': ['Profiles Manage', 'Demografi Manage'],
     'Konten & Publikasi': ['News Manage', 'Galleries Manage', 'Events Manage', 'Produk-desa Manage'],
     'Regulasi Desa': ['Produk-hukum Manage', 'Dana-desa Manage'],
-    'Interaksi Pengguna': ['Comments Manage', 'Feedbacks Manage', 'Activity-logs Manage']
+    'Interaksi Pengguna': ['Comments Manage', 'Feedbacks Manage'],
+    'Lainnya': ['Home Manage', 'Statistics Manage'],
 };
 
 // Reorganized permissions by section
@@ -169,7 +170,7 @@ const submit = () => {
                             <div v-for="(permissions, sectionName) in organizedPermissions" :key="sectionName"
                                 class="mb-8">
                                 <!-- Section Title -->
-                                <h4 class="text-selectedText font-medium text-[15px] mb-[19px]">{{ sectionName }}</h4>
+                                <h4 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px]">{{ sectionName }}</h4>
 
                                 <!-- Permissions as vertical list -->
                                 <div class="">
@@ -177,7 +178,7 @@ const submit = () => {
                                         class=" pb-[13px] pt-[13px] flex items-center">
                                         <div class="relative flex items-center">
                                             <!-- Custom checkbox design -->
-                                            <div class="w-[24px] h-[24px] rounded-[5px] border border-blueBorder flex items-center justify-center cursor-pointer"
+                                            <div class="w-[14px] h-[14px] sm:w-[15px] sm:h-[15px] md:w-[16px] md:h-[16px] xl:w-[16px] xl:h-[16px] 2xl:w-[20px] 2xl:h-[20px] 3xl:w-[22px] 3xl:h-[22px] 4xl:w-[24px] 4xl:h-[24px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] border border-blueBorder flex items-center justify-center cursor-pointer"
                                                 :class="{ 'bg-blueBorder': hasPermission(permission.name) }"
                                                 @click="togglePermission(permission.name)">
                                                 <!-- Checkmark SVG - visible when checked -->
@@ -197,7 +198,7 @@ const submit = () => {
 
                                         <!-- Permission display name -->
                                         <label :for="permission.name"
-                                            class="ml-[10px] block text-[18px] text-TableText cursor-pointer">
+                                            class="ml-[10px] block text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] text-TableText cursor-pointer">
                                             {{ permission.displayName }}
                                         </label>
                                     </div>

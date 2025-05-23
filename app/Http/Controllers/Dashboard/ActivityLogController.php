@@ -11,6 +11,9 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request, $page = 1)
     {
+        // Convert $page to integer if it's a string
+        $page = (int)$page;
+        
         $perPage = 25; // Show a reasonable amount of records per page
         $sortField = 'time'; // Always sort by time/created_at
         $sortDirection = $request->input('direction', 'desc'); // Default direction is descending
@@ -38,16 +41,13 @@ class ActivityLogController extends Controller
         // Apply sorting
         $query->orderBy('created_at', $sortDirection);
         
-        // Count total records (for debugging)
-        $totalRecords = $query->count();
-        
         // Paginate results
         $logs = $query->paginate($perPage, ['*'], 'page', $page);
         
 
-        return Inertia::render('Dashboard/Dashboard', [
+        return Inertia::render('Dashboard/Home/LogActivity', [
             'logs' => $logs,
-            'currentPage' => (int)$page,
+            'currentPage' => $page,
             'sortField' => $sortField,
             'sortDirection' => $sortDirection,
             'search' => $searchQuery, // Pass search query back to component

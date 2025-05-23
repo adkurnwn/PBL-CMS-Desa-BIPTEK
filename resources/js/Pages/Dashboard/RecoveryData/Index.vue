@@ -58,14 +58,17 @@ const deleteBackup = (path) => {
 </script>
 
 <template>
+
     <Head title="Data Recovery" />
 
     <AuthenticatedLayout>
         <template #header>
-            <HeadingMenu title="Data Recovery">
+            <HeadingMenu title="Cadangkan dan Pulihkan Data">
                 <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" class="text-selectedText">
-                        <path d="M20 36.6667C17.2222 36.6667 14.6389 36.0556 12.25 34.8333C9.86111 33.6111 7.80556 31.9722 6.08333 29.9167C4.36111 27.8611 3.05556 25.5 2.16667 22.8333C1.27778 20.1667 0.833333 17.3333 0.833333 14.3333C0.833333 11.7778 1.25 9.30556 2.08333 6.91667C2.91667 4.52778 4.11111 2.41667 5.66667 0.583336H14.1667L17.5 7.25H31.6667C33.0556 7.25 34.2361 7.75 35.2083 8.75C36.1806 9.75 36.6667 10.9444 36.6667 12.3333V15.6667H33.3333V12.3333C33.3333 11.8889 33.1944 11.5 32.9167 11.1667C32.6389 10.8333 32.2222 10.6667 31.6667 10.6667H15.8333L12.5 4H7.41667C6.27778 5.55556 5.41667 7.27778 4.83333 9.16667C4.25 11.0556 3.95833 12.9722 3.95833 14.9167C3.95833 19.6389 5.375 23.7778 8.20833 27.3333C11.0417 30.8889 14.6667 33.1111 19.0833 34H23.3333V28.3333L33.3333 36.6667L23.3333 45V39.1667H18.75C15.5556 39.1667 12.5556 38.5 9.75 37.1667C6.94444 35.8333 4.55556 33.9722 2.58333 31.5833C0.611111 29.1944 -0.305555 26.5556 0.0833334 23.6667L3.08333 24.3333C2.86111 26.2778 3.45833 28.0278 4.875 29.5833C6.29167 31.1389 8.05556 32.3611 10.1667 33.25C12.2778 34.1389 14.4722 34.5833 16.75 34.5833H20V31.3333H14.9167C11.5556 30.6111 8.77778 28.8889 6.58333 26.1667C4.38889 23.4444 3.33333 20.2222 3.41667 16.5L6.5 16.1667C6.5 18.9167 7.33333 21.3333 9 23.4167C10.6667 25.5 12.8333 26.8333 15.5 27.4167H20.0833V37.0833H20Z" fill="currentColor"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#40483D">
+                        <path
+                            d="M480-400q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0 280q-139 0-241-91.5T122-440h82q14 104 92.5 172T480-200q117 0 198.5-81.5T760-480q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120v-240h80v94q51-64 124.5-99T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-120Z" />
                     </svg>
                 </template>
             </HeadingMenu>
@@ -79,9 +82,7 @@ const deleteBackup = (path) => {
                             <h3 class="text-lg font-medium text-gray-900">
                                 Backup Management
                             </h3>
-                            <PrimaryButton @click="createBackup"
-                                >Create New Backup</PrimaryButton
-                            >
+                            <PrimaryButton @click="createBackup">Create New Backup</PrimaryButton>
                         </div>
 
                         <div class="bg-gray-100 p-4 mb-6 rounded-lg">
@@ -102,38 +103,27 @@ const deleteBackup = (path) => {
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Date
                                         </th>
                                         <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Size
                                         </th>
                                         <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody
-                                    class="bg-white divide-y divide-gray-200"
-                                >
+                                <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-if="backups && backups.length === 0">
-                                        <td
-                                            class="px-6 py-4 text-center text-gray-500"
-                                            colspan="3"
-                                        >
+                                        <td class="px-6 py-4 text-center text-gray-500" colspan="3">
                                             No backups available. Create your
                                             first backup to get started.
                                         </td>
                                     </tr>
-                                    <tr
-                                        v-for="(backup, index) in backups"
-                                        :key="index"
-                                    >
+                                    <tr v-for="(backup, index) in backups" :key="index">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div>
                                                 <span v-if="backup.date">
@@ -147,34 +137,25 @@ const deleteBackup = (path) => {
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex space-x-2">
-                                                <PrimaryButton
-                                                    @click="
-                                                        downloadBackup(
-                                                            backup.path
-                                                        )
-                                                    "
-                                                    :disabled="downloading"
-                                                >
+                                                <PrimaryButton @click="
+                                                    downloadBackup(
+                                                        backup.path
+                                                    )
+                                                    " :disabled="downloading">
                                                     Download
                                                 </PrimaryButton>
-                                                <PrimaryButton
-                                                    class="bg-yellow-500 hover:bg-yellow-600"
-                                                    @click="
-                                                        restoreBackup(
-                                                            backup.path
-                                                        )
-                                                    "
-                                                    :disabled="restoring"
-                                                >
+                                                <PrimaryButton class="bg-yellow-500 hover:bg-yellow-600" @click="
+                                                    restoreBackup(
+                                                        backup.path
+                                                    )
+                                                    " :disabled="restoring">
                                                     Restore
                                                 </PrimaryButton>
-                                                <DangerButton
-                                                    @click="
-                                                        deleteBackup(
-                                                            backup.path
-                                                        )
-                                                    "
-                                                >
+                                                <DangerButton @click="
+                                                    deleteBackup(
+                                                        backup.path
+                                                    )
+                                                    ">
                                                     Delete
                                                 </DangerButton>
                                             </div>

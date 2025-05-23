@@ -28,10 +28,105 @@ class NewsController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get request parameters for search and sorting
+        $search = $request->input('search');
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('category_id')) {
+            $filters['category_id'] = $request->input('category_id');
+        }
+        // Add filters for is_draft
+        if ($request->has('is_draft')) {
+            $filters['is_draft'] = $request->input('is_draft');
+        }
+        // Add filters for is_moderate
+        if ($request->has('is_moderate')) {
+            $filters['is_moderate'] = $request->input('is_moderate');
+        }
+        // Add filter for date range
+        if ($request->has('date_filter')) {
+            $filters['date_filter'] = $request->input('date_filter');
+        }
+        
+        // Start building the query
+        $query = News::with(['category', 'images']); // Include images relation
+        
+        // Apply search filter if provided
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply category filter if provided
+        if (isset($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+        
+        // Apply is_draft filter if provided
+        if (isset($filters['is_draft'])) {
+            $query->where('is_draft', $filters['is_draft']);
+        }
+        
+        // Apply is_moderate filter if provided
+        if (isset($filters['is_moderate'])) {
+            $query->where('is_moderate', $filters['is_moderate']);
+        }
+        
+        // Apply date filter if provided
+        if (isset($filters['date_filter'])) {
+            $dateFilter = $filters['date_filter'];
+            
+            switch ($dateFilter) {
+                case 'today':
+                    // Filter for today
+                    $query->whereDate('created_at', now()->toDateString());
+                    break;
+                    
+                case 'this_week':
+                    // Filter for this week
+                    $query->whereBetween('created_at', [
+                        now()->startOfWeek()->toDateString(),
+                        now()->endOfWeek()->toDateString()
+                    ]);
+                    break;
+                    
+                case 'this_month':
+                    // Filter for this month
+                    $query->whereMonth('created_at', now()->month)
+                          ->whereYear('created_at', now()->year);
+                    break;
+                    
+                case 'this_year':
+                    // Filter for this year
+                    $query->whereYear('created_at', now()->year);
+                    break;
+            }
+        }
+        
+        // Apply sorting - first by draft status (drafts first), then by the user's sort field
+        $query->orderBy('is_draft', 'desc') // Put drafts (is_draft=1) first
+              ->orderBy($sortField, $sortDirection);
+        
+        // Get paginated results - 10 items per page
+        $news = $query->paginate(10)->withQueryString();
+        
+        // Get all categories for filtering
+        $categories = Category::where('category_type', 1)->get();
+        
         return Inertia::render('Dashboard/News/Index', [
-            'news' => News::with('category')->get(),
+            'news' => $news,
+            'search' => $search,
+            'sort' => $sortField,
+            'direction' => $sortDirection,
+            'filters' => $filters,
+            'categories' => $categories,
         ]);
     }
 
@@ -118,11 +213,105 @@ class NewsController extends Controller
         return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');
     }
 
-    public function archive()
+    public function archive(Request $request)
     {
-        News::onlyTrashed()->with('category')->get();
+        // Get request parameters for search and sorting
+        $search = $request->input('search');
+        $sortField = $request->input('sort', 'created_at');
+        $sortDirection = $request->input('direction', 'desc');
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('category_id')) {
+            $filters['category_id'] = $request->input('category_id');
+        }
+        // Add filters for is_draft
+        if ($request->has('is_draft')) {
+            $filters['is_draft'] = $request->input('is_draft');
+        }
+        // Add filters for is_moderate
+        if ($request->has('is_moderate')) {
+            $filters['is_moderate'] = $request->input('is_moderate');
+        }
+        // Add filter for date range
+        if ($request->has('date_filter')) {
+            $filters['date_filter'] = $request->input('date_filter');
+        }
+        
+        // Start building the query
+        $query = News::onlyTrashed()->with(['category', 'images']); // Include images relation
+        
+        // Apply search filter if provided
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply category filter if provided
+        if (isset($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+        
+        // Apply is_draft filter if provided
+        if (isset($filters['is_draft'])) {
+            $query->where('is_draft', $filters['is_draft']);
+        }
+        
+        // Apply is_moderate filter if provided
+        if (isset($filters['is_moderate'])) {
+            $query->where('is_moderate', $filters['is_moderate']);
+        }
+        
+        // Apply date filter if provided
+        if (isset($filters['date_filter'])) {
+            $dateFilter = $filters['date_filter'];
+            
+            switch ($dateFilter) {
+                case 'today':
+                    // Filter for today
+                    $query->whereDate('created_at', now()->toDateString());
+                    break;
+                    
+                case 'this_week':
+                    // Filter for this week
+                    $query->whereBetween('created_at', [
+                        now()->startOfWeek()->toDateString(),
+                        now()->endOfWeek()->toDateString()
+                    ]);
+                    break;
+                    
+                case 'this_month':
+                    // Filter for this month
+                    $query->whereMonth('created_at', now()->month)
+                          ->whereYear('created_at', now()->year);
+                    break;
+                    
+                case 'this_year':
+                    // Filter for this year
+                    $query->whereYear('created_at', now()->year);
+                    break;
+            }
+        }
+        
+        // Apply sorting - first by draft status (drafts first), then by the user's sort field
+        $query->orderBy('is_draft', 'desc') // Put drafts (is_draft=1) first
+              ->orderBy($sortField, $sortDirection);
+    
+        // Get paginated results - 10 items per page
+        $news = $query->paginate(10)->withQueryString();
+        
+        // Get all categories for filtering
+        $categories = Category::where('category_type', 1)->get();
+        
         return Inertia::render('Dashboard/News/Archive', [
-            'news' => News::onlyTrashed()->with('category')->get(),
+            'news' => $news,
+            'search' => $search,
+            'sort' => $sortField,
+            'direction' => $sortDirection,
+            'filters' => $filters,
+            'categories' => $categories,
         ]);
     }
 

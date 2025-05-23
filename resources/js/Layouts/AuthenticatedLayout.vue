@@ -137,7 +137,7 @@ const handleSidebarCollapse = (collapsed) => {
 
                 
 
-                <div v-if="$slots['tab-devider']" class="h-[31px] sm:h-[35px] md:h-[39px] xl:h-[31px] 2xl:h-[36px] 3xl:h-[42px] 4xl:h-[48px] pt-[7px] sm:pt-[8px] md:pt-[9px] xl:pt-[7px] 2xl:pt-[8px] 3xl:pt-[10px] 4xl:pt-[11px]">
+                <div v-if="$slots['tab-devider']" class=" pt-[7px] sm:pt-[8px] md:pt-[9px] xl:pt-[7px] 2xl:pt-[8px] 3xl:pt-[10px] 4xl:pt-[11px]">
                     <slot name="tab-devider"></slot>
                 </div>
 
@@ -145,18 +145,14 @@ const handleSidebarCollapse = (collapsed) => {
                     <slot name="subtitle-area"></slot>
                 </div>
 
-                <!-- Replace blank space with a named slot for search functionality - Only display if content exists -->
-                <div v-if="$slots['search-area']" class="h-[62px] sm:h-[62px] md:h-[62px] xl:h-[62px] 2xl:h-[70px] 3xl:h-[76px] 4xl:h-[94px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
+                <div v-if="$slots['search-area']" class="pt-[2px] pb-[13px] sm:pb-[14px] md:pb-[15px] lg:pb-[16px] xl:pb-[16.67px] 2xl:pb-[19px] 3xl:pb-[22px] 4xl:pb-[25px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
                     <slot name="search-area"></slot>
                 </div>
 
-                <!-- Special Table Content slot - Only render if used -->
                 <div v-if="$slots['table-content']" class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] table-container-slot">
                     <slot name="table-content"></slot>
                 </div>
-
-                <!-- Page Content with Custom Scrollbar - Only this part scrolls -->
-                <!-- Only render if table-content slot is not used -->
+                 
                 <Scrollbar 
                     v-if="!$slots['table-content']"
                     class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px]" 
@@ -167,48 +163,6 @@ const handleSidebarCollapse = (collapsed) => {
                         <slot />
                     </main>
                 </Scrollbar>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div v-show="showingNavigationDropdown" class="fixed inset-0 z-40 lg:hidden">
-        <div class="fixed inset-0 bg-black bg-opacity-25" @click="showingNavigationDropdown = false"></div>
-        
-        <div class="fixed inset-y-0 left-0 flex flex-col z-50 w-64 bg-gray-800 overflow-y-auto">
-            <div class="p-5">
-                <div class="flex items-center justify-between">
-                    <Link :href="route('dashboard')" class="flex items-center">
-                        <ApplicationLogo class="h-8 w-auto fill-current text-white" />
-                    </Link>
-                    <button @click="showingNavigationDropdown = false" class="text-gray-300 hover:text-white">
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-                
-                <div class="mt-5 space-y-1">
-                    <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                        Dashboard
-                    </ResponsiveNavLink>
-
-                    <div class="pt-4 pb-1 border-t border-gray-600">
-                        <div class="px-4">
-                            <div class="text-base font-medium text-white">{{ $page.props.auth.user.name }}</div>
-                            <div class="text-sm font-medium text-gray-400">{{ $page.props.auth.user.email }}</div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('logout')" method="post" as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

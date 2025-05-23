@@ -313,8 +313,7 @@ const truncateText = (text) => {
 //   multiline: false,         // Whether to allow multiple lines (default: false)
 // }]
 
-// Modify this function to check if text should be truncated
-// Default to true if not specified
+// Modify this function to make truncation the default behavior
 const shouldTruncate = (header) => {
     // If truncate property is explicitly set to false, don't truncate
     // Otherwise, truncate by default (if truncate is undefined or true)

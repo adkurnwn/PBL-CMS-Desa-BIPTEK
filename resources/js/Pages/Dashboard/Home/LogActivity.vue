@@ -1,11 +1,12 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import { ref, onMounted, computed, watch } from "vue";
 import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import Labels from "@/Components/DashboardComponent/Labels.vue";
 import Search from "@/Components/DashboardComponent/Search.vue";
+import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
 
 const props = defineProps({
     logs: Object,
@@ -33,17 +34,17 @@ const activityLogs = computed(() => props.logs?.data || []);
 // Extract pagination info with more explicit debugging
 const pagination = computed(() => {
     if (!props.logs) return null;
-    
+
     const paginationData = {
         currentPage: props.logs.current_page,
         lastPage: props.logs.last_page,
         perPage: props.logs.per_page,
         total: props.logs.total,
     };
-    
+
     // Debug output
     console.log('Pagination info:', paginationData);
-    
+
     return paginationData;
 });
 
@@ -72,7 +73,6 @@ const tableHeaders = [
         nowrap: true,
         width: '20%',  // Changed from '270px' to percentage
         style: {
-            fontSize: '18px',
             fontStyle: 'normal',
             fontWeight: '400',
             lineHeight: 'normal'
@@ -162,12 +162,12 @@ const handlePageChanged = (newPage) => {
         sort: props.sortField,
         direction: props.sortDirection
     };
-    
+
     // Add search parameter if it exists
     if (searchQuery.value) {
         routeParams.search = searchQuery.value;
     }
-    
+
     if (newPage === 1) {
         router.get(route('dashboard'), routeParams, {
             preserveScroll: true,
@@ -187,19 +187,19 @@ const handlePageChanged = (newPage) => {
 const handleSort = (field) => {
     // Only allow sorting on time field
     if (field !== 'time') return;
-    
+
     // Toggle sort direction
     const sortDirection = props.sortDirection === 'asc' ? 'desc' : 'asc';
-    
+
     // Build route params including search if it exists
     const routeParams = {
         direction: sortDirection
     };
-    
+
     if (searchQuery.value) {
         routeParams.search = searchQuery.value;
     }
-    
+
     // Navigate to the appropriate route with parameters
     if (props.currentPage === 1) {
         router.get(route('dashboard'), routeParams, {
@@ -227,9 +227,34 @@ watch(() => props.logs, (newLogs) => {
         });
     }
 }, { immediate: true });
+
+const page = usePage();
+const auth = computed(() => page.props.auth);
+const hasPermission = (permission) => {
+    // Always show for admin users
+    if (auth.value.user?.roles?.some(role => role.name.toLowerCase() === 'admin')) {
+        return true;
+    }
+    // Check if user has the specific permission
+    return auth.value.user?.permissions?.includes(permission);
+};
+
+// Add redirect check if user doesn't have permission
+onMounted(() => {
+    // If user doesn't have activity logs permission
+    if (!hasPermission('manage_activity-logs')) {
+        // Redirect to statistics if they have that permission, otherwise to dashboard
+        if (hasPermission('manage_statistics')) {
+            router.get(route('dashboard.statistics'));
+        } else {
+            router.get(route('dashboard'));
+        }
+    }
+});
 </script>
 
 <template>
+
     <Head title="Aktivitas Terbaru" />
 
     <AuthenticatedLayout>
@@ -253,41 +278,37 @@ watch(() => props.logs, (newLogs) => {
             </HeadingMenu>
         </template>
 
-        <!-- Add the search component in the search-area slot -->
-        <template #search-area>
-            <Search 
-                v-model="searchQuery"
-                placeholder="Cari aktivitas..."
-                @search="handleSearch"
-            />
+        <template #tab-devider>
+            <TabDevider 
+                :tabs="[
+                    { name: 'Home', href: route('dashboard'), active: false },
+                    ...(hasPermission('manage_activity-logs') ? [{ name: 'Aktivitas Terbaru', href: route('dashboard.activity-logs'), active: true }] : []),
+                    ...(hasPermission('manage_statistics') ? [{ name: 'Statistik', href: route('dashboard.statistics'), active: false }] : [])
+                ]" />
         </template>
 
-        <!-- Use the new table-content slot instead of default slot -->
+        <!-- Add the search component in the search-area slot -->
+        <template #search-area>
+            <Search v-model="searchQuery" placeholder="Cari aktivitas..." @search="handleSearch" />
+        </template>
+
+        <!-- Use the table-content slot -->
         <template #table-content>
             <div class="h-full">
                 <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <div class="h-full">
-                        <Tabel 
-                            :headers="tableHeaders" 
-                            :items="tableItems" 
-                            :pagination="true" 
-                            :items-per-page="pagination?.perPage || 25"
-                            :total-items="pagination?.total || 0"
+                        <Tabel :headers="tableHeaders" :items="tableItems" :pagination="true"
+                            :items-per-page="pagination?.perPage || 25" :total-items="pagination?.total || 0"
                             empty-state-message="Log aktivitas tidak ditemukan."
-                            :current-page="pagination?.currentPage || 1"
-                            :total-pages="pagination?.lastPage || 1"
-                            @page-changed="handlePageChanged"
-                            @sort="handleSort"
-                            :sort-field="sortField"
-                            :sort-direction="sortDirection"
-                        >
-                           
+                            :current-page="pagination?.currentPage || 1" :total-pages="pagination?.lastPage || 1"
+                            @page-changed="handlePageChanged" @sort="handleSort" :sort-field="sortField"
+                            :sort-direction="sortDirection">
+
                             <!-- Action column customization -->
                             <template #item.Aksi="{ item }">
-                                <Labels 
-                                    :type="['create', 'update', 'delete', 'login', 'logout', 'edit'].includes(item.action) ? item.action : 'other'" 
-                                    :text="item.action"
-                                />
+                                <Labels
+                                    :type="['create', 'update', 'delete', 'login', 'logout', 'edit'].includes(item.action) ? item.action : 'other'"
+                                    :text="item.action" />
                             </template>
                             <template #item.Modul="{ item }">
                                 <div class="italic">
@@ -302,7 +323,8 @@ watch(() => props.logs, (newLogs) => {
 
                             <!-- Time column customization -->
                             <template #item.Waktu="{ item }">
-                                <div class="text-[#6B86B5] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
+                                <div
+                                    class="text-[#404DBD] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
                                     {{ formatDate(item.time) }}
                                 </div>
                             </template>
