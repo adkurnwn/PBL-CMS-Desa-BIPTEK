@@ -52,6 +52,8 @@ class NewsController extends Controller
         return response()->json($news);
     }
 
+    
+
     /**
      * Update the specified resource in storage.
      */
