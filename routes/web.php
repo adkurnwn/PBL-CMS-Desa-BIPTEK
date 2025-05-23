@@ -64,6 +64,10 @@ Route::get('/laporan-dana-desa', function () {
     return Inertia::render('FrontEnd/LaporanDana');
 });
 
+Route::get('/produk-unggulan', function () {
+    return Inertia::render('FrontEnd/ProdukUnggulan');
+});
+
 Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

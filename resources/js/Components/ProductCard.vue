@@ -11,7 +11,7 @@ defineProps({
 });
 </script>
 <template>
-    <div class="w-full lg:w-1/4 p-1">
+    <div class="w-full max-w-sm p-1">
         <div
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300"
         >
