@@ -471,8 +471,8 @@ onMounted(() => {
                                         >
                                             <div class="flex w-1/2">
                                                 <img
-                                                    :src="`/storage/${item.images?.[0]?.path || 'default.jpg'}`"
-                                                    alt="News Image"
+                                                    :src="item.image && item.image.path ? `/storage${item.image.path}` : '/default-image.jpg'"
+                                                    :alt="item.image && item.image.alt ? item.image.alt : 'News Image'"
                                                     class="w-full h-20 object-cover rounded-md"
                                                 />
                                             </div>
