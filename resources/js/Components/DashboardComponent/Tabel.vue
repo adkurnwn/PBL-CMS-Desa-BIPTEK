@@ -348,7 +348,7 @@ const isMultiline = (header) => {
                             :style="getColumnWidthStyle(header)"
                         />
                     </colgroup>
-                    <thead class="bg-TopTableBG">
+                    <thead class="bg-TopTableBG rounded-table-header">
                         <tr class="h-[28px] sm:h-[32px] md:h-[36px] lg:h-[38px] xl:h-[42px] 2xl:h-[50px] 3xl:h-[56px] 4xl:h-[63px]">
                             <th
                                 v-for="(header, index) in headers"
@@ -358,7 +358,9 @@ const isMultiline = (header) => {
                                 :class="
                                     [
                                         { 'cursor-pointer': header.sortable || header.filterable },
-                                        header.headerClass
+                                        header.headerClass,
+                                        { 'first-th': index === 0 },
+                                        { 'last-th': index === headers.length - 1 }
                                     ]"
                                 :style="styleObjectToString(header.headerStyle)"
                             >
@@ -642,5 +644,79 @@ table.table-fixed {
 /* Make sure cursor shows it's hoverable */
 [title]:not([title=""]) {
     cursor: help;
+}
+
+/* Rounded table header styles */
+.rounded-table-header {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Apply rounded corners to first and last th elements */
+.first-th {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.last-th {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* Responsive border-radius values */
+@media (min-width: 1280px) { /* xl breakpoint */
+    .rounded-table-header {
+        border-radius: 6.67px;
+    }
+    .first-th {
+        border-top-left-radius: 6.67px;
+        border-bottom-left-radius: 6.67px;
+    }
+    .last-th {
+        border-top-right-radius: 6.67px;
+        border-bottom-right-radius: 6.67px;
+    }
+}
+
+@media (min-width: 1440px) { /* 2xl breakpoint */
+    .rounded-table-header {
+        border-radius: 7.5px;
+    }
+    .first-th {
+        border-top-left-radius: 7.5px;
+        border-bottom-left-radius: 7.5px;
+    }
+    .last-th {
+        border-top-right-radius: 7.5px;
+        border-bottom-right-radius: 7.5px;
+    }
+}
+
+@media (min-width: 1536px) { /* 3xl breakpoint */
+    .rounded-table-header {
+        border-radius: 8.5px;
+    }
+    .first-th {
+        border-top-left-radius: 8.5px;
+        border-bottom-left-radius: 8.5px;
+    }
+    .last-th {
+        border-top-right-radius: 8.5px;
+        border-bottom-right-radius: 8.5px;
+    }
+}
+
+@media (min-width: 1920px) { /* 4xl breakpoint */
+    .rounded-table-header {
+        border-radius: 10px;
+    }
+    .first-th {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    .last-th {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
 }
 </style>
