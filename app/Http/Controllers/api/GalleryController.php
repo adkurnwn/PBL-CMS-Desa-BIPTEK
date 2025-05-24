@@ -20,15 +20,13 @@ class GalleryController extends Controller
         try {
             $search = $request->query('search');
             $category = $request->query('category');
-            $sort = $request->query('sort');
 
             $query = Gallery::with(['images', 'category', 'user:id,name']);
 
             // Search by title or content
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', '%' . $search . '%')
-                        ->orWhere('content', 'like', '%' . $search . '%');
+                    $q->where('title', 'like', '%' . $search . '%');
                 });
             }
 
@@ -36,11 +34,6 @@ class GalleryController extends Controller
                 $query->where('category_id', $category);
             }
 
-            if ($sort === 'views') {
-                $query->orderBy('views', 'desc');
-            } else {
-                $query->latest();
-            }
             $galleries = $query->latest()->paginate(12);
             if ($galleries->isEmpty()) {
                 return response()->json([
@@ -108,8 +101,6 @@ class GalleryController extends Controller
                     'message' => 'Gallery not found'
                 ], 404);
             }
-
-            $gallery->increment('views');
 
             return response()->json([
                 'success' => true,
