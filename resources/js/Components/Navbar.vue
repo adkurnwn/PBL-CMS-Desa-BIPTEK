@@ -14,7 +14,7 @@ const currentPath = ref(window.location.pathname);
 const isHomePage = computed(() => currentPath.value === "/");
 const menuItems = [
     { name: "Beranda", link: "/" },
-    { name: "Profil Desa", link: "/profildesa" },
+    { name: "Profil Desa", link: "/profile" },
     { name: "Informasi & Berita", link: "/informasi" },
     { name: "Layanan Publik", link: "/layanan" },
 ];

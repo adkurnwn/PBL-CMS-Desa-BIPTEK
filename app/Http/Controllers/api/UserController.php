@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User\KepalaDesa;
+use App\Http\Resources\User\UserPreview;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,64 +16,60 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with(['position'])
-            ->whereDoesntHave('roles', function ($query) {
+        try {
+            $users = User::with('position')->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })
-            ->where('status', true) // Only active users
-            ->get();
-        $profile = Profile::first();
-        if (!$profile) {
-            return response()->json(['message' => 'Profile not found'], 404);
+            })->where('status', true)->get();
+
+            if ($users->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No active users found'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'users' => UserPreview::collection($users),
+                    'organization_image' => Profile::latest()->first()->organization_image ?? null,
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'users' => $users->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'photo_profile' => $user->photo_profile ? asset('storage/' . $user->photo_profile) : null,
-                    'position' => $user->position ? [
-                        'id' => $user->position->id,
-                        'name' => $user->position->name
-                    ] : null
-                ];
-            }),
-            'organization_image' => $profile->organization_image ? asset('storage/' . $profile->organization_image) : null,
-        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function kepalaDesa()
     {
-        //
-    }
+        try {
+            $kepalaDesa = User::whereHas('roles', function ($query) {
+                $query->where('name', 'Kepala Desa');
+            })->where('status', true)->first();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
-    {
-        //
-    }
+            if (!$kepalaDesa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kepala Desa not found'
+                ], 404);
+            }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(User $user)
-    {
-        //
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'name' => $kepalaDesa->name,
+                    'photo_profile' => $kepalaDesa->photo_profile ??  null,
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

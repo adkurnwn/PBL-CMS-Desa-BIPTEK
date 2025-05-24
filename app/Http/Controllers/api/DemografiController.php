@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Demografi\DemografiPreview;
 use App\Models\Demografi;
 use Illuminate\Http\Request;
 
@@ -11,14 +12,65 @@ class DemografiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index() {}
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function index(Request $request)
     {
-        //
+        try {
+            $search = $request->input('search');
+
+            $query = Demografi::query();
+            if ($search) {
+                $query->where('tahun', 'like', '%' . $search . '%')
+                    ->orWhere('jumlah_penduduk', 'like', '%' . $search . '%');
+            }
+            $demografi = $query->latest()->paginate(10);
+            if ($demografi->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No Demografi data found'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => DemografiPreview::collection($demografi),
+                'meta' => [
+                    'current_page' => $demografi->currentPage(),
+                    'last_page' => $demografi->lastPage(),
+                    'total' => $demografi->total(),
+                    'per_page' => $demografi->perPage()
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function preview()
+    {
+        try {
+            $demografi = Demografi::latest()->first();
+
+            if (!$demografi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Demografi data not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new DemografiPreview($demografi)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -26,28 +78,26 @@ class DemografiController extends Controller
      */
     public function show($slug)
     {
-        $demografi = Demografi::where('tahun', $slug)->first();
+        try {
+            $demografi = Demografi::where('tahun', $slug)->first();
 
-        if (!$demografi) {
-            return response()->json(['message' => 'Demografi not found'], 404);
+            if (!$demografi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Demografi not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $demografi
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json($demografi);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Demografi $demografi)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Demografi $demografi)
-    {
-        //
     }
 }

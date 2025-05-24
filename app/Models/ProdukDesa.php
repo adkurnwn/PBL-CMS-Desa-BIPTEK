@@ -17,7 +17,6 @@ class ProdukDesa extends Model
         'x',
         'tiktok',
         'youtube',
-        'status',
         'alamat_penjual',
         'nama_penjual',
         'kontak_penjual',
