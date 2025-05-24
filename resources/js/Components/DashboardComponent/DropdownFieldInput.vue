@@ -64,10 +64,10 @@
                             @click="selectOption(option.value)"
                             class="p-[1.8px] sm:p-[2px] md:p-[2.2px] lg:p-[2.4px] xl:p-[2.67px] 2xl:p-[3px] 3xl:p-[3.6px] 4xl:p-[4px] hover:bg-selectedBG cursor-pointer rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex justify-between items-center text-TableText text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
                             :style="{ 'height': `${itemHeight}px` }"
-                            :class="{ 'bg-blue-50 font-medium text-selectedText': modelValue === option.value }"
+                            :class="{ 'bg-blue-50 font-medium text-selectedText': isOptionSelected(option.value) }"
                         >
                             {{ option.label }}
-                            <span v-if="modelValue === option.value" class="text-selectedText">
+                            <span v-if="isOptionSelected(option.value)" class="text-selectedText">
                                 <svg xmlns="http://www.w3.org/2000/svg" 
                                     width="16" height="16"
                                     viewBox="0 0 24 24" 
@@ -124,6 +124,16 @@ export default {
         id: {
             type: String,
             default: ''
+        },
+        // Add new prop for manually setting display text when options are loading
+        initialLabel: {
+            type: String,
+            default: ''
+        },
+        // Add prop to indicate if we're loading data
+        loading: {
+            type: Boolean,
+            default: false
         }
     },
     emits: ['update:modelValue'],
@@ -133,13 +143,35 @@ export default {
             searchQuery: '',
             dropUpwards: false,
             itemHeight: 15.1, // Default size before we calculate breakpoint adjustments
+            // Add a local cached label to persist display value during async loading
+            cachedLabel: '',
         }
     },
     computed: {
         displayText() {
+            // If we have a cached label from a previous render, use it
+            if (this.cachedLabel && !this.options.length) {
+                return this.cachedLabel;
+            }
+            
+            // If initialLabel is provided and we don't have options yet, use it
+            if (this.initialLabel && (!this.options.length || this.loading)) {
+                return this.initialLabel;
+            }
+            
+            // Standard behavior - find in options
             if (!this.modelValue) return '';
-            const selectedOption = this.options.find(option => option.value === this.modelValue);
-            return selectedOption ? selectedOption.label : '';
+            const selectedOption = this.options.find(option => option.value === this.modelValue || 
+                                                                option.value.toString() === this.modelValue.toString());
+            
+            // If we found a match, cache the label and return it
+            if (selectedOption) {
+                this.cachedLabel = selectedOption.label;
+                return selectedOption.label;
+            }
+            
+            // If we have a value but no matching option (might be loading), show the value itself
+            return this.modelValue ? this.modelValue.toString() : '';
         },
         filteredOptions() {
             if (!this.searchQuery.trim()) return this.options;
@@ -224,6 +256,47 @@ export default {
             // This will trigger a reactivity update in the itemHeight computed property
             this.$forceUpdate();
         },
+        // Add a new method to safely compare option values regardless of type
+        isOptionSelected(optionValue) {
+            if (!this.modelValue && !optionValue) return true;
+            if (!this.modelValue || !optionValue) return false;
+            
+            // Convert both values to strings for comparison to handle type differences
+            return String(this.modelValue) === String(optionValue);
+        },
+    },
+    watch: {
+        // Add watcher to update cached label when options change
+        options: {
+            handler(newOptions) {
+                if (this.modelValue && newOptions.length) {
+                    const selectedOption = newOptions.find(option => 
+                        option.value === this.modelValue || 
+                        option.value.toString() === this.modelValue.toString()
+                    );
+                    if (selectedOption) {
+                        this.cachedLabel = selectedOption.label;
+                    }
+                }
+            },
+            deep: true,
+            immediate: true
+        },
+        // Watch for model value changes to update cached label
+        modelValue: {
+            handler(newValue) {
+                if (newValue && this.options.length) {
+                    const selectedOption = this.options.find(option => 
+                        option.value === newValue || 
+                        option.value.toString() === newValue.toString()
+                    );
+                    if (selectedOption) {
+                        this.cachedLabel = selectedOption.label;
+                    }
+                }
+            },
+            immediate: true
+        }
     },
     mounted() {
         // Add window resize listener to update itemHeight

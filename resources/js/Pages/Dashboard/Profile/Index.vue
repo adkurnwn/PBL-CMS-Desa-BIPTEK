@@ -1,10 +1,19 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import { onMounted } from "vue";
+
 const props = defineProps({
     profiles: Array,
+});
+
+onMounted(() => {
+    // If profiles exist, redirect to edit page of the first profile
+    if (props.profiles && props.profiles.length > 0) {
+        router.visit(route('dashboard.profiles.edit', props.profiles[0].name));
+    }
 });
 </script>
 
@@ -20,22 +29,13 @@ const props = defineProps({
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
+        <div class="hidden">
                         <table class="min-w-full divide-y divide-gray-200 dashboard-table">
                             <thead>
                                 <tr>
                                     <th
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Nama Desa
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Actions
                                     </th>
                                 </tr>
                             </thead>
@@ -44,9 +44,6 @@ const props = defineProps({
                                     v-for="profile in profiles"
                                     :key="profile.id"
                                 >
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ profile.name }}
-                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <Link
                                             :href="
@@ -65,8 +62,5 @@ const props = defineProps({
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
     </AuthenticatedLayout>
 </template>

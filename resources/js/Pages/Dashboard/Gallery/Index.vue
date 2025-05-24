@@ -45,7 +45,7 @@ const sortDirection = ref(props.direction || 'asc');
 // Table headers configuration
 const tableHeaders = [
     {
-        label: 'Gambar',
+        label: 'Album',
         field: 'image',
         sortable: false,
         width: '20%',
@@ -219,21 +219,7 @@ const formatDate = (dateString) => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
 
-// Determine category type for styling
-const getCategoryType = (categoryName) => {
-    if (!categoryName) return 'other';
 
-    const name = categoryName.toLowerCase();
-
-    // Add logic to determine category type based on name
-    if (name.includes('umum')) return 'umum';
-    if (name.includes('kegiatan')) return 'kegiatan';
-    if (name.includes('event')) return 'event';
-    if (name.includes('fasilitas')) return 'fasilitas';
-
-    // Default type
-    return 'other';
-};
 
 // Watch for external search changes
 watch(() => props.search, (newValue) => {
@@ -300,7 +286,7 @@ watch(() => props.filters, (newValue) => {
                         empty-state-message="Tidak ada galeri ditemukan" @sort="handleSort"
                         @filter-changed="handleFilterChange" @page-changed="handlePageChange">
                         <!-- Add custom template for Gambar column with stacked effect -->
-                        <template #['item.Gambar']="{ item }">
+                        <template #['item.Album']="{ item }">
                             <div class="flex justify-center items-center h-full">
                                 <div
                                     class="relative w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] md:w-[55px] md:h-[55px] lg:w-[60px] lg:h-[60px] xl:w-[60px] xl:h-[60px] 2xl:w-[70px] 2xl:h-[70px] 3xl:w-[80px] 3xl:h-[80px] 4xl:w-[90px] 4xl:h-[90px]">

@@ -115,7 +115,7 @@ class NewsController extends Controller
               ->orderBy($sortField, $sortDirection);
         
         // Get paginated results - 10 items per page
-        $news = $query->paginate(10)->withQueryString();
+        $news = $query->paginate(25)->withQueryString();
         
         // Get all categories for filtering
         $categories = Category::where('category_type', 1)->get();
@@ -144,7 +144,10 @@ class NewsController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
-        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        
+        // Generate a truly unique slug with a timestamp suffix to prevent duplicates
+        $baseSlug = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        $data['slug'] = $baseSlug . '-' . time();
 
         $news = News::create($data);
 
@@ -184,7 +187,15 @@ class NewsController extends Controller
 
         $data = $request->all();
         $data['category_id'] = $category_id;
-        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        
+        // For updates, only change slug if title changed, and ensure uniqueness
+        if ($news->title != $request->title) {
+            $baseSlug = SlugHelper::generateUniqueSlug(News::class, $request->title);
+            $data['slug'] = $baseSlug . '-' . time();
+        } else {
+            // Keep the existing slug if title hasn't changed
+            $data['slug'] = $news->slug;
+        }
 
         // Update news record
         $news->update($data);
@@ -300,7 +311,7 @@ class NewsController extends Controller
               ->orderBy($sortField, $sortDirection);
     
         // Get paginated results - 10 items per page
-        $news = $query->paginate(10)->withQueryString();
+        $news = $query->paginate(25)->withQueryString();
         
         // Get all categories for filtering
         $categories = Category::where('category_type', 1)->get();

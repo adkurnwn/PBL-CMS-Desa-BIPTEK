@@ -138,7 +138,7 @@ const searchQuery = ref(props.search || '');
 
 const handleSearch = (query) => {
     // Reset to first page when searching
-    router.get(route('dashboard'), {
+    router.get(route('dashboard.activity-logs'), {
         search: query,
         sort: props.sortField,
         direction: props.sortDirection
@@ -169,13 +169,13 @@ const handlePageChanged = (newPage) => {
     }
 
     if (newPage === 1) {
-        router.get(route('dashboard'), routeParams, {
+        router.get(route('dashboard.activity-logs'), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs']
         });
     } else {
-        router.get(route('dashboard.page', { page: newPage }), routeParams, {
+        router.get(route('dashboard.activity-logs.page', { page: newPage }), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs']
@@ -202,13 +202,13 @@ const handleSort = (field) => {
 
     // Navigate to the appropriate route with parameters
     if (props.currentPage === 1) {
-        router.get(route('dashboard'), routeParams, {
+        router.get(route('dashboard.activity-logs'), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs', 'sortDirection']
         });
     } else {
-        router.get(route('dashboard.page', { page: props.currentPage }), routeParams, {
+        router.get(route('dashboard.activity-logs.page', { page: props.currentPage }), routeParams, {
             preserveScroll: true,
             preserveState: true,
             only: ['logs', 'sortDirection']

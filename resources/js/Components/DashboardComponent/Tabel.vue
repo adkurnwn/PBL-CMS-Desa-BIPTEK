@@ -327,6 +327,12 @@ const isMultiline = (header) => {
     return header.multiline === true;
 };
 
+// New helper function to normalize slot names (replace spaces with underscores)
+const normalizeSlotName = (headerLabel) => {
+    if (!headerLabel) return '';
+    return headerLabel.replace(/\s+/g, '_');
+};
+
 </script>
 
 <template>
@@ -422,8 +428,8 @@ const isMultiline = (header) => {
                                 class="text-TableText"
                                 :style="styleObjectToString(header.style)"
                             >
-                                <!-- Use format that matches how it's used in Dashboard.vue and elsewhere -->
-                                <slot :name="`item.${header.label}`" :item="item" :header="header">
+                                <!-- Use normalized slot name for multi-word header labels -->
+                                <slot :name="`item.${normalizeSlotName(header.label)}`" :item="item" :header="header">
                                     <!-- Add special handling for job_description field -->
                                     <div v-if="getFieldName(header) === 'job_description'">
                                         <ul class="list-disc ml-5">

@@ -85,6 +85,6 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
-        return redirect()->route('dashboard.profiles.index')->with('success', 'Profil Berhasil Diperbarui');
+        return redirect()->route('dashboard')->with('success', 'Profil Berhasil Diperbarui');
     }
 }

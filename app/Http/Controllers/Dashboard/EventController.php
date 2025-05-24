@@ -19,10 +19,62 @@ class EventController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get the search term from request
+        $search = $request->input('search');
+        
+        // Get the sort parameters from request (default to 'title' and 'asc')
+        $sort = $request->input('sort', 'title');
+        $direction = $request->input('direction', 'asc');
+        
+        // Process filters if any
+        $filters = $request->input('filters', []);
+        
+        // Build the query
+        $query = Event::query();
+        
+        // Apply search if provided
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply filters if any
+        if (!empty($filters)) {
+            // Example: Filter by date range
+            if (isset($filters['date_range'])) {
+                $dateRange = $filters['date_range'];
+                if ($dateRange === 'future') {
+                    $query->where('date', '>=', now()->format('Y-m-d'));
+                } elseif ($dateRange === 'past') {
+                    $query->where('date', '<', now()->format('Y-m-d'));
+                } elseif ($dateRange === 'today') {
+                    $query->whereDate('date', now()->format('Y-m-d'));
+                }
+            }
+            
+            // Example: Filter by location
+            if (isset($filters['location']) && $filters['location']) {
+                $query->where('location', $filters['location']);
+            }
+        }
+        
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+        
+        // Get paginated results (10 items per page)
+        $events = $query->paginate(25)->withQueryString();
+        
         return Inertia::render('Dashboard/Events/Index', [
-            'events' => Event::all(),
+            'events' => $events,
+            'search' => $search,
+            'filters' => $filters,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -58,6 +110,15 @@ class EventController extends Controller
         $event = Event::where('slug', $slug)->firstOrFail();
 
         return Inertia::render('Dashboard/Events/Edit', [
+            'event' => $event,
+        ]);
+    }
+
+    public function show($slug)
+    {
+        $event = Event::where('slug', $slug)->firstOrFail();
+
+        return Inertia::render('Dashboard/Events/Show', [
             'event' => $event,
         ]);
     }

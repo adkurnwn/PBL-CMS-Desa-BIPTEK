@@ -50,14 +50,14 @@ const tableHeaders = [
         field: 'image',
         sortable: false,
         nowrap: true,
-        width: '10%',
+        width: '15%',
     },
     {
         label: 'Judul',
         field: 'title',
         sortable: true,
         nowrap: true,
-        width: '40%', // Reduced from 50% to accommodate image column
+        width: '35%', // Reduced from 50% to accommodate image column
         style: {
             fontStyle: 'normal',
             fontWeight: '400',
@@ -270,6 +270,12 @@ watch(() => props.filters, (newValue) => {
         filterState.value = { ...newValue };
     }
 }, { deep: true });
+
+// Add this method after the existing methods
+const openInNewTab = (slug) => {
+    const url = route('berita.show', slug);
+    window.open(url, '_blank', 'noopener,noreferrer');
+};
 </script>
 
 <template>
@@ -313,9 +319,11 @@ watch(() => props.filters, (newValue) => {
                         @filter-changed="handleFilterChange" @page-changed="handlePageChange">
                         <!-- Add custom template for Gambar column -->
                         <template #['item.Gambar']="{ item }">
-                            <div class="flex justify-center items-center h-full">
+                            <a :href="route('berita.show', item.slug)" target="_blank" rel="noopener noreferrer"
+                                @click.prevent="openInNewTab(item.slug)">
+                            <div class="flex justify-left items-center h-full">
                                 <div
-                                    class="w-[30px] h-[30px] sm:w-[40px] sm:h-[40px] md:w-[45px] md:h-[45px] lg:w-[50px] lg:h-[50px] xl:w-[50px] xl:h-[50px] 2xl:w-[60px] 2xl:h-[60px] 3xl:w-[70px] 3xl:h-[70px] 4xl:w-[80px] 4xl:h-[80px] rounded-md overflow-hidden bg-gray-100">
+                                    class="h-[30px] sm:h-[40px] md:h-[45px] lg:h-[50px] w-full xl:h-[50px] 2xl:h-[60px] 3xl:h-[70px] 4xl:h-[80px] rounded-md overflow-hidden bg-TopTableBG">
                                     <img v-if="item.thumbnailGambar" :src="item.thumbnailGambar" :alt="item.title"
                                         class="w-full h-full object-cover" />
                                     <div v-else class="w-full h-full flex items-center justify-center bg-gray-200">
@@ -327,6 +335,7 @@ watch(() => props.filters, (newValue) => {
                                     </div>
                                 </div>
                             </div>
+                        </a>
                         </template>
 
                         <!-- Add custom template for Judul column -->

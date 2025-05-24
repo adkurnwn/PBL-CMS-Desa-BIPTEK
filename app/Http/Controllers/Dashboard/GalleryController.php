@@ -66,7 +66,7 @@ class GalleryController extends Controller
         }
         
         // Paginate the results
-        $galleries = $query->paginate(10)->withQueryString();
+        $galleries = $query->paginate(25)->withQueryString();
         
         return Inertia::render('Dashboard/Gallery/Index', [
             'galleries' => $galleries,
@@ -189,7 +189,7 @@ class GalleryController extends Controller
         }
         
         // Paginate the results
-        $galleries = $query->paginate(10)->withQueryString();
+        $galleries = $query->paginate(25)->withQueryString();
         
         return Inertia::render('Dashboard/Gallery/Archive', [
             'galleries' => $galleries,

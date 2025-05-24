@@ -6,9 +6,12 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import JsonArrayInput from "@/Components/JsonArrayInput.vue";
-import ImageInput from "@/Components/ImageInput.vue";
+import ImageInput from "@/Components/DashboardComponent/ImageInput.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import DropdownFieldInput from "@/Components/DashboardComponent/DropdownFieldInput.vue";
 import { ref, computed } from "vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
     settings: Object,
@@ -20,6 +23,13 @@ const props = defineProps({
 
 const activeTab = ref("general");
 const faviconPreview = ref(null);
+
+// Add reactive states for section locks
+const isDatabaseLocked = ref(true);
+const isEmailLocked = ref(true);
+
+// Add reactive state for confirmation popup
+const showConfirmation = ref(false);
 
 const form = useForm({
     app_name: props.settings.app_name || "",
@@ -46,18 +56,10 @@ const form = useForm({
     backup_frequency: props.settings.backup_frequency || "daily",
 });
 
-const handleFaviconChange = (e) => {
-    if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-        form.favicon = file;
-
-        // Preview the selected image
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            faviconPreview.value = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
+const handleFaviconChange = (file) => {
+    form.favicon = file;
+    // Clear any previous preview since ImageInput handles its own preview
+    faviconPreview.value = null;
 };
 
 const setActiveTab = (tab) => {
@@ -89,11 +91,59 @@ const getContrastColor = (hexColor) => {
     // Return white for dark backgrounds, black for light backgrounds
     return luminance > 0.5 ? "#000000" : "#ffffff";
 };
+
+// Add computed properties for dropdown options
+const timezoneOptions = computed(() =>
+    props.timezones.map(timezone => ({ value: timezone, label: timezone }))
+);
+
+const dbConnectionOptions = computed(() =>
+    props.dbConnections.map(connection => ({ value: connection, label: connection }))
+);
+
+const mailDriverOptions = computed(() =>
+    props.mailDrivers.map(driver => ({ value: driver, label: driver }))
+);
+
+const mailEncryptionOptions = [
+    { value: 'tls', label: 'TLS' },
+    { value: 'ssl', label: 'SSL' },
+    { value: 'null', label: 'None' }
+];
+
+const backupFrequencyOptions = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' }
+];
+
+// Add methods to unlock sections
+const unlockDatabase = () => {
+    isDatabaseLocked.value = false;
+};
+
+const unlockEmail = () => {
+    isEmailLocked.value = false;
+};
+
+// Update submit method
+const showConfirmationDialog = () => {
+    showConfirmation.value = true;
+};
+
+const confirmSave = () => {
+    showConfirmation.value = false;
+    submit();
+};
+
+const cancelSave = () => {
+    showConfirmation.value = false;
+};
 </script>
 
 <template>
 
-    <Head title="Application Settings" />
+    <Head title="Pengaturan Aplikasi" />
     <AuthenticatedLayout>
         <template #header>
             <HeadingMenu title="Pengaturan Aplikasi">
@@ -107,274 +157,290 @@ const getContrastColor = (hexColor) => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="mb-4 border-b border-gray-200">
-                    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
-                        <li class="mr-2">
-                            <a href="#" :class="{
-                                'text-blue-600 border-b-2 border-blue-600':
-                                    activeTab === 'general',
-                                'text-gray-500 hover:text-gray-600':
-                                    activeTab !== 'general',
-                            }" class="inline-block p-4 rounded-t-lg" @click.prevent="setActiveTab('general')">
-                                General
-                            </a>
-                        </li>
-                        <li class="mr-2">
-                            <a href="#" :class="{
-                                'text-blue-600 border-b-2 border-blue-600':
-                                    activeTab === 'database',
-                                'text-gray-500 hover:text-gray-600':
-                                    activeTab !== 'database',
-                            }" class="inline-block p-4 rounded-t-lg" @click.prevent="setActiveTab('database')">
-                                Database
-                            </a>
-                        </li>
-                        <li class="mr-2">
-                            <a href="#" :class="{
-                                'text-blue-600 border-b-2 border-blue-600':
-                                    activeTab === 'mail',
-                                'text-gray-500 hover:text-gray-600':
-                                    activeTab !== 'mail',
-                            }" class="inline-block p-4 rounded-t-lg" @click.prevent="setActiveTab('mail')">
-                                Mail
-                            </a>
-                        </li>
-                        <li class="mr-2">
-                            <a href="#" :class="{
-                                'text-blue-600 border-b-2 border-blue-600':
-                                    activeTab === 'theme',
-                                'text-gray-500 hover:text-gray-600':
-                                    activeTab !== 'theme',
-                            }" class="inline-block p-4 rounded-t-lg" @click.prevent="setActiveTab('theme')">
-                                Theme
-                            </a>
-                        </li>
-                        <!-- Add this after the existing tabs -->
-                        <li class="mr-2">
-                            <a href="#" :class="{
-                                'text-blue-600 border-b-2 border-blue-600':
-                                    activeTab === 'backup',
-                                'text-gray-500 hover:text-gray-600':
-                                    activeTab !== 'backup',
-                            }" class="inline-block p-4 rounded-t-lg" @click.prevent="setActiveTab('backup')">
-                                Backup
-                            </a>
-                        </li>
-                    </ul>
+        <template #tab-devider>
+
+        </template>
+
+        <div class="h-full ">
+            <div
+                class="overflow-hidden pl-[6px] sm:pl-[7px] md:pl-[8px] xl:pl-[8px] 2xl:pl-[9px] 3xl:pl-[9px] 4xl:pl-[10px]">
+                <div class="mb-4">
+                    <div class="tab-devider">
+                        <div class="flex">
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'general' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('general')">
+                                    Umum
+                                    <div v-if="activeTab === 'general'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'database' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('database')">
+                                    Database
+                                    <div v-if="activeTab === 'database'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'mail' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('mail')">
+                                    Email
+                                    <div v-if="activeTab === 'mail'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'theme' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('theme')">
+                                    Tema
+                                    <div v-if="activeTab === 'theme'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'backup' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('backup')">
+                                    Cadangan
+                                    <div v-if="activeTab === 'backup'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
+                <div class="overflow-hidden ">
+                    <div>
                         <form @submit.prevent="submit" enctype="multipart/form-data">
                             <!-- General Settings -->
                             <div v-show="activeTab === 'general'">
-                                <h3 class="mb-4 text-lg font-semibold">
-                                    General Settings
-                                </h3>
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <!-- App Name -->
                                     <div>
-                                        <InputLabel for="app_name" value="Application Name" />
-                                        <TextInput id="app_name" v-model="form.app_name" type="text"
-                                            class="mt-1 block w-full" required />
+                                        <SingleLineField id="app_name" v-model="form.app_name" type="text"
+                                            fieldName="Nama Website" required custom-width="100%" />
                                         <InputError :message="form.errors.app_name" class="mt-2" />
                                     </div>
 
                                     <!-- App URL -->
                                     <div>
-                                        <InputLabel for="app_url" value="Application URL" />
-                                        <TextInput id="app_url" v-model="form.app_url" type="text"
-                                            class="mt-1 block w-full" required />
+                                        <SingleLineField id="app_url" v-model="form.app_url" type="text"
+                                            fieldName="Application URL" required custom-width="100%" />
                                         <InputError :message="form.errors.app_url" class="mt-2" />
                                     </div>
 
                                     <!-- Timezone -->
                                     <div>
-                                        <InputLabel for="app_timezone" value="Timezone" />
-                                        <select id="app_timezone" v-model="form.app_timezone"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            required>
-                                            <option v-for="timezone in timezones" :key="timezone" :value="timezone">
-                                                {{ timezone }}
-                                            </option>
-                                        </select>
+                                        <DropdownFieldInput id="app_timezone" v-model="form.app_timezone"
+                                            fieldName="Timezone" :options="timezoneOptions" :required="true"
+                                            custom-width="100%" />
                                         <InputError :message="form.errors.app_timezone" class="mt-2" />
                                     </div>
 
                                     <!-- Favicon -->
                                     <div>
-                                        <InputLabel for="favicon" value="Favicon" />
-                                        <div class="flex items-center mt-2">
-                                            <img v-if="faviconPreview" :src="faviconPreview"
-                                                class="h-16 w-16 object-cover rounded mr-4" />
-                                            <img v-else-if="settings.favicon" :src="`/storage/${settings.favicon}`"
-                                                class="h-16 w-16 object-cover rounded mr-4" />
-                                        </div>
-                                        <input id="favicon" type="file" @input="handleFaviconChange"
-                                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                            accept="image/png, image/jpeg, image/gif, image/ico" />
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Recommended size: 32x32px or 64x64px
-                                            (PNG or ICO format)
+                                        <ImageInput
+                                            :model-value="form.favicon"
+                                            @update:model-value="handleFaviconChange"
+                                            label="Favicon"
+                                            :current-image="settings.favicon"
+                                            :error="form.errors.favicon"
+                                            accept="image/png, image/jpeg, image/gif, image/ico, image/x-icon"
+                                            custom-width="100%"
+                                            image-height="64px"
+                                            image-class="rounded-sm border"
+                                        />
+                                        <p class="mt-1 text-[6.2px] sm:text-[7px] md:text-[8px] lg:text-[8.7px] xl:text-[9.33px] 2xl:text-[10.8px] 3xl:text-[12.4px] 4xl:text-[14px] text-gray-500">
+                                            Recommended size: 32x32px or 64x64px (PNG or ICO format)
                                         </p>
-                                        <InputError :message="form.errors.favicon" class="mt-2" />
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Database Settings -->
-                            <div v-show="activeTab === 'database'">
-                                <h3 class="mb-4 text-lg font-semibold">
-                                    Database Settings
-                                </h3>
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <!-- Database Connection -->
-                                    <div>
-                                        <InputLabel for="db_connection" value="Database Connection" />
-                                        <select id="db_connection" v-model="form.db_connection"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option v-for="connection in dbConnections" :key="connection"
-                                                :value="connection">
-                                                {{ connection }}
-                                            </option>
-                                        </select>
-                                        <InputError :message="form.errors.db_connection" class="mt-2" />
+                            <div v-show="activeTab === 'database'" class="relative">
+                                <!-- Blur overlay when locked -->
+                                <div v-if="isDatabaseLocked"
+                                    class="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                                    <div class="bg-menuBG p-6 rounded-[5px] shadow-2xl text-center">
+                                        <div class="mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="mx-auto text-yellowLabelText">
+                                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                                <circle cx="12" cy="16" r="1" />
+                                                <path d="m7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">Pengaturan Database Terkunci
+                                        </h3>
+                                        <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">Klik unlock untuk membuka pengaturan database</p>
+                                        <SecondaryButton @click="unlockDatabase" class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
+                                            Unlock
+                                        </SecondaryButton>
                                     </div>
+                                </div>
 
-                                    <!-- Database Host -->
-                                    <div>
-                                        <InputLabel for="db_host" value="Database Host" />
-                                        <TextInput id="db_host" v-model="form.db_host" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.db_host" class="mt-2" />
-                                    </div>
+                                <div :class="{ 'blur-sm pointer-events-none': isDatabaseLocked }">
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <!-- Database Connection -->
+                                        <div>
+                                            <DropdownFieldInput id="db_connection" v-model="form.db_connection"
+                                                fieldName="Database Connection" :options="dbConnectionOptions"
+                                                custom-width="100%" />
+                                            <InputError :message="form.errors.db_connection" class="mt-2" />
+                                        </div>
 
-                                    <!-- Database Port -->
-                                    <div>
-                                        <InputLabel for="db_port" value="Database Port" />
-                                        <TextInput id="db_port" v-model="form.db_port" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.db_port" class="mt-2" />
-                                    </div>
+                                        <!-- Database Host -->
+                                        <div>
+                                            <SingleLineField id="db_host" v-model="form.db_host" type="text"
+                                                fieldName="Database Host" custom-width="100%" />
+                                            <InputError :message="form.errors.db_host" class="mt-2" />
+                                        </div>
 
-                                    <!-- Database Name -->
-                                    <div>
-                                        <InputLabel for="db_database" value="Database Name" />
-                                        <TextInput id="db_database" v-model="form.db_database" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.db_database" class="mt-2" />
-                                    </div>
+                                        <!-- Database Port -->
+                                        <div>
+                                            <SingleLineField id="db_port" v-model="form.db_port" type="text"
+                                                fieldName="Database Port" custom-width="100%" />
+                                            <InputError :message="form.errors.db_port" class="mt-2" />
+                                        </div>
 
-                                    <!-- Database Username -->
-                                    <div>
-                                        <InputLabel for="db_username" value="Database Username" />
-                                        <TextInput id="db_username" v-model="form.db_username" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.db_username" class="mt-2" />
-                                    </div>
+                                        <!-- Database Name -->
+                                        <div>
+                                            <SingleLineField id="db_database" v-model="form.db_database" type="text"
+                                                fieldName="Database Name" custom-width="100%" />
+                                            <InputError :message="form.errors.db_database" class="mt-2" />
+                                        </div>
 
-                                    <!-- Database Password -->
-                                    <div>
-                                        <InputLabel for="db_password" value="Database Password" />
-                                        <TextInput id="db_password" v-model="form.db_password" type="password"
-                                            class="mt-1 block w-full"
-                                            placeholder="Leave empty to keep current password" />
-                                        <InputError :message="form.errors.db_password" class="mt-2" />
+                                        <!-- Database Username -->
+                                        <div>
+                                            <SingleLineField id="db_username" v-model="form.db_username" type="text"
+                                                fieldName="Database Username" custom-width="100%" />
+                                            <InputError :message="form.errors.db_username" class="mt-2" />
+                                        </div>
+
+                                        <!-- Database Password -->
+                                        <div>
+                                            <SingleLineField id="db_password" v-model="form.db_password" type="password"
+                                                fieldName="Database Password (Opsional)" custom-width="100%" />
+                                            <InputError :message="form.errors.db_password" class="mt-2" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Mail Settings -->
-                            <div v-show="activeTab === 'mail'">
-                                <h3 class="mb-4 text-lg font-semibold">
-                                    Mail Settings
-                                </h3>
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <!-- Mail Driver -->
-                                    <div>
-                                        <InputLabel for="mail_mailer" value="Mail Driver" />
-                                        <select id="mail_mailer" v-model="form.mail_mailer"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option v-for="driver in mailDrivers" :key="driver" :value="driver">
-                                                {{ driver }}
-                                            </option>
-                                        </select>
-                                        <InputError :message="form.errors.mail_mailer" class="mt-2" />
+                            <div v-show="activeTab === 'mail'" class="relative">
+                                <!-- Blur overlay when locked -->
+                                <div v-if="isEmailLocked"
+                                    class="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                                    <div class="bg-menuBG p-6 rounded-[5px] shadow-2xl text-center">
+                                        <div class="mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="mx-auto text-yellowLabelText">
+                                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                                <circle cx="12" cy="16" r="1" />
+                                                <path d="m7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">Pengaturan Email Terkunci
+                                        </h3>
+                                        <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">Klik unlock untuk membuka pengaturan email</p>
+                                        <SecondaryButton @click="unlockEmail" class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
+                                            Unlock
+                                        </SecondaryButton>
                                     </div>
+                                </div>
 
-                                    <!-- Mail Host -->
-                                    <div>
-                                        <InputLabel for="mail_host" value="Mail Host" />
-                                        <TextInput id="mail_host" v-model="form.mail_host" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.mail_host" class="mt-2" />
-                                    </div>
+                                <div :class="{ 'blur-sm pointer-events-none': isEmailLocked }">
+                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <!-- Mail Driver -->
+                                        <div>
+                                            <DropdownFieldInput id="mail_mailer" v-model="form.mail_mailer"
+                                                fieldName="Mail Driver" :options="mailDriverOptions"
+                                                custom-width="100%" />
+                                            <InputError :message="form.errors.mail_mailer" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail Port -->
-                                    <div>
-                                        <InputLabel for="mail_port" value="Mail Port" />
-                                        <TextInput id="mail_port" v-model="form.mail_port" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.mail_port" class="mt-2" />
-                                    </div>
+                                        <!-- Mail Host -->
+                                        <div>
+                                            <SingleLineField id="mail_host" v-model="form.mail_host" type="text"
+                                                fieldName="Mail Host" custom-width="100%" />
+                                            <InputError :message="form.errors.mail_host" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail Username -->
-                                    <div>
-                                        <InputLabel for="mail_username" value="Mail Username" />
-                                        <TextInput id="mail_username" v-model="form.mail_username" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.mail_username" class="mt-2" />
-                                    </div>
+                                        <!-- Mail Port -->
+                                        <div>
+                                            <SingleLineField id="mail_port" v-model="form.mail_port" type="text"
+                                                fieldName="Mail Port" custom-width="100%" />
+                                            <InputError :message="form.errors.mail_port" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail Password -->
-                                    <div>
-                                        <InputLabel for="mail_password" value="Mail Password" />
-                                        <TextInput id="mail_password" v-model="form.mail_password" type="password"
-                                            class="mt-1 block w-full"
-                                            placeholder="Leave empty to keep current password" />
-                                        <InputError :message="form.errors.mail_password" class="mt-2" />
-                                    </div>
+                                        <!-- Mail Username -->
+                                        <div>
+                                            <SingleLineField id="mail_username" v-model="form.mail_username" type="text"
+                                                fieldName="Mail Username" custom-width="100%" />
+                                            <InputError :message="form.errors.mail_username" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail Encryption -->
-                                    <div>
-                                        <InputLabel for="mail_encryption" value="Mail Encryption" />
-                                        <select id="mail_encryption" v-model="form.mail_encryption"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="tls">TLS</option>
-                                            <option value="ssl">SSL</option>
-                                            <option value="null">None</option>
-                                        </select>
-                                        <InputError :message="form.errors.mail_encryption
-                                            " class="mt-2" />
-                                    </div>
+                                        <!-- Mail Password -->
+                                        <div>
+                                            <SingleLineField id="mail_password" v-model="form.mail_password"
+                                                type="password" fieldName="Mail Password (Opsional)"
+                                                custom-width="100%" />
+                                            <InputError :message="form.errors.mail_password" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail From Address -->
-                                    <div>
-                                        <InputLabel for="mail_from_address" value="From Email Address" />
-                                        <TextInput id="mail_from_address" v-model="form.mail_from_address" type="email"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.mail_from_address
-                                            " class="mt-2" />
-                                    </div>
+                                        <!-- Mail Encryption -->
+                                        <div>
+                                            <DropdownFieldInput id="mail_encryption" v-model="form.mail_encryption"
+                                                fieldName="Mail Encryption" :options="mailEncryptionOptions"
+                                                custom-width="100%" />
+                                            <InputError :message="form.errors.mail_encryption" class="mt-2" />
+                                        </div>
 
-                                    <!-- Mail From Name -->
-                                    <div>
-                                        <InputLabel for="mail_from_name" value="From Name" />
-                                        <TextInput id="mail_from_name" v-model="form.mail_from_name" type="text"
-                                            class="mt-1 block w-full" />
-                                        <InputError :message="form.errors.mail_from_name
-                                            " class="mt-2" />
+                                        <!-- Mail From Address -->
+                                        <div>
+                                            <SingleLineField id="mail_from_address" v-model="form.mail_from_address"
+                                                type="email" fieldName="From Email Address" custom-width="100%" />
+                                            <InputError :message="form.errors.mail_from_address
+                                                " class="mt-2" />
+                                        </div>
+
+                                        <!-- Mail From Name -->
+                                        <div>
+                                            <SingleLineField id="mail_from_name" v-model="form.mail_from_name"
+                                                type="text" fieldName="From Name" custom-width="100%" />
+                                            <InputError :message="form.errors.mail_from_name
+                                                " class="mt-2" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Theme Settings -->
                             <div v-show="activeTab === 'theme'">
-                                <h3 class="mb-4 text-lg font-semibold">
-                                    Theme Settings
-                                </h3>
+
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <!-- Primary Color -->
                                     <div>
@@ -385,10 +451,11 @@ name, color
                                                 ) in colorOptions" :key="color" @click="
                                                     form.primary_color = color
                                                     " :class="{
-                                                    'ring-2 ring-offset-2 ring-blue-500':
-                                                        form.primary_color ===
-                                                        color,
-                                                }" class="w-8 h-8 rounded-full cursor-pointer transition-all" :style="{
+                                                        'ring-2 ring-offset-2 ring-blue-500':
+                                                            form.primary_color ===
+                                                            color,
+                                                    }" class="w-8 h-8 rounded-full cursor-pointer transition-all"
+                                                :style="{
                                                     backgroundColor: color,
                                                 }" :title="name"></div>
                                         </div>
@@ -408,10 +475,11 @@ name, color
                                                 ) in colorOptions" :key="color" @click="
                                                     form.secondary_color = color
                                                     " :class="{
-                                                    'ring-2 ring-offset-2 ring-blue-500':
-                                                        form.secondary_color ===
-                                                        color,
-                                                }" class="w-8 h-8 rounded-full cursor-pointer transition-all" :style="{
+                                                        'ring-2 ring-offset-2 ring-blue-500':
+                                                            form.secondary_color ===
+                                                            color,
+                                                    }" class="w-8 h-8 rounded-full cursor-pointer transition-all"
+                                                :style="{
                                                     backgroundColor: color,
                                                 }" :title="name"></div>
                                         </div>
@@ -484,9 +552,7 @@ name, color
 
                             <!-- Backup Settings -->
                             <div v-show="activeTab === 'backup'">
-                                <h3 class="mb-4 text-lg font-semibold">
-                                    Database Backup Settings
-                                </h3>
+
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <!-- Enable Scheduled Backups -->
                                     <div class="col-span-2">
@@ -507,31 +573,50 @@ name, color
 
                                     <!-- Backup Frequency -->
                                     <div>
-                                        <InputLabel for="backup_frequency" value="Backup Frequency" />
-                                        <select id="backup_frequency" v-model="form.backup_frequency"
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            :disabled="!form.backup_enabled">
-                                            <option value="daily">Daily</option>
-                                            <option value="weekly">
-                                                Weekly
-                                            </option>
-                                            <option value="monthly">
-                                                Monthly
-                                            </option>
-                                        </select>
-                                        <InputError :message="form.errors.backup_frequency
-                                            " class="mt-2" />
+                                        <DropdownFieldInput id="backup_frequency" v-model="form.backup_frequency"
+                                            fieldName="Backup Frequency" :options="backupFrequencyOptions"
+                                            custom-width="100%"
+                                            :class="!form.backup_enabled ? 'opacity-50 pointer-events-none' : ''" />
+                                        <InputError :message="form.errors.backup_frequency" class="mt-2" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Save Settings
+                            <div class="mt-6 flex justify-end">
+                                <PrimaryButton type="button" @click="showConfirmationDialog" :disabled="form.processing">
+                                    Simpan Pengaturan
                                 </PrimaryButton>
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Popup -->
+        <div v-if="showConfirmation" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-menuBG p-6 rounded-[5px] shadow-2xl max-w-md w-full mx-4 text-center">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-yellowLabelText">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                </div>
+                <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">
+                    Konfirmasi Simpan Pengaturan
+                </h3>
+                <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-6">
+                    Apakah Anda yakin ingin menyimpan perubahan pengaturan aplikasi ini? Perubahan yang salah dapat menyebabkan kesalahan kinerja website.
+                </p>
+                <div class="flex space-x-3 justify-center">
+                    <SecondaryButton type="button" @click="cancelSave">
+                        Batal
+                    </SecondaryButton>
+                    <PrimaryButton type="button" @click="confirmSave" :disabled="form.processing">
+                        <span v-if="form.processing">Menyimpan...</span>
+                        <span v-else>Ya, Simpan</span>
+                    </PrimaryButton>
                 </div>
             </div>
         </div>

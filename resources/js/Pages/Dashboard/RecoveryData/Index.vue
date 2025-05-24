@@ -6,6 +6,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import { router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
 
 const props = defineProps({
     backups: Array,
@@ -55,6 +56,31 @@ const deleteBackup = (path) => {
         });
     }
 };
+
+// Define table headers for the backups table
+const tableHeaders = [
+    {
+        label: 'Date',
+        field: 'date',
+        sortable: true,
+        nowrap: true
+    },
+    {
+        label: 'Size',
+        field: 'size',
+        sortable: false,
+        nowrap: true
+    },
+    {
+        label: 'Actions',
+        field: 'actions',
+        sortable: false,
+        nowrap: true
+    }
+];
+
+// Empty state message
+const emptyStateMessage = "No backups available. Create your first backup to get started.";
 </script>
 
 <template>
@@ -74,98 +100,53 @@ const deleteBackup = (path) => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm  ">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-medium text-gray-900">
-                                Backup Management
-                            </h3>
-                            <PrimaryButton @click="createBackup">Create New Backup</PrimaryButton>
-                        </div>
+        <template #search-area>
+            <PrimaryButton @click="createBackup">Cadangkan Sekarang</PrimaryButton>
+        </template>
 
-                        <div class="bg-gray-100 p-4 mb-6 rounded-lg">
-                            <h4 class="text-md font-medium mb-2">
-                                About Data Backup
-                            </h4>
-                            <p class="text-sm text-gray-600">
-                                This page allows you to create, download, and
-                                restore data backups for your application.
-                                Creating a backup will save the current state of
-                                your database and files. Restoring will replace
-                                the current data with the selected backup.
-                            </p>
-                        </div>
+        <div class="bg-greenLabel p-4 mb-6 rounded-lg">
+            <h4
+                class="text-[18px] sm:text-[18px] md:text-[18px] xl:text-[20px] 2xl:text-[23px] 3xl:text-[27px] 4xl:text-[31px] font-semibold leading-tight text-accent2 mb-2">
+                Terkait Pencadangan dan Pemulihan Data
+            </h4>
+            <p
+                class="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] 4xl:text-[20px] text-gray-600">
+                Dengan halaman ini Anda dapat membuat, mengunduh, dan memulihkan cadangan data untuk website CMS Desa
+                Anda.
+                Membuat cadangan akan menyimpan database dan semua file dari website CMS Desa. Secara default, pencadangan data
+                dilakukan secara
+                otomatis setiap minggu. Anda dapat mengatur frekuensi pencadangan di halaman Pengaturan. 
+            </p>
+        </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dashboard-table">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Date
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Size
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-if="backups && backups.length === 0">
-                                        <td class="px-6 py-4 text-center text-gray-500" colspan="3">
-                                            No backups available. Create your
-                                            first backup to get started.
-                                        </td>
-                                    </tr>
-                                    <tr v-for="(backup, index) in backups" :key="index">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div>
-                                                <span v-if="backup.date">
-                                                    {{ backup.date }}
-                                                </span>
-                                                <span v-else>Unknown date</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            {{ backup.size }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex space-x-2">
-                                                <PrimaryButton @click="
-                                                    downloadBackup(
-                                                        backup.path
-                                                    )
-                                                    " :disabled="downloading">
-                                                    Download
-                                                </PrimaryButton>
-                                                <PrimaryButton class="bg-yellow-500 hover:bg-yellow-600" @click="
-                                                    restoreBackup(
-                                                        backup.path
-                                                    )
-                                                    " :disabled="restoring">
-                                                    Restore
-                                                </PrimaryButton>
-                                                <DangerButton @click="
-                                                    deleteBackup(
-                                                        backup.path
-                                                    )
-                                                    ">
-                                                    Delete
-                                                </DangerButton>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+        <div class="h-full">
+            <div class="overflow-hidden bg-white shadow-sm h-full">
+                <Tabel 
+                    :headers="tableHeaders"
+                    :items="backups || []"
+                    :empty-state-message="emptyStateMessage"
+                    :pagination="backups && backups.length > 10"
+                    :items-per-page="10"
+                >
+                    <!-- Custom slot for Actions column -->
+                    <template #item.Actions="{ item }">
+                        <div class="flex justify-left space-x-2">
+                            <PrimaryButton 
+                                @click="downloadBackup(item.path)" 
+                                :disabled="downloading"
+                            >
+                                Download
+                            </PrimaryButton>
+                            <PrimaryButton 
+                                class="bg-yellow-500 hover:bg-yellow-600" 
+                                @click="restoreBackup(item.path)" 
+                                :disabled="restoring"
+                            >
+                                Restore
+                            </PrimaryButton>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </Tabel>
             </div>
         </div>
     </AuthenticatedLayout>
