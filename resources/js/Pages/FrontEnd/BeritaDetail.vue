@@ -36,22 +36,6 @@ const replyCaptchaData = ref(null);
 const mainCaptchaCode = ref("");
 const replyCaptchaCode = ref("");
 
-// Home data
-const home = ref({});
-const homeLoading = ref(false);
-
-const fetchHome = async () => {
-    try {
-        homeLoading.value = true;
-        const response = await axios.get("/api/home");
-        home.value = response.data;
-    } catch (error) {
-        console.error("Error fetching home data:", error);
-    } finally {
-        homeLoading.value = false;
-    }
-};
-
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString("id-ID", {
         year: "numeric",
@@ -79,7 +63,7 @@ const fetchNewsDetail = async () => {
     try {
         loading.value = true;
         const response = await axios.get(`/api/news/${props.slug}`);
-        news.value = response.data;
+        news.value = response.data.data;
     } catch (err) {
         error.value = "Failed to load news";
         console.error("Error fetching news:", err);
@@ -325,21 +309,21 @@ onMounted(() => {
                             />
                         </svg>
                         <h1
-                            class="lg:text-lg text-accent2 -mb-0.5 font-merriweather"
+                            class="text-lg font- text-accent2 -mb-0.5 font-merriweather"
                         >
-                            Berita {{ news.category.name }}
+                            Berita {{ news.category_name }}
                         </h1>
                     </div>
 
-                    <div class="flex flex-col lg:flex-row">
-                        <div class="flex flex-col w-full lg:w-2/3">
+                    <div class="flex flex-row">
+                        <div class="flex flex-col w-2/3">
                             <!-- News Detail -->
                             <div
-                                class="flex flex-col bg-white rounded-lg shadow overflow-hidden mx-auto p-5 lg:p-6"
+                                class="flex flex-col bg-white rounded-lg shadow overflow-hidden mx-auto p-6"
                             >
                                 <!-- Title -->
                                 <h1
-                                    class="flex text-xl lg:text-3xl font-bold text-accent1 lg:mb-4 font-merriweather"
+                                    class="flex text-3xl font-bold text-accent1 mb-4 font-merriweather"
                                 >
                                     {{ news.title }}
                                 </h1>
@@ -362,42 +346,35 @@ onMounted(() => {
                                                 d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm80 240v-80h400v80H280Zm0 160v-80h280v80H280Z"
                                             />
                                         </svg>
-                                        <h3
-                                            class="flex lg:-mb-1 text-sm lg:text-lg"
-                                        >
+                                        <h3 class="flex -mb-1">
                                             {{ formatDate(news.created_at) }}
                                         </h3>
                                     </div>
-                                    <!-- AUTHOR -->
                                     <div class="flex items-center space-x-2">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            height="20px"
+                                            height="24px"
                                             viewBox="0 -960 960 960"
-                                            width="20px"
-                                            fill="currentColor "
-                                            class="text-accent2 lg:w-6 lg:h-6"
+                                            width="24px"
+                                            fill="currentColor"
+                                            class="text-accent2"
                                         >
                                             <path
                                                 d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"
                                             />
                                         </svg>
-                                        <h3
-                                            class="flex lg:-mb-1 text-sm lg:text-lg"
-                                        >
+                                        <h3 class="flex -mb-1">
                                             {{ news.user?.name || "Admin" }}
                                         </h3>
                                     </div>
-
-                                    <!-- Views -->
                                     <div class="flex items-center space-x-2">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            height="20px"
+                                            height="24px"
                                             viewBox="0 -960 960 960"
-                                            width="20px"
+                                            width="24px"
                                             fill="currentColor"
-                                            class="text-accent2 lg:w-6 lg:h-6"
+                                            class="text-accent2"
                                         >
                                             <path
                                                 d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"
@@ -536,23 +513,16 @@ onMounted(() => {
                                         <Link
                                             v-for="item in relatedNews"
                                             :key="item.id"
-                                            :href="`/berita-test/${item.slug}`"
+                                            :href="`/berita/${item.slug}`"
                                             class="flex flex-row py-3 gap-2 hover:bg-gray-200 hover:shadow-sm rounded-md transition duration-300 ease-in-out cursor-pointer"
                                         >
                                             <div class="flex w-1/2">
                                                 <img
-                                                    :src="
-                                                        item.image &&
-                                                        item.image.path
-                                                            ? `/storage/${item.image.path}`
-                                                            : '/default-image.jpg'
-                                                    "
-                                                    :alt="
-                                                        item.image &&
-                                                        item.image.alt
-                                                            ? item.image.alt
-                                                            : 'News Image'
-                                                    "
+                                                    :src="`/storage/${
+                                                        item.thumbnail ||
+                                                        'default.jpg'
+                                                    }`"
+                                                    alt="News Image"
                                                     class="w-full h-20 object-cover rounded-md"
                                                 />
                                             </div>

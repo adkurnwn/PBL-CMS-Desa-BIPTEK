@@ -41,11 +41,25 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request, $slug)
     {
         $profile = Profile::where('name', $slug)->firstOrFail();
+
+        $profileData = $request->except([
+            'logo',
+            'organization_image',
+            'hero_images',
+            'hero_image_1',
+            'hero_image_2',
+            'hero_image_3',
+            'lembaga',
+            'fasilitas'
+        ]);
+
+        // Get the village name for the profile name
         $village = Village::find($request->kelurahan);
         if ($village) {
             $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
         }
 
+        // Handle JSON fields
         $profileData['lembaga'] = json_encode($request->lembaga);
         $profileData['fasilitas'] = json_encode($request->fasilitas);
 

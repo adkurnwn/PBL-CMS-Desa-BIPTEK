@@ -6,41 +6,50 @@ import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import axios from 'axios';
 
-// Home data
+// Data refs
 const home = ref({});
-const homeLoading = ref(false);
-
-const fetchHome = async () => {
-    try {
-        homeLoading.value = true;
-        const response = await axios.get("/api/home");
-        home.value = response.data;
-    } catch (error) {
-        console.error("Error fetching home data:", error);
-    } finally {
-        homeLoading.value = false;
-    }
-};
-
-// Events data
+const news = ref([]);
 const events = ref([]);
-const eventsLoading = ref(true);
+const gallery = ref({});
+const produkDesa = ref([]);
+const loading = ref({
+  home: true,
+  events: true,
+  news: true,
+  gallery: true,
+  produk: true
+});
 
-const fetchEvents = async () => {
-    try {
-        const response = await axios.get('/api/events');
-        events.value = response.data;
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        events.value = []; // Set to empty array if API fails
-    } finally {
-        eventsLoading.value = false;
-    }
+// Unified fetch function for all data
+const fetchData = async () => {
+  try {
+    // Fetch all data in parallel
+    const [homeRes, eventsRes, newsRes, galleryRes, produkRes] = await Promise.all([
+      axios.get('/api/profile/home'),
+      axios.get('/api/events'),
+      axios.get('/api/news/preview'),
+      axios.get('/api/gallery/highlight'),
+      axios.get('/api/produk-desa/preview')
+    ]);
+
+    // Update refs with response data
+    home.value = homeRes.data.data || {};
+    events.value = eventsRes.data.data || [];
+    news.value = newsRes.data.data || [];
+    gallery.value = galleryRes.data.data || { images: [] };
+    produkDesa.value = produkRes.data.data || [];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    // Set all loading states to false
+    Object.keys(loading.value).forEach(key => {
+      loading.value[key] = false;
+    });
+  }
 };
 
 onMounted(() => {
-    fetchHome();
-    fetchEvents();
+  fetchData();
 });
 </script>
 <!-- Homeview.vue -->
@@ -89,9 +98,9 @@ onMounted(() => {
 
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
           <NewsCard
-              v-for="newsItem in home.news"
+              v-for="newsItem in news"
               :key="newsItem.id"
-              :href="`/berita-test/${newsItem.slug}`"
+              :href="`/berita/${newsItem.slug}`"
               :isHome="true"
               :news="newsItem"
           />
@@ -140,19 +149,19 @@ onMounted(() => {
         </div>
 
         <!-- Gallery content -->
-        <div v-else-if="home.gallery && home.gallery.images && home.gallery.images.length > 0" class="flex flex-col w-full justify-between space-y-4">
+        <div v-else-if="gallery && gallery.images && gallery.images.length > 0" class="flex flex-col w-full justify-between space-y-4">
           <!-- First row - 2 images -->
           <div class="flex flex-row w-full justify-between space-x-2">
             <img
-              v-if="home.gallery.images[0]"
-              :src="`/storage/${home.gallery.images[0].path}`"
-              :alt="home.gallery.images[0].alt"
+              v-if="gallery.images[0]"
+              :src="`/storage/${gallery.images[0].path}`"
+              :alt="gallery.images[0].alt"
               class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[1]"
-              :src="`/storage/${home.gallery.images[1].path}`"
-              :alt="home.gallery.images[1].alt"
+              v-if="gallery.images[1]"
+              :src="`/storage/${gallery.images[1].path}`"
+              :alt="gallery.images[1].alt"
               class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
             />
           </div>
@@ -160,21 +169,21 @@ onMounted(() => {
           <!-- Second row - 3 images -->
           <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
             <img
-              v-if="home.gallery.images[2]"
-              :src="`/storage/${home.gallery.images[2].path}`"
-              :alt="home.gallery.images[2].alt"
+              v-if="gallery.images[2]"
+              :src="`/storage/${gallery.images[2].path}`"
+              :alt="gallery.images[2].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[3]"
-              :src="`/storage/${home.gallery.images[3].path}`"
-              :alt="home.gallery.images[3].alt"
+              v-if="gallery.images[3]"
+              :src="`/storage/${gallery.images[3].path}`"
+              :alt="gallery.images[3].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[4]"
-              :src="`/storage/${home.gallery.images[4].path}`"
-              :alt="home.gallery.images[4].alt"
+              v-if="gallery.images[4]"
+              :src="`/storage/${gallery.images[4].path}`"
+              :alt="gallery.images[4].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
             />
           </div>
@@ -197,7 +206,7 @@ onMounted(() => {
         </h2>
         <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2 w-max-full">
           <ProductCard
-          v-for="produkDesa in home.produkDesa"
+          v-for="produkDesa in produkDesa"
                 :key="produkDesa.id"
                 :produkDesa="produkDesa"
            />

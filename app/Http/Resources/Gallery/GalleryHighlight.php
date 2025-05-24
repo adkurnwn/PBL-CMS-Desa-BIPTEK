@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Gallery;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class GalleryResource extends JsonResource
+class GalleryHighlight extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array<string, mixed>
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'images' => $this->images->take(5)->map(function ($image) {
