@@ -370,7 +370,7 @@ const toggleCommentModerator = () => {
                                     <!-- Custom comment moderation box -->
                                     <div class="moderation-container ">
                                         <div 
-                                            class="w-full mb-[15px] rounded-[10px] overflow-hidden bg-menuBG"
+                                            class="w-full mb-[15px] rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] overflow-hidden bg-menuBG"
                                         >
                                             <!-- Header - highlight if any of the submenu items are active -->
                                             <button 
@@ -411,7 +411,7 @@ const toggleCommentModerator = () => {
                                                 v-show="commentModeratorExpanded"
                                                 class="transition-all duration-300 ease-out overflow-hidden "
                                             >
-                                                <div class="submenu-wrapper rounded-[10px] overflow-hidden">
+                                                <div class="submenu-wrapper rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] overflow-hidden">
                                                     <!-- Berita submenu with proper MenuBox styling -->
                                                     <Link
                                                         :href="route('dashboard.comments')"

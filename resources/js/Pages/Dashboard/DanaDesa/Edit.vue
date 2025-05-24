@@ -4,8 +4,11 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+import FileField from "@/Components/DashboardComponent/FileField.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
 
 const props = defineProps({
     danaDesa: {
@@ -22,8 +25,8 @@ const form = useForm({
     _method: "PUT",
 });
 
-const handleFileChange = (e) => {
-    form.file = e.target.files[0];
+const handleFileChange = (file) => {
+    form.file = file;
 };
 
 const submit = () => {
@@ -51,115 +54,89 @@ const submit = () => {
                                 fill="#4C7660" />
                         </g>
                     </svg>
-
                 </template>
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <form
-                            @submit.prevent="submit"
-                            enctype="multipart/form-data"
-                        >
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Name Field -->
+        <template #subtitle-area>
+            Edit Dana Desa
+        </template>
+
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                    <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column -->
                                 <div>
-                                    <InputLabel for="title" value="Title" />
-                                    <TextInput
-                                        id="title"
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
+                                    <SingleLineField 
+                                        id="title" 
+                                        v-model="form.title" 
+                                        type="text" 
+                                        fieldName="Judul" 
+                                        required 
+                                        custom-width="100%" 
                                     />
-                                    <InputError
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.title" class="mt-2" />
                                 </div>
 
+                                <!-- Date Field -->
                                 <div>
-                                    <InputLabel for="link" value="Link" />
-                                    <TextInput
-                                        id="link"
-                                        v-model="form.link"
-                                        type="text"
-                                        class="mt-1 block w-full"
+                                    <SingleLineField 
+                                        id="date" 
+                                        v-model="form.date" 
+                                        type="date" 
+                                        fieldName="Tanggal" 
+                                        required 
+                                        custom-width="100%" 
                                     />
-                                    <InputError
-                                        :message="form.errors.link"
-                                        class="mt-2"
+                                    <InputError :message="form.errors.date" class="mt-2" />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- Second column -->
+                                <div>
+                                    <SingleLineField 
+                                        id="link" 
+                                        v-model="form.link" 
+                                        type="text" 
+                                        fieldName="Link" 
+                                        custom-width="100%" 
                                     />
+                                    <InputError :message="form.errors.link" class="mt-2" />
                                 </div>
 
+                                <!-- Updated File Field -->
                                 <div>
-                                    <InputLabel for="file" value="File" />
-                                    <!-- Show current file if exists -->
-                                    <div
-                                        v-if="props.danaDesa.file"
-                                        class="mb-2"
-                                    >
-                                        <p class="text-sm text-gray-600">
-                                            Current file:
-                                        </p>
-                                        <a
-                                            :href="`/storage/${props.danaDesa.file}`"
-                                            target="_blank"
-                                            class="text-blue-600 hover:text-blue-800"
-                                        >
-                                            View current file
-                                        </a>
-                                    </div>
-                                    <input
+                                    <FileField
                                         id="file"
-                                        type="file"
-                                        @input="handleFileChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        v-model="form.file"
+                                        fieldName="File"
+                                        :current-file="props.danaDesa.file"
+                                        :current-file-url="`/storage/${props.danaDesa.file}`"
                                         accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        custom-width="100%"
+                                        help-text="Kosongkan untuk mempertahankan file saat ini"
+                                        @update:modelValue="handleFileChange"
                                     />
-                                    <p class="mt-1 text-sm text-gray-500">
-                                        Leave empty to keep the current file
-                                    </p>
-                                    <InputError
-                                        :message="form.errors.file"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Add Date Field -->
-                                <div>
-                                    <InputLabel for="date" value="Date" />
-                                    <TextInput
-                                        id="date"
-                                        v-model="form.date"
-                                        type="date"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.date"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.file" class="mt-2" />
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Update Dana Desa
-                                </PrimaryButton>
-                                <Link
-                                    :href="route('dashboard.dana-desa.index')"
-                                >
-                                    <PrimaryButton type="button">
-                                        Cancel
-                                    </PrimaryButton>
-                                </Link>
-                            </div>
-                        </form>
-                    </div>
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.dana-desa.index')" class="mr-[15px]">
+                                <SecondaryButton type="button">
+                                    BATAL
+                                </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                UPDATE
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

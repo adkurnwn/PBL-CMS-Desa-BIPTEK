@@ -9,9 +9,10 @@ use App\Http\Controllers\Controller;
 
 class ActivityLogController extends Controller
 {
-    public function index(Request $request, $page = 1)
+    public function index(Request $request, $page = null)
     {
-        // Convert $page to integer if it's a string
+        // Get page from request parameter or route parameter
+        $page = $request->input('page', $page ?? 1);
         $page = (int)$page;
         
         $perPage = 25; // Show a reasonable amount of records per page
@@ -41,13 +42,13 @@ class ActivityLogController extends Controller
         // Apply sorting
         $query->orderBy('created_at', $sortDirection);
         
-        // Paginate results
-        $logs = $query->paginate($perPage, ['*'], 'page', $page);
-        
+        // Paginate results with proper page parameter
+        $logs = $query->paginate($perPage, ['*'], 'page', $page)
+                     ->withQueryString(); // Preserve query parameters in pagination links
 
         return Inertia::render('Dashboard/Home/LogActivity', [
             'logs' => $logs,
-            'currentPage' => $page,
+            'currentPage' => $logs->currentPage(),
             'sortField' => $sortField,
             'sortDirection' => $sortDirection,
             'search' => $searchQuery, // Pass search query back to component

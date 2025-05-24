@@ -103,10 +103,14 @@ class ProdukHukumController extends Controller
         $data['category_id'] = $category_id;
 
         if ($request->hasFile('file')) {
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            // Generate a sanitized filename from the title with timestamp
+            $sanitizedTitle = preg_replace('/[^a-zA-Z0-9\-_\.]/', '_', $request->title);
+            $sanitizedTitle = preg_replace('/_+/', '_', $sanitizedTitle); // Remove multiple underscores
+            $sanitizedTitle = trim($sanitizedTitle, '_'); // Remove leading/trailing underscores
+            
+            $timestamp = now()->format('Y-m-d_H-i-s');
             $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
+            $filename = $sanitizedTitle . '_' . $timestamp . '.' . $extension;
 
             // Store the file with the custom filename
             $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
@@ -149,10 +153,14 @@ class ProdukHukumController extends Controller
                 Storage::disk('public')->delete($produkHukum->file);
             }
 
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
+            // Generate a sanitized filename from the title with timestamp
+            $sanitizedTitle = preg_replace('/[^a-zA-Z0-9\-_\.]/', '_', $request->title);
+            $sanitizedTitle = preg_replace('/_+/', '_', $sanitizedTitle); // Remove multiple underscores
+            $sanitizedTitle = trim($sanitizedTitle, '_'); // Remove leading/trailing underscores
+            
+            $timestamp = now()->format('Y-m-d_H-i-s');
             $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
+            $filename = $sanitizedTitle . '_' . $timestamp . '.' . $extension;
 
             // Store the file with the custom filename
             $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');

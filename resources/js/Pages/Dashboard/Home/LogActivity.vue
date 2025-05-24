@@ -31,19 +31,16 @@ const props = defineProps({
 // Extract the logs data from the paginated response
 const activityLogs = computed(() => props.logs?.data || []);
 
-// Extract pagination info with more explicit debugging
+// Extract pagination info with proper error handling
 const pagination = computed(() => {
     if (!props.logs) return null;
 
     const paginationData = {
-        currentPage: props.logs.current_page,
-        lastPage: props.logs.last_page,
-        perPage: props.logs.per_page,
-        total: props.logs.total,
+        currentPage: props.logs.current_page || props.currentPage || 1,
+        lastPage: props.logs.last_page || 1,
+        perPage: props.logs.per_page || 25,
+        total: props.logs.total || 0,
     };
-
-    // Debug output
-    console.log('Pagination info:', paginationData);
 
     return paginationData;
 });
@@ -156,10 +153,10 @@ watch(() => props.search, (newValue) => {
     }
 }, { immediate: true });
 
-// Handle pagination changes
+// Handle pagination changes - simplified and fixed
 const handlePageChanged = (newPage) => {
     const routeParams = {
-        sort: props.sortField,
+        page: newPage,
         direction: props.sortDirection
     };
 
@@ -168,22 +165,15 @@ const handlePageChanged = (newPage) => {
         routeParams.search = searchQuery.value;
     }
 
-    if (newPage === 1) {
-        router.get(route('dashboard.activity-logs'), routeParams, {
-            preserveScroll: true,
-            preserveState: true,
-            only: ['logs']
-        });
-    } else {
-        router.get(route('dashboard.activity-logs.page', { page: newPage }), routeParams, {
-            preserveScroll: true,
-            preserveState: true,
-            only: ['logs']
-        });
-    }
+    // Use the same route for all pages, Laravel will handle the page parameter
+    router.get(route('dashboard.activity-logs'), routeParams, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['logs', 'currentPage']
+    });
 };
 
-// Handle sorting - simplified for time only
+// Handle sorting - fixed to maintain page state
 const handleSort = (field) => {
     // Only allow sorting on time field
     if (field !== 'time') return;
@@ -191,29 +181,21 @@ const handleSort = (field) => {
     // Toggle sort direction
     const sortDirection = props.sortDirection === 'asc' ? 'desc' : 'asc';
 
-    // Build route params including search if it exists
+    // Build route params
     const routeParams = {
-        direction: sortDirection
+        direction: sortDirection,
+        page: 1 // Reset to first page when sorting
     };
 
     if (searchQuery.value) {
         routeParams.search = searchQuery.value;
     }
 
-    // Navigate to the appropriate route with parameters
-    if (props.currentPage === 1) {
-        router.get(route('dashboard.activity-logs'), routeParams, {
-            preserveScroll: true,
-            preserveState: true,
-            only: ['logs', 'sortDirection']
-        });
-    } else {
-        router.get(route('dashboard.activity-logs.page', { page: props.currentPage }), routeParams, {
-            preserveScroll: true,
-            preserveState: true,
-            only: ['logs', 'sortDirection']
-        });
-    }
+    router.get(route('dashboard.activity-logs'), routeParams, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['logs', 'sortDirection', 'currentPage']
+    });
 };
 
 // Add a console log to verify pagination data
@@ -295,7 +277,7 @@ onMounted(() => {
         <!-- Use the table-content slot -->
         <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm   h-full">
+                <div class="overflow-hidden bg-white shadow-sm h-full">
                     <div class="h-full">
                         <Tabel :headers="tableHeaders" :items="tableItems" :pagination="true"
                             :items-per-page="pagination?.perPage || 25" :total-items="pagination?.total || 0"

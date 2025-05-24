@@ -4,8 +4,11 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import TextAreaInput from "@/Components/DashboardComponent/TextAreaInput.vue";
 
 const form = useForm({
     title: "",
@@ -17,7 +20,6 @@ const form = useForm({
 
 const submit = () => {
     form.post(route("dashboard.events.store"), {
-        // Changed from news.store to events.store
         onSuccess: () => form.reset(),
         preserveScroll: true,
     });
@@ -25,6 +27,7 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Buat Agenda" />
     <AuthenticatedLayout>
         <template #header>
@@ -39,111 +42,68 @@ const submit = () => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <form @submit.prevent="submit">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Title Field -->
-                                <div>
-                                    <InputLabel for="title" value="Title" />
-                                    <TextInput
-                                        id="title"
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
-                                </div>
+        <template #subtitle-area>
+            Buat Agenda
+        </template>
 
-                                <!-- Location Field -->
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                    <form @submit.prevent="submit">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column -->
                                 <div>
-                                    <InputLabel
-                                        for="location"
-                                        value="Location"
-                                    />
-                                    <TextInput
-                                        id="location"
-                                        v-model="form.location"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.location"
-                                        class="mt-2"
-                                    />
+                                    <SingleLineField id="title" v-model="form.title" type="text" fieldName="Judul"
+                                        required custom-width="100%" />
+                                    <InputError :message="form.errors.title" class="mt-2" />
                                 </div>
 
                                 <!-- Date Field -->
                                 <div>
-                                    <InputLabel for="date" value="Date" />
-                                    <TextInput
-                                        id="date"
-                                        v-model="form.date"
-                                        type="date"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.date"
-                                        class="mt-2"
-                                    />
+                                    <SingleLineField id="date" v-model="form.date" type="date" fieldName="Tanggal"
+                                        required custom-width="100%" />
+                                    <InputError :message="form.errors.date" class="mt-2" />
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- Second column -->
+                                <div>
+                                    <SingleLineField id="location" v-model="form.location" type="text"
+                                        fieldName="Lokasi" required custom-width="100%" />
+                                    <InputError :message="form.errors.location" class="mt-2" />
                                 </div>
 
                                 <!-- Time Field -->
                                 <div>
-                                    <InputLabel for="time" value="Time" />
-                                    <TextInput
-                                        id="time"
-                                        v-model="form.time"
-                                        type="time"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.time"
-                                        class="mt-2"
-                                    />
+                                    <SingleLineField id="time" v-model="form.time" type="time" fieldName="Waktu"
+                                        required custom-width="100%" />
+                                    <InputError :message="form.errors.time" class="mt-2" />
                                 </div>
 
-                                <!-- Description Field -->
-                                <div class="col-span-2">
-                                    <InputLabel
-                                        for="description"
-                                        value="Description"
-                                    />
-                                    <textarea
-                                        id="description"
-                                        v-model="form.description"
-                                        rows="4"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.description"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create Event
-                                </PrimaryButton>
-                                <Link :href="route('dashboard.events.index')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
-                                </Link>
-                            </div>
-                        </form>
-                    </div>
+
+                        </div>
+
+                        <div>
+                            <TextAreaInput id="description" v-model="form.description" type="text" fieldName="Deskripsi"
+                                required custom-width="100%" />
+                            <InputError :message="form.errors.description" class="mt-2" />
+                        </div>
+
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.events.index')" class="mr-[15px]">
+                            <SecondaryButton type="button">
+                                BATAL
+                            </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                CREATE EVENT
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

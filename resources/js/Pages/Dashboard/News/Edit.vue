@@ -7,8 +7,8 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
-import CategoryInput from "@/Components/CategoryInput.vue";
-import ImageEditor from "@/Components/ImageEditor.vue";
+import CategoryInput from "@/Components/DashboardComponent/CategoryInput.vue";
+import ImageEditor from "@/Components/DashboardComponent/ImageEditor.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
