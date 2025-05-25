@@ -179,8 +179,13 @@ class NewsController extends Controller
         $news = News::where('slug', $slug)->firstOrFail();
         $categories = $this->categoryService->getCategoriesWithUsageCounts(1);
 
+        // Convert existing images in content to placeholders for editing
+        $editableContent = $this->convertImagesToPlaceholders($news->content);
+
         return Inertia::render('Dashboard/News/Edit', [
-            'news' => $news->load('images', 'category'),
+            'news' => array_merge($news->load('images', 'category')->toArray(), [
+                'content' => $editableContent
+            ]),
             'categories' => $categories,
             'unused_categories' => $this->categoryService->getUnusedCategories(1),
         ]);
@@ -243,37 +248,67 @@ class NewsController extends Controller
     }
 
     /**
+     * Convert img tags in content to placeholders for editing
+     */
+    private function convertImagesToPlaceholders($content)
+    {
+        // Replace img tags that reference storage images with placeholders
+        $pattern = '/<img[^>]*src="[^"]*\/storage\/[^"]*"[^>]*>/';
+        $convertedContent = preg_replace_callback($pattern, function($matches) {
+            return '{{EXISTING_IMAGE_PLACEHOLDER}}';
+        }, $content);
+        
+        return $convertedContent;
+    }
+
+    /**
      * Process image placeholders in content and replace with HTML img tags
+     * Modified to append ImageUploader images at the end
      */
     private function processImagePlaceholdersInContent($content, $uploadedImages)
     {
         $processedContent = $content;
         
-        // Replace placeholders with actual image HTML
-        foreach ($uploadedImages as $index => $imageData) {
-            $placeholder = "{{IMAGE_$index}}";
-            $imageHtml = sprintf(
-                '<img src="%s" alt="%s" class="max-w-full h-auto block my-2" />',
-                asset('storage/' . $imageData['path']),
-                htmlspecialchars($imageData['alt'] ?? '')
-            );
-            
-            $processedContent = str_replace($placeholder, $imageHtml, $processedContent);
-        }
+        // For create mode: Remove ImageUploader placeholders from content
+        // For edit mode: Handle both existing and new placeholders
         
-        // Clean up any remaining placeholder patterns that might not have been processed
+        // First, restore existing image placeholders (these stay in place) - only for edit mode
+        $processedContent = str_replace('{{EXISTING_IMAGE_PLACEHOLDER}}', '', $processedContent);
+        
+        // Remove any ImageUploader placeholders from the main content
+        $processedContent = str_replace('{{IMAGEUPLOADER_PLACEHOLDER}}', '', $processedContent);
+        
+        // Clean up any remaining placeholder patterns
         $processedContent = preg_replace('/\{\{IMAGE_\d+\}\}/', '', $processedContent);
         
-        // Clean up any remaining blob URLs that might have slipped through
+        // Clean up any remaining blob URLs and temp image attributes
         $processedContent = preg_replace('/<img[^>]*src="blob:[^"]*"[^>]*>/', '', $processedContent);
+        $processedContent = preg_replace('/<img[^>]*data-is-temp-upload="true"[^>]*>/', '', $processedContent);
         
-        // Remove any data-is-placeholder attributes from remaining images
+        // Remove data attributes from remaining images
         $processedContent = preg_replace('/\s*data-is-placeholder="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-image-id="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-blob-url="[^"]*"/', '', $processedContent);
+        $processedContent = preg_replace('/\s*data-temp-image-id="[^"]*"/', '', $processedContent);
+        $processedContent = preg_replace('/\s*data-is-temp-upload="[^"]*"/', '', $processedContent);
         
-        // Replace preview classes with final classes for full-width display
-        $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="max-w-full h-auto block my-2"', $processedContent);
+        // Replace preview classes with final classes
+        $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="w-full h-auto block my-2"', $processedContent);
+        
+        // Now append all ImageUploader images at the end
+        if (!empty($uploadedImages)) {
+            $appendedImages = '';
+            foreach ($uploadedImages as $imageData) {
+                $appendedImages .= sprintf(
+                    '<img src="%s" alt="%s" class="w-full h-auto block my-2" />',
+                    asset('storage/' . $imageData['path']),
+                    htmlspecialchars($imageData['alt'] ?? '')
+                );
+            }
+            
+            // Add images at the end of content
+            $processedContent .= $appendedImages;
+        }
         
         return $processedContent;
     }

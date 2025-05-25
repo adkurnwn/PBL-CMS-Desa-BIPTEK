@@ -91,9 +91,20 @@ class MediaService
 
             // Different models have different relationship methods
             if (method_exists($model, 'images')) {
-                $createdImages[] = $model->images()->create($imageData);
+                $createdImage = $model->images()->create($imageData);
+                // Return data in format expected by controller
+                $createdImages[] = [
+                    'path' => $filePath,
+                    'alt' => $altText,
+                    'id' => $createdImage->id
+                ];
             } elseif (method_exists($model, 'gambarProduk')) {
-                $createdImages[] = $model->gambarProduk()->create($imageData);
+                $createdImage = $model->gambarProduk()->create($imageData);
+                $createdImages[] = [
+                    'path' => $filePath,
+                    'alt' => $altText,
+                    'id' => $createdImage->id
+                ];
             }
         }
 

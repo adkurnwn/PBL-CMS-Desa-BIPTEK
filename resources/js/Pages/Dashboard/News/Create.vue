@@ -226,7 +226,7 @@ const submit = (isDraft = false) => {
 
                             <div
                                 class="col-span-2 p-[3.5px] sm:p-[4px] md:p-[4.5px] lg:p-[4.8px] xl:p-[5.3px] 2xl:p-[6px] 3xl:p-[7px] 4xl:p-[8px]">
-                                <RichText ref="richTextRef" v-model="form.content"
+                                <RichText type="for_create" ref="richTextRef" v-model="form.content"
                                     @image-added="handleRichTextImageAdded" />
                                 <InputError :message="form.errors.content" class="mt-2" />
                             </div>

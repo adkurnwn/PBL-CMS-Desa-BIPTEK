@@ -22,6 +22,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   modelValue: String,
+  type: {
+    type: String,
+    default: 'for_create', // 'for_create' or 'for_edit'
+    validator: (value) => ['for_create', 'for_edit'].includes(value)
+  }
 })
 
 const emit = defineEmits(['update:modelValue', 'image-added'])
@@ -33,11 +38,67 @@ const isResizing = ref(false)
 const minHeight = ref(600) // Minimum height that can't be shrunk
 const currentHeight = ref(300) // Current height of the editor
 
-const editor = useEditor({
-  content: props.modelValue,
-  onUpdate: ({ editor }) => {
+// Track placeholder count for edit mode
+const existingImagePlaceholderCount = ref(0)
+
+// Method to convert temporary images to placeholders (for create mode)
+const convertTempImagesToPlaceholders = () => {
+  if (props.type !== 'for_create') return editor.value.getHTML()
+  
+  let content = editor.value.getHTML()
+  
+  // Replace temporary images with placeholders
+  content = content.replace(/<img[^>]*data-is-temp-upload="true"[^>]*>/g, '{{IMAGEUPLOADER_PLACEHOLDER}}')
+  
+  return content
+}
+
+// Method to restore placeholders for edit mode
+const restoreImageUploaderPlaceholders = () => {
+  if (props.type !== 'for_edit' || existingImagePlaceholderCount.value === 0) {
+    return editor.value.getHTML()
+  }
+  
+  let content = editor.value.getHTML()
+  
+  // Add EXISTING_IMAGE_PLACEHOLDER at the end based on count
+  for (let i = 0; i < existingImagePlaceholderCount.value; i++) {
+    content += '{{EXISTING_IMAGE_PLACEHOLDER}}'
+  }
+  
+  return content
+}
+
+// Process content for edit mode - hide placeholders and count them
+const processContentForEditMode = (content) => {
+  if (props.type !== 'for_edit') return content
+  
+  // Count EXISTING_IMAGE_PLACEHOLDER
+  const placeholderMatches = content.match(/\{\{EXISTING_IMAGE_PLACEHOLDER\}\}/g)
+  existingImagePlaceholderCount.value = placeholderMatches ? placeholderMatches.length : 0
+  
+  // Remove EXISTING_IMAGE_PLACEHOLDER from display
+  let processedContent = content.replace(/\{\{EXISTING_IMAGE_PLACEHOLDER\}\}/g, '')
+  
+  return processedContent
+}
+
+// Override the update event to handle different modes
+const handleUpdate = ({ editor }) => {
+  if (props.type === 'for_create') {
+    // Convert temp images to placeholders before emitting
+    const contentWithPlaceholders = convertTempImagesToPlaceholders()
+    emit('update:modelValue', contentWithPlaceholders)
+  } else {
+    // For edit mode, emit as-is (without hidden placeholders)
     emit('update:modelValue', editor.getHTML())
-  },
+  }
+}
+
+// Update the editor configuration
+const editor = useEditor({
+  content: processContentForEditMode(props.modelValue),
+  onUpdate: handleUpdate,
   extensions: [
     StarterKit, 
     Underline,
@@ -108,27 +169,30 @@ const handleImageUpload = () => {
       // Emit image file to parent component
       emit('image-added', file)
       
-      // Create temporary blob URL for preview
-      const tempUrl = URL.createObjectURL(file)
-      tempImageUrls.value.add(tempUrl)
-      
-      // Insert image with temporary URL for preview and data attribute for tracking
-      const imageId = `image_placeholder_${Date.now()}`
-      editor.value.chain().focus().setImage({ 
-        src: tempUrl,
-        alt: '',
-        'data-image-id': imageId,
-        'data-is-placeholder': 'true',
-        'data-blob-url': tempUrl // Add this to help with replacement
-      }).run()
-      
-      // Don't revoke the URL immediately - let the processing handle it
+      if (props.type === 'for_create') {
+        // For create mode: Show actual image in editor but it will be converted to placeholder on submit
+        const tempUrl = URL.createObjectURL(file)
+        tempImageUrls.value.add(tempUrl)
+        
+        // Insert actual image with temporary URL and special attributes for identification
+        const imageId = `temp_image_${Date.now()}`
+        editor.value.chain().focus().setImage({ 
+          src: tempUrl,
+          alt: '',
+          'data-temp-image-id': imageId,
+          'data-is-temp-upload': 'true',
+          'data-blob-url': tempUrl
+        }).run()
+      } else {
+        // For edit mode: Just increment the counter (don't show placeholder text)
+        existingImagePlaceholderCount.value++
+      }
     }
   }
   input.click()
 }
 
-// Method to replace placeholder with actual image path
+// Method to replace placeholder with actual image path - simplified
 const replaceImagePlaceholder = (placeholderId, imagePath) => {
   const content = editor.value.getHTML()
   const updatedContent = content.replace(
@@ -138,9 +202,11 @@ const replaceImagePlaceholder = (placeholderId, imagePath) => {
   editor.value.commands.setContent(updatedContent)
 }
 
-// Expose method to parent
+// Expose methods to parent
 defineExpose({
-  replaceImagePlaceholder
+  replaceImagePlaceholder,
+  convertTempImagesToPlaceholders,
+  restoreImageUploaderPlaceholders
 })
 </script>
 
@@ -286,9 +352,18 @@ defineExpose({
 </template>
 
 <style scoped>
-/* Style for preview images in the editor - half width */
+/* Style for preview images in the editor */
 :deep(.richtext-preview-image) {
   max-width: 50% !important;
+  height: auto !important;
+  display: block;
+  margin: 0.5rem 0;
+}
+
+/* For create mode, show temp images at full width in editor */
+:deep(img[data-is-temp-upload="true"]) {
+  max-width: 100% !important;
+  width: 100% !important;
   height: auto !important;
   display: block;
   margin: 0.5rem 0;
