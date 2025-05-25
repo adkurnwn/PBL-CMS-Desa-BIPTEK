@@ -34,7 +34,6 @@ Route::prefix('berita')->group(function () {
     })->name('berita.show');
 });
 
-
 Route::prefix('produk-hukum')->group(function () {
     Route::get('/', function () {
         return Inertia::render('FrontEnd/ProdukHukumList');
