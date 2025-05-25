@@ -6,41 +6,50 @@ import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import axios from 'axios';
 
-// Home data
+// Data refs
 const home = ref({});
-const homeLoading = ref(false);
-
-const fetchHome = async () => {
-    try {
-        homeLoading.value = true;
-        const response = await axios.get("/api/home");
-        home.value = response.data;
-    } catch (error) {
-        console.error("Error fetching home data:", error);
-    } finally {
-        homeLoading.value = false;
-    }
-};
-
-// Events data
+const news = ref([]);
 const events = ref([]);
-const eventsLoading = ref(true);
+const gallery = ref({});
+const produkDesa = ref([]);
+const loading = ref({
+  home: true,
+  events: true,
+  news: true,
+  gallery: true,
+  produk: true
+});
 
-const fetchEvents = async () => {
-    try {
-        const response = await axios.get('/api/events');
-        events.value = response.data;
-    } catch (error) {
-        console.error('Error fetching events:', error);
-        events.value = []; // Set to empty array if API fails
-    } finally {
-        eventsLoading.value = false;
-    }
+// Unified fetch function for all data
+const fetchData = async () => {
+  try {
+    // Fetch all data in parallel
+    const [homeRes, eventsRes, newsRes, galleryRes, produkRes] = await Promise.all([
+      axios.get('/api/profile/home'),
+      axios.get('/api/events'),
+      axios.get('/api/news/preview'),
+      axios.get('/api/gallery/highlight'),
+      axios.get('/api/produk-desa/preview')
+    ]);
+
+    // Update refs with response data
+    home.value = homeRes.data.data || {};
+    events.value = eventsRes.data.data || [];
+    news.value = newsRes.data.data || [];
+    gallery.value = galleryRes.data.data || { images: [] };
+    produkDesa.value = produkRes.data.data || [];
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  } finally {
+    // Set all loading states to false
+    Object.keys(loading.value).forEach(key => {
+      loading.value[key] = false;
+    });
+  }
 };
 
 onMounted(() => {
-    fetchHome();
-    fetchEvents();
+  fetchData();
 });
 </script>
 <!-- Homeview.vue -->
@@ -89,9 +98,9 @@ onMounted(() => {
 
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
           <NewsCard
-              v-for="newsItem in home.news"
+              v-for="newsItem in news"
               :key="newsItem.id"
-              :href="`/berita-test/${newsItem.slug}`"
+              :href="`/berita/${newsItem.slug}`"
               :isHome="true"
               :news="newsItem"
           />
@@ -140,19 +149,19 @@ onMounted(() => {
         </div>
 
         <!-- Gallery content -->
-        <div v-else-if="home.gallery && home.gallery.images && home.gallery.images.length > 0" class="flex flex-col w-full justify-between space-y-4">
+        <div v-else-if="gallery && gallery.images && gallery.images.length > 0" class="flex flex-col w-full justify-between space-y-4">
           <!-- First row - 2 images -->
           <div class="flex flex-row w-full justify-between space-x-2">
             <img
-              v-if="home.gallery.images[0]"
-              :src="`/storage/${home.gallery.images[0].path}`"
-              :alt="home.gallery.images[0].alt"
+              v-if="gallery.images[0]"
+              :src="`/storage/${gallery.images[0].path}`"
+              :alt="gallery.images[0].alt"
               class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[1]"
-              :src="`/storage/${home.gallery.images[1].path}`"
-              :alt="home.gallery.images[1].alt"
+              v-if="gallery.images[1]"
+              :src="`/storage/${gallery.images[1].path}`"
+              :alt="gallery.images[1].alt"
               class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
             />
           </div>
@@ -160,21 +169,21 @@ onMounted(() => {
           <!-- Second row - 3 images -->
           <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
             <img
-              v-if="home.gallery.images[2]"
-              :src="`/storage/${home.gallery.images[2].path}`"
-              :alt="home.gallery.images[2].alt"
+              v-if="gallery.images[2]"
+              :src="`/storage/${gallery.images[2].path}`"
+              :alt="gallery.images[2].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[3]"
-              :src="`/storage/${home.gallery.images[3].path}`"
-              :alt="home.gallery.images[3].alt"
+              v-if="gallery.images[3]"
+              :src="`/storage/${gallery.images[3].path}`"
+              :alt="gallery.images[3].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
             />
             <img
-              v-if="home.gallery.images[4]"
-              :src="`/storage/${home.gallery.images[4].path}`"
-              :alt="home.gallery.images[4].alt"
+              v-if="gallery.images[4]"
+              :src="`/storage/${gallery.images[4].path}`"
+              :alt="gallery.images[4].alt"
               class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
             />
           </div>
@@ -197,7 +206,7 @@ onMounted(() => {
         </h2>
         <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2 w-max-full">
           <ProductCard
-          v-for="produkDesa in home.produkDesa"
+          v-for="produkDesa in produkDesa"
                 :key="produkDesa.id"
                 :produkDesa="produkDesa"
            />
@@ -231,7 +240,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <a href="/produk-hukum-test" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+          <a v-if="home.produk_hukum" href="/produk-hukum" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
               <div>
                 <svg xmlns=w3.org/2000/svg height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">
@@ -245,7 +254,7 @@ onMounted(() => {
               </div>
             </div>
           </a>
-          <a href="/produk-unggulan" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+          <a v-if="home.dana_desa" href="/dana-desa" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
               <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">
                 <path d="M450-240h60v-40h60q12.75 0 21.38-8.63Q600-297.25 600-310v-130q0-12.75-8.62-21.38Q582.75-470 570-470H420v-70h180v-60h-90v-40h-60v40h-60q-12.75 0-21.37 8.62Q360-582.75 360-570v130q0 12.75 8.63 21.37Q377.25-410 390-410h150v70H360v60h90v40ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h341l239 239v501q0 24-18 42t-42 18H220Zm0-60h520v-474L534-820H220v680Zm0 0v-680 680Z"/>

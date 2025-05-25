@@ -16,8 +16,7 @@
       <div 
         v-if="type === 'password'" 
         @click="togglePasswordVisibility" 
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-        style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer w-[14.7px] h-[14.7px] sm:w-[16.7px] sm:h-[16.7px] md:w-[18.7px] md:h-[18.7px] lg:w-[20.3px] lg:h-[20.3px] xl:w-[14.7px] xl:h-[14.7px] 2xl:w-[16.7px] 2xl:h-[16.7px] 3xl:w-[19.3px] 3xl:h-[19.3px] 4xl:w-[22px] 4xl:h-[22px] flex items-center justify-center"
       >
         <!-- Show password icon (eye) - Updated -->
         <svg v-if="!showPassword" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" class="text-selectedText">
@@ -86,32 +85,161 @@ export default {
 
 <style scoped>
 .single-field-container {
-  padding: 12px;
+  padding: 5.3px;
+  padding-top: 5.3px;
+  padding-bottom: 5.3px;
+  padding-left: 5.3px;
+  padding-right: 5.3px;
 }
 
 .field-name {
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 8px;
+  margin-bottom: 4.4px;
 }
 
 .field-box {
-  height: 46px;
-  font-size: 18px;
-  padding: 12px 12px 12px 12px;
+  height: 20.7px;
+  font-size: 8px;
+  padding: 5.3px;
   width: 100%;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 2.2px;
   transition: border 0.2s ease;
 }
 
-/* Remove all focus styling to prevent browser defaults */
+/* Responsive styles using media queries */
+@media (min-width: 640px) { /* sm */
+  .single-field-container {
+    padding: 6px;
+  }
+  
+  .field-name {
+    font-size: 9px;
+    margin-bottom: 5px;
+  }
+  
+  .field-box {
+    height: 23.5px;
+    font-size: 9px;
+    padding: 6px;
+    border-radius: 2.5px;
+  }
+}
+
+@media (min-width: 768px) { /* md */
+  .single-field-container {
+    padding: 6.7px;
+  }
+  
+  .field-name {
+    font-size: 10px;
+    margin-bottom: 5.6px;
+  }
+  
+  .field-box {
+    height: 26.3px;
+    font-size: 10px;
+    padding: 6.7px;
+    border-radius: 2.9px;
+  }
+}
+
+@media (min-width: 1024px) { /* lg */
+  .single-field-container {
+    padding: 7.3px;
+  }
+  
+  .field-name {
+    font-size: 11px;
+    margin-bottom: 6.1px;
+  }
+  
+  .field-box {
+    height: 28.7px;
+    font-size: 11px;
+    padding: 7.3px;
+    border-radius: 3.1px;
+  }
+}
+
+@media (min-width: 1280px) { /* xl */
+  .single-field-container {
+    padding: 8px;
+  }
+  
+  .field-name {
+    font-size: 12px;
+    margin-bottom: 6.67px;
+  }
+  
+  .field-box {
+    height: 31px;
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 3.33px;
+  }
+}
+
+@media (min-width: 1536px) { /* 2xl */
+  .single-field-container {
+    padding: 9.3px;
+  }
+  
+  .field-name {
+    font-size: 14px;
+    margin-bottom: 7.7px;
+  }
+  
+  .field-box {
+    height: 35.3px;
+    font-size: 14px;
+    padding: 9.3px;
+    border-radius: 3.8px;
+  }
+}
+
+@media (min-width: 1920px) { /* 3xl */
+  .single-field-container {
+    padding: 10.7px;
+  }
+  
+  .field-name {
+    font-size: 16px;
+    margin-bottom: 8.9px;
+  }
+  
+  .field-box {
+    height: 40px;
+    font-size: 16px;
+    padding: 10.7px;
+    border-radius: 4.4px;
+  }
+}
+
+@media (min-width: 2560px) { /* 4xl */
+  .single-field-container {
+    padding: 12px;
+  }
+  
+  .field-name {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .field-box {
+    height: 46px;
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 5px;
+  }
+}
+
+/* Keep existing rules for focus and disabled states */
 .field-box:focus {
   outline: none !important;
   box-shadow: none !important;
-  /* The focus:border-2 and focus:border-selectedText classes in the template will handle the focus style */
 }
 
-/* Keep disabled styling */
 .field-box:disabled {
   background-color: #C2C2C2;
   cursor: not-allowed;

@@ -78,7 +78,7 @@ const tableHeaders = [
         field: 'name',
         sortable: true,
         nowrap: true,
-        width: '320px',
+        width: '22%',  // Changed from '320px' to percentage
         style: {
             fontSize: '18px',
             fontStyle: 'normal',
@@ -96,7 +96,7 @@ const tableHeaders = [
         label: 'Kontak',
         field: 'email',
         sortable: false,
-        width: '400px'
+        width: '28%'  // Changed from '400px' to percentage
     },
     {
         label: 'Posisi',
@@ -105,7 +105,7 @@ const tableHeaders = [
         sortable: false,
         filterable: true,
         filterOptions: props.positions.map(pos => ({ id: pos.id, name: pos.name })),
-        width: '300px'
+        width: '21%'  // Changed from '300px' to percentage
     },
     {
         label: 'Status',
@@ -116,13 +116,13 @@ const tableHeaders = [
             { id: 1, name: 'Aktif' },
             { id: 0, name: 'Nonaktif' }
         ],
-        width: '264px'
+        width: '19%'  // Changed from '264px' to percentage
     },
     {
-        label: 'Aksi', // Changed from Actions to Aksi
+        label: 'Aksi',
         field: 'actions',
         sortable: false,
-        width: '140px'
+        width: '10%'  // Changed from '140px' to percentage
     },
 ];
 
@@ -238,10 +238,10 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
         <template #header>
             <HeadingMenu title="Manajemen Pengguna" :hasRightContent="false">
                 <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="26" viewBox="0 0 25 26" fill="none">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#40483D">
                         <path
-                            d="M12.4998 13.0003C10.804 13.0003 9.35227 12.3965 8.14463 11.1889C6.93699 9.98123 6.33317 8.52949 6.33317 6.83366C6.33317 5.13783 6.93699 3.68609 8.14463 2.47845C9.35227 1.27081 10.804 0.666992 12.4998 0.666992C14.1957 0.666992 15.6474 1.27081 16.855 2.47845C18.0627 3.68609 18.6665 5.13783 18.6665 6.83366C18.6665 8.52949 18.0627 9.98123 16.855 11.1889C15.6474 12.3965 14.1957 13.0003 12.4998 13.0003ZM0.166504 25.3337V21.017C0.166504 20.1434 0.39133 19.3404 0.840983 18.6081C1.29064 17.8758 1.88803 17.317 2.63317 16.9316C4.22623 16.135 5.84498 15.5377 7.48942 15.1394C9.13386 14.7411 10.804 14.542 12.4998 14.542C14.1957 14.542 15.8658 14.7411 17.5103 15.1394C19.1547 15.5377 20.7734 16.135 22.3665 16.9316C23.1116 17.317 23.709 17.8758 24.1587 18.6081C24.6083 19.3404 24.8332 20.1434 24.8332 21.017V25.3337H0.166504Z"
-                            fill="currentColor" />
+                            d="M400-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM80-160v-112q0-33 17-62t47-44q51-26 115-44t141-18h14q6 0 12 2-8 18-13.5 37.5T404-360h-4q-71 0-127.5 18T180-306q-9 5-14.5 14t-5.5 20v32h252q6 21 16 41.5t22 38.5H80Zm560 40-12-60q-12-5-22.5-10.5T584-204l-58 18-40-68 46-40q-2-14-2-26t2-26l-46-40 40-68 58 18q11-8 21.5-13.5T628-460l12-60h80l12 60q12 5 22.5 11t21.5 15l58-20 40 70-46 40q2 12 2 25t-2 25l46 40-40 68-58-18q-11 8-21.5 13.5T732-180l-12 60h-80Zm40-120q33 0 56.5-23.5T760-320q0-33-23.5-56.5T680-400q-33 0-56.5 23.5T600-320q0 33 23.5 56.5T680-240ZM400-560q33 0 56.5-23.5T480-640q0-33-23.5-56.5T400-720q-33 0-56.5 23.5T320-640q0 33 23.5 56.5T400-560Zm0-80Zm12 400Z" />
                     </svg>
                 </template>
             </HeadingMenu>
@@ -254,7 +254,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                 activeFiltersTitle="Filter yang aktif" :close-on-select="false" />
             <Link :href="route('dashboard.users.create')">
             <TopButton>
-                
+
             </TopButton>
             </Link>
         </template>
@@ -266,19 +266,25 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
             ]" />
         </template>
 
-        <div class="dashboard-container">
+        <!-- Use the new table-content slot instead of default slot -->
+        <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <Tabel :headers="tableHeaders" :items="userItems" :pagination="true"
                         :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
                         empty-state-message="No users found" @filter-changed="handleFilterChange" @sort="handleSort">
+                        <!-- Add slot templates for different columns -->
                         <!-- Add a template for the Kontak column -->
                         <template #['item.Kontak']="{ item }">
                             <div class="flex flex-col">
-                                <span class="text-[18px] italic text-TableText">{{ item.phone || '-' }}</span>
-                                <span class="italic text-[18px] text-emailText">{{ item.email }}</span>
+                                <span class="italic text-TableText text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">
+                                    {{ item.phone || '-' }}
+                                </span>
+                                <span class="italic text-emailText text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">
+                                    {{ item.email }}
+                                </span>
                             </div>
                         </template>
 
@@ -313,16 +319,10 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                     </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 
 <style scoped>
-/* Dashboard specific styles to manage scrolling */
-.dashboard-container {
-    position: relative;
-    height: calc(100vh - 348px);
-    min-height: 650px;
-    overflow: hidden;
-}
+/* Remove the dashboard-container styles since we're using the table-content slot now */
 </style>

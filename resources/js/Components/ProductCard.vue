@@ -20,11 +20,11 @@ defineProps({
             <div class="px-3 mt-5">
                 <img
                     :src="
-                        produkDesa?.image?.path
-                            ? `/storage/${produkDesa.image.path}`
+                        produkDesa?.thumbnail
+                            ? `/storage/${produkDesa.thumbnail}`
                             : '/default-image.jpg'
                     "
-                    :alt="produkDesa?.image?.alt || 'Default Image'"
+                    :alt="produkDesa?.alt || 'Default Image'"
                     class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
                 />
             </div>

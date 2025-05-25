@@ -219,7 +219,7 @@ const submit = () => {
                 </ul>
             </div>
             
-            <div class="overflow-hidden bg-white sm:rounded-lg">
+            <div class="overflow-hidden bg-white  ">
                 <div class="">
                     <form @submit.prevent="submit">
                         <!-- Year Field (Standalone) -->
