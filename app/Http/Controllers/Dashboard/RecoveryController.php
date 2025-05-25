@@ -30,7 +30,6 @@ class RecoveryController extends Controller
     public function create()
     {
         try {
-            // Run backup command
             Artisan::call('backup:run');
 
             $this->logHelper->logActivity('create', 'backup', 'Created new database backup');
@@ -69,21 +68,17 @@ class RecoveryController extends Controller
     public function restore($fileName)
     {
         try {
-            // Check if file exists in backup-temp directory
             $backupPath = storage_path('app/backup-temp/' . $fileName);
 
-            // If not in backup-temp, check in Data Recovery directory
             if (!file_exists($backupPath)) {
                 $backupPath = storage_path('app/Data Recovery/' . $fileName);
             }
 
-            // Verify file exists
             if (!file_exists($backupPath)) {
                 return redirect()->route('dashboard.recovery.index')
                     ->with('error', 'Backup file not found');
             }
 
-            // Create temporary extraction directory
             $extractPath = storage_path('app/backup-restore-temp');
             if (!file_exists($extractPath)) {
                 mkdir($extractPath, 0755, true);
@@ -91,7 +86,6 @@ class RecoveryController extends Controller
                 $this->cleanupTempFiles($extractPath);
             }
 
-            // Extract the zip archive
             $zip = new \ZipArchive;
             if ($zip->open($backupPath) === true) {
                 $zip->extractTo($extractPath);
@@ -100,13 +94,11 @@ class RecoveryController extends Controller
                 throw new \Exception('Unable to extract backup archive');
             }
 
-            // Find the SQL dump file
             $sqlFiles = glob($extractPath . '/db-dumps/*.sql');
 
             if (!empty($sqlFiles)) {
                 $sqlFile = $sqlFiles[0]; // Use the first SQL file found
 
-                // Get database configuration
                 $dbConnection = config('database.default');
                 $dbConfig = config('database.connections.' . $dbConnection);
 
@@ -114,7 +106,6 @@ class RecoveryController extends Controller
                     ? "-p" . $dbConfig['password']
                     : "";
 
-                // Import the SQL file
                 $command = sprintf(
                     'mysql -h%s -u%s %s %s < %s',
                     escapeshellarg($dbConfig['host']),
@@ -133,7 +124,6 @@ class RecoveryController extends Controller
                 }
             }
 
-            // Check if public folder exists in the backup
             $publicBackupPath = $extractPath . '/public';
             if (is_dir($publicBackupPath)) {
                 $this->copyDirectory($publicBackupPath, public_path());
@@ -141,7 +131,6 @@ class RecoveryController extends Controller
                 $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
             }
 
-            // Clean up temporary files
             $this->cleanupTempFiles($extractPath);
 
             return redirect()->route('dashboard.recovery.index')
@@ -179,10 +168,8 @@ class RecoveryController extends Controller
     {
         $backups = [];
 
-        // Check backup-temp directory
         $tempFiles = glob(storage_path('app/backup-temp/*.zip'));
 
-        // Also check Laravel directory (default location for spatie/laravel-backup)
         $laravelFiles = glob(storage_path('app/Data Recovery/*.zip'));
 
         $files = array_merge($tempFiles ?: [], $laravelFiles ?: []);
@@ -196,7 +183,6 @@ class RecoveryController extends Controller
             ];
         }
 
-        // Sort by date descending
         usort($backups, function ($a, $b) {
             return strtotime($b['date']) - strtotime($a['date']);
         });
@@ -231,7 +217,6 @@ class RecoveryController extends Controller
             if (is_dir($filePath)) {
                 $this->cleanupTempFiles($filePath);
             } else {
-                // Try to safely unlink file
                 try {
                     if (!unlink($filePath)) {
                         Log::warning("Failed to unlink file: $filePath");
@@ -242,7 +227,6 @@ class RecoveryController extends Controller
             }
         }
 
-        // Try to remove directory
         try {
             if (!rmdir($path)) {
                 Log::warning("Failed to remove directory: $path");

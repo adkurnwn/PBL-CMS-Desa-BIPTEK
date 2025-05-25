@@ -52,7 +52,6 @@ class GalleryController extends Controller
 
         $gallery = Gallery::create($data);
 
-        // Handle multiple image uploads
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
@@ -83,22 +82,21 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
-        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
+        if ($gallery->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
+        }
         $data['category_id'] = $category_id;
 
         $gallery->update($data);
 
-        // Handle image removals
         if ($request->removed_images) {
             $this->mediaService->handleImageRemovals($gallery, $request->removed_images);
         }
 
-        // Handle updated alt texts for existing images
         if ($request->updated_existing_images) {
             $this->mediaService->handleImageAltTextUpdates($gallery, $request->updated_existing_images);
         }
 
-        // Handle new image uploads
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
@@ -118,7 +116,6 @@ class GalleryController extends Controller
     public function restore($slug)
     {
         $gallery = Gallery::withTrashed()->where('slug', $slug)->firstOrFail();
-        // Restore the gallery
         $gallery->restore();
         $this->logHelper->logActivity('restore', 'gallery', 'Memulihkan gallery ' . $gallery->title);
         return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dipulihkan');

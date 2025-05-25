@@ -5,20 +5,22 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\DanaDesa;
 use App\Helpers\SlugHelper;
-use Illuminate\Http\Request;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\StoreDanaDesaRequest;
 use App\Http\Requests\Validation\UpdateDanaDesaRequest;
+use App\Services\MediaService;
 
 class DanaDesaController extends Controller
 {
+    protected $mediaService;
     protected $logHelper;
 
-    public function __construct()
+    public function __construct(MediaService $mediaService)
     {
+        $this->mediaService = $mediaService;
         $this->logHelper = new LogActivityHelper();
     }
 
@@ -41,14 +43,11 @@ class DanaDesaController extends Controller
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('file')) {
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'dana-desa-documents'
+            );
         }
 
         DanaDesa::create($data);
@@ -70,21 +69,17 @@ class DanaDesaController extends Controller
         $danaDesa = DanaDesa::where('slug', $slug)->firstOrFail();
 
         $data = $request->all();
-        $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
+        if ($danaDesa->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
+        }
 
         if ($request->hasFile('file')) {
-            if ($danaDesa->file) {
-                Storage::disk('public')->delete($danaDesa->file);
-            }
-
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'dana-desa-documents',
+                $danaDesa->file
+            );
         } else {
             unset($data['file']);
         }

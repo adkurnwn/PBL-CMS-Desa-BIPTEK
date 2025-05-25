@@ -44,7 +44,6 @@ class FeedbackController extends Controller
             'status' => 'Ditanggapi'
         ]);
 
-        // Send email to user
         try {
             Mail::to($feedback->email)->send(new FeedbackResponse($feedback));
         } catch (\Exception $e) {

@@ -82,21 +82,18 @@ class PositionController extends Controller
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
         $perPage = $request->input('per_page', 25);
-        
+
         $positionsQuery = Position::query();
-        
-        // Apply search if provided
+
         if (!empty($search)) {
             $positionsQuery->where('name', 'like', "%{$search}%")
                 ->orWhere('job_description', 'like', "%{$search}%");
         }
-        
-        // Apply sorting
+
         $positionsQuery->orderBy($sort, $direction);
-        
-        // Get paginated results
+
         $positions = $positionsQuery->paginate($perPage)->withQueryString();
-        
+
         return Inertia::render('Dashboard/UserManagement/Positions/Index', [
             'positions' => $positions,
             'search' => $search,
