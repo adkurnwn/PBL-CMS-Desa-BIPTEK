@@ -13,7 +13,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
-use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
@@ -31,7 +30,7 @@ class NewsController extends Controller
     public function index()
     {
         return Inertia::render('Dashboard/News/Index', [
-            'news' => News::with('category')->get(),
+            'news' => News::with('category')->latest()->paginate(10)
         ]);
     }
 
@@ -89,27 +88,24 @@ class NewsController extends Controller
 
         $data = $request->all();
         $data['category_id'] = $category_id;
-        $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        if ($news->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        }
 
-        // Update news record
         $news->update($data);
 
-        // Handle removed images
         if ($request->removed_images) {
             $this->mediaService->handleImageRemovals($news, $request->removed_images);
         }
 
-        // Handle updated alt texts for existing images
         if ($request->updated_existing_images) {
             $this->mediaService->handleImageAltTextUpdates($news, $request->updated_existing_images);
         }
 
-        // Handle new images
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
         }
 
-        // Handle video upload if needed
         if ($request->hasFile('video')) {
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
@@ -120,7 +116,6 @@ class NewsController extends Controller
 
     public function archive()
     {
-        News::onlyTrashed()->with('category')->get();
         return Inertia::render('Dashboard/News/Archive', [
             'news' => News::onlyTrashed()->with('category')->get(),
         ]);
