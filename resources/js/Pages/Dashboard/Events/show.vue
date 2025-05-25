@@ -1,11 +1,12 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/DashboardComponent/InputError.vue";
-import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+import { Head, Link } from "@inertiajs/vue3";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import TextAreaInput from "@/Components/DashboardComponent/TextAreaInput.vue";
+import Labels from "@/Components/DashboardComponent/Labels.vue";
+import { computed } from 'vue';
 
 const props = defineProps({
     event: Object,
@@ -17,23 +18,27 @@ const formatDate = (dateString) => {
     return date.toISOString().split("T")[0];
 };
 
-const form = useForm({
-    title: props.event.title,
-    description: props.event.description,
-    date: formatDate(props.event.date),
-    time: props.event.time,
-    location: props.event.location,
-    _method: "PUT",
-});
+// Compute event status based on date
+const eventStatus = computed(() => {
+    if (!props.event.date) return { type: 'other', text: 'Tidak diketahui' };
 
-const submit = () => {
-    form.put(route("dashboard.events.update", props.event.slug), {
-        preserveScroll: true,
-    });
-};
+    const eventDate = new Date(props.event.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+    eventDate.setHours(0, 0, 0, 0);
+
+    if (eventDate > today) {
+        return { type: 'mendatang', text: 'Event akan datang' };
+    } else if (eventDate.getTime() === today.getTime()) {
+        return { type: 'berlangsung', text: 'Event berlangsung' };
+    } else {
+        return { type: 'berakhir', text: 'Event telah berakhir' };
+    }
+});
 </script>
 
 <template>
+
     <Head title="Lihat Agenda" />
     <AuthenticatedLayout>
         <template #header>
@@ -48,110 +53,56 @@ const submit = () => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <form @submit.prevent="submit">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Title Field -->
-                                <div>
-                                    <InputLabel for="title" value="Title" />
-                                    <TextInput
-                                        id="title"
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
-                                </div>
+        <template #subtitle-area>
+            Lihat Agenda
+        </template>
 
-                                <!-- Location Field -->
-                                <div>
-                                    <InputLabel
-                                        for="location"
-                                        value="Location"
-                                    />
-                                    <TextInput
-                                        id="location"
-                                        v-model="form.location"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.location"
-                                        class="mt-2"
-                                    />
-                                </div>
+        <div class="h-full pb-[48px] pt-[27px]">
 
-                                <!-- Date Field -->
-                                <div>
-                                    <InputLabel for="date" value="Date" />
-                                    <TextInput
-                                        id="date"
-                                        v-model="form.date"
-                                        type="date"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.date"
-                                        class="mt-2"
-                                    />
-                                </div>
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                     <div class="p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px]">
+                            <Labels :type="eventStatus.type" :text="eventStatus.text" />
+                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                        <div class="flex flex-col gap-y-[15px]">
+                            <!-- First column -->
+                            <div>
+                                <SingleLineField id="title" :modelValue="event.title" type="text" fieldName="Judul"
+                                    disabled custom-width="100%" />
+                            </div>
+                            <!-- Date Field -->
+                            <div>
+                                <SingleLineField id="date" :modelValue="formatDate(event.date)" type="date"
+                                    fieldName="Tanggal" disabled custom-width="100%" />
+                            </div>
+                        </div>
 
-                                <!-- Time Field -->
-                                <div>
-                                    <InputLabel for="time" value="Time" />
-                                    <TextInput
-                                        id="time"
-                                        v-model="form.time"
-                                        type="time"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.time"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <!-- Description Field -->
-                                <div class="col-span-2">
-                                    <InputLabel
-                                        for="description"
-                                        value="Description"
-                                    />
-                                    <textarea
-                                        id="description"
-                                        v-model="form.description"
-                                        rows="4"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.description"
-                                        class="mt-2"
-                                    />
-                                </div>
+                        <div class="flex flex-col gap-y-[15px]">
+                            <!-- Second column -->
+                            <div>
+                                <SingleLineField id="location" :modelValue="event.location" type="text"
+                                    fieldName="Lokasi" disabled custom-width="100%" />
                             </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Update Event
-                                </PrimaryButton>
-                                <Link :href="route('dashboard.events.index')">
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
-                                </Link>
+                            <!-- Time Field -->
+                            <div>
+                                <SingleLineField id="time" :modelValue="event.time" type="time" fieldName="Waktu"
+                                    disabled custom-width="100%" />
                             </div>
-                        </form>
+                        </div>
+                    </div>
+                    <div>
+                        <TextAreaInput id="description" :modelValue="event.description" type="text"
+                            fieldName="Deskripsi" disabled custom-width="100%" />
+                    </div>
+
+                    <div class="mt-[15px] flex justify-end">
+                        <Link :href="route('dashboard.events.index')">
+                        <SecondaryButton type="button">
+                            KEMBALI
+                        </SecondaryButton>
+                        </Link>
                     </div>
                 </div>
             </div>

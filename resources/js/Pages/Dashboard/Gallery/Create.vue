@@ -131,7 +131,8 @@ const submit = () => {
                                 :defaultAltText="form.title"
                                 :alt-error="form.errors.alts" 
                                 :error="form.errors" 
-                                :required="true" 
+                                :required="true"
+                                max-images="25" 
                             />
                         </div>
 

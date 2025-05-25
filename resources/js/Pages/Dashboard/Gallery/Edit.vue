@@ -160,6 +160,7 @@ const submit = () => {
                             <ImageEditor label="Gambar" v-model="form.images" v-model:alts="form.alts"
                                 :existingImages="gallery.images" v-model:removedImages="form.removed_images"
                                 v-model:existingImages="form.updated_existing_images"
+                                max-images="25"
                                 v-model:bulkAltText="form.bulk_alt_text" :defaultAltText="form.title"
                                 :alt-error="form.errors.alts" :error="form.errors" :required="true" />
                         </div>

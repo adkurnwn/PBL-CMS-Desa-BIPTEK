@@ -49,6 +49,10 @@ const props = defineProps({
         type: String,
         default: "",
     },
+    maxImages: {
+        type: Number,
+        default: 25,
+    },
 });
 
 // Create a local copy of existing images to track alt text changes
@@ -162,6 +166,8 @@ const visibleImagesCount = computed(() => {
                 @update:alts="updateAlts"
                 :altText="altText"
                 :defaultAltText="defaultAltText"
+                :maxImages="maxImages"
+                :existingImagesCount="visibleImagesCount"
             />
         </div>
         <!-- Show existing images -->

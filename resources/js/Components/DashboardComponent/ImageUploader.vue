@@ -37,6 +37,14 @@ const props = defineProps({
         type: String,
         default: "",
     },
+    maxImages: {
+        type: Number,
+        default: 25,
+    },
+    existingImagesCount: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "update:alts"]);
@@ -80,13 +88,12 @@ const handleImagesChange = (e) => {
 const processFiles = (files) => {
     if (!files || files.length === 0) return;
     
-    // Check image limit (25 max)
-    const maxImages = 25;
-    const currentCount = localImages.value.length;
-    const availableSlots = maxImages - currentCount;
+    // Check image limit using prop
+    const currentCount = localImages.value.length + props.existingImagesCount;
+    const availableSlots = props.maxImages - currentCount;
     
     if (availableSlots <= 0) {
-        alert(`Maksimal ${maxImages} gambar yang diizinkan`);
+        alert(`Maksimal ${props.maxImages} gambar yang diizinkan`);
         return;
     }
     
@@ -194,12 +201,12 @@ const triggerFileInput = () => {
                 class="self-stretch bg-menuBG border border-selectedText hover:bg-selectedBG rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex flex-col items-center justify-start p-[10.7px] sm:p-[12.1px] md:p-[13.6px] lg:p-[14.8px] xl:p-[16px] 2xl:p-[18.5px] 3xl:p-[21.3px] 4xl:p-[24px] text-[6.7px] sm:text-[7.5px] md:text-[8.5px] lg:text-[9.2px] xl:text-[10px] 2xl:text-[11.5px] 3xl:text-[13.3px] 4xl:text-[15px] cursor-pointer transition-all duration-200 min-h-[60px] sm:min-h-[70px] md:min-h-[80px] lg:min-h-[90px] xl:min-h-[100px] 2xl:min-h-[110px] 3xl:min-h-[120px] 4xl:min-h-[140px] w-full box-border"
                 :class="{ 
                     'bg-blue-50 border-blue-400 border-2 border-dashed shadow-lg': isDragging,
-                    'opacity-50 cursor-not-allowed': modelValue.length >= 25
+                    'opacity-50 cursor-not-allowed': (modelValue.length + existingImagesCount) >= maxImages
                 }"
-                @click="modelValue.length < 25 ? triggerFileInput() : null"
-                @dragover.prevent="modelValue.length < 25 ? handleDragOver($event) : null"
+                @click="(modelValue.length + existingImagesCount) < maxImages ? triggerFileInput() : null"
+                @dragover.prevent="(modelValue.length + existingImagesCount) < maxImages ? handleDragOver($event) : null"
                 @dragleave.prevent="handleDragLeave"
-                @drop.prevent="modelValue.length < 25 ? handleDrop($event) : null"
+                @drop.prevent="(modelValue.length + existingImagesCount) < maxImages ? handleDrop($event) : null"
             >
                 <div class="rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] overflow-hidden flex flex-row items-center justify-center p-[2.7px] sm:p-[3px] md:p-[3.4px] lg:p-[3.7px] xl:p-[4px] 2xl:p-[4.6px] 3xl:p-[5.3px] 4xl:p-[6px] gap-[2.2px] sm:gap-[2.5px] md:gap-[2.9px] lg:gap-[3.1px] xl:gap-[3.33px] 2xl:gap-[3.8px] 3xl:gap-[4.4px] 4xl:gap-[5px] cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none"
@@ -217,13 +224,13 @@ const triggerFileInput = () => {
                 </div>
                 <div class="self-stretch flex flex-col items-center justify-start p-[2.7px] sm:p-[3px] md:p-[3.4px] lg:p-[3.7px] xl:p-[4px] 2xl:p-[4.6px] 3xl:p-[5.3px] 4xl:p-[6px] gap-[1.3px] sm:gap-[1.5px] md:gap-[1.7px] lg:gap-[1.8px] xl:gap-[2px] 2xl:gap-[2.3px] 3xl:gap-[2.7px] 4xl:gap-[3px] text-center text-[10.6px] sm:text-[12px] md:text-[13.6px] lg:text-[14.6px] xl:text-[16px] 2xl:text-[18.4px] 3xl:text-[21.4px] 4xl:text-[24px] mt-[4.4px] sm:mt-[5px] md:mt-[5.6px] lg:mt-[6.1px] xl:mt-[6.67px] 2xl:mt-[7.7px] 3xl:mt-[8.9px] 4xl:mt-[10px]">
                     <div class="self-stretch relative text-menuText font-medium text-[10.6px] sm:text-[12px] md:text-[13.6px] lg:text-[14.6px] xl:text-[16px] 2xl:text-[18.4px] 3xl:text-[21.4px] 4xl:text-[24px]">
-                        <span v-if="modelValue.length >= 25">Maksimal 25 gambar tercapai</span>
+                        <span v-if="(modelValue.length + existingImagesCount) >= maxImages">Maksimal {{ maxImages }} gambar tercapai</span>
                         <span v-else-if="modelValue.length === 0">Pilih gambar atau tarik dan lepaskan disini</span>
                         <span v-else>Tambah gambar lagi</span>
                     </div>
                     <div class="self-stretch relative text-searchIcon text-[8.8px] sm:text-[10px] md:text-[11.2px] lg:text-[12.2px] xl:text-[13.34px] 2xl:text-[15.4px] 3xl:text-[17.8px] 4xl:text-[20px]">
-                        <span v-if="modelValue.length >= 25">Hapus beberapa gambar untuk menambah yang baru</span>
-                        <span v-else>JPG, JPEG, dan PNG. Maksimal 10 MB pergambar ({{ modelValue.length }}/25)</span>
+                        <span v-if="(modelValue.length + existingImagesCount) >= maxImages">Hapus beberapa gambar untuk menambah yang baru</span>
+                        <span v-else>JPG, JPEG, dan PNG. Maksimal 10 MB pergambar ({{ modelValue.length + existingImagesCount }}/{{ maxImages }})</span>
                     </div>
                 </div>
             </div>

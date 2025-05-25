@@ -5,7 +5,11 @@ const props = defineProps({
     type: {
         type: String,
         required: true,
-        validator: (value) => ['create', 'update', 'delete', 'other'].includes(value)
+        validator: (value) => [
+            'create', 'update', 'delete', 'other', 'mendatang', 'edit', 
+            'berlangsung', 'berakhir', 'logout', 'login', 'kepala desa', 
+            'sekretaris desa', 'bendahara desa'
+        ].includes(value)
     },
     text: {
         type: String,

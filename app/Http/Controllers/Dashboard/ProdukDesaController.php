@@ -28,8 +28,8 @@ class ProdukDesaController extends Controller
         // Get search parameters
         $search = $request->input('search');
         $filters = $request->input('filters', []);
-        $sort = $request->input('sort', 'product_name');
-        $direction = $request->input('direction', 'asc');
+        $sort = $request->input('sort', 'updated_at');
+        $direction = $request->input('direction', 'desc');
         $perPage = $request->input('per_page', 25);
 
         // Query builder for product filtering

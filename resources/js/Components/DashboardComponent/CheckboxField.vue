@@ -26,7 +26,7 @@ export default {
       required: true
     },
     modelValue: {
-      type: Boolean,
+      type: [Boolean, Number],
       default: false
     },
     labelText: {
@@ -49,9 +49,11 @@ export default {
   computed: {
     localValue: {
       get() {
-        return this.modelValue;
+        // Convert numeric values to boolean for display
+        return Boolean(this.modelValue);
       },
       set(value) {
+        // Emit the boolean value directly
         this.$emit('update:modelValue', value);
       }
     }

@@ -1,13 +1,13 @@
 <template>
-  <div class="single-field-container" :style="{ width: customWidth }">
-    <div class="field-name text-selectedText">{{ fieldName }}</div>
-    <div class="input-button-container">
-      <div class="relative input-container">
+  <div class="p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px]" :style="{ width: customWidth }">
+    <div class="text-selectedText text-[8px] mb-[4.4px] sm:text-[9px] sm:mb-[5px] md:text-[10px] md:mb-[5.6px] lg:text-[11px] lg:mb-[6.1px] xl:text-[12px] xl:mb-[6.67px] 2xl:text-[14px] 2xl:mb-[7.7px] 3xl:text-[16px] 3xl:mb-[8.9px] 4xl:text-[18px] 4xl:mb-[10px]">{{ fieldName }}</div>
+    <div class="flex items-start gap-[5px]">
+      <div class="relative flex-1">
         <input
-          class="field-box text-TableText bg-menuBG border border-selectedText border-solid focus:outline-none focus:border-2 focus:border-selectedText"
+          class="h-[20.7px] text-[8px] p-[5.3px] w-full box-border rounded-[2.2px] transition-[border] duration-200 ease-in-out text-TableText bg-menuBG border border-selectedText border-solid focus:outline-none focus:border-2 focus:border-selectedText focus:shadow-none disabled:bg-[#C2C2C2] disabled:cursor-not-allowed sm:h-[23.5px] sm:text-[9px] sm:p-[6px] sm:rounded-[2.5px] md:h-[26.3px] md:text-[10px] md:p-[6.7px] md:rounded-[2.9px] lg:h-[28.7px] lg:text-[11px] lg:p-[7.3px] lg:rounded-[3.1px] xl:h-[31px] xl:text-[12px] xl:p-[8px] xl:rounded-[3.33px] 2xl:h-[35.3px] 2xl:text-[14px] 2xl:p-[9.3px] 2xl:rounded-[3.8px] 3xl:h-[40px] 3xl:text-[16px] 3xl:p-[10.7px] 3xl:rounded-[4.4px] 4xl:h-[46px] 4xl:text-[18px] 4xl:p-[12px] 4xl:rounded-[5px]"
           :type="showPassword ? 'text' : (type === 'numbers' ? 'text' : type)" 
           :value="modelValue"
-          @input="$emit('update:modelValue', $event.target.value)" 
+          @input="handleInput"
           @keydown="handleKeyDown"
           :placeholder="placeholder" 
           :required="required"
@@ -25,7 +25,7 @@
           </svg>
 
           <!-- Hide password icon (crossed eye) -->
-          <svg v-else xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16"
+          <svg v-else xmlns="http://www.w3.org/2000/svg" height="16" viewBox="http://www.w3.org/2000/svg" width="16"
             class="text-selectedText">
             <path
               d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"
@@ -33,7 +33,7 @@
           </svg>
         </div>
       </div>
-      <div v-if="type === 'add'" class="button-container">
+      <div v-if="type === 'add'" class="mt-0 flex items-center h-[20.7px] sm:h-[23.5px] md:h-[26.3px] lg:h-[28.7px] xl:h-[31px] 2xl:h-[35.3px] 3xl:h-[40px] 4xl:h-[46px]">
         <PrimaryButton type="button" @click="$emit('click')">
           Tambah
         </PrimaryButton>
@@ -104,230 +104,15 @@ export default {
           this.$emit('update:modelValue', '');
         }
       }
+    },
+    handleInput(event) {
+      // First emit the custom input event if provided
+      this.$emit('input', event);
+      
+      // Then emit the standard update event
+      this.$emit('update:modelValue', event.target.value);
     }
   },
-  emits: ['update:modelValue', 'click', 'add-numbered-item']
+  emits: ['update:modelValue', 'click', 'add-numbered-item', 'input']
 }
 </script>
-
-<style scoped>
-.single-field-container {
-  padding: 5.3px;
-  padding-top: 5.3px;
-  padding-bottom: 5.3px;
-  padding-left: 5.3px;
-  padding-right: 5.3px;
-}
-
-.input-button-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
-}
-
-.input-container {
-  flex: 1;
-}
-
-.button-container {
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  height: 20.7px;
-}
-
-.field-name {
-  font-size: 8px;
-  margin-bottom: 4.4px;
-}
-
-.field-box {
-  height: 20.7px;
-  font-size: 8px;
-  padding: 5.3px;
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 2.2px;
-  transition: border 0.2s ease;
-}
-
-/* Responsive styles using media queries */
-@media (min-width: 640px) {
-
-  /* sm */
-  .single-field-container {
-    padding: 6px;
-  }
-
-  .field-name {
-    font-size: 9px;
-    margin-bottom: 5px;
-  }
-
-  .field-box {
-    height: 23.5px;
-    font-size: 9px;
-    padding: 6px;
-    border-radius: 2.5px;
-  }
-
-  .button-container {
-    height: 23.5px;
-  }
-}
-
-@media (min-width: 768px) {
-
-  /* md */
-  .single-field-container {
-    padding: 6.7px;
-  }
-
-  .field-name {
-    font-size: 10px;
-    margin-bottom: 5.6px;
-  }
-
-  .field-box {
-    height: 26.3px;
-    font-size: 10px;
-    padding: 6.7px;
-    border-radius: 2.9px;
-  }
-
-  .button-container {
-    height: 26.3px;
-  }
-}
-
-@media (min-width: 1024px) {
-
-  /* lg */
-  .single-field-container {
-    padding: 7.3px;
-  }
-
-  .field-name {
-    font-size: 11px;
-    margin-bottom: 6.1px;
-  }
-
-  .field-box {
-    height: 28.7px;
-    font-size: 11px;
-    padding: 7.3px;
-    border-radius: 3.1px;
-  }
-
-  .button-container {
-    height: 28.7px;
-  }
-}
-
-@media (min-width: 1280px) {
-
-  /* xl */
-  .single-field-container {
-    padding: 8px;
-  }
-
-  .field-name {
-    font-size: 12px;
-    margin-bottom: 6.67px;
-  }
-
-  .field-box {
-    height: 31px;
-    font-size: 12px;
-    padding: 8px;
-    border-radius: 3.33px;
-  }
-
-  .button-container {
-    height: 31px;
-  }
-}
-
-@media (min-width: 1536px) {
-
-  /* 2xl */
-  .single-field-container {
-    padding: 9.3px;
-  }
-
-  .field-name {
-    font-size: 14px;
-    margin-bottom: 7.7px;
-  }
-
-  .field-box {
-    height: 35.3px;
-    font-size: 14px;
-    padding: 9.3px;
-    border-radius: 3.8px;
-  }
-
-  .button-container {
-    height: 35.3px;
-  }
-}
-
-@media (min-width: 1920px) {
-
-  /* 3xl */
-  .single-field-container {
-    padding: 10.7px;
-  }
-
-  .field-name {
-    font-size: 16px;
-    margin-bottom: 8.9px;
-  }
-
-  .field-box {
-    height: 40px;
-    font-size: 16px;
-    padding: 10.7px;
-    border-radius: 4.4px;
-  }
-
-  .button-container {
-    height: 40px;
-  }
-}
-
-@media (min-width: 2560px) {
-
-  /* 4xl */
-  .single-field-container {
-    padding: 12px;
-  }
-
-  .field-name {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-
-  .field-box {
-    height: 46px;
-    font-size: 18px;
-    padding: 12px;
-    border-radius: 5px;
-  }
-
-  .button-container {
-    height: 46px;
-  }
-}
-
-/* Keep existing rules for focus and disabled states */
-.field-box:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.field-box:disabled {
-  background-color: #C2C2C2;
-  cursor: not-allowed;
-}
-</style>

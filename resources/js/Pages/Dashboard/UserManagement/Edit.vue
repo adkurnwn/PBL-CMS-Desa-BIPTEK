@@ -10,7 +10,7 @@ import { ref, computed } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
 import DropdownFieldInput from "@/Components/DashboardComponent/DropdownFieldInput.vue";
-import PhotoProfileUpload from "@/Components/DashboardComponent/PhotoProfileUpload.vue";
+import ImageInput from "@/Components/DashboardComponent/ImageInput.vue";
 import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
@@ -178,10 +178,13 @@ const submit = () => {
 
                                 <!-- Photo Profile Field -->
                                 <div>
-                                    <PhotoProfileUpload id="photo_profile" :model-value="form.photo_profile"
-                                        @update:model-value="handlePhotoProfileChange" :preview-image="photoProfileUrl"
-                                        custom-width="100%" />
-                                    <InputError :message="form.errors.photo_profile" class="mt-2" />
+                                    <ImageInput 
+                                        label="Foto Profil" 
+                                        :model-value="form.photo_profile"
+                                        @update:model-value="handlePhotoProfileChange" 
+                                        :current-image="props.user.photo_profile"
+                                        :error="form.errors.photo_profile" 
+                                    />
                                 </div>
                             </div>
                         </div>

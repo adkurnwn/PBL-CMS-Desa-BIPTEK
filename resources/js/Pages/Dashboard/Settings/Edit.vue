@@ -256,18 +256,13 @@ const cancelSave = () => {
 
                                     <!-- Favicon -->
                                     <div>
-                                        <ImageInput
-                                            :model-value="form.favicon"
-                                            @update:model-value="handleFaviconChange"
-                                            label="Favicon"
-                                            :current-image="settings.favicon"
-                                            :error="form.errors.favicon"
+                                        <ImageInput :model-value="form.favicon"
+                                            @update:model-value="handleFaviconChange" label="Favicon"
+                                            :current-image="settings.favicon" :error="form.errors.favicon"
                                             accept="image/png, image/jpeg, image/gif, image/ico, image/x-icon"
-                                            custom-width="100%"
-                                            image-height="64px"
-                                            image-class="rounded-sm border"
-                                        />
-                                        <p class="mt-1 text-[6.2px] sm:text-[7px] md:text-[8px] lg:text-[8.7px] xl:text-[9.33px] 2xl:text-[10.8px] 3xl:text-[12.4px] 4xl:text-[14px] text-gray-500">
+                                            custom-width="100%" image-height="64px" image-class="rounded-sm border" />
+                                        <p
+                                            class="mt-1 text-[6.2px] sm:text-[7px] md:text-[8px] lg:text-[8.7px] xl:text-[9.33px] 2xl:text-[10.8px] 3xl:text-[12.4px] 4xl:text-[14px] text-gray-500">
                                             Recommended size: 32x32px or 64x64px (PNG or ICO format)
                                         </p>
                                     </div>
@@ -290,10 +285,15 @@ const cancelSave = () => {
                                                 <path d="m7 11V7a5 5 0 0 1 10 0v4" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">Pengaturan Database Terkunci
+                                        <h3
+                                            class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">
+                                            Pengaturan Database Terkunci
                                         </h3>
-                                        <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">Klik unlock untuk membuka pengaturan database</p>
-                                        <SecondaryButton @click="unlockDatabase" class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
+                                        <p
+                                            class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">
+                                            Klik unlock untuk membuka pengaturan database</p>
+                                        <SecondaryButton @click="unlockDatabase"
+                                            class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
                                             Unlock
                                         </SecondaryButton>
                                     </div>
@@ -363,10 +363,15 @@ const cancelSave = () => {
                                                 <path d="m7 11V7a5 5 0 0 1 10 0v4" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">Pengaturan Email Terkunci
+                                        <h3
+                                            class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">
+                                            Pengaturan Email Terkunci
                                         </h3>
-                                        <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">Klik unlock untuk membuka pengaturan email</p>
-                                        <SecondaryButton @click="unlockEmail" class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
+                                        <p
+                                            class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-4">
+                                            Klik unlock untuk membuka pengaturan email</p>
+                                        <SecondaryButton @click="unlockEmail"
+                                            class="!border-red-600 hover:!border-red-700 active:!border-red-800 !text-red-600 hover:!text-red-700 active:!text-red-800 hover:!bg-red-50">
                                             Unlock
                                         </SecondaryButton>
                                     </div>
@@ -441,14 +446,13 @@ const cancelSave = () => {
                             <!-- Theme Settings -->
                             <div v-show="activeTab === 'theme'">
 
-                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px]">
                                     <!-- Primary Color -->
                                     <div>
-                                        <InputLabel for="primary_color" value="Primary Color" />
+                                        <InputLabel for="primary_color" value="Warna" />
                                         <div class="mt-2 flex items-center space-x-3">
-                                            <div v-for="(
-name, color
-                                                ) in colorOptions" :key="color" @click="
+                                            <div v-for="(name, color
+                                            ) in colorOptions" :key="color" @click="
                                                     form.primary_color = color
                                                     " :class="{
                                                         'ring-2 ring-offset-2 ring-blue-500':
@@ -466,35 +470,10 @@ name, color
                                         <InputError :message="form.errors.primary_color" class="mt-2" />
                                     </div>
 
-                                    <!-- Secondary Color -->
-                                    <div>
-                                        <InputLabel for="secondary_color" value="Secondary Color" />
-                                        <div class="mt-2 flex items-center space-x-3">
-                                            <div v-for="(
-name, color
-                                                ) in colorOptions" :key="color" @click="
-                                                    form.secondary_color = color
-                                                    " :class="{
-                                                        'ring-2 ring-offset-2 ring-blue-500':
-                                                            form.secondary_color ===
-                                                            color,
-                                                    }" class="w-8 h-8 rounded-full cursor-pointer transition-all"
-                                                :style="{
-                                                    backgroundColor: color,
-                                                }" :title="name"></div>
-                                        </div>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Secondary theme color for buttons
-                                            and accents
-                                        </p>
-                                        <InputError :message="form.errors.secondary_color
-                                            " class="mt-2" />
-                                    </div>
-
                                     <!-- Preview Section -->
                                     <div class="col-span-2">
                                         <h4 class="font-medium text-gray-700 mb-2">
-                                            Theme Preview
+                                            Preview Tema
                                         </h4>
                                         <div class="border rounded-lg p-4 overflow-hidden">
                                             <div class="py-2 px-4 mb-4" :style="{
@@ -505,7 +484,7 @@ name, color
                                                 ),
                                             }">
                                                 <h5 class="font-bold">
-                                                    Header with Primary Color
+                                                   Navbar
                                                 </h5>
                                             </div>
                                             <div class="flex space-x-2 mb-4">
@@ -516,7 +495,7 @@ name, color
                                                         form.secondary_color
                                                     ),
                                                 }">
-                                                    Button with Secondary Color
+                                                    Tombol Utama
                                                 </button>
                                                 <button class="px-4 py-2 rounded border" :style="{
                                                     borderColor:
@@ -583,7 +562,8 @@ name, color
                             </div>
 
                             <div class="mt-6 flex justify-end">
-                                <PrimaryButton type="button" @click="showConfirmationDialog" :disabled="form.processing">
+                                <PrimaryButton type="button" @click="showConfirmationDialog"
+                                    :disabled="form.processing">
                                     Simpan Pengaturan
                                 </PrimaryButton>
                             </div>
@@ -597,17 +577,23 @@ name, color
         <div v-if="showConfirmation" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div class="bg-menuBG p-6 rounded-[5px] shadow-2xl max-w-md w-full mx-4 text-center">
                 <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-yellowLabelText">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4"/>
-                        <path d="M12 8h.01"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mx-auto text-yellowLabelText">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
                     </svg>
                 </div>
-                <h3 class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">
+                <h3
+                    class="text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-semibold text-selectedText mb-2">
                     Konfirmasi Simpan Pengaturan
                 </h3>
-                <p class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-6">
-                    Apakah Anda yakin ingin menyimpan perubahan pengaturan aplikasi ini? Perubahan yang salah dapat menyebabkan kesalahan kinerja website.
+                <p
+                    class="text-menuText text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-6">
+                    Apakah Anda yakin ingin menyimpan perubahan pengaturan aplikasi ini? Perubahan yang salah dapat
+                    menyebabkan
+                    kesalahan kinerja website.
                 </p>
                 <div class="flex space-x-3 justify-center">
                     <SecondaryButton type="button" @click="cancelSave">
