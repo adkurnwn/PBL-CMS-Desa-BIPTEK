@@ -68,6 +68,12 @@ Route::get('/produk-unggulan', function () {
     return Inertia::render('FrontEnd/ProdukUnggulan');
 });
 
+Route::get('/produk-unggulan/{slug}', function ($slug) {
+    return Inertia::render('FrontEnd/ProdukUnggulanDetail', [
+        'slug' => $slug
+    ]);
+})->name('produk-desa.detail');
+
 Route::middleware(['auth', 'user.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

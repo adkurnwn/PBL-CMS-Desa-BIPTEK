@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     produkDesa: {
         type: Object,
@@ -27,9 +29,9 @@ defineProps({
                 />
             </div>
             <div class="px-4">
-                <div class="mt-2 space-y-1">
+                <div class="mt-2 space-y-1 ">
                     <h2
-                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2"
+                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2 line-clamp-2 min-h-14"
                     >
                         {{ produkDesa?.name || "Unnamed Product" }}
                     </h2>
@@ -40,11 +42,14 @@ defineProps({
                 <div
                     class="flex flex-row justify-center py-4 hover:scale-105 transition-transform"
                 >
-                    <button
+                    <Link
+                        :href="`/produk-unggulan/${produkDesa.slug}`"
                         class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
                     >
                         Lihat Katalog
-                    </button>
+                    </Link>
+
+                    
                 </div>
             </div>
         </div>
