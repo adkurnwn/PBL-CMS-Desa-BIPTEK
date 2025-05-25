@@ -14,21 +14,91 @@ class RegionController extends Controller
 {
     public function getProvinces(): JsonResponse
     {
-        return response()->json(Province::all());
+        try {
+            $provinces = Province::all();
+            if ($provinces->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No provinces found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $provinces
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to retrieve provinces'
+            ], 500);
+        }
     }
 
     public function getRegencies($province_id): JsonResponse
     {
-        return response()->json(Regency::where('province_id', $province_id)->get());
+        try {
+            $regencies = Regency::where('province_id', $province_id)->get();
+            if ($regencies->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No regencies found for this province'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $regencies
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to retrieve regencies'
+            ], 500);
+        }
     }
 
     public function getDistricts($regency_id): JsonResponse
     {
-        return response()->json(District::where('regency_id', $regency_id)->get());
+        try {
+            $districts = District::where('regency_id', $regency_id)->get();
+            if ($districts->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No districts found for this regency'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $districts
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to retrieve districts'
+            ], 500);
+        }
     }
 
     public function getVillages($district_id): JsonResponse
     {
-        return response()->json(Village::where('district_id', $district_id)->get());
+        try {
+            $villages = Village::where('district_id', $district_id)->get();
+            if ($villages->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No villages found for this district'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $villages
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to retrieve villages'
+            ], 500);
+        }
     }
 }

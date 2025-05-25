@@ -51,10 +51,22 @@ class KomentarBeritaController extends Controller
         return response()->json($this->addParentUserNames($replies));
     }
 
+    private function countAllReplies($reply)
+    {
+        $count = $reply->replies ? $reply->replies->count() : 0;
+        if ($reply->replies) {
+            foreach ($reply->replies as $child) {
+                $count += $this->countAllReplies($child);
+            }
+        }
+        return $count;
+    }
+
     private function addParentUserNames($replies)
     {
         return $replies->map(function ($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            $reply->replies_count = $this->countAllReplies($reply); // Use recursive count
             if ($reply->replies) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }

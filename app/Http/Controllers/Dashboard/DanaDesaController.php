@@ -10,8 +10,8 @@ use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreDanaDesaRequest;
-use App\Http\Requests\UpdateDanaDesaRequest;
+use App\Http\Requests\Validation\StoreDanaDesaRequest;
+use App\Http\Requests\Validation\UpdateDanaDesaRequest;
 
 class DanaDesaController extends Controller
 {

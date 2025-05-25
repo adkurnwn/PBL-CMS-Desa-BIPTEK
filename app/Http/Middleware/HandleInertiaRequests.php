@@ -48,8 +48,8 @@ class HandleInertiaRequests extends Middleware
                             'display_name' => ucfirst($role->name),
                         ];
                     }),
-                    // You can also include permissions if needed
-                    // 'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                    // Include user permissions for sidebar menu
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
                 ] : null,
             ],
             'ziggy' => fn() => [

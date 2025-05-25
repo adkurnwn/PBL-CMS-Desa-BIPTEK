@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
                 ProdukDesaSeeder::class,
                 DanaDesaSeeder::class,
                 DemografiSeeder::class,
+                ProdukHukumSeeder::class,
             ]
         );
     }

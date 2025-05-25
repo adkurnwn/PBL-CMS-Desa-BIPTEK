@@ -29,6 +29,10 @@ const props = defineProps({
   hideScrollbar: {
     type: Boolean,
     default: false
+  },
+  scrollbarWidth: {
+    type: String,
+    default: '8px'
   }
 });
 
@@ -71,13 +75,19 @@ onUnmounted(() => {
   <div 
     ref="scrollContainer"
     class="custom-scrollbar"
-    :class="{ 'auto-hide': autoHide, 'is-scrolling': isScrolling }"
+    :class="{ 
+      'auto-hide': autoHide, 
+      'is-scrolling': isScrolling,
+      'hide-scrollbar': hideScrollbar
+    }"
     :style="{ 
       height, 
       width,
       '--thumb-color': thumbColor, 
       '--thumb-hover-color': thumbHoverColor,
-      '--scrollbar-display': hideScrollbar ? 'none' : 'block'
+      '--track-color': trackColor,
+      '--scrollbar-width': scrollbarWidth,
+      '--scrollbar-display': hideScrollbar ? 'none' : 'block' 
     }"
   >
     <slot></slot>
@@ -89,16 +99,30 @@ onUnmounted(() => {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  scrollbar-width: var(--scrollbar-display);
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--thumb-color) var(--track-color); /* Firefox */
+}
+
+/* Complete scrollbar hiding for all browsers when hideScrollbar is true */
+.hide-scrollbar {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+  width: var(--scrollbar-width);
   display: var(--scrollbar-display);
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--track-color);
+  border-radius: 20px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -117,6 +141,18 @@ onUnmounted(() => {
 
 .custom-scrollbar.auto-hide.is-scrolling::-webkit-scrollbar-thumb,
 .custom-scrollbar.auto-hide:hover::-webkit-scrollbar-thumb {
-  background-color: v-bind(thumbColor);
+  background-color: var(--thumb-color);
+}
+
+/* Fix for Firefox to ensure scrollbar is visible when needed */
+@supports (scrollbar-width: thin) {
+  .custom-scrollbar.auto-hide {
+    scrollbar-width: var(--scrollbar-display);
+  }
+  
+  .custom-scrollbar.auto-hide:hover,
+  .custom-scrollbar.auto-hide.is-scrolling {
+    scrollbar-width: thin;
+  }
 }
 </style>

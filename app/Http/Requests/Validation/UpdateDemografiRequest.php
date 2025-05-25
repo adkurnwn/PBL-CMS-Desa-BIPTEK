@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Validation;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDemografiRequest extends FormRequest
 {
@@ -21,10 +22,15 @@ class UpdateDemografiRequest extends FormRequest
      */
     public function rules(): array
     {
+        $year = $this->route('slug'); // Get the current year from the route
+
         return [
             'penduduk_pria' => 'required',
             'penduduk_wanita' => 'required',
-            'tahun' => 'required',
+            'tahun' => [
+                'required',
+                Rule::unique('demografi', 'tahun')->ignore($year, 'tahun')
+            ],
             'jumlah_peserta_bpjs' => 'required',
             'jumlah_pindah_keluar' => 'required',
             'jumlah_pendatang' => 'required',
@@ -38,6 +44,18 @@ class UpdateDemografiRequest extends FormRequest
             'jumlah_anak' => 'required',
             'jumlah_penduduk' => 'required',
             'jumlah_keluarga' => 'required',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'tahun.unique' => 'Data demografi untuk tahun ini sudah ada.',
         ];
     }
 }

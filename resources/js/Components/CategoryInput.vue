@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
 
 const props = defineProps({
     categories: {

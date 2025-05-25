@@ -11,8 +11,8 @@ const loading = ref(true);
 const fetchProfile = async () => {
     try {
         loading.value = true;
-        const response = await axios.get("/api/layout");
-        layout.value = response.data;
+        const response = await axios.get("/api/profile/layout");
+        layout.value = response.data.data;
         loading.value = false;
     } catch (error) {
         console.error("Error fetching layout data:", error);

@@ -34,12 +34,12 @@ const toggleExpand = () => {
 </script>
 
 <template>
-    <div class="menu-section mb-[20px]">
+    <div class="menu-section mb-[10px] sm:mb-[11px] md:mb-[12px] xl:mb-[13px] 2xl:mb-[15px] 3xl:mb-[18px] 4xl:mb-[20px]">
         <!-- Title button - hide in collapsed mode -->
         <button
             v-if="!collapsed"
             @click="toggleExpand"
-            class="w-full flex items-center justify-between py-2.5 pl-[48px] transition duration-200 text-selectedText"
+            class="w-full flex items-center justify-between py-2.5 transition duration-200 text-selectedText text-[10px] sm:text-[10px] md:text-[10px] xl:text-[10px] 2xl:text-[12px] 3xl:text-[13px] 4xl:text-[15px]"
         >
             <div class="flex items-center">
                 <span class="font-medium truncate max-w-[280px]">{{ title }}</span>
@@ -68,8 +68,8 @@ const toggleExpand = () => {
             }"
         >
             <div 
-                class="pt-[10px] space-y-[15px]"
-                :class="collapsed ? 'px-4 flex flex-col items-center' : 'pl-[48px]'"
+                class="pt-[8px] sm:pt-[8px] md:pt-[9px] xl:pt-[10px] 2xl:pt-[12px] 3xl:pt-[14px] 4xl:pt-[15px] space-y-[8px] sm:space-y-[9px] md:space-y-[10px] xl:space-y-[10px] 2xl:space-y-[11px] 3xl:space-y-[13px] 4xl:space-y-[15px]"
+                :class="collapsed ? '' : ''"
             >
                 <slot></slot>
             </div>

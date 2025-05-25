@@ -9,12 +9,12 @@ use Illuminate\Http\Request;
 
 class KomentarProdukHukumController extends Controller
 {
-    public function index($newsId)
+    public function index($slug)
     {
-        $news = ProdukHukum::findOrFail($newsId);
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        $comments = KomentarProdukHukum::where('id_produk_hukum', $newsId)
-            ->when($news->is_moderate, function($query) {
+        $comments = KomentarProdukHukum::where('id_produk_hukum', $slug)
+            ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
             })
             ->whereNull('id_ref_komentar')
@@ -24,26 +24,39 @@ class KomentarProdukHukumController extends Controller
         return response()->json($comments);
     }
 
-    public function getReplies($produkhukumId, $commentId)
+    public function getReplies($slug, $commentId)
     {
-        $produkhukum = ProdukHukum::findOrFail($produkhukumId);
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        // Only get direct replies to the comment
-        $replies = KomentarProdukHukum::where('id_produk_hukum', $produkhukumId)
-            ->where('id_ref_komentar', $commentId)
-            ->when($produkhukum->is_moderate, function($query) {
+        $replies = KomentarProdukHukum::where('id_produk_hukum', $slug)
+            ->whereNotNull('id_ref_komentar')
+            ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
             })
             ->with(['parent', 'replies'])
             ->get();
 
-        return response()->json($this->addParentUserNames($replies));
+        $replies = $this->addParentUserNames($replies);
+
+        return response()->json($replies);
+    }
+
+    private function countAllReplies($reply)
+    {
+        $count = $reply->replies ? $reply->replies->count() : 0;
+        if ($reply->replies) {
+            foreach ($reply->replies as $child) {
+                $count += $this->countAllReplies($child);
+            }
+        }
+        return $count;
     }
 
     private function addParentUserNames($replies)
     {
-        return $replies->map(function($reply) {
+        return $replies->map(function ($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
+            $reply->replies_count = $this->countAllReplies($reply); // gunakan rekursif
             if ($reply->replies && $reply->replies->count() > 0) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }

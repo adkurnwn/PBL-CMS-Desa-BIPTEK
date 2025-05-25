@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onUnmounted } from "vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import InputError from "@/Components/InputError.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
 
 const props = defineProps({
     modelValue: {
