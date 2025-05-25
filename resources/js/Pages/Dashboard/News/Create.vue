@@ -15,6 +15,7 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
 import { watch, ref } from 'vue';
 import PreviewBerita from "@/Components/DashboardComponent/PreviewBerita.vue";
 import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
+import VideoUploader from "@/Components/DashboardComponent/VideoUploader.vue";
 
 const props = defineProps({
     categories: {
@@ -82,11 +83,6 @@ const handleRichTextImageAdded = (imageFile) => {
 
     // Store mapping for later replacement
     imageToPlaceholderMap.value.set(newImages.length - 1, placeholderId)
-}
-
-// Handle video file input
-const handleVideoChange = (event) => {
-    form.video = event.target.files[0]
 }
 
 // Process content before submission to replace image URLs with placeholders
@@ -236,13 +232,13 @@ const submit = (isDraft = false) => {
                                 :error="form.errors" :alt-error="form.errors.alts" :defaultAltText="form.title"
                                 :required="true" :maxImages="10" />
 
-                            <div>
-                                <InputLabel for="video" value="Video" />
-                                <input id="video" type="file" @input="handleVideoChange"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    accept="video/mp4, video/ogg, video/webm" />
-                                <InputError :message="form.errors.video" class="mt-2" />
-                            </div>
+                            <VideoUploader 
+                                v-model="form.video" 
+                                label="Video Berita" 
+                                :error="form.errors.video"
+                                :required="false"
+                            />
+
                         </div>
 
                         <div class="mt-6 flex space-x-4">

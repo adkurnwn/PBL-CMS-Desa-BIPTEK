@@ -13,6 +13,7 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
 import RichText from "@/Components/DashboardComponent/RichText.vue";
 import PreviewBerita from "@/Components/DashboardComponent/PreviewBerita.vue";
 import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
+import VideoUploader from "@/Components/DashboardComponent/VideoUploader.vue";
 
 
 const props = defineProps({
@@ -46,6 +47,7 @@ const form = useForm({
     updated_existing_images: [],
     bulk_alt_text: "",
     video: null,
+    remove_existing_video: false,
     is_moderate: Boolean(props.news.is_moderate),
     is_draft: Boolean(props.news.is_draft),
     _method: "PUT",
@@ -53,37 +55,6 @@ const form = useForm({
 
 const richTextRef = ref(null);
 const showPreview = ref(false);
-
-const handleVideoChange = (e) => {
-    form.video = e.target.files[0];
-};
-
-// Process content before submission to replace image URLs with placeholders
-const processContentForSubmission = (content) => {
-    let processedContent = content;
-    let imageIndex = 0;
-
-    // Replace images with data-is-placeholder attribute
-    const imgWithPlaceholderRegex = /<img[^>]*data-is-placeholder="true"[^>]*>/g;
-    processedContent = processedContent.replace(imgWithPlaceholderRegex, (match) => {
-        const placeholder = `{{IMAGE_${imageIndex}}}`;
-        imageIndex++;
-        return placeholder;
-    });
-
-    // Replace remaining blob URLs
-    const blobUrlRegex = /<img[^>]*src="blob:[^"]*"[^>]*>/g;
-    processedContent = processedContent.replace(blobUrlRegex, (match) => {
-        if (!match.includes('{{IMAGE_')) {
-            const placeholder = `{{IMAGE_${imageIndex}}}`;
-            imageIndex++;
-            return placeholder;
-        }
-        return match;
-    });
-
-    return processedContent;
-};
 
 const openPreview = () => {
     showPreview.value = true;
@@ -144,6 +115,11 @@ const handleRichTextImageAdded = (imageFile) => {
 
     form.images = newImages;
     form.alts = newAlts;
+};
+
+// Handle existing video removal
+const handleRemoveExistingVideo = () => {
+    form.remove_existing_video = true;
 };
 </script>
 
@@ -260,17 +236,15 @@ const handleRichTextImageAdded = (imageFile) => {
                             />
 
                             <!-- Video Upload -->
-                            <div>
-                                <InputLabel for="video" value="Video" />
-                                <input 
-                                    id="video" 
-                                    type="file" 
-                                    @input="handleVideoChange"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    accept="video/mp4, video/ogg, video/webm" 
-                                />
-                                <InputError :message="form.errors.video" class="mt-2" />
-                            </div>
+                            <VideoUploader 
+                                v-model="form.video" 
+                                :existingVideoUrl="news.video ? `/storage/${news.video}` : null"
+                                label="Video Berita" 
+                                :error="form.errors.video"
+                                :required="false"
+                                @remove-existing="handleRemoveExistingVideo"
+                            />
+
                         </div>
                     </form>
                 </div>

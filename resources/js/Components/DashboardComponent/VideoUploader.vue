@@ -8,6 +8,10 @@ const props = defineProps({
         type: File,
         default: null,
     },
+    existingVideoUrl: {
+        type: String,
+        default: null,
+    },
     label: {
         type: String,
         default: "Video",
@@ -26,18 +30,30 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "remove-existing"]);
 
 const localVideo = ref(null);
 const fileInput = ref(null);
 const isDragging = ref(false);
 const videoPreviewUrl = ref(null);
+const showExistingVideo = ref(false);
 
-// Initialize local video from prop
+// Initialize local video and existing video
 onMounted(() => {
     if (props.modelValue) {
         localVideo.value = props.modelValue;
         videoPreviewUrl.value = URL.createObjectURL(props.modelValue);
+    } else if (props.existingVideoUrl) {
+        showExistingVideo.value = true;
+    }
+});
+
+// Watch for changes in existingVideoUrl prop
+watch(() => props.existingVideoUrl, (newValue) => {
+    if (newValue && !localVideo.value) {
+        showExistingVideo.value = true;
+    } else {
+        showExistingVideo.value = false;
     }
 });
 
@@ -90,6 +106,9 @@ const processFile = (file) => {
         URL.revokeObjectURL(videoPreviewUrl.value);
     }
     
+    // Hide existing video when new video is selected
+    showExistingVideo.value = false;
+    
     localVideo.value = file;
     videoPreviewUrl.value = URL.createObjectURL(file);
     
@@ -140,6 +159,11 @@ const removeVideo = () => {
     }
 };
 
+const removeExistingVideo = () => {
+    showExistingVideo.value = false;
+    emit("remove-existing");
+};
+
 const triggerFileInput = () => {
     fileInput.value.click();
 };
@@ -156,6 +180,10 @@ const formatFileSize = (bytes) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+
+const hasVideo = computed(() => {
+    return localVideo.value || showExistingVideo.value;
+});
 </script>
 
 <template>
@@ -175,7 +203,7 @@ const formatFileSize = (bytes) => {
 
             <!-- Upload box - only show when no video is selected -->
             <div
-                v-if="showUploadBox && !localVideo"
+                v-if="showUploadBox && !hasVideo"
                 class="self-stretch bg-menuBG border border-selectedText hover:bg-selectedBG rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex flex-col items-center justify-start p-[10.7px] sm:p-[12.1px] md:p-[13.6px] lg:p-[14.8px] xl:p-[16px] 2xl:p-[18.5px] 3xl:p-[21.3px] 4xl:p-[24px] text-[6.7px] sm:text-[7.5px] md:text-[8.5px] lg:text-[9.2px] xl:text-[10px] 2xl:text-[11.5px] 3xl:text-[13.3px] 4xl:text-[15px] cursor-pointer transition-all duration-200 min-h-[60px] sm:min-h-[70px] md:min-h-[80px] lg:min-h-[90px] xl:min-h-[100px] 2xl:min-h-[110px] 3xl:min-h-[120px] 4xl:min-h-[140px] w-full box-border"
                 :class="{ 
                     'bg-blue-50 border-blue-400 border-2 border-dashed shadow-lg': isDragging
@@ -204,7 +232,42 @@ const formatFileSize = (bytes) => {
                 </div>
             </div>
 
-            <!-- Video preview - show when video is selected -->
+            <!-- Existing Video Display -->
+            <div v-if="showExistingVideo && existingVideoUrl" class="self-stretch bg-menuBG border border-gray-300 rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] p-[8px] sm:p-[9px] md:p-[10px] lg:p-[11px] xl:p-[12px] 2xl:p-[14px] 3xl:p-[16px] 4xl:p-[18px]">
+                <div class="relative w-full">
+                    <video
+                        :src="existingVideoUrl"
+                        class="w-full h-[200px] sm:h-[220px] md:h-[240px] lg:h-[260px] xl:h-[280px] 2xl:h-[300px] 3xl:h-[320px] 4xl:h-[340px] object-cover rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] shadow-sm"
+                        controls
+                        preload="metadata"
+                    />
+                    <button
+                        type="button"
+                        @click="removeExistingVideo"
+                        class="bg-dangerText text-white absolute -top-[5.3px] sm:-top-[6px] md:-top-[6.7px] lg:-top-[7.3px] xl:-top-[8px] 2xl:-top-[9.3px] 3xl:-top-[10.7px] 4xl:-top-[12px] -right-[5.3px] sm:-right-[6px] md:-right-[6.7px] lg:-right-[7.3px] xl:-right-[8px] 2xl:-right-[9.3px] 3xl:-right-[10.7px] 4xl:-right-[12px] w-[10.7px] sm:w-[12px] md:w-[13.6px] lg:w-[14.7px] xl:w-[16px] 2xl:w-[18.5px] 3xl:w-[21.3px] 4xl:w-[24px] h-[10.7px] sm:h-[12px] md:h-[13.6px] lg:h-[14.7px] xl:h-[16px] 2xl:h-[18.5px] 3xl:h-[21.3px] 4xl:h-[24px] rounded-full flex items-center justify-center border border-white cursor-pointer p-0 shadow-sm transition-opacity duration-200 hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-red-400"
+                        aria-label="Delete existing video"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-[8px] sm:mt-[9px] md:mt-[10px] lg:mt-[11px] xl:mt-[12px] 2xl:mt-[14px] 3xl:mt-[16px] 4xl:mt-[18px] text-selectedText text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">
+                    <div class="font-medium">Video Saat Ini</div>
+                </div>
+                
+                <!-- Replace existing video button -->
+                <button
+                    type="button"
+                    @click="triggerFileInput"
+                    class="mt-[8px] sm:mt-[9px] md:mt-[10px] lg:mt-[11px] xl:mt-[12px] 2xl:mt-[14px] 3xl:mt-[16px] 4xl:mt-[18px] bg-selectedText text-white px-[8px] sm:px-[9px] md:px-[10px] lg:px-[11px] xl:px-[12px] 2xl:px-[14px] 3xl:px-[16px] 4xl:px-[18px] py-[4px] sm:py-[5px] md:py-[6px] lg:py-[7px] xl:py-[8px] 2xl:py-[9px] 3xl:py-[10px] 4xl:py-[12px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] 4xl:text-[17px] hover:opacity-90 transition-opacity"
+                >
+                    Ganti Video
+                </button>
+            </div>
+
+            <!-- New Video preview - show when new video is selected -->
             <div v-if="localVideo && videoPreviewUrl" class="self-stretch bg-menuBG border border-gray-300 rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] p-[8px] sm:p-[9px] md:p-[10px] lg:p-[11px] xl:p-[12px] 2xl:p-[14px] 3xl:p-[16px] 4xl:p-[18px]">
                 <div class="relative w-full">
                     <video

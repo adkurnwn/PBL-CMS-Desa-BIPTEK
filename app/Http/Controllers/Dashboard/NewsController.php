@@ -235,13 +235,18 @@ class NewsController extends Controller
         $processedContent = $this->processImagePlaceholdersInContent($originalContent, $uploadedImages);
         $data['content'] = $processedContent;
 
-        // Update news record
-        $news->update($data);
+        // Handle existing video removal
+        if ($request->remove_existing_video) {
+            $this->mediaService->handleVideoRemoval($news);
+        }
 
         // Handle video upload if needed
         if ($request->hasFile('video')) {
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
+
+        // Update news record
+        $news->update($data);
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
         return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');

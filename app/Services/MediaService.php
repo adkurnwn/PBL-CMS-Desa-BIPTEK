@@ -169,49 +169,42 @@ class MediaService
             $this->delete($model->$column, $disk);
         }
 
-        // Upload new video
-        $videoPath = $this->upload($video, $path, $disk);
+        // Generate unique filename with proper extension
+        $extension = $video->getClientOriginalExtension();
+        $filename = uniqid() . '_' . time() . '.' . $extension;
+        $fullPath = $path . '/' . $filename;
+
+        // Store the video file
+        $video->storeAs($path, $filename, $disk);
 
         // Update model with new path
-        $model->update([$column => $videoPath]);
+        $model->update([$column => $fullPath]);
 
-        return $videoPath;
+        return $fullPath;
     }
 
-    public function handleJsonImages($model, $files, $column, $path, $disk = 'public')
+    public function handleVideoRemoval($model, $column = 'video', $disk = 'public')
     {
-        // Get existing images from JSON
-        $images = json_decode($model->$column) ?? [];
-
-        // Process each file
-        foreach ($files as $index => $file) {
-            if (isset($images[$index])) {
-                $this->delete($images[$index], $disk);
-            }
-
-            $storedPath = $this->upload($file, $path, $disk);
-            $images[$index] = $storedPath;
+        if (!empty($model->$column)) {
+            $this->delete($model->$column, $disk);
+            $model->update([$column => null]);
+            return true;
         }
-
-        // Ensure array is sequential
-        $images = array_values($images);
-
-        // Update model with JSON
-        $model->update([$column => json_encode($images)]);
-
-        return $images;
+        return false;
     }
 
     public function deleteAllMedia($model)
     {
         // Delete all images
-        foreach ($model->images as $image) {
-            $this->delete($image->path);
-            $image->delete();
+        if (method_exists($model, 'images')) {
+            foreach ($model->images as $image) {
+                $this->delete($image->path);
+                $image->delete();
+            }
         }
 
         // Delete video if exists
-        if ($model->video) {
+        if (!empty($model->video)) {
             $this->delete($model->video);
         }
     }
