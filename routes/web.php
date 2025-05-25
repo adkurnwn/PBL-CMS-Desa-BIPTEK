@@ -55,7 +55,6 @@ Route::get('/laporan-dana-desa', function () {
     return Inertia::render('FrontEnd/LaporanDana');
 });
 
-
 Route::get('/produk-unggulan', function () {
     return Inertia::render('FrontEnd/ProdukUnggulan');
 });
