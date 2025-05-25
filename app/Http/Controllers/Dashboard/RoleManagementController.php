@@ -21,7 +21,6 @@ class RoleManagementController extends Controller
 
     public function index()
     {
-        // Only get non-admin roles for the list view
         $roles = Role::where('name', '!=', 'Admin')->get();
 
         return Inertia::render('Dashboard/RoleManagement/Index', [
@@ -31,7 +30,6 @@ class RoleManagementController extends Controller
 
     public function edit(Role $role)
     {
-        // Don't allow editing admin role
         if (strtolower($role->name) === 'admin') {
             abort(403, 'Cannot edit admin role');
         }
@@ -45,20 +43,17 @@ class RoleManagementController extends Controller
 
     public function update(Request $request, Role $role)
     {
-        // Debug logging
         Log::info('Role update request received', [
             'role' => $role->name,
             'permissions' => $request->permissions
         ]);
-        
-        // Don't allow updating admin role
+
         if (strtolower($role->name) === 'admin') {
             abort(403, 'Cannot modify admin role permissions');
         }
 
-        // Modified validation to allow empty array
         $validated = $request->validate([
-            'permissions' => 'present|array', // Changed from 'required|array' to 'present|array'
+            'permissions' => 'present|array',
             'permissions.*' => 'string|exists:permissions,name'
         ], [
             'permissions.present' => 'Daftar hak akses wajib diberikan.',
@@ -66,33 +61,25 @@ class RoleManagementController extends Controller
             'permissions.*.exists' => 'Salah satu hak akses yang diberikan tidak valid.'
         ]);
 
-        // Ensure we're getting an array even if empty
         $permissions = $request->permissions ?? [];
-        
-        // Debug before sync
+
         Log::info('Before syncing permissions', [
             'role' => $role->name,
             'current_permissions' => $role->permissions->pluck('name'),
             'new_permissions' => $permissions
         ]);
 
-        // Sync permissions and get changes
         $role->syncPermissions($permissions);
-        
-        // Debug after sync
+
         Log::info('After syncing permissions', [
             'role' => $role->name,
             'new_permissions' => $role->permissions->pluck('name')
         ]);
 
-        // Log activity
         $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses role ' . $role->name);
-        
-        // Return with both flash message and JSON response for Inertia
         return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
     }
 
-    // Keeping the batch update method for future reference, but it's not used in the current UI
     public function batchUpdate(Request $request)
     {
         $request->validate([
@@ -102,7 +89,6 @@ class RoleManagementController extends Controller
         foreach ($request->permissions as $roleId => $permissionNames) {
             $role = Role::find($roleId);
 
-            // Skip admin role for security
             if (strtolower($role->name) === 'admin') {
                 continue;
             }

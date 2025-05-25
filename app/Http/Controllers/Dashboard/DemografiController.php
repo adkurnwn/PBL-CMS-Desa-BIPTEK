@@ -23,35 +23,31 @@ class DemografiController extends Controller
     public function index(Request $request)
     {
         $query = Demografi::query();
-        
-        // Apply search if provided
+
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('tahun', 'like', "%{$search}%")
-                  ->orWhere('jumlah_penduduk', 'like', "%{$search}%")
-                  ->orWhere('jumlah_keluarga', 'like', "%{$search}%")
-                  ->orWhere('jumlah_pendatang', 'like', "%{$search}%")
-                  ->orWhere('jumlah_pindah_keluar', 'like', "%{$search}%");
+                    ->orWhere('jumlah_penduduk', 'like', "%{$search}%")
+                    ->orWhere('jumlah_keluarga', 'like', "%{$search}%")
+                    ->orWhere('jumlah_pendatang', 'like', "%{$search}%")
+                    ->orWhere('jumlah_pindah_keluar', 'like', "%{$search}%");
             });
         }
-        
-        // Apply tahun filter if provided - modify to check for existence more strictly
+
         if ($request->has('tahun') && $request->tahun !== null && $request->tahun !== '') {
             $query->where('tahun', $request->tahun);
         }
-        
-        // Apply sorting
+
         $sortField = $request->input('sort', 'tahun');
         $sortDirection = $request->input('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
-        
-        // Get all unique years for the filter dropdown
+
         $years = Demografi::distinct()->pluck('tahun')->toArray();
-        $yearsFormatted = array_map(function($year) {
+        $yearsFormatted = array_map(function ($year) {
             return ['id' => $year, 'name' => (string)$year];
         }, $years);
-        
+
         return Inertia::render('Dashboard/Demografi/Index', [
             'demografi' => $query->get(),
             'search' => $request->search,
@@ -91,20 +87,18 @@ class DemografiController extends Controller
     public function update(UpdateDemografiRequest $request, $slug)
     {
         $demografi = Demografi::where('tahun', $slug)->firstOrFail();
-        
-        // Check if the year was changed and if it conflicts with another record
+
         if ($request->tahun != $slug) {
             $existingDemografi = Demografi::where('tahun', $request->tahun)->first();
-            
+
             if ($existingDemografi) {
                 return redirect()->back()->withErrors([
                     'tahun' => 'Data demografi untuk tahun ini sudah ada.'
                 ])->withInput();
             }
         }
-        
-        $demografiData = $request->all();
 
+        $demografiData = $request->all();
         $demografi->update($demografiData);
 
         $this->logHelper->logActivity('update', 'demografi', 'Memperbarui demografi ' . $request->title);

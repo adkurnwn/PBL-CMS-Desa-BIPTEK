@@ -76,7 +76,9 @@ class EventController extends Controller
         $request->validate($rules);
 
         $data = $request->all();
-        $data['slug'] = SlugHelper::generateUniqueSlug(Event::class, $request->title);
+        if ($event->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(Event::class, $request->title);
+        }
 
         $event->update($data);
 

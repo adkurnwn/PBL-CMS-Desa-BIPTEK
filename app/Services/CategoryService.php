@@ -81,10 +81,8 @@ class CategoryService
     private function getCategoryUsageCount(int $categoryId, int $categoryType = 1): int
     {
         if ($categoryType === 0) {
-            // For ProdukHukum
             return ProdukHukum::where('category_id', $categoryId)->count();
         } else {
-            // For News and Gallery
             $newsCount = News::where('category_id', $categoryId)->count();
             $galleryCount = Gallery::where('category_id', $categoryId)->count();
             return $newsCount + $galleryCount;
