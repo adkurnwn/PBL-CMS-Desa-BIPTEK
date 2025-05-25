@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Profile\ProfileDetail;
 use App\Http\Resources\Profile\ProfileLayout;
+use App\Models\DanaDesa;
+use App\Models\Demografi;
+use App\Models\ProdukHukum;
 
 class ProfileController extends Controller
 {
@@ -55,6 +58,8 @@ class ProfileController extends Controller
                 'data' => [
                     'name' => $profile->name,
                     'hero_image' => json_decode($profile->hero_images)[0],
+                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
+                    'dana_desa' => (DanaDesa::exists()) ? true : false,
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -91,7 +96,7 @@ class ProfileController extends Controller
         }
     }
 
-    public function getName()
+    public function layananPage()
     {
         try {
             $profile = Profile::latest()->first();
@@ -107,6 +112,9 @@ class ProfileController extends Controller
                 'success' => true,
                 'data' => [
                     'name' => $profile->name,
+                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
+                    'dana_desa' => (DanaDesa::exists()) ? true : false,
+                    'demografi' => (Demografi::exists()) ? true : false,
                 ]
             ], 200);
         } catch (\Exception $e) {

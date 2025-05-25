@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\NewsController;
 use App\Http\Controllers\api\UserController;
@@ -16,7 +15,6 @@ use App\Http\Controllers\api\ProdukDesaController;
 use App\Http\Controllers\api\ProdukHukumController;
 use App\Http\Controllers\api\KomentarBeritaController;
 use App\Http\Controllers\api\KomentarProdukHukumController;
-use App\Models\Profile;
 
 Route::get('provinces', [RegionController::class, 'getProvinces']);
 Route::get('regencies/{province_id}', [RegionController::class, 'getRegencies']);
@@ -27,7 +25,7 @@ Route::prefix('profile')->group(function () {
     Route::get('/layout', [ProfileController::class, 'layout']);
     Route::get('/home', [ProfileController::class, 'landingPage']);
     Route::get('/profile', [ProfileController::class, 'profilePage']);
-    Route::get('/name', [ProfileController::class, 'getName']);
+    Route::get('/layanan', [ProfileController::class, 'layananPage']);
 });
 
 Route::prefix('users')->group(function () {
@@ -70,11 +68,10 @@ Route::prefix('produk-hukum')->group(function () {
     Route::get('/{slug}', [ProdukHukumController::class, 'show']);
 });
 
-
 Route::prefix('produk-hukum-comments')->group(function () {
-    Route::get('/{dokumenId}', [KomentarProdukHukumController::class, 'index']);
+    Route::get('/{slug}', [KomentarProdukHukumController::class, 'index']);
     Route::post('/', [KomentarProdukHukumController::class, 'store']);
-    Route::get('/{dokumenId}/replies/{commentId}', [KomentarProdukHukumController::class, 'getReplies']);
+    Route::get('/{slug}/replies/{commentId}', [KomentarProdukHukumController::class, 'getReplies']);
 });
 
 Route::prefix('feedback')->group(function () {

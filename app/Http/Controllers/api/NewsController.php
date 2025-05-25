@@ -40,7 +40,7 @@ class NewsController extends Controller
             if ($sort === 'views') {
                 $query->orderBy('views', 'desc');
             } else {
-                $query->latest(); // Default sort by date
+                $query->latest();
             }
 
             $news = $query->latest()->paginate(12);

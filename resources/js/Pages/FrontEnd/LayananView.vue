@@ -10,7 +10,7 @@ const fetchData = async () => {
     try {
         loading.value = true;
         const response = await axios.get("/api/produk-desa/preview");
-        const desaResponse = await axios.get("/api/profile/name");
+        const desaResponse = await axios.get("/api/profile/layanan");
         desa.value = desaResponse.data.data || {};
         produkDesa.value = response.data.data || {};
         loading.value = false;
@@ -123,6 +123,7 @@ onMounted(() => {
                 >
                     <!-- Grid 1 -->
                     <div
+                        v-if="desa.produk_hukum"
                         class="bg-secondary text-accent1 text-center p-4 rounded-lg shadow-lg xl:w-8/12 sm:w-64 w-72 xl:h-40 sm:h-40 h-32"
                     >
                         <svg
@@ -149,6 +150,7 @@ onMounted(() => {
                     </div>
                     <!-- Grid 2 -->
                     <div
+                        v-if="desa.dana_desa"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-40 sm:h-40 h-32 text-center"
                     >
                         <svg
@@ -175,6 +177,7 @@ onMounted(() => {
                     </div>
                     <!-- Grid 3 -->
                     <div
+                        v-if="desa.demografi"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-40 sm:h-40 h-32 text-center"
                     >
                         <svg
