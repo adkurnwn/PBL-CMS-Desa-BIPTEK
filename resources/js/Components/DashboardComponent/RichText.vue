@@ -1,413 +1,329 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue';
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/DashboardComponent/InputError.vue";
-import ImageUploader from "@/Components/DashboardComponent/ImageUploader.vue";
+import { Head, Link, useForm } from '@inertiajs/vue3'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Image from '@tiptap/extension-image'
+
+import BoldIcon from 'vue-material-design-icons/FormatBold.vue'
+import ItalicIcon from 'vue-material-design-icons/FormatItalic.vue'
+import UnderlineIcon from 'vue-material-design-icons/FormatUnderline.vue'
+import H1Icon from 'vue-material-design-icons/FormatHeader1.vue'
+import H2Icon from 'vue-material-design-icons/FormatHeader2.vue'
+import ListIcon from 'vue-material-design-icons/FormatListBulleted.vue'
+import OrderedListIcon from 'vue-material-design-icons/FormatListNumbered.vue'
+import BlockquoteIcon from 'vue-material-design-icons/FormatQuoteClose.vue'
+import CodeIcon from 'vue-material-design-icons/CodeTags.vue'
+import HorizontalRuleIcon from 'vue-material-design-icons/Minus.vue'
+import UndoIcon from 'vue-material-design-icons/Undo.vue'
+import RedoIcon from 'vue-material-design-icons/Redo.vue'
+import ImageIcon from 'vue-material-design-icons/Image.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
-    modelValue: {
-        type: Object,
-        default: () => ({
-            title: '',
-            content: '',
-            images: [],
-            alts: []
-        })
+  modelValue: String,
+})
+
+const emit = defineEmits(['update:modelValue', 'image-added'])
+
+// Store temporary image URLs for cleanup
+const tempImageUrls = ref(new Set())
+const editorContainer = ref(null)
+const isResizing = ref(false)
+const minHeight = ref(600) // Minimum height that can't be shrunk
+const currentHeight = ref(300) // Current height of the editor
+
+const editor = useEditor({
+  content: props.modelValue,
+  onUpdate: ({ editor }) => {
+    emit('update:modelValue', editor.getHTML())
+  },
+  extensions: [
+    StarterKit, 
+    Underline,
+    Image.configure({
+      inline: false,
+      allowBase64: true,
+      HTMLAttributes: {
+        class: 'richtext-preview-image',
+      },
+    }),
+  ],
+  editorProps: {
+    attributes: {
+      class:
+        'p-4 overflow-y-auto outline-none prose max-w-none resize-none',
     },
-    errors: {
-        type: Object,
-        default: () => ({})
+  },
+  onDestroy: () => {
+    // Clean up temporary URLs when editor is destroyed
+    tempImageUrls.value.forEach(url => {
+      URL.revokeObjectURL(url)
+    })
+    tempImageUrls.value.clear()
+  }
+})
+
+// Resize functionality
+const startResize = (e) => {
+  e.preventDefault()
+  isResizing.value = true
+  const startY = e.clientY
+  const startHeight = currentHeight.value
+  
+  const doDrag = (e) => {
+    const newHeight = startHeight + (e.clientY - startY)
+    if (newHeight >= minHeight.value && newHeight <= 800) { // Min to max height
+      currentHeight.value = newHeight
+      if (editorContainer.value) {
+        editorContainer.value.style.height = newHeight + 'px'
+      }
     }
-});
+  }
+  
+  const stopDrag = () => {
+    isResizing.value = false
+    document.removeEventListener('mousemove', doDrag)
+    document.removeEventListener('mouseup', stopDrag)
+  }
+  
+  document.addEventListener('mousemove', doDrag)
+  document.addEventListener('mouseup', stopDrag)
+}
 
-const emit = defineEmits(['update:modelValue']);
+onMounted(() => {
+  if (editorContainer.value) {
+    currentHeight.value = minHeight.value
+    editorContainer.value.style.height = minHeight.value + 'px'
+  }
+})
 
-const localValue = ref({ ...props.modelValue });
-const contentEditor = ref(null);
-const isSourceMode = ref(false);
-
-// Watch for changes and emit updates
-watch(localValue, (newValue) => {
-    emit('update:modelValue', newValue);
-}, { deep: true });
-
-// Watch for external changes to modelValue
-watch(() => props.modelValue, (newValue) => {
-    localValue.value = { ...newValue };
-    if (contentEditor.value && !isSourceMode.value) {
-        contentEditor.value.innerHTML = newValue.content;
+const handleImageUpload = () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'image/*'
+  input.onchange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      // Emit image file to parent component
+      emit('image-added', file)
+      
+      // Create temporary blob URL for preview
+      const tempUrl = URL.createObjectURL(file)
+      tempImageUrls.value.add(tempUrl)
+      
+      // Insert image with temporary URL for preview and data attribute for tracking
+      const imageId = `image_placeholder_${Date.now()}`
+      editor.value.chain().focus().setImage({ 
+        src: tempUrl,
+        alt: '',
+        'data-image-id': imageId,
+        'data-is-placeholder': 'true',
+        'data-blob-url': tempUrl // Add this to help with replacement
+      }).run()
+      
+      // Don't revoke the URL immediately - let the processing handle it
     }
-}, { deep: true });
+  }
+  input.click()
+}
 
-// Handle image changes
-const handleImagesChange = (images) => {
-    localValue.value.images = images;
-};
+// Method to replace placeholder with actual image path
+const replaceImagePlaceholder = (placeholderId, imagePath) => {
+  const content = editor.value.getHTML()
+  const updatedContent = content.replace(
+    new RegExp(`{{${placeholderId}}}`, 'g'),
+    imagePath
+  )
+  editor.value.commands.setContent(updatedContent)
+}
 
-const handleAltsChange = (alts) => {
-    localValue.value.alts = alts;
-};
-
-// Handle content editor input
-const handleContentInput = () => {
-    if (contentEditor.value) {
-        localValue.value.content = contentEditor.value.innerHTML;
-    }
-};
-
-// Toggle between WYSIWYG and source code mode
-const toggleSourceMode = () => {
-    isSourceMode.value = !isSourceMode.value;
-    
-    nextTick(() => {
-        if (isSourceMode.value) {
-            // Switching to source mode - show HTML
-            const textarea = document.getElementById('content-source');
-            if (textarea) {
-                textarea.focus();
-            }
-        } else {
-            // Switching to WYSIWYG mode - show formatted content
-            if (contentEditor.value) {
-                contentEditor.value.innerHTML = localValue.value.content;
-                contentEditor.value.focus();
-            }
-        }
-    });
-};
-
-// Handle source code changes
-const handleSourceInput = (event) => {
-    localValue.value.content = event.target.value;
-    if (contentEditor.value && !isSourceMode.value) {
-        contentEditor.value.innerHTML = event.target.value;
-    }
-};
-
-// WYSIWYG formatting functions using document.execCommand
-const execCommand = (command, value = null) => {
-    if (isSourceMode.value) return;
-    
-    document.execCommand(command, false, value);
-    contentEditor.value.focus();
-    handleContentInput(); // Update the content
-};
-
-const formatBold = () => execCommand('bold');
-const formatItalic = () => execCommand('italic');
-const formatUnderline = () => execCommand('underline');
-const formatH1 = () => execCommand('formatBlock', '<h1>');
-const formatH2 = () => execCommand('formatBlock', '<h2>');
-const formatH3 = () => execCommand('formatBlock', '<h3>');
-const formatParagraph = () => execCommand('formatBlock', '<p>');
-const formatUnorderedList = () => execCommand('insertUnorderedList');
-const formatOrderedList = () => execCommand('insertOrderedList');
-const formatBlockquote = () => execCommand('formatBlock', '<blockquote>');
-
-const formatLink = () => {
-    const url = prompt('Enter URL:');
-    if (url) {
-        execCommand('createLink', url);
-    }
-};
-
-const formatLineBreak = () => {
-    execCommand('insertHTML', '<br>');
-};
-
-const formatCode = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-        
-        if (selectedText) {
-            execCommand('insertHTML', `<code>${selectedText}</code>`);
-        } else {
-            execCommand('insertHTML', '<code></code>');
-            // Move cursor inside the code tags
-            const codeElements = contentEditor.value.querySelectorAll('code');
-            const lastCode = codeElements[codeElements.length - 1];
-            if (lastCode) {
-                const newRange = document.createRange();
-                newRange.setStart(lastCode, 0);
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
-        }
-    }
-};
-
-const formatCodeBlock = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-        
-        if (selectedText) {
-            execCommand('insertHTML', `<pre><code>${selectedText}</code></pre>`);
-        } else {
-            execCommand('insertHTML', '<pre><code></code></pre>');
-        }
-    }
-};
-
-// Initialize the editor when component mounts
-nextTick(() => {
-    if (contentEditor.value && localValue.value.content) {
-        contentEditor.value.innerHTML = localValue.value.content;
-    }
-    
-    // Ensure proper text direction
-    if (contentEditor.value) {
-        contentEditor.value.style.direction = 'ltr';
-        contentEditor.value.style.textAlign = 'left';
-        contentEditor.value.style.unicodeBidi = 'normal';
-    }
-});
+// Expose method to parent
+defineExpose({
+  replaceImagePlaceholder
+})
 </script>
 
 <template>
-    <div class="space-y-6">
-        <!-- Title Field -->
-        <div>
-            <InputLabel for="title" value="Title" />
-            <TextInput 
-                id="title" 
-                v-model="localValue.title" 
-                type="text" 
-                class="mt-1 block w-full text-2xl font-bold p-4"
-                placeholder="Enter your news title..."
-                required 
-            />
-            <InputError :message="errors.title" class="mt-2" />
-        </div>
-
-        <!-- Content Field with WYSIWYG Editor -->
-        <div>
-            <div class="flex items-center justify-between mb-2">
-                <InputLabel for="content" value="Content" />
-                
-                <!-- Source/WYSIWYG Toggle Button -->
-                <button
-                    type="button"
-                    @click="toggleSourceMode"
-                    :class=" [
-                        'px-3 py-1 text-sm rounded-md border transition-colors',
-                        isSourceMode 
-                            ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
-                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    ]">
-                    {{ isSourceMode ? '🎨 Visual Editor' : '📝 Source Code' }}
-                </button>
-            </div>
-            
-            <!-- WYSIWYG Formatting Toolbar (only visible in WYSIWYG mode) -->
-            <div v-show="!isSourceMode" class="mt-2 mb-3 p-3 bg-gray-50 border border-gray-300 rounded-t-md">
-                <div class="flex flex-wrap gap-2">
-                    <!-- Text Formatting -->
-                    <div class="flex gap-1 border-r border-gray-300 pr-2">
-                        <button
-                            type="button"
-                            @click="formatBold"
-                            class="px-2 py-1 text-sm font-bold bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Bold">
-                            <strong>B</strong>
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatItalic"
-                            class="px-2 py-1 text-sm italic bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Italic">
-                            <em>I</em>
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatUnderline"
-                            class="px-2 py-1 text-sm underline bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Underline">
-                            U
-                        </button>
-                    </div>
-
-                    <!-- Headings -->
-                    <div class="flex gap-1 border-r border-gray-300 pr-2">
-                        <button
-                            type="button"
-                            @click="formatH1"
-                            class="px-2 py-1 text-sm font-bold bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Heading 1">
-                            H1
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatH2"
-                            class="px-2 py-1 text-sm font-semibold bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Heading 2">
-                            H2
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatH3"
-                            class="px-2 py-1 text-sm font-medium bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Heading 3">
-                            H3
-                        </button>
-                    </div>
-
-                    <!-- Lists -->
-                    <div class="flex gap-1 border-r border-gray-300 pr-2">
-                        <button
-                            type="button"
-                            @click="formatUnorderedList"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Bullet List">
-                            • List
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatOrderedList"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Numbered List">
-                            1. List
-                        </button>
-                    </div>
-
-                    <!-- Other Elements -->
-                    <div class="flex gap-1 border-r border-gray-300 pr-2">
-                        <button
-                            type="button"
-                            @click="formatParagraph"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Paragraph">
-                            ¶
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatLineBreak"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Line Break">
-                            BR
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatLink"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Link">
-                            🔗
-                        </button>
-                    </div>
-
-                    <!-- Advanced -->
-                    <div class="flex gap-1">
-                        <button
-                            type="button"
-                            @click="formatBlockquote"
-                            class="px-2 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Blockquote">
-                            " "
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatCode"
-                            class="px-2 py-1 text-sm font-mono bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Inline Code">
-                            &lt;&gt;
-                        </button>
-                        <button
-                            type="button"
-                            @click="formatCodeBlock"
-                            class="px-2 py-1 text-sm font-mono bg-white border border-gray-300 rounded hover:bg-gray-100"
-                            title="Code Block">
-                            { }
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Editor Container -->
-            <div class="relative">
-                <!-- WYSIWYG Editor (visible when not in source mode) -->
-                <div 
-                    v-show="!isSourceMode"
-                    ref="contentEditor"
-                    contenteditable="true"
-                    @input="handleContentInput"
-                    @paste="handleContentInput"
-                    dir="ltr"
-                    lang="en"
-                    class="mt-0 block w-full min-h-[400px] border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-4 text-base leading-relaxed bg-white overflow-y-auto outline-none rounded-b-md resize-y
-                    [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:my-6 [&_h1]:leading-tight
-                    [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:my-5 [&_h2]:leading-tight
-                    [&_h3]:text-xl [&_h3]:font-medium [&_h3]:my-4 [&_h3]:leading-tight
-                    [&_p]:my-3 [&_p]:leading-relaxed
-                    [&_ul]:my-4 [&_ul]:pl-6 [&_ol]:my-4 [&_ol]:pl-6
-                    [&_li]:my-1
-                    [&_blockquote]:border-l-4 [&_blockquote]:border-gray-300 [&_blockquote]:pl-4 [&_blockquote]:my-4 [&_blockquote]:italic [&_blockquote]:text-gray-600
-                    [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono
-                    [&_pre]:bg-gray-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4
-                    [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:rounded-none
-                    [&_strong]:font-semibold
-                    [&_em]:italic
-                    [&_u]:underline
-                    [&_a]:text-blue-600 [&_a]:underline [&_a:hover]:text-blue-800
-                    empty:before:content-[attr(placeholder)] empty:before:text-gray-400 empty:before:italic"
-                    placeholder="Start typing your content here... Use the formatting buttons above to style your text."
-                    :style="{
-                        direction: 'ltr',
-                        textAlign: 'left',
-                        unicodeBidi: 'normal',
-                        writingMode: 'horizontal-tb'
-                    }">
-                </div>
-
-                <!-- Source Code Editor (visible when in source mode) -->
-                <textarea 
-                    v-show="isSourceMode"
-                    id="content-source"
-                    :value="localValue.content"
-                    @input="handleSourceInput"
-                    dir="ltr"
-                    class="mt-0 block w-full min-h-[400px] rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-4 text-base leading-relaxed font-mono resize-y"
-                    placeholder="Edit HTML source code here..."
-                    :style="{
-                        direction: 'ltr',
-                        textAlign: 'left',
-                        unicodeBidi: 'normal'
-                    }">
-                </textarea>
-            </div>
-
-            <InputError :message="errors.content" class="mt-2" />
-            
-            <!-- Mode Indicator -->
-            <div class="mt-2 text-sm text-gray-600">
-                <span v-if="isSourceMode" class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                    Source Code Mode - Edit raw HTML
-                </span>
-                <span v-else class="flex items-center gap-2">
-                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                    Visual Editor Mode - WYSIWYG formatting
-                </span>
-            </div>
-        </div>
-
-        <!-- Images Section -->
-        <div>
-            <ImageUploader 
-                :modelValue="localValue.images"
-                @update:modelValue="handleImagesChange"
-                :modelValueAlts="localValue.alts"
-                @update:modelValueAlts="handleAltsChange"
-                label="Article Images"
-                :error="errors" 
-                :alt-error="errors.alts" 
-                :defaultAltText="localValue.title"
-                :required="true" 
-            />
-        </div>
+  <div 
+    ref="editorContainer" 
+    class="relative border border-selectedText rounded-[5px] flex flex-col"
+    :class="{ 'select-none': isResizing }"
+    :style="{ height: currentHeight + 'px', minHeight: minHeight + 'px' }"
+  >
+    <!-- Toolbar -->
+    <section
+      v-if="editor"
+      class="buttons text-selectedText flex items-center rounded-[5px] flex-wrap gap-x-4 p-4 bg-menuBG flex-shrink-0"
+    >
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleBold().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('bold') }"
+        class="p-1"
+      >
+        <BoldIcon title="Bold" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleItalic().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('italic') }"
+        class="p-1"
+      >
+        <ItalicIcon title="Italic" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleUnderline().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('underline') }"
+        class="p-1"
+      >
+        <UnderlineIcon title="Underline" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+        :class="{
+          'bg-gray-200 rounded': editor.isActive('heading', { level: 1 }),
+        }"
+        class="p-1"
+      >
+        <H1Icon title="H1" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+        :class="{
+          'bg-gray-200 rounded': editor.isActive('heading', { level: 2 }),
+        }"
+        class="p-1"
+      >
+        <H2Icon title="H2" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleBulletList().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('bulletList') }"
+        class="p-1"
+      >
+        <ListIcon title="Bullet List" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleOrderedList().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('orderedList') }"
+        class="p-1"
+      >
+        <OrderedListIcon title="Ordered List" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleBlockquote().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('blockquote') }"
+        class="p-1"
+      >
+        <BlockquoteIcon title="Blockquote" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().toggleCode().run()"
+        :class="{ 'bg-gray-200 rounded': editor.isActive('code') }"
+        class="p-1"
+      >
+        <CodeIcon title="Code" />
+      </button>
+      <button
+        type="button"
+        @click="handleImageUpload"
+        class="p-1"
+      >
+        <ImageIcon title="Upload Image" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().setHorizontalRule().run()"
+        class="p-1"
+      >
+        <HorizontalRuleIcon title="Horizontal Rule" />
+      </button>
+      <button
+        type="button"
+        class="p-1 disabled:text-gray-400"
+        @click="editor.chain().focus().undo().run()"
+        :disabled="!editor.can().chain().focus().undo().run()"
+      >
+        <UndoIcon title="Undo" />
+      </button>
+      <button
+        type="button"
+        @click="editor.chain().focus().redo().run()"
+        :disabled="!editor.can().chain().focus().redo().run()"
+        class="p-1 disabled:text-gray-400"
+      >
+        <RedoIcon title="Redo" />
+      </button>
+    </section>
+    
+    <!-- Editor content with resize handle -->
+    <div class="relative flex-1 flex flex-col min-h-0">
+      <EditorContent :editor="editor" class="flex-1 min-h-0" />
+      
+      <!-- Resize handle - positioned at bottom-right edge -->
+      <div
+        @mousedown="startResize"
+        class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-300 hover:bg-gray-400 transition-colors duration-200 flex items-center justify-center z-10"
+        title="Drag to resize"
+      >
+        <!-- Triangle resize icon -->
+        <svg width="10" height="10" viewBox="0 0 10 10" class="text-gray-600">
+          <path d="M10 10L0 10L10 0Z" fill="currentColor" opacity="0.8"/>
+          <path d="M7 10L10 7L10 10Z" fill="currentColor" opacity="0.5"/>
+          <path d="M4 10L10 4L10 10Z" fill="currentColor" opacity="0.3"/>
+        </svg>
+      </div>
     </div>
+  </div>
 </template>
+
+<style scoped>
+/* Style for preview images in the editor - half width */
+:deep(.richtext-preview-image) {
+  max-width: 50% !important;
+  height: auto !important;
+  display: block;
+  margin: 0.5rem 0;
+}
+
+/* Ensure the editor content doesn't interfere with image sizing */
+:deep(.ProseMirror img) {
+  max-width: 50% !important;
+  height: auto !important;
+}
+
+/* Make the editor content fill available space */
+:deep(.ProseMirror) {
+  min-height: 200px;
+  height: 100%;
+  border: none;
+  padding: 1rem;
+  outline: none;
+  overflow-y: auto;
+}
+
+/* Ensure the editor container is flexible */
+:deep(.ProseMirror-focused) {
+  outline: none;
+}
+
+/* Style for when resizing */
+.select-none * {
+  user-select: none !important;
+}
+
+/* Ensure proper flexbox behavior */
+:deep(.tiptap) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+</style>

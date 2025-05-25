@@ -149,11 +149,22 @@ class NewsController extends Controller
         $baseSlug = SlugHelper::generateUniqueSlug(News::class, $request->title);
         $data['slug'] = $baseSlug . '-' . time();
 
+        // Store content temporarily without processing
+        $originalContent = $data['content'];
+        
         $news = News::create($data);
 
+        // Handle image uploads and get the uploaded image paths
+        $uploadedImages = [];
         if ($request->hasFile('images')) {
-            $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
+            $uploadedImages = $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
         }
+
+        // Process content to replace image placeholders with actual HTML
+        $processedContent = $this->processImagePlaceholdersInContent($originalContent, $uploadedImages);
+        
+        // Update news with processed content
+        $news->update(['content' => $processedContent]);
 
         if ($request->hasFile('video')) {
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
@@ -193,12 +204,11 @@ class NewsController extends Controller
             $baseSlug = SlugHelper::generateUniqueSlug(News::class, $request->title);
             $data['slug'] = $baseSlug . '-' . time();
         } else {
-            // Keep the existing slug if title hasn't changed
             $data['slug'] = $news->slug;
         }
 
-        // Update news record
-        $news->update($data);
+        // Store content temporarily without processing
+        $originalContent = $data['content'];
 
         // Handle removed images
         if ($request->removed_images) {
@@ -210,10 +220,18 @@ class NewsController extends Controller
             $this->mediaService->handleImageAltTextUpdates($news, $request->updated_existing_images);
         }
 
-        // Handle new images
+        // Handle new images and get uploaded paths
+        $uploadedImages = [];
         if ($request->hasFile('images')) {
-            $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
+            $uploadedImages = $this->mediaService->handleImageUploads($news, $request->file('images'), $request->alts);
         }
+
+        // Process content to replace image placeholders with actual HTML
+        $processedContent = $this->processImagePlaceholdersInContent($originalContent, $uploadedImages);
+        $data['content'] = $processedContent;
+
+        // Update news record
+        $news->update($data);
 
         // Handle video upload if needed
         if ($request->hasFile('video')) {
@@ -222,6 +240,42 @@ class NewsController extends Controller
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
         return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');
+    }
+
+    /**
+     * Process image placeholders in content and replace with HTML img tags
+     */
+    private function processImagePlaceholdersInContent($content, $uploadedImages)
+    {
+        $processedContent = $content;
+        
+        // Replace placeholders with actual image HTML
+        foreach ($uploadedImages as $index => $imageData) {
+            $placeholder = "{{IMAGE_$index}}";
+            $imageHtml = sprintf(
+                '<img src="%s" alt="%s" class="max-w-full h-auto block my-2" />',
+                asset('storage/' . $imageData['path']),
+                htmlspecialchars($imageData['alt'] ?? '')
+            );
+            
+            $processedContent = str_replace($placeholder, $imageHtml, $processedContent);
+        }
+        
+        // Clean up any remaining placeholder patterns that might not have been processed
+        $processedContent = preg_replace('/\{\{IMAGE_\d+\}\}/', '', $processedContent);
+        
+        // Clean up any remaining blob URLs that might have slipped through
+        $processedContent = preg_replace('/<img[^>]*src="blob:[^"]*"[^>]*>/', '', $processedContent);
+        
+        // Remove any data-is-placeholder attributes from remaining images
+        $processedContent = preg_replace('/\s*data-is-placeholder="[^"]*"/', '', $processedContent);
+        $processedContent = preg_replace('/\s*data-image-id="[^"]*"/', '', $processedContent);
+        $processedContent = preg_replace('/\s*data-blob-url="[^"]*"/', '', $processedContent);
+        
+        // Replace preview classes with final classes for full-width display
+        $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="max-w-full h-auto block my-2"', $processedContent);
+        
+        return $processedContent;
     }
 
     public function archive(Request $request)

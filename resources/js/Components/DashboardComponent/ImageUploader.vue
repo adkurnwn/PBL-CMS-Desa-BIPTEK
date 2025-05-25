@@ -45,6 +45,14 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    type: {
+        type: String,
+        default: "",
+    },
+    showUploadBox: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "update:alts"]);
@@ -196,8 +204,9 @@ const triggerFileInput = () => {
                 :required="required"
             />
 
-            <!-- Upload box - always visible -->
+            <!-- Upload box - hidden for news type -->
             <div
+                v-if="showUploadBox && type !== 'news'"
                 class="self-stretch bg-menuBG border border-selectedText hover:bg-selectedBG rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex flex-col items-center justify-start p-[10.7px] sm:p-[12.1px] md:p-[13.6px] lg:p-[14.8px] xl:p-[16px] 2xl:p-[18.5px] 3xl:p-[21.3px] 4xl:p-[24px] text-[6.7px] sm:text-[7.5px] md:text-[8.5px] lg:text-[9.2px] xl:text-[10px] 2xl:text-[11.5px] 3xl:text-[13.3px] 4xl:text-[15px] cursor-pointer transition-all duration-200 min-h-[60px] sm:min-h-[70px] md:min-h-[80px] lg:min-h-[90px] xl:min-h-[100px] 2xl:min-h-[110px] 3xl:min-h-[120px] 4xl:min-h-[140px] w-full box-border"
                 :class="{ 
                     'bg-blue-50 border-blue-400 border-2 border-dashed shadow-lg': isDragging,

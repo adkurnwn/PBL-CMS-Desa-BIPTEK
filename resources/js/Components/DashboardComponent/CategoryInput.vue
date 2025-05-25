@@ -291,7 +291,7 @@ watch(
                 </div>
             </div>
 
-            <div class="mt-[3.5px] sm:mt-[4px] md:mt-[4.5px] lg:mt-[4.8px] xl:mt-[5.3px] 2xl:mt-[6px] 3xl:mt-[7px] 4xl:mt-[8px] flex gap-[1.8px] sm:gap-[2px] md:gap-[2.2px] lg:gap-[2.4px] xl:gap-[2.67px] 2xl:gap-[3px] 3xl:gap-[3.6px] 4xl:gap-[4px]">
+            <div v-if="categories.length > 0" class="mt-[3.5px] sm:mt-[4px] md:mt-[4.5px] lg:mt-[4.8px] xl:mt-[5.3px] 2xl:mt-[6px] 3xl:mt-[7px] 4xl:mt-[8px] flex gap-[1.8px] sm:gap-[2px] md:gap-[2.2px] lg:gap-[2.4px] xl:gap-[2.67px] 2xl:gap-[3px] 3xl:gap-[3.6px] 4xl:gap-[4px]">
                 <button
                     type="button"
                     class="border-selectedText border-[1px] bg-white px-[3.5px] sm:px-[4px] md:px-[4.5px] lg:px-[4.8px] xl:px-[5.3px] 2xl:px-[6px] 3xl:px-[7px] 4xl:px-[8px] py-[1.8px] sm:py-[2px] md:py-[2.2px] lg:py-[2.4px] xl:py-[2.67px] 2xl:py-[3px] 3xl:py-[3.6px] 4xl:py-[4px] text-selectedText rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] hover:bg-selectedBG hover:border-transparent text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
@@ -440,9 +440,9 @@ watch(
             </div>
 
             <!-- Category management buttons -->
-            <div class="flex gap-[3.5px] sm:gap-[4px] md:gap-[4.5px] lg:gap-[4.8px] xl:gap-[5.3px] 2xl:gap-[6px] 3xl:gap-[7px] 4xl:gap-[8px] mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.5px] 3xl:mt-[1.8px] 4xl:mt-[2px]">
+            <div v-if="modelValue.category_id" class="flex gap-[3.5px] sm:gap-[4px] md:gap-[4.5px] lg:gap-[4.8px] xl:gap-[5.3px] 2xl:gap-[6px] 3xl:gap-[7px] 4xl:gap-[8px] mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.5px] 3xl:mt-[1.8px] 4xl:mt-[2px]">
                 <button
-                    v-if="!showNewCategoryInput && modelValue.category_id"
+                    v-if="!showNewCategoryInput"
                     type="button"
                     class="rounded-[5px] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-[3.5px] sm:px-[4px] md:px-[4.5px] lg:px-[4.8px] xl:px-[5.3px] 2xl:px-[6px] 3xl:px-[7px] 4xl:px-[8px] py-[1.8px] sm:py-[2px] md:py-[2.2px] lg:py-[2.4px] xl:py-[2.67px] 2xl:py-[3px] 3xl:py-[3.6px] 4xl:py-[4px]"
                     @click="startEditCategory(modelValue.category_id)"

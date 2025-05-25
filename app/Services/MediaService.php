@@ -5,6 +5,7 @@ namespace App\Services;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
+use App\Models\Image as ImageModel;
 
 class MediaService
 {
