@@ -16,6 +16,53 @@ function openFilter() {
   // logika buka filter di sini
   alert('Filter dibuka')
 }
+
+// Data dummy album
+const albums = ref([
+  {
+    id: 1,
+    title: 'MOU Pao-Pao x ICMI',
+    images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ],
+    date: '12 April 2025'
+  },
+    { id: 2, title: 'Title Here', images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ], date: 'dd mm yyyy'
+  },
+  { id: 3, title: 'Title Here', images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ], date: 'dd mm yyyy'
+  },
+  { id: 4, title: 'Title Here', images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ], date: 'dd mm yyyy'
+  },
+  { id: 5, title: 'Title Here', images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ], date: 'dd mm yyyy'
+  },
+  { id: 6, title: 'Title Here', images: [
+      'https://via.placeholder.com/150x90?text=Main',
+      'https://via.placeholder.com/80x40?text=1',
+      'https://via.placeholder.com/80x40?text=2'
+    ], date: 'dd mm yyyy'
+  },
+]);
+
+const page = ref(1);
+const totalPages = 2;
 </script>
 
 <template>
@@ -67,6 +114,54 @@ function openFilter() {
                     Album Desa
                 </h1>
             </article> 
+            <article class="w-full mt-7 px-20 mb-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                    v-for="album in albums"
+                    :key="album.id"
+                    class="bg-white rounded-lg shadow p-3 flex flex-col"
+                    >
+                    <!-- Judul dan ikon -->
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold text-accent1 text-lg line-clamp-2">{{ album.title }}</span>
+                        <span class="material-symbols-outlined text-accent1 text-2xl">gallery_thumbnail</span>
+                    </div>
+                    <!-- Gambar utama dan 2 gambar kecil -->
+                    <div class="flex gap-2 mb-2">
+                        <img
+                        :src="album.images[0]"
+                        alt="main"
+                        class="rounded object-cover w-1/2 h-24 text-gray-500"
+                        />
+                        <div class="flex flex-col gap-2 w-1/2 text-gray-500">
+                        <img
+                            v-for="(img, i) in album.images.slice(1, 3)"
+                            :key="i"
+                            :src="img"
+                            alt="thumb"
+                            class="rounded object-cover h-11 w-full"
+                        />
+                        </div>
+                    </div>
+                    <!-- Tanggal -->
+                    <div class="text-xs text-right text-gray-500 mt-auto">
+                        {{ album.date }}
+                    </div>
+                </div>
+            </div>
+            <!-- Pagination -->
+            <div class="flex justify-center mt-8 gap-2">
+                <button class="px-2 py-1 rounded-2xl text-white bg-accent2" :disabled="page === 1" @click="page--">&lt;</button>
+                <button
+                v-for="p in totalPages"
+                :key="p"
+                class="px-3 py-1 rounded-2xl border text-accent2"
+                :class="{'bg-accent2 text-white': page === p}"
+                @click="page = p"
+                >{{ p }}</button>
+                <button class="px-2 py-1 rounded-2xl border text-white bg-accent2" :disabled="page === totalPages" @click="page++">&gt;</button>
+            </div>
+            </article>
         </main>
     </UserLayout>
 </template>

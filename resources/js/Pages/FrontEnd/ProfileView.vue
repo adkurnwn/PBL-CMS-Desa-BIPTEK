@@ -333,14 +333,14 @@ const parseJson = (value) => {
             </div>
             <!-- Data Geografi -->
             <div
-                class="flex flex-col items-center w-full font-merriweather bg-type1 mt-3"
+                class="flex flex-col items-center w-full font-merriweather bg-type1 xl:mt-3 -mt-32"
             >
                 <h1
-                    class="font-bold text-accent1 text-3xl max-w-30 pr-96 -ml-96 mr-52 mt-20"
+                    class="font-bold text-accent1 xl:text-3xl text-xl max-w-30 xl:pr-96 pr-2 xl:-ml-96 -ml-52 mr-52 xl:mt-24 mt-16"
                 >
                     Data Geografi
                 </h1>
-                <div class="flex flex-col w-96 -ml-96 mr-96 text-lg">
+                <div class="flex flex-col w-96 xl:-ml-96 -ml-36 xl:mr-96 mr-2 xl:text-xl text-md">
                     <div class="flex w-full">
                         <p class="w-1/3 font-bold text-accent1 -ml-3">
                             Koordinat
@@ -358,12 +358,12 @@ const parseJson = (value) => {
                 </div>
                 <!-- Pass location data to Map component if available -->
                 <div
-                    class="h-96 xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2 z-0"
+                    class="xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2 z-0"
                 >
                     <Map :location-name="profile.name" />
                 </div>
                 <div
-                    class="xl:ml-72 sm:ml-96 xl:-mr-80 -mr-10 -mt-96 pt-2 text-accent1 xl:text-lg text-sm"
+                    class="xl:ml-80 sm:ml-96 xl:-mr-80 -mr-10 xl:-mt-[455px] -mt-[305px] text-accent1 xl:text-xl text-sm"
                 >
                     <h1 class="font-bold">Batas Desa</h1>
                     <div class="xl:max-w-96 max-w-40">
@@ -378,9 +378,9 @@ const parseJson = (value) => {
                     </div>
                 </div>
                 <div
-                    class="xl:mt-24 mt-11 xl:-ml-80 ml-24 xl:pr-6 text-accent1 xl:text-lg text-sm"
+                    class="xl:mt-32 mt-16 xl:-ml-80 ml-12 xl:pr-4 text-accent1 xl:text-xl text-sm"
                 >
-                    <p class="font-bold -ml-32">
+                    <p class="font-bold -ml-16">
                         GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru,
                         Sulawesi Selatan 90761
                     </p>
@@ -391,16 +391,16 @@ const parseJson = (value) => {
                 class="flex flex-col items-center w-full font-merriweather bg-type1 mb-12"
             >
                 <h1
-                    class="font-bold text-accent1 text-4xl max-w-30 -ml-96 mr-96 pr-28 m-20 mt-20"
+                    class="font-bold text-accent1 xl:text-3xl text-xl max-w-30 xl:-ml-96 -ml-96 xl:mr-96 mr-6 xl:pr-44 pr-0 m-20 mt-20"
                 >
                     Data Demografi
                 </h1>
-                <p class="text-xl text-accent1 max-w-5xl -ml-32 -mt-20 italic">
+                <p class="xl:text-xl text-md text-accent1 xl:max-w-5xl max-w-xl xl:-ml-36 ml-3 -mt-20 italic">
                     Menyajikan informasi mengenai aspek kependudukan yang
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.
                 </p>
-                <div class="flex flex-wrap gap-5 mr-16 mt-3 justify-center">
+                <div class="flex flex-wrap gap-5 xl:mr-20 mr-9 mt-3 justify-center">
                     <!-- Grid 1 -->
                     <div
                         class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center"

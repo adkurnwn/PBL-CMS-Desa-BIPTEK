@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import { Link } from "@inertiajs/vue3";
 import axios from "axios";
 import NewsCard from "@/Components/NewsCard.vue";
+import { computed } from "vue";
 
 const news = ref([]);
 const loading = ref(true);
@@ -93,6 +94,38 @@ const goToPage = async (page) => {
     }
 };
 
+const paginationNumbers = computed(() => {
+    if (!pagination.value) return [];
+    const total = pagination.value.last_page;
+    const current = pagination.value.current_page;
+    const delta = 1;
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    for (let i = 1; i <= total; i++) {
+        if (
+            i === 1 ||
+            i === total ||
+            (i >= current - delta && i <= current + delta)
+        ) {
+            range.push(i);
+        }
+    }
+     for (let i of range) {
+        if (l) {
+            if (i - l === 2) {
+                rangeWithDots.push(l + 1);
+            } else if (i - l > 2) {
+                rangeWithDots.push("...");
+            }
+        }
+        rangeWithDots.push(i);
+        l = i;
+    }
+    return rangeWithDots;
+});
+
 onMounted(() => {
     fetchNews();
 });
@@ -116,48 +149,41 @@ onMounted(() => {
                     v-model="searchQuery"
                     placeholder="Cari Informasi atau Kegiatan..."
                     style="width: 800px"
-                    class="flex-grow items-center mt-6 max-w-2xl py-2 mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-ligh"
+                    class="flex-grow items-center mt-6 xl:max-w-2xl sm:max-w-md py-2 mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-ligh"
                 />
                 <!-- Button Ikon Search -->
                 <button
-                    class="absolute right-24 mt-6 transform text-accent1"
+                    class="absolute right-20 mt-6 transform text-accent1"
                     @click="handleSearch"
                 >
-                    <svg
-                        class="-mr-2"
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="http://www.w3.org/2000/svg"
-                        width="24px"
-                        fill="#244031"
-                    >
-                        <path
-                            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
-                        />
-                    </svg>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    height="24px" 
+                    viewBox="0 -960 960 960" 
+                    width="24px" 
+                    fill="244031">
+                    <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+                </svg>
                 </button>
                 <!-- Button Filter Waktu Berita -->
                 <button
                     @click="openFilter"
                     class="transform mt-6 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
                 >
-                    <svg
-                        class="ml-2"
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="http://www.w3.org/2000/svg"
-                        width="24px"
-                        fill="#244031"
-                    >
-                        <path
-                            d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"
-                        />
-                    </svg>
+                <svg 
+                    class="ml-2" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    height="24px" 
+                    viewBox="0 -960 960 960" 
+                    width="24px" 
+                    fill="244031">
+                    <path d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"/>
+                </svg>
                 </button>
             </div>
             <!-- Kategori Berita -->
             <div
-                class="flex relative items-center space-x-7 mt-7 overflow-x-auto text-lg text-accent1"
+                class="flex relative items-center xl:space-x-7 space-x-5 mt-7 ml-10 overflow-x-auto xl:text-lg text-sm text-accent1"
             >
                 <button class="hover:underline font-medium">Semua</button>
                 <button class="hover:underline">Populer</button>
@@ -183,7 +209,7 @@ onMounted(() => {
             </div>
             <!--Berita Terkini-->
             <h1
-                class="relative flex-grow items-center text-xl font-bold text-gray-800 self-start mb-1 mt-5 ml-24"
+                class="w-full text-center text-xl font-bold text-gray-800 mt-5 mr-96 pr-96 -ml-60"
             >
                 Berita Terkini
             </h1>
@@ -191,7 +217,7 @@ onMounted(() => {
                 <!-- Loading State -->
                 <div
                     v-if="loading"
-                    class="flex justify-center items-center py-12"
+                    class="flex justify-center items-center py-40"
                 >
                     <div
                         class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
@@ -206,9 +232,9 @@ onMounted(() => {
                 <!-- News Grid -->
                 <div
                     v-else
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 xl:max-w-6xl max-w-xl mb-20"
                 >
-                    <div v-for="item in news" :key="item.id" class="mb-6">
+                    <div v-for="item in news" :key="item.id" class="-mb-12">
                         <NewsCard
                             :news="{
                                 slug: item.slug,
@@ -234,26 +260,6 @@ onMounted(() => {
                             Belum ada berita yang tersedia.
                         </p>
                     </div>
-                </div>
-
-                <!-- Pagination (if needed) -->
-                <div
-                    v-if="pagination && pagination.last_page > 1"
-                    class="mt-8 flex justify-center space-x-2"
-                >
-                    <button
-                        v-for="page in pagination.last_page"
-                        :key="page"
-                        @click="goToPage(page)"
-                        class="px-3 py-1 rounded"
-                        :class="
-                            page === pagination.current_page
-                                ? 'bg-accent1 text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        "
-                    >
-                        {{ page }}
-                    </button>
                 </div>
             </article>
         </main>
