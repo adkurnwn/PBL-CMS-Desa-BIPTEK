@@ -11,7 +11,7 @@ use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
 
@@ -192,6 +192,7 @@ class NewsController extends Controller
 
     public function update(UpdateNewsRequest $request, $slug)
     {
+        
         $news = News::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
@@ -201,6 +202,7 @@ class NewsController extends Controller
         }
 
         $data = $request->all();
+        $originalContent = $data['content'];
         $data['category_id'] = $category_id;
         if ($news->title !== $request->title) {
             $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);

@@ -235,4 +235,28 @@ class MediaService
 
         return $filePath;
     }
+
+    public function handleJsonImages($model, $files, $column, $path, $disk = 'public')
+    {
+        // Get existing images from JSON
+        $images = json_decode($model->$column) ?? [];
+
+        // Process each file
+        foreach ($files as $index => $file) {
+            if (isset($images[$index])) {
+                $this->delete($images[$index], $disk);
+            }
+
+            $storedPath = $this->upload($file, $path, $disk);
+            $images[$index] = $storedPath;
+        }
+
+        // Ensure array is sequential
+        $images = array_values($images);
+
+        // Update model with JSON
+        $model->update([$column => json_encode($images)]);
+
+        return $images;
+    }
 }
