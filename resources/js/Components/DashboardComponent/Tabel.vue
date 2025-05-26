@@ -81,6 +81,11 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
+    // Add prop to control row background
+    whiteBackground: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const emit = defineEmits(['page-changed', 'sort', 'filter-changed']);
@@ -333,6 +338,14 @@ const normalizeSlotName = (headerLabel) => {
     return headerLabel.replace(/\s+/g, '_');
 };
 
+// Function to determine row background class
+const getRowBackgroundClass = (rowIndex) => {
+    if (props.whiteBackground) {
+        return 'bg-white';
+    }
+    return rowIndex % 2 !== 0 ? 'bg-menuBG' : 'bg-white';
+};
+
 </script>
 
 <template>
@@ -412,7 +425,7 @@ const normalizeSlotName = (headerLabel) => {
                         <tr
                             v-for="(item, rowIndex) in items"
                             :key="`row-${rowIndex}`"
-                            :class="{ 'bg-menuBG': rowIndex % 2 !== 0, 'bg-white': rowIndex % 2 === 0 }"
+                            :class="getRowBackgroundClass(rowIndex)"
                             class="h-[35px] sm:h-[40px] md:h-[45px] lg:h-[50px] xl:h-[54px] 2xl:h-[70px] 3xl:h-[90px] 4xl:h-[107px] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
                         >
                             <td 
