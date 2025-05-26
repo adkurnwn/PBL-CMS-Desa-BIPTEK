@@ -10,6 +10,10 @@ use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Validation\StoreProdukHukumRequest;
 use App\Http\Requests\Validation\UpdateProdukHukumRequest;
 use App\Services\MediaService;
@@ -27,10 +31,61 @@ class ProdukHukumController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get query parameters
+        $search = $request->input('search');
+        $filters = $request->except(['search', 'sort', 'direction', 'page', '_token']);
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $perPage = 10;
+
+        // Start building the query
+        $query = ProdukHukum::with('category');
+
+        // Apply search
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // Apply filters
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if ($key === 'category_id' && !empty($value)) {
+                    $query->where('category_id', $value);
+                }
+                
+                if ($key === 'year' && !empty($value)) {
+                    // Use the date column instead of created_at
+                    $query->whereYear('date', $value);
+                }
+            }
+        }
+
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+
+        // Get paginated results
+        $produkHukum = $query->paginate($perPage)->withQueryString();
+
+        // Get available years for the filter - using date column
+        $availableYears = ProdukHukum::select(DB::raw('YEAR(date) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(function($year) {
+                return ['id' => $year, 'name' => $year];
+            })
+            ->toArray();
+
         return inertia('Dashboard/ProdukHukum/Index', [
-            'produkHukum' => ProdukHukum::with('category')->get()
+            'produkHukum' => $produkHukum,
+            'categories' => Category::where('category_type', 0)->get(),
+            'availableYears' => $availableYears,
+            'search' => $search,
+            'filters' => $filters,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -53,7 +108,7 @@ class ProdukHukumController extends Controller
         if ($request->hasFile('file')) {
             $data['file'] = $this->mediaService->handleDocumentUpload(
                 $request->file('file'),
-                $request->title,
+                $data['slug'],
                 'produk-hukum-documents'
             );
         }
@@ -95,6 +150,12 @@ class ProdukHukumController extends Controller
                 'produk-hukum-documents',
                 $produkHukum->file
             );
+
+            // Delete the old file if it exists
+            if ($produkHukum->file) {
+                Storage::disk('public')->delete($produkHukum->file);
+            }
+
         } else {
             unset($data['file']);
         }

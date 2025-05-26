@@ -253,10 +253,10 @@ const submit = () => {
 
                         <!-- Population Data Section -->
                         <div class="mb-6">
-                            <h3 class="font-medium text-lg text-menuText mb-3 pl-[12px]">Data Umum</h3>
-                            <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <h3 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px] pl-[12px]">Data Umum</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[15px] md:gap-x-[22px] gap-y-[13px] md:gap-y-[15px]">
                                 <!-- First column -->
-                                <div class="flex flex-col gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <!-- Gender Population -->
                                     <div>
                                         <SingleLineField
@@ -294,7 +294,7 @@ const submit = () => {
                                 </div>
                                 
                                 <!-- Second column -->
-                                <div class="flex flex-col gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="jumlah_penduduk"
@@ -333,9 +333,9 @@ const submit = () => {
 
                         <!-- Age Group Section -->
                         <div class="mb-6">
-                            <h3 class="font-medium text-lg text-menuText mb-3 pl-[12px]">Berdasarkan Kelompok Umur</h3>
-                            <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
-                                <div class="flex flex-col gap-y-[15px]">
+                            <h3 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px] pl-[12px]">Berdasarkan Kelompok Umur</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[15px] md:gap-x-[22px] gap-y-[13px] md:gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="jumlah_anak"
@@ -369,7 +369,7 @@ const submit = () => {
                                     </div>
                                 </div>
                                 
-                                <div class="flex flex-col gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="jumlah_dewasa"
@@ -407,9 +407,9 @@ const submit = () => {
 
                         <!-- Education Section -->
                         <div class="mb-6">
-                            <h3 class="font-medium text-lg text-menuText mb-3 pl-[12px]">Berdasarkan Tingkat Pendidikan</h3>
-                            <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
-                                <div class="flex flex-col gap-y-[15px]">
+                            <h3 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px] pl-[12px]">Berdasarkan Tingkat Pendidikan</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[15px] md:gap-x-[22px] gap-y-[13px] md:gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="tamat_sd"
@@ -443,7 +443,7 @@ const submit = () => {
                                     </div>
                                 </div>
                                 
-                                <div class="flex flex-col gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="tamat_sma"
@@ -481,9 +481,9 @@ const submit = () => {
 
                         <!-- Other Demographics Section -->
                         <div class="mb-6">
-                            <h3 class="font-medium text-lg text-menuText mb-3 pl-[12px]">Data Lainnya</h3>
-                            <div class="grid grid-cols-2 gap-x-[22px] gap-y-[15px]">
-                                <div class="flex flex-col gap-y-[15px]">
+                            <h3 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px] pl-[12px]">Data Lainnya</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[15px] md:gap-x-[22px] gap-y-[13px] md:gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="jumlah_peserta_bpjs"
@@ -501,7 +501,7 @@ const submit = () => {
                                     </div>
                                 </div>
                                 
-                                <div class="flex flex-col gap-y-[15px]">
+                                <div class="flex flex-col gap-y-[13px] md:gap-y-[15px]">
                                     <div>
                                         <SingleLineField
                                             id="jumlah_pendatang"

@@ -307,7 +307,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 
                         <!-- Fixed Actions column template to match the header label 'Aksi' -->
                         <template #['item.Aksi']="{ item }">
-                            <div class="flex justify-left">
+                            <div class="flex justify-left gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] items-center">
                                 <Link :href="route('dashboard.users.edit', item.id)">
                                 <button
                                     class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">

@@ -66,7 +66,7 @@ class ProfileController extends Controller
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
             $profileData['logo'] = $logoPath;
 
-            $this->updateFaviconFromLogo($logoPath);
+            // Favicon is now handled in SettingsController
         }
 
         if ($request->hasFile('organization_image')) {
@@ -93,11 +93,6 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
-        return redirect()->route('dashboard.profiles.index')->with('success', 'Profil Berhasil Diperbarui');
-    }
-
-    protected function updateFaviconFromLogo(string $logoPath)
-    {
-        Storage::disk('public')->put('favicon.png', Storage::disk('public')->get($logoPath));
+        return redirect()->route('dashboard')->with('success', 'Profil Berhasil Diperbarui');
     }
 }

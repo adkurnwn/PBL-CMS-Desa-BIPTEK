@@ -1,12 +1,15 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
+import { Head, useForm, Link } from "@inertiajs/vue3";
+import { ref } from "vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
-import ImageUploader from "@/Components/ImageUploader.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+import ImageEditor from "@/Components/DashboardComponent/ImageEditor.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import TextAreaInput from "@/Components/DashboardComponent/TextAreaInput.vue";
+import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
 
 const form = useForm({
     product_name: "",
@@ -21,12 +24,54 @@ const form = useForm({
     alamat_penjual: "",
     kontak_penjual: "",
     images: [],
-    status: true,
+    status: true, // Keep as boolean like original
 });
 
+// Store display value separately from form value
+const displayPrice = ref("");
+
+// Currency formatting function
+const formatCurrency = (value) => {
+    // Remove all non-digit characters
+    const numericValue = value.replace(/\D/g, '');
+    
+    if (!numericValue) return '';
+    
+    // Format with thousand separators
+    const formatted = parseInt(numericValue).toLocaleString('id-ID');
+    
+    return `Rp ${formatted}`;
+};
+
+// Handle price input with live formatting
+const handlePriceInput = (event) => {
+    const rawValue = event.target.value;
+    const numericValue = rawValue.replace(/\D/g, '');
+    
+    // Store plain numeric value in form
+    form.price = numericValue;
+    
+    // Format for display
+    const formattedValue = formatCurrency(rawValue);
+    displayPrice.value = formattedValue;
+    
+    // Set the input value to the formatted version
+    event.target.value = formattedValue;
+};
+
 const submit = () => {
+    // Ensure we have the plain numeric value for price before submission
+    if (displayPrice.value) {
+        const numericValue = displayPrice.value.replace(/\D/g, '');
+        form.price = numericValue;
+    }
+    
+    // Use original submit logic - this should work correctly for slug generation
     form.post(route("dashboard.produk-desa.store"), {
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            displayPrice.value = ""; // Reset display price too
+        },
         preserveScroll: true,
         forceFormData: true,
     });
@@ -34,7 +79,6 @@ const submit = () => {
 </script>
 
 <template>
-
     <Head title="Tambah UMKM/Produk Unggulan" />
     <AuthenticatedLayout>
         <template #header>
@@ -49,135 +93,188 @@ const submit = () => {
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <form @submit.prevent="submit" enctype="multipart/form-data">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Name Field -->
+        <template #subtitle-area>
+            Tambah UMKM/Produk Unggulan
+        </template>
+
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                    <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column -->
                                 <div>
-                                    <InputLabel for="product_name" value="Nama Produk" />
-                                    <TextInput id="product_name" v-model="form.product_name" type="text"
-                                        class="mt-1 block w-full" required />
+                                    <SingleLineField
+                                        id="product_name"
+                                        v-model="form.product_name"
+                                        type="text"
+                                        fieldName="Nama Produk"
+                                        required
+                                        custom-width="100%"
+                                    />
                                     <InputError :message="form.errors.product_name" class="mt-2" />
                                 </div>
 
-                                <!-- Price Field -->
                                 <div>
-                                    <InputLabel for="price" value="Harga (Rp)" />
-                                    <TextInput id="price" v-model="form.price" type="text" class="mt-1 block w-full"
-                                        required />
+                                    <SingleLineField
+                                        id="price"
+                                        v-model="displayPrice"
+                                        type="text"
+                                        fieldName="Harga (Rp)"
+                                        required
+                                        custom-width="100%"
+                                        @input="handlePriceInput"
+                                    />
                                     <InputError :message="form.errors.price" class="mt-2" />
                                 </div>
 
-                                <!-- Contact Field -->
                                 <div>
-                                    <InputLabel for="kontak_penjual" value="Kontak Penjual" />
-                                    <TextInput id="kontak_penjual" v-model="form.kontak_penjual" type="text"
-                                        class="mt-1 block w-full" required />
+                                    <SingleLineField
+                                        id="kontak_penjual"
+                                        v-model="form.kontak_penjual"
+                                        type="text"
+                                        fieldName="Kontak Whatsapp Penjual"
+                                        required
+                                        custom-width="100%"
+                                    />
                                     <InputError :message="form.errors.kontak_penjual" class="mt-2" />
                                 </div>
 
-                                <!-- Nama Penjual Field -->
                                 <div>
-                                    <InputLabel for="nama_penjual" value="Nama Penjual" />
-                                    <TextInput id="nama_penjual" v-model="form.nama_penjual" type="text"
-                                        class="mt-1 block w-full" required />
+                                    <SingleLineField
+                                        id="nama_penjual"
+                                        v-model="form.nama_penjual"
+                                        type="text"
+                                        fieldName="Nama Penjual"
+                                        required
+                                        custom-width="100%"
+                                    />
                                     <InputError :message="form.errors.nama_penjual" class="mt-2" />
                                 </div>
 
-                                <!-- Alamat Penjual Field -->
                                 <div>
-                                    <InputLabel for="alamat_penjual" value="Alamat Penjual" />
-                                    <TextInput id="alamat_penjual" v-model="form.alamat_penjual" type="text"
-                                        class="mt-1 block w-full" required />
+                                    <SingleLineField
+                                        id="alamat_penjual"
+                                        v-model="form.alamat_penjual"
+                                        type="text"
+                                        fieldName="Alamat Penjual (Google Maps)"
+                                        required
+                                        custom-width="100%"
+                                    />
                                     <InputError :message="form.errors.alamat_penjual" class="mt-2" />
                                 </div>
-
-                                <div>
-                                    <div class="flex-row items-center">
-                                        <InputLabel for="status" value="Status" />
-                                        <input id="status" v-model="form.status" type="checkbox"
-                                            class="rounded border-gray-300 mt-2" />
-                                    </div>
-                                    <InputError :message="form.errors.status" class="mt-2" />
-                                </div>
-
-                                <!-- Image Field -->
-                                <div>
-                                    <ImageUploader v-model="form.images" label="Product Images" :error="form.errors"
-                                        :required="true" :altText="false" />
-                                    <label for="images" class="text-red-500">Max 3 images</label>
-                                </div>
-
-                                <!-- Social Media Section - Full Width -->
-                                <div class="col-span-2 mt-4">
-                                    <h3 class="font-medium text-gray-700 mb-2">
-                                        Social Media Links
-                                    </h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <!-- Instagram Field -->
-                                        <div>
-                                            <InputLabel for="instagram" value="Instagram" />
-                                            <TextInput id="instagram" v-model="form.instagram" type="text"
-                                                class="mt-1 block w-full" />
-                                            <InputError :message="form.errors.instagram" class="mt-2" />
-                                        </div>
-
-                                        <!-- Facebook Field -->
-                                        <div>
-                                            <InputLabel for="facebook" value="Facebook" />
-                                            <TextInput id="facebook" v-model="form.facebook" type="text"
-                                                class="mt-1 block w-full" />
-                                            <InputError :message="form.errors.facebook" class="mt-2" />
-                                        </div>
-
-                                        <!-- TikTok Field -->
-                                        <div>
-                                            <InputLabel for="tiktok" value="TikTok" />
-                                            <TextInput id="tiktok" v-model="form.tiktok" type="text"
-                                                class="mt-1 block w-full" />
-                                            <InputError :message="form.errors.tiktok" class="mt-2" />
-                                        </div>
-
-                                        <!-- YouTube Field -->
-                                        <div>
-                                            <InputLabel for="youtube" value="YouTube" />
-                                            <TextInput id="youtube" v-model="form.youtube" type="text"
-                                                class="mt-1 block w-full" />
-                                            <InputError :message="form.errors.youtube" class="mt-2" />
-                                        </div>
-
-                                        <!-- X (Twitter) Field -->
-                                        <div>
-                                            <InputLabel for="x" value="X (Twitter)" />
-                                            <TextInput id="x" v-model="form.x" type="text" class="mt-1 block w-full" />
-                                            <InputError :message="form.errors.x" class="mt-2" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Description Field - Full Width -->
-                                <div class="col-span-2">
-                                    <InputLabel for="description" value="Description" />
-                                    <textarea id="description" v-model="form.description" rows="4"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required></textarea>
-                                    <InputError :message="form.errors.description" class="mt-2" />
-                                </div>
                             </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create Produk Desa
-                                </PrimaryButton>
-                                <Link :href="route('dashboard.produk-desa.index')">
-                                <PrimaryButton type="button">Cancel</PrimaryButton>
-                                </Link>
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- Second column - Social Media -->
+                                <div>
+                                    <SingleLineField
+                                        id="instagram"
+                                        v-model="form.instagram"
+                                        type="text"
+                                        fieldName="Tautan Instagram"
+                                        custom-width="100%"
+                                    />
+                                    <InputError :message="form.errors.instagram" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="facebook"
+                                        v-model="form.facebook"
+                                        type="text"
+                                        fieldName="Tautan Facebook"
+                                        custom-width="100%"
+                                    />
+                                    <InputError :message="form.errors.facebook" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="tiktok"
+                                        v-model="form.tiktok"
+                                        type="text"
+                                        fieldName="Tautan TikTok"
+                                        custom-width="100%"
+                                    />
+                                    <InputError :message="form.errors.tiktok" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="youtube"
+                                        v-model="form.youtube"
+                                        type="text"
+                                        fieldName="Tautan YouTube"
+                                        custom-width="100%"
+                                    />
+                                    <InputError :message="form.errors.youtube" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="x"
+                                        v-model="form.x"
+                                        type="text"
+                                        fieldName="Tautan X (Twitter)"
+                                        custom-width="100%"
+                                    />
+                                    <InputError :message="form.errors.x" class="mt-2" />
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <!-- Status Field -->
+                        <div class="mt-[15px]">
+                            <CheckboxField
+                                id="status"
+                                v-model="form.status"
+                                fieldName="Status"
+                                labelText="Aktif"
+                                custom-width="100%"
+                            />
+                            <InputError :message="form.errors.status" class="mt-2" />
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mt-[15px]">
+                            <TextAreaInput
+                                id="description"
+                                v-model="form.description"
+                                type="text"
+                                fieldName="Deskripsi"
+                                required
+                                custom-width="100%"
+                                :rows="4"
+                            />
+                            <InputError :message="form.errors.description" class="mt-2" />
+                        </div>
+
+                        <!-- Image Editor -->
+                        <div class="mt-[15px]">
+                            <ImageEditor
+                                label="Gambar Produk"
+                                v-model="form.images"
+                                :existingImages="[]"
+                                :error="form.errors"
+                                :required="true"
+                                :altText="false"
+                                :maxImages="3"
+                            />
+                        </div>
+
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.produk-desa.index')" class="mr-[15px]">
+                                <SecondaryButton type="button">
+                                    BATAL
+                                </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                SIMPAN
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
