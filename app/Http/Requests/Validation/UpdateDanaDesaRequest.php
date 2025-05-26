@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Validation;
 
 use App\Models\DanaDesa;
 use Illuminate\Foundation\Http\FormRequest;

@@ -209,9 +209,9 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 12px;
+    gap: 5.3px;
     text-align: left;
-    font-size: 18px;
+    font-size: 8px;
 }
 
 .upload-section {
@@ -221,26 +221,29 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    padding: 12px;
-    gap: 10px;
+    padding: 5.3px;
+    gap: 0; /* Set gap to 0 for base size */
 }
 
 .field-name {
     align-self: stretch;
     font-weight: 500;
+    font-size: 8px;
+    margin-bottom: 4.4px;
 }
 
 .upload-box {
     align-self: stretch;
-    border-radius: 10px;
+    border-radius: 2.2px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 24px;
-    font-size: 15px;
+    padding: 10.7px;
+    font-size: 6.7px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
+    height: 37.3px;
 }
 
 .drag-over {
@@ -250,25 +253,26 @@ export default {
 }
 
 .upload-button {
-    border-radius: 5px;
+    border-radius: 2.2px;
     overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 6px 12px;
-    gap: 5px;
+    padding: 2.7px 5.3px;
+    gap: 2.2px;
     cursor: pointer;
 }
 
 .upload-icon {
-    width: 20px;
+    width: 8.9px;
     position: relative;
     max-height: 100%;
 }
 
 .upload-text {
     position: relative;
+    font-size: 6.7px;
 }
 
 .hidden {
@@ -281,28 +285,30 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 6px 12px;
-    gap: 3px;
+    padding: 2.7px 5.3px;
+    gap: 1.3px;
     text-align: center;
-    font-size: 12px;
-    margin-top: 10px;
+    font-size: 5.3px;
+    margin-top: 4.4px;
 }
 
 .instructions-title {
     align-self: stretch;
     position: relative;
+    font-size: 5.3px;
 }
 
 .instructions-subtitle {
     align-self: stretch;
     position: relative;
+    font-size: 4.4px;
 }
 
 .preview-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 4.4px;
 }
 
 .image-wrapper {
@@ -311,27 +317,27 @@ export default {
 }
 
 .preview-image {
-    width: 157px;
-    height: 211px;
+    width: 70.2px;
+    height: 94.2px;
     object-fit: cover;
-    border-radius: 16px; /* Add rounded corners */
-    box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.2); /* Add box shadow */
+    border-radius: 7.1px;
+    box-shadow: 0px 1.3px 1.3px 0px rgba(0, 0, 0, 0.2);
 }
 
 .delete-button {
     position: absolute;
-    top: -12px;
-    right: -12px;
-    width: 24px;
-    height: 24px;
+    top: -5.3px;
+    right: -5.3px;
+    width: 10.7px;
+    height: 10.7px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid white;
+    border: 1px solid white;
     cursor: pointer;
     padding: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0.9px 1.8px rgba(0, 0, 0, 0.2);
     transition: background-color 0.2s;
 }
 
@@ -341,11 +347,537 @@ export default {
 
 .delete-button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(220, 20, 60, 0.5);
+    box-shadow: 0 0 0 1px rgba(220, 20, 60, 0.5);
 }
 
 .error-message {
-    font-size: 14px;
-    margin-top: 4px;
+    font-size: 6.2px;
+    margin-top: 1.8px;
+}
+
+/* Responsive styles using media queries */
+@media (min-width: 640px) { /* sm */
+    .photo-upload-container {
+        gap: 6px;
+        font-size: 9px;
+    }
+    
+    .upload-section {
+        padding: 6px;
+        gap: 0; /* Set gap to 0 for sm */
+    }
+    
+    .field-name {
+        font-size: 9px;
+        margin-bottom: 5px;
+    }
+    
+    .upload-box {
+        border-radius: 2.5px;
+        padding: 12.1px;
+        font-size: 7.5px;
+        height: 42.3px;
+    }
+    
+    .upload-button {
+        border-radius: 2.5px;
+        padding: 3px 6px;
+        gap: 2.5px;
+    }
+    
+    .upload-icon {
+        width: 10.1px;
+    }
+    
+    .upload-text {
+        font-size: 7.5px;
+    }
+    
+    .instructions {
+        padding: 3px 6px;
+        gap: 1.5px;
+        font-size: 6px;
+        margin-top: 5px;
+    }
+    
+    .instructions-title {
+        font-size: 6px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 5px;
+    }
+    
+    .preview-container {
+        margin-top: 5px;
+    }
+    
+    .preview-image {
+        width: 79.5px;
+        height: 106.5px;
+        border-radius: 8px;
+    }
+    
+    .delete-button {
+        top: -6px;
+        right: -6px;
+        width: 12px;
+        height: 12px;
+    }
+    
+    .error-message {
+        font-size: 7px;
+        margin-top: 2px;
+    }
+}
+
+@media (min-width: 768px) { /* md */
+    .photo-upload-container {
+        gap: 6.7px;
+        font-size: 10px;
+    }
+    
+    .upload-section {
+        padding: 6.7px;
+        gap: 0; /* Set gap to 0 for md */
+    }
+    
+    .field-name {
+        font-size: 10px;
+        margin-bottom: 5.6px;
+    }
+    
+    .upload-box {
+        border-radius: 2.9px;
+        padding: 13.6px;
+        font-size: 8.5px;
+        height: 48px;
+    }
+    
+    .upload-button {
+        border-radius: 2.9px;
+        padding: 3.4px 6.7px;
+        gap: 2.9px;
+    }
+    
+    .upload-icon {
+        width: 11.5px;
+    }
+    
+    .upload-text {
+        font-size: 8.5px;
+    }
+    
+    .instructions {
+        padding: 3.4px 6.7px;
+        gap: 1.7px;
+        font-size: 6.8px;
+        margin-top: 5.6px;
+    }
+    
+    .instructions-title {
+        font-size: 6.8px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 5.6px;
+    }
+    
+    .preview-container {
+        margin-top: 5.6px;
+    }
+    
+    .preview-image {
+        width: 90.3px;
+        height: 121px;
+        border-radius: 9.1px;
+    }
+    
+    .delete-button {
+        top: -6.7px;
+        right: -6.7px;
+        width: 13.6px;
+        height: 13.6px;
+    }
+    
+    .error-message {
+        font-size: 8px;
+        margin-top: 2.2px;
+    }
+}
+
+@media (min-width: 1024px) { /* lg */
+    .photo-upload-container {
+        gap: 7.3px;
+        font-size: 11px;
+    }
+    
+    .upload-section {
+        padding: 7.3px;
+        gap: 0; /* Set gap to 0 for lg */
+    }
+    
+    .field-name {
+        font-size: 11px;
+        margin-bottom: 6.1px;
+    }
+    
+    .upload-box {
+        border-radius: 3.1px;
+        padding: 14.8px;
+        font-size: 9.2px;
+        height: 52px;
+    }
+    
+    .upload-button {
+        border-radius: 3.1px;
+        padding: 3.7px 7.3px;
+        gap: 3.1px;
+    }
+    
+    .upload-icon {
+        width: 12.5px;
+    }
+    
+    .upload-text {
+        font-size: 9.2px;
+    }
+    
+    .instructions {
+        padding: 3.7px 7.3px;
+        gap: 1.8px;
+        font-size: 7.3px;
+        margin-top: 6.1px;
+    }
+    
+    .instructions-title {
+        font-size: 7.3px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 6.1px;
+    }
+    
+    .preview-container {
+        margin-top: 6.1px;
+    }
+    
+    .preview-image {
+        width: 98px;
+        height: 131.6px;
+        border-radius: 10px;
+    }
+    
+    .delete-button {
+        top: -7.3px;
+        right: -7.3px;
+        width: 14.7px;
+        height: 14.7px;
+    }
+    
+    .error-message {
+        font-size: 8.7px;
+        margin-top: 2.4px;
+    }
+}
+
+@media (min-width: 1280px) { /* xl */
+    .photo-upload-container {
+        gap: 8px;
+        font-size: 12px;
+    }
+    
+    .upload-section {
+        padding: 8px;
+        gap: 0; /* Removed the gap that was showing as purple in inspector */
+    }
+    
+    .field-name {
+        font-size: 12px;
+        margin-bottom: 6.67px;
+    }
+    
+    .upload-box {
+        border-radius: 3.33px;
+        padding: 16px;
+        font-size: 10px;
+        height: 83px; /* Exactly 83px at xl breakpoint as specified */
+    }
+    
+    .upload-button {
+        border-radius: 3.33px;
+        padding: 4px 8px;
+        gap: 3.33px;
+    }
+    
+    .upload-icon {
+        width: 13.3px;
+    }
+    
+    .upload-text {
+        font-size: 10px;
+    }
+    
+    .instructions {
+        padding: 4px 8px;
+        gap: 2px;
+        font-size: 8px;
+        margin-top: 6.67px;
+    }
+    
+    .instructions-title {
+        font-size: 8px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 6.67px;
+    }
+    
+    .preview-container {
+        margin-top: 6.67px;
+    }
+    
+    .preview-image {
+        width: 104.7px;
+        height: 140.7px;
+        border-radius: 10.7px;
+    }
+    
+    .delete-button {
+        top: -8px;
+        right: -8px;
+        width: 16px;
+        height: 16px;
+    }
+    
+    .error-message {
+        font-size: 9.33px;
+        margin-top: 2.67px;
+    }
+}
+
+@media (min-width: 1536px) { /* 2xl */
+    .photo-upload-container {
+        gap: 9.3px;
+        font-size: 14px;
+    }
+    
+    .upload-section {
+        padding: 9.3px;
+        gap: 0; /* Set gap to 0 for 2xl */
+    }
+    
+    .field-name {
+        font-size: 14px;
+        margin-bottom: 7.7px;
+    }
+    
+    .upload-box {
+        border-radius: 3.8px;
+        padding: 18.5px;
+        font-size: 11.5px;
+        height: 96px;
+    }
+    
+    .upload-button {
+        border-radius: 3.8px;
+        padding: 4.6px 9.3px;
+        gap: 3.8px;
+    }
+    
+    .upload-icon {
+        width: 15.4px;
+    }
+    
+    .upload-text {
+        font-size: 11.5px;
+    }
+    
+    .instructions {
+        padding: 4.6px 9.3px;
+        gap: 2.3px;
+        font-size: 9.2px;
+        margin-top: 7.7px;
+    }
+    
+    .instructions-title {
+        font-size: 9.2px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 7.7px;
+    }
+    
+    .preview-container {
+        margin-top: 7.7px;
+    }
+    
+    .preview-image {
+        width: 121px;
+        height: 162.5px;
+        border-radius: 12.3px;
+    }
+    
+    .delete-button {
+        top: -9.3px;
+        right: -9.3px;
+        width: 18.5px;
+        height: 18.5px;
+    }
+    
+    .error-message {
+        font-size: 10.8px;
+        margin-top: 3.1px;
+    }
+}
+
+@media (min-width: 1920px) { /* 3xl */
+    .photo-upload-container {
+        gap: 10.7px;
+        font-size: 16px;
+    }
+    
+    .upload-section {
+        padding: 10.7px;
+        gap: 0; /* Set gap to 0 for 3xl */
+    }
+    
+    .field-name {
+        font-size: 16px;
+        margin-bottom: 8.9px;
+    }
+    
+    .upload-box {
+        border-radius: 4.4px;
+        padding: 21.3px;
+        font-size: 13.3px;
+        height: 111px;
+    }
+    
+    .upload-button {
+        border-radius: 4.4px;
+        padding: 5.3px 10.7px;
+        gap: 4.4px;
+    }
+    
+    .upload-icon {
+        width: 17.8px;
+    }
+    
+    .upload-text {
+        font-size: 13.3px;
+    }
+    
+    .instructions {
+        padding: 5.3px 10.7px;
+        gap: 2.7px;
+        font-size: 10.7px;
+        margin-top: 8.9px;
+    }
+    
+    .instructions-title {
+        font-size: 10.7px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 8.9px;
+    }
+    
+    .preview-container {
+        margin-top: 8.9px;
+    }
+    
+    .preview_image {
+        width: 138.2px;
+        height: 185.7px;
+        border-radius: 14px;
+    }
+    
+    .delete-button {
+        top: -10.7px;
+        right: -10.7px;
+        width: 21.3px;
+        height: 21.3px;
+    }
+    
+    .error-message {
+        font-size: 12.4px;
+        margin-top: 3.6px;
+    }
+}
+
+@media (min-width: 2560px) { /* 4xl */
+    .photo-upload-container {
+        gap: 12px;
+        font-size: 18px;
+    }
+    
+    .upload-section {
+        padding: 12px;
+        gap: 0; /* Set gap to 0 for 4xl */
+    }
+    
+    .field-name {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .upload-box {
+        border-radius: 5px;
+        padding: 24px;
+        font-size: 15px;
+        height: 126px;
+    }
+    
+    .upload-button {
+        border-radius: 5px;
+        padding: 6px 12px;
+        gap: 5px;
+    }
+    
+    .upload-icon {
+        width: 20px;
+    }
+    
+    .upload-text {
+        font-size: 15px;
+    }
+    
+    .instructions {
+        padding: 6px 12px;
+        gap: 3px;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+    
+    .instructions-title {
+        font-size: 12px;
+    }
+    
+    .instructions-subtitle {
+        font-size: 10px;
+    }
+    
+    .preview-container {
+        margin-top: 10px;
+    }
+    
+    .preview-image {
+        width: 157px;
+        height: 211px;
+        border-radius: 16px;
+    }
+    
+    .delete-button {
+        top: -12px;
+        right: -12px;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .error-message {
+        font-size: 14px;
+        margin-top: 4px;
+    }
 }
 </style>

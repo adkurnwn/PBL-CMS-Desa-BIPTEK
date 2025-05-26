@@ -84,7 +84,7 @@ const tableHeaders = [
         field: 'tahun',
         sortable: true,
         nowrap: true,
-        width: '150px',
+        width: '10%',
         style: {
             fontSize: '18px',
             fontStyle: 'normal',
@@ -97,34 +97,34 @@ const tableHeaders = [
         field: 'jumlah_penduduk',
         sortable: true,
         nowrap: true,
-        width: '200px'
+        width: '20%'
     },
     {
         label: 'Jumlah KK',
         field: 'jumlah_keluarga',
         sortable: true,
         nowrap: true,
-        width: '200px'
+        width: '20%'
     },
     {
         label: 'Pendatang',
         field: 'jumlah_pendatang',
         sortable: true,
         nowrap: true,
-        width: '200px'
+        width: '20%'
     },
     {
         label: 'Pindah Keluar',
         field: 'jumlah_pindah_keluar',
         sortable: true,
         nowrap: true,
-        width: '200px'
+        width: '20%'
     },
     {
         label: 'Aksi',
         field: 'actions',
         sortable: false,
-        width: '100px'
+        width: '10%'
     },
 ];
 
@@ -252,9 +252,9 @@ watch(() => props.filters, (newValue) => {
             </Link>
         </template>
 
-        <div class="dashboard-container">
+        <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <Tabel :headers="tableHeaders" :items="demografiItems" :pagination="true"
                         :items-per-page="pagination.perPage" :current-page="pagination.currentPage"
                         :total-pages="pagination.lastPage" :total-items="pagination.total" :sort-field="sortField"
@@ -275,7 +275,7 @@ watch(() => props.filters, (newValue) => {
                     </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 

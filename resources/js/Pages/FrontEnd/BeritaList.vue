@@ -1,97 +1,93 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { ref, onMounted } from "vue";
-import { Link } from "@inertiajs/vue3";
-import axios from "axios";
 import NewsCard from "@/Components/NewsCard.vue";
-import { computed } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
 const news = ref([]);
+const categories = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const pagination = ref(null);
 const searchQuery = ref("");
 const selectedCategory = ref("Semua");
 
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
-};
-
-const fetchNews = async () => {
+async function fetchNews({ search = "", category = null, page = 1 } = {}) {
     try {
         loading.value = true;
-        const response = await axios.get("/api/news");
-        news.value = response.data.data;
-        pagination.value = {
-            current_page: response.data.current_page,
-            last_page: response.data.last_page,
-            total: response.data.total,
-        };
+        error.value = null;
+
+        const params = new URLSearchParams();
+
+        if (search) params.append("search", search);
+        if (category && category !== "Semua") {
+            if (category === "Populer") {
+                params.append("sort", "views");
+            } else {
+                params.append("category", category);
+            }
+        }
+        params.append("page", page);
+
+        const response = await fetch(`/api/news?${params.toString()}`);
+        const result = await response.json();
+
+        if (result.success) {
+            news.value = result.data;
+            pagination.value = {
+                current_page: result.meta.current_page,
+                last_page: result.meta.last_page,
+                total: result.meta.total,
+            };
+        } else {
+            error.value = result.message || "Gagal memuat berita";
+            console.error("Gagal memuat berita:", result.message);
+        }
     } catch (err) {
-        error.value = "Gagal memuat berita";
+        error.value = "Terjadi kesalahan saat memuat berita";
         console.error("Error fetching news:", err);
     } finally {
         loading.value = false;
     }
-};
+}
 
-const handleSearch = async () => {
+const fetchCategories = async () => {
     try {
-        loading.value = true;
-        const response = await axios.get("/api/news", {
-            params: {
-                search: searchQuery.value,
-                category:
-                    selectedCategory.value === "Semua"
-                        ? null
-                        : selectedCategory.value,
-                sort: selectedCategory.value === "Populer" ? "views" : "latest",
-            },
-        });
-        news.value = response.data.data;
-        pagination.value = {
-            current_page: response.data.current_page,
-            last_page: response.data.last_page,
-            total: response.data.total,
-        };
+        const response = await axios.get("/api/categories?type=1");
+        categories.value = response.data.data;
     } catch (err) {
-        error.value = "Gagal memuat berita";
-        console.error("Error searching news:", err);
-    } finally {
-        loading.value = false;
+        console.error("Error fetching categories:", err);
     }
 };
 
-const goToPage = async (page) => {
-    try {
-        loading.value = true;
-        const response = await axios.get(`/api/news?page=${page}`, {
-            params: {
-                search: searchQuery.value,
-                category:
-                    selectedCategory.value === "Semua"
-                        ? null
-                        : selectedCategory.value,
-                sort: selectedCategory.value === "Populer" ? "views" : "latest",
-            },
-        });
-        news.value = response.data.data;
-        pagination.value = {
-            current_page: response.data.current_page,
-            last_page: response.data.last_page,
-            total: response.data.total,
-        };
-        window.scrollTo(0, 0);
-    } catch (err) {
-        error.value = "Gagal memuat berita";
-        console.error("Error fetching news page:", err);
-    } finally {
-        loading.value = false;
-    }
+// Function to handle search button click
+const handleSearch = () => {
+    fetchNews({
+        search: searchQuery.value,
+        category:
+            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
+    });
+};
+
+// Function to handle category selection
+const selectCategory = (category) => {
+    selectedCategory.value = category;
+    fetchNews({
+        search: searchQuery.value,
+        category: category !== "Semua" ? category : null,
+    });
+};
+
+// Function to handle pagination
+const goToPage = (page) => {
+    fetchNews({
+        search: searchQuery.value,
+        category:
+            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
+        page,
+    });
+    // Scroll to top when changing pages
+    window.scrollTo(0, 0);
 };
 
 const paginationNumbers = computed(() => {
@@ -127,7 +123,9 @@ const paginationNumbers = computed(() => {
 });
 
 onMounted(() => {
+    // Initial data fetch without parameters
     fetchNews();
+    fetchCategories();
 });
 </script>
 
@@ -185,26 +183,32 @@ onMounted(() => {
             <div
                 class="flex relative items-center xl:space-x-7 space-x-5 mt-7 ml-10 overflow-x-auto xl:text-lg text-sm text-accent1"
             >
-                <button class="hover:underline font-medium">Semua</button>
-                <button class="hover:underline">Populer</button>
-                <button class="hover:underline">Wisata</button>
-                <button class="hover:underline">Acara</button>
-                <button class="hover:underline">UMKM</button>
-                <button class="hover:underline">Pertanian</button>
-                <button class="hover:underline">Kesehatan</button>
-                <button class="hover:underline">Pendidikan</button>
-                <button class="ml-auto">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="http://www.w3.org/2000/svg"
-                        width="24px"
-                        fill="#244031"
-                    >
-                        <path
-                            d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"
-                        />
-                    </svg>
+                <button
+                    @click="selectCategory('Semua')"
+                    class="hover:underline"
+                    :class="{ 'font-medium': selectedCategory === 'Semua' }"
+                >
+                    Semua
+                </button>
+                <button
+                    @click="selectCategory('Populer')"
+                    class="hover:underline"
+                    :class="{ 'font-medium': selectedCategory === 'Populer' }"
+                >
+                    Populer
+                </button>
+
+                <!-- Dynamic categories from API -->
+                <button
+                    v-for="category in categories"
+                    :key="category.id"
+                    @click="selectCategory(category.id)"
+                    class="hover:underline"
+                    :class="{
+                        'font-medium': selectedCategory === category.name,
+                    }"
+                >
+                    {{ category.name }}
                 </button>
             </div>
             <!--Berita Terkini-->
@@ -234,22 +238,13 @@ onMounted(() => {
                     v-else
                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 xl:max-w-6xl max-w-xl mb-20"
                 >
-                    <div v-for="item in news" :key="item.id" class="-mb-12">
-                        <NewsCard
-                            :news="{
-                                slug: item.slug,
-                                title: item.title,
-                                content: item.content,
-                                created_at: item.created_at,
-                                views: item.views,
-                                comments_count: item.comments_count,
-                                image: item.image,
-                                category: item.category,
-                                author: item.author,
-                            }"
-                            :href="`/berita-test/${item.slug}`"
-                        />
-                    </div>
+                    <NewsCard
+                        v-for="newsItem in news"
+                        :key="newsItem.id"
+                        :href="`/berita/${newsItem.slug}`"
+                        :isHome="true"
+                        :news="newsItem"
+                    />
 
                     <!-- Empty State -->
                     <div
@@ -260,6 +255,26 @@ onMounted(() => {
                             Belum ada berita yang tersedia.
                         </p>
                     </div>
+                </div>
+
+                <!-- Pagination (if needed) -->
+                <div
+                    v-if="pagination && pagination.last_page > 1"
+                    class="my-8 flex justify-center space-x-2"
+                >
+                    <button
+                        v-for="page in pagination.last_page"
+                        :key="page"
+                        @click="goToPage(page)"
+                        class="px-3 py-1 rounded"
+                        :class="
+                            page === pagination.current_page
+                                ? 'bg-accent1 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        "
+                    >
+                        {{ page }}
+                    </button>
                 </div>
             </article>
         </main>

@@ -10,17 +10,19 @@ use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\StoreProdukHukumRequest;
 use App\Http\Requests\Validation\UpdateProdukHukumRequest;
+use App\Services\MediaService;
 
 class ProdukHukumController extends Controller
 {
+    protected $mediaService;
     protected $categoryService;
     protected $logHelper;
 
-    public function __construct(CategoryService $categoryService)
+    public function __construct(CategoryService $categoryService, MediaService $mediaService)
     {
+        $this->mediaService = $mediaService;
         $this->categoryService = $categoryService;
         $this->logHelper = new LogActivityHelper();
     }
@@ -49,14 +51,11 @@ class ProdukHukumController extends Controller
         $data['category_id'] = $category_id;
 
         if ($request->hasFile('file')) {
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'produk-hukum-documents'
+            );
         }
 
         ProdukHukum::create($data);
@@ -90,24 +89,19 @@ class ProdukHukumController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('file')) {
-            // Delete the old file if it exists
-            if ($produkHukum->file) {
-                Storage::disk('public')->delete($produkHukum->file);
-            }
-
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'produk-hukum-documents',
+                $produkHukum->file
+            );
         } else {
             unset($data['file']);
         }
 
-        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
+        if ($produkHukum->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
+        }
         $data['category_id'] = $category_id;
 
         $produkHukum->update($data);

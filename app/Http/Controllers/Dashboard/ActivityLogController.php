@@ -11,46 +11,35 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request, $page = 1)
     {
-        $perPage = 25; // Show a reasonable amount of records per page
-        $sortField = 'time'; // Always sort by time/created_at
-        $sortDirection = $request->input('direction', 'desc'); // Default direction is descending
-        $searchQuery = $request->input('search', ''); // Get search query from request
-        
-        // Create query with sorting and ensure user relationship includes photo_profile
-        $query = ActivityLog::with(['user' => function($query) {
-            $query->select('id', 'name', 'photo_profile'); // Include photo_profile
+        $perPage = 25;
+        $sortField = 'time';
+        $sortDirection = $request->input('direction', 'desc');
+        $searchQuery = $request->input('search', '');
+
+        $query = ActivityLog::with(['user' => function ($query) {
+            $query->select('id', 'name', 'photo_profile');
         }]);
-        
-        // Apply search if provided
+
         if (!empty($searchQuery)) {
-            $query->where(function($q) use ($searchQuery) {
-                // Search in activity log fields
+            $query->where(function ($q) use ($searchQuery) {
                 $q->where('action', 'like', "%{$searchQuery}%")
-                  ->orWhere('module', 'like', "%{$searchQuery}%")
-                  ->orWhere('description', 'like', "%{$searchQuery}%")
-                  // Search in related user name
-                  ->orWhereHas('user', function($userQuery) use ($searchQuery) {
-                      $userQuery->where('name', 'like', "%{$searchQuery}%");
-                  });
+                    ->orWhere('module', 'like', "%{$searchQuery}%")
+                    ->orWhere('description', 'like', "%{$searchQuery}%")
+                    ->orWhereHas('user', function ($userQuery) use ($searchQuery) {
+                        $userQuery->where('name', 'like', "%{$searchQuery}%");
+                    });
             });
         }
-        
-        // Apply sorting
+
         $query->orderBy('created_at', $sortDirection);
-        
-        // Count total records (for debugging)
-        $totalRecords = $query->count();
-        
-        // Paginate results
         $logs = $query->paginate($perPage, ['*'], 'page', $page);
-        
 
         return Inertia::render('Dashboard/Dashboard', [
             'logs' => $logs,
             'currentPage' => (int)$page,
             'sortField' => $sortField,
             'sortDirection' => $sortDirection,
-            'search' => $searchQuery, // Pass search query back to component
+            'search' => $searchQuery,
         ]);
     }
 }

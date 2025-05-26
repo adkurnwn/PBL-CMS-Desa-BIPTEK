@@ -41,6 +41,18 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request, $slug)
     {
         $profile = Profile::where('name', $slug)->firstOrFail();
+
+        $profileData = $request->except([
+            'logo',
+            'organization_image',
+            'hero_images',
+            'hero_image_1',
+            'hero_image_2',
+            'hero_image_3',
+            'lembaga',
+            'fasilitas'
+        ]);
+
         $village = Village::find($request->kelurahan);
         if ($village) {
             $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
@@ -49,7 +61,6 @@ class ProfileController extends Controller
         $profileData['lembaga'] = json_encode($request->lembaga);
         $profileData['fasilitas'] = json_encode($request->fasilitas);
 
-        // Handle single uploads
         if ($request->hasFile('logo')) {
             if ($profile->logo) $this->mediaService->delete($profile->logo);
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
@@ -63,7 +74,6 @@ class ProfileController extends Controller
             $profileData['organization_image'] = $this->mediaService->upload($request->file('organization_image'), 'organization-images');
         }
 
-        // Handle hero images
         if ($request->hasFile('hero_images')) {
             $this->mediaService->handleJsonImages($profile, $request->file('hero_images'), 'hero_images', 'hero-images');
         } else {

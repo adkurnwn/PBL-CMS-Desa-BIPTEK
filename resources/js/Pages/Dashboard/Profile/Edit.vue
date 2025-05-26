@@ -83,14 +83,14 @@ const submit = () => {
 // Add methods to fetch region data
 const fetchProvinces = async () => {
     const response = await axios.get("/api/provinces");
-    provinces.value = response.data;
+    provinces.value = response.data.data;
 };
 
 const fetchRegencies = async (provinceId) => {
     if (!provinceId) return;
     try {
         const response = await axios.get(`/api/regencies/${provinceId}`);
-        regencies.value = response.data;
+        regencies.value = response.data.data;
         if (!props.profile.kabupaten) {
             form.kabupaten = "";
             form.kecamatan = "";
@@ -105,7 +105,7 @@ const fetchDistricts = async (regencyId) => {
     if (!regencyId) return;
     try {
         const response = await axios.get(`/api/districts/${regencyId}`);
-        districts.value = response.data;
+        districts.value = response.data.data;
         if (!props.profile.kecamatan) {
             form.kecamatan = "";
             form.kelurahan = "";
@@ -119,7 +119,7 @@ const fetchVillages = async (districtId) => {
     if (!districtId) return;
     try {
         const response = await axios.get(`/api/villages/${districtId}`);
-        villages.value = response.data;
+        villages.value = response.data.data;
         if (!props.profile.kelurahan) {
             form.kelurahan = "";
         }
@@ -143,16 +143,21 @@ onMounted(async () => {
 });
 </script>
 <template>
-
     <Head title="Profile Desa" />
     <AuthenticatedLayout>
         <template #header>
             <HeadingMenu title="Profile Desa">
                 <template #icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="26" viewBox="0 0 25 26" fill="none">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="0 -960 960 960"
+                        width="24px"
+                        fill="#40483D"
+                    >
                         <path
-                            d="M12.4998 13.0003C10.804 13.0003 9.35227 12.3965 8.14463 11.1889C6.93699 9.98123 6.33317 8.52949 6.33317 6.83366C6.33317 5.13783 6.93699 3.68609 8.14463 2.47845C9.35227 1.27081 10.804 0.666992 12.4998 0.666992C14.1957 0.666992 15.6474 1.27081 16.855 2.47845C18.0627 3.68609 18.6665 5.13783 18.6665 6.83366C18.6665 8.52949 18.0627 9.98123 16.855 11.1889C15.6474 12.3965 14.1957 13.0003 12.4998 13.0003ZM0.166504 25.3337V21.017C0.166504 20.1434 0.39133 19.3404 0.840983 18.6081C1.29064 17.8758 1.88803 17.317 2.63317 16.9316C4.22623 16.135 5.84498 15.5377 7.48942 15.1394C9.13386 14.7411 10.804 14.542 12.4998 14.542C14.1957 14.542 15.8658 14.7411 17.5103 15.1394C19.1547 15.5377 20.7734 16.135 22.3665 16.9316C23.1116 17.317 23.709 17.8758 24.1587 18.6081C24.6083 19.3404 24.8332 20.1434 24.8332 21.017V25.3337H0.166504Z"
-                            fill="#4C7660" />
+                            d="M80-160v-400l240-240 240 240v400H80Zm80-80h120v-120h80v120h120v-287L320-687 160-527v287Zm120-200v-80h80v80h-80Zm360 280v-433L433-800h113l174 174v466h-80Zm160 0v-499L659-800h113l108 108v532h-80Zm-640-80h320-320Z"
+                        />
                     </svg>
                 </template>
             </HeadingMenu>
@@ -160,165 +165,324 @@ onMounted(async () => {
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-sm">
                     <div class="p-6">
-                        <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <form
+                            @submit.prevent="submit"
+                            enctype="multipart/form-data"
+                        >
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <InputLabel for="email" value="Email" />
-                                    <TextInput id="email" v-model="form.email" type="email" class="mt-1 block w-full"
-                                        required />
-                                    <InputError :message="form.errors.email" class="mt-2" />
+                                    <TextInput
+                                        id="email"
+                                        v-model="form.email"
+                                        type="email"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.email"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel for="phone" value="Phone Number" />
-                                    <TextInput id="phone" v-model="form.phone" type="text" class="mt-1 block w-full"
-                                        required />
-                                    <InputError :message="form.errors.phone" class="mt-2" />
+                                    <InputLabel
+                                        for="phone"
+                                        value="Phone Number"
+                                    />
+                                    <TextInput
+                                        id="phone"
+                                        v-model="form.phone"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.phone"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <!-- Logo Input -->
-                                <ImageInput v-model="form.logo" label="Village Logo" :error="form.errors.logo"
+                                <ImageInput
+                                    v-model="form.logo"
+                                    label="Village Logo"
+                                    :error="form.errors.logo"
                                     :current-image="props.profile.logo"
-                                    image-class="h-32 w-32 object-cover rounded-lg" />
+                                    image-class="h-32 w-32 object-cover rounded-lg"
+                                />
 
                                 <!-- Region Fields -->
                                 <div>
-                                    <InputLabel for="provinsi" value="Provinsi" />
-                                    <select id="provinsi" v-model="form.provinsi" @change="
-                                        fetchRegencies($event.target.value)
+                                    <InputLabel
+                                        for="provinsi"
+                                        value="Provinsi"
+                                    />
+                                    <select
+                                        id="provinsi"
+                                        v-model="form.provinsi"
+                                        @change="
+                                            fetchRegencies($event.target.value)
                                         "
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required>
+                                        required
+                                    >
                                         <option value="">
                                             Select Province
                                         </option>
-                                        <option v-for="province in provinces" :key="province.id" :value="province.id">
+                                        <option
+                                            v-for="province in provinces"
+                                            :key="province.id"
+                                            :value="province.id"
+                                        >
                                             {{ province.name }}
                                         </option>
                                     </select>
-                                    <InputError :message="form.errors.provinsi" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.provinsi"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel for="kabupaten" value="Kabupaten" />
-                                    <select id="kabupaten" v-model="form.kabupaten" @change="
-                                        fetchDistricts($event.target.value)
+                                    <InputLabel
+                                        for="kabupaten"
+                                        value="Kabupaten"
+                                    />
+                                    <select
+                                        id="kabupaten"
+                                        v-model="form.kabupaten"
+                                        @change="
+                                            fetchDistricts($event.target.value)
                                         "
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required :disabled="!form.provinsi">
+                                        required
+                                        :disabled="!form.provinsi"
+                                    >
                                         <option value="">Select Regency</option>
-                                        <option v-for="regency in regencies" :key="regency.id" :value="regency.id">
+                                        <option
+                                            v-for="regency in regencies"
+                                            :key="regency.id"
+                                            :value="regency.id"
+                                        >
                                             {{ regency.name }}
                                         </option>
                                     </select>
-                                    <InputError :message="form.errors.kabupaten" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.kabupaten"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel for="kecamatan" value="Kecamatan" />
-                                    <select id="kecamatan" v-model="form.kecamatan" @change="
-                                        fetchVillages($event.target.value)
+                                    <InputLabel
+                                        for="kecamatan"
+                                        value="Kecamatan"
+                                    />
+                                    <select
+                                        id="kecamatan"
+                                        v-model="form.kecamatan"
+                                        @change="
+                                            fetchVillages($event.target.value)
                                         "
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required :disabled="!form.kabupaten">
+                                        required
+                                        :disabled="!form.kabupaten"
+                                    >
                                         <option value="">
                                             Select District
                                         </option>
-                                        <option v-for="district in districts" :key="district.id" :value="district.id">
+                                        <option
+                                            v-for="district in districts"
+                                            :key="district.id"
+                                            :value="district.id"
+                                        >
                                             {{ district.name }}
                                         </option>
                                     </select>
-                                    <InputError :message="form.errors.kecamatan" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.kecamatan"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel for="kelurahan" value="Kelurahan" />
-                                    <select id="kelurahan" v-model="form.kelurahan"
+                                    <InputLabel
+                                        for="kelurahan"
+                                        value="Kelurahan"
+                                    />
+                                    <select
+                                        id="kelurahan"
+                                        v-model="form.kelurahan"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required :disabled="!form.kecamatan">
+                                        required
+                                        :disabled="!form.kecamatan"
+                                    >
                                         <option value="">Select Village</option>
-                                        <option v-for="village in villages" :key="village.id" :value="village.id">
+                                        <option
+                                            v-for="village in villages"
+                                            :key="village.id"
+                                            :value="village.id"
+                                        >
                                             {{ village.name }}
                                         </option>
                                     </select>
-                                    <InputError :message="form.errors.kelurahan" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.kelurahan"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <!-- Organization Image Input -->
-                                <ImageInput v-model="form.organization_image" label="Organization Image"
-                                    :error="form.errors.organization_image" :current-image="props.profile.organization_image
-                                        " image-class="h-32 w-auto object-cover rounded-lg" />
+                                <ImageInput
+                                    v-model="form.organization_image"
+                                    label="Organization Image"
+                                    :error="form.errors.organization_image"
+                                    :current-image="
+                                        props.profile.organization_image
+                                    "
+                                    image-class="h-32 w-auto object-cover rounded-lg"
+                                />
 
                                 <!-- Hero Images -->
                                 <div class="col-span-2 grid grid-cols-3 gap-4">
-                                    <ImageInput v-model="form.hero_image_1" label="Hero Image 1"
-                                        :error="form.errors.hero_image_1" :current-image="form.currentHeroImages[0]
-                                            " image-class="h-32 w-full object-cover rounded-lg" />
-                                    <ImageInput v-model="form.hero_image_2" label="Hero Image 2"
-                                        :error="form.errors.hero_image_2" :current-image="form.currentHeroImages[1]
-                                            " image-class="h-32 w-full object-cover rounded-lg" />
-                                    <ImageInput v-model="form.hero_image_3" label="Hero Image 3"
-                                        :error="form.errors.hero_image_3" :current-image="form.currentHeroImages[2]
-                                            " image-class="h-32 w-full object-cover rounded-lg" />
+                                    <ImageInput
+                                        v-model="form.hero_image_1"
+                                        label="Hero Image 1"
+                                        :error="form.errors.hero_image_1"
+                                        :current-image="
+                                            form.currentHeroImages[0]
+                                        "
+                                        image-class="h-32 w-full object-cover rounded-lg"
+                                    />
+                                    <ImageInput
+                                        v-model="form.hero_image_2"
+                                        label="Hero Image 2"
+                                        :error="form.errors.hero_image_2"
+                                        :current-image="
+                                            form.currentHeroImages[1]
+                                        "
+                                        image-class="h-32 w-full object-cover rounded-lg"
+                                    />
+                                    <ImageInput
+                                        v-model="form.hero_image_3"
+                                        label="Hero Image 3"
+                                        :error="form.errors.hero_image_3"
+                                        :current-image="
+                                            form.currentHeroImages[2]
+                                        "
+                                        image-class="h-32 w-full object-cover rounded-lg"
+                                    />
                                 </div>
 
                                 <div class="col-span-2 mb-4">
-                                    <JsonArrayInput v-model="form.fasilitas" label="Fasilitas"
-                                        placeholder="Masukkan fasilitas desa" :error="form.errors.fasilitas" />
+                                    <JsonArrayInput
+                                        v-model="form.fasilitas"
+                                        label="Fasilitas"
+                                        placeholder="Masukkan fasilitas desa"
+                                        :error="form.errors.fasilitas"
+                                    />
                                 </div>
 
                                 <!-- Add new lembaga input -->
                                 <div class="col-span-2 mb-4">
-                                    <JsonArrayInput v-model="form.lembaga" label="Lembaga"
-                                        placeholder="Masukkan nama lembaga desa" :error="form.errors.lembaga" />
+                                    <JsonArrayInput
+                                        v-model="form.lembaga"
+                                        label="Lembaga"
+                                        placeholder="Masukkan nama lembaga desa"
+                                        :error="form.errors.lembaga"
+                                    />
                                 </div>
 
                                 <!-- Colors -->
                                 <div>
-                                    <InputLabel for="primary_color" value="Primary Color" />
-                                    <select id="primary_color" v-model="form.primary_color"
+                                    <InputLabel
+                                        for="primary_color"
+                                        value="Primary Color"
+                                    />
+                                    <select
+                                        id="primary_color"
+                                        v-model="form.primary_color"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required>
+                                        required
+                                    >
                                         <option value="#000000">Black</option>
                                         <option value="#ffffff">White</option>
                                     </select>
-                                    <InputError :message="form.errors.primary_color" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.primary_color"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div>
-                                    <InputLabel for="secondary_color" value="Secondary Color" />
-                                    <select id="secondary_color" v-model="form.secondary_color"
+                                    <InputLabel
+                                        for="secondary_color"
+                                        value="Secondary Color"
+                                    />
+                                    <select
+                                        id="secondary_color"
+                                        v-model="form.secondary_color"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required>
+                                        required
+                                    >
                                         <option value="#000000">Black</option>
                                         <option value="#ffffff">White</option>
                                     </select>
-                                    <InputError :message="form.errors.secondary_color" class="mt-2" />
+                                    <InputError
+                                        :message="form.errors.secondary_color"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div class="col-span-2">
                                     <InputLabel for="vision" value="Vision" />
-                                    <TextInput id="vision" v-model="form.vision" type="text" class="mt-1 block w-full"
-                                        required />
-                                    <InputError :message="form.errors.vision" class="mt-2" />
+                                    <TextInput
+                                        id="vision"
+                                        v-model="form.vision"
+                                        type="text"
+                                        class="mt-1 block w-full"
+                                        required
+                                    />
+                                    <InputError
+                                        :message="form.errors.vision"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div class="col-span-2">
                                     <InputLabel for="mission" value="Mission" />
-                                    <textarea id="mission" v-model="form.mission"
+                                    <textarea
+                                        id="mission"
+                                        v-model="form.mission"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        rows="4" required></textarea>
-                                    <InputError :message="form.errors.mission" class="mt-2" />
+                                        rows="4"
+                                        required
+                                    ></textarea>
+                                    <InputError
+                                        :message="form.errors.mission"
+                                        class="mt-2"
+                                    />
                                 </div>
 
                                 <div class="col-span-2">
-                                    <InputLabel for="history" value="Village History" />
-                                    <textarea id="history" v-model="form.history"
+                                    <InputLabel
+                                        for="history"
+                                        value="Village History"
+                                    />
+                                    <textarea
+                                        id="history"
+                                        v-model="form.history"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        rows="6" required></textarea>
-                                    <InputError :message="form.errors.history" class="mt-2" />
+                                        rows="6"
+                                        required
+                                    ></textarea>
+                                    <InputError
+                                        :message="form.errors.history"
+                                        class="mt-2"
+                                    />
                                 </div>
                             </div>
 
@@ -327,7 +491,9 @@ onMounted(async () => {
                                     Update Village Profile
                                 </PrimaryButton>
                                 <Link :href="route('dashboard.profiles.index')">
-                                <PrimaryButton type="button">Cancel</PrimaryButton>
+                                    <PrimaryButton type="button"
+                                        >Cancel</PrimaryButton
+                                    >
                                 </Link>
                             </div>
                         </form>

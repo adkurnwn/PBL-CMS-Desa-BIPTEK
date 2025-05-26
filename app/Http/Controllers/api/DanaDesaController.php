@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DanaDesa\DanaDesaDetail;
+use App\Http\Resources\DanaDesa\DanaDesaPreview;
 use App\Models\DanaDesa;
 use Illuminate\Http\Request;
 
@@ -11,40 +13,55 @@ class DanaDesaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $danaDesa = DanaDesa::orderBy('created_at', 'desc')
-            ->paginate(12);
+        try {
+            $search = $request->query('search');
+            $sort = $request->query('sort');
 
-        return response()->json([
-            'data' => $danaDesa->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'slug' => $item->slug,
-                    'title' => $item->title,
-                    'views' => $item->views,
-                    'downloads' => $item->downloads,
-                    'date' => $item->date,
-                    'created_at' => $item->created_at->format('Y-m-d H:i:s'),
-                ];
-            }),
-            'pagination' => [
-                'total' => $danaDesa->total(),
-                'per_page' => $danaDesa->perPage(),
-                'current_page' => $danaDesa->currentPage(),
-                'last_page' => $danaDesa->lastPage(),
-                'from' => $danaDesa->firstItem(),
-                'to' => $danaDesa->lastItem(),
-            ]
-        ]);
-    }
+            $query = DanaDesa::query();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%')
+                        ->orWhere('date', 'like', '%' . $search . '%');
+                });
+            }
+
+            if ($sort === 'views') {
+                $query->orderBy('views', 'desc');
+            } elseif ($sort === 'downloads') {
+                $query->orderBy('downloads', 'desc');
+            } else {
+                $query->latest();
+            }
+
+            $danaDesa = $query->latest()->paginate(10);
+
+            if ($danaDesa->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No Dana Desa found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => DanaDesaPreview::collection($danaDesa),
+                'meta' => [
+                    'current_page' => $danaDesa->currentPage(),
+                    'last_page' => $danaDesa->lastPage(),
+                    'per_page' => $danaDesa->perPage(),
+                    'total' => $danaDesa->total(),
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -52,31 +69,26 @@ class DanaDesaController extends Controller
      */
     public function show($slug)
     {
-        $danaDesa = DanaDesa::where('slug', $slug)->first();
+        try {
+            $danaDesa = DanaDesa::where('slug', $slug)->first();
 
-        if (!$danaDesa) {
-            return response()->json(['message' => 'Dana Desa not found'], 404);
+            if (!$danaDesa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dana Desa not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new DanaDesaDetail($danaDesa)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Increment view count
-        $danaDesa->increment('views');
-
-        return response()->json($danaDesa);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, DanaDesa $danaDesa)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(DanaDesa $danaDesa)
-    {
-        //
     }
 }

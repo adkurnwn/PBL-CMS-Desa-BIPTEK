@@ -114,13 +114,6 @@ const tableHeaders = [
         sortable: true,
         nowrap: true,
         width: '18%',  // Changed from '264px' to percentage
-        style: {
-            fontSize: '18px',
-            fontStyle: 'normal',
-            fontWeight: '400',
-            lineHeight: 'normal',
-            color: '#6B86B5'
-        }
     },
 ];
 
@@ -237,7 +230,6 @@ watch(() => props.logs, (newLogs) => {
 </script>
 
 <template>
-
     <Head title="Aktivitas Terbaru" />
 
     <AuthenticatedLayout>
@@ -270,11 +262,10 @@ watch(() => props.logs, (newLogs) => {
             />
         </template>
 
-        <!-- Disable scrollbar from parent by adding special class -->
-        <!-- Add height constraint to container to ensure all elements fit -->
-        <div class="dashboard-container">
+        <!-- Use the new table-content slot instead of default slot -->
+        <template #table-content>
             <div class="h-full">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg h-full">
+                <div class="overflow-hidden bg-white shadow-sm   h-full">
                     <div class="h-full">
                         <Tabel 
                             :headers="tableHeaders" 
@@ -290,6 +281,7 @@ watch(() => props.logs, (newLogs) => {
                             :sort-field="sortField"
                             :sort-direction="sortDirection"
                         >
+                           
                             <!-- Action column customization -->
                             <template #item.Aksi="{ item }">
                                 <Labels 
@@ -302,10 +294,15 @@ watch(() => props.logs, (newLogs) => {
                                     {{ (item.module).toUpperCase() }}
                                 </div>
                             </template>
+                            <template #item.Deskripsi="{ item }">
+                                <div class="italic">
+                                    {{ item.description }}
+                                </div>
+                            </template>
 
                             <!-- Time column customization -->
                             <template #item.Waktu="{ item }">
-                                <div class="text-[#6B86B5] text-[18px] font-normal">
+                                <div class="text-[#6B86B5] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
                                     {{ formatDate(item.time) }}
                                 </div>
                             </template>
@@ -313,16 +310,10 @@ watch(() => props.logs, (newLogs) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
 
 <style scoped>
-/* Dashboard specific styles to manage scrolling */
-.dashboard-container {
-    position: relative;
-    height: calc(100vh - 304px);
-    min-height: 650px;
-    overflow: hidden;
-}
+/* Remove the dashboard-container styles since we're using the table-content slot now */
 </style>

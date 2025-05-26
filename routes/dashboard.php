@@ -136,6 +136,10 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             Route::delete('/recovery/delete/{fileName}', [RecoveryController::class, 'delete'])->name('dashboard.recovery.delete');
         });
 
+        Route::get('/user-profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/user-profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/user-profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
         // Dashboard route with page parameter
         Route::get('/', [ActivityLogController::class, 'index'])->name('dashboard');
         Route::get('/{page}', [ActivityLogController::class, 'index'])->name('dashboard.page');
