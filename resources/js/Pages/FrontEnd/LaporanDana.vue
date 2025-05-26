@@ -1,3 +1,8 @@
+<script setup lang="ts">
+import UserLayout from '@/Layouts/UserLayout.vue';
+
+</script>
+
 <template>
   <UserLayout>
     <div class="min-h-screen bg-type1">

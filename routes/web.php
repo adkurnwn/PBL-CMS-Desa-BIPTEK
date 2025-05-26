@@ -64,8 +64,17 @@ Route::get('/laporan-dana-desa', function () {
     return Inertia::render('FrontEnd/LaporanDana');
 });
 
+
 Route::get('/produk-unggulan', function () {
     return Inertia::render('FrontEnd/ProdukUnggulan');
+});
+
+Route::get('/galeri-desa', function () {
+    return Inertia::render('FrontEnd/GaleriList');
+});
+
+Route::get('/galeri-desa-detail', function () {
+    return Inertia::render('FrontEnd/GaleriDetail');
 });
 
 Route::middleware(['auth', 'user.status'])->group(function () {
