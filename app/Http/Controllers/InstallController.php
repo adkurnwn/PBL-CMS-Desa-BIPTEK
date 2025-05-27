@@ -171,8 +171,6 @@ class InstallController extends Controller
                     if (file_exists($sourceImage)) {
                         copy($sourceImage, $defaultImagePath);
                     } else {
-                        // Generate a placeholder image (letter avatar)
-                        // This is a simple implementation - you may want to use a more robust solution
                         $this->generateDefaultAvatar($request->name, $defaultImagePath);
                     }
                 }
