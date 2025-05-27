@@ -50,7 +50,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -78,7 +78,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -108,7 +108,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }

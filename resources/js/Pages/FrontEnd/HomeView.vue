@@ -4,53 +4,44 @@ import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
-import axios from 'axios';
+import { useApiCache } from '@/Composables/UseApiCache';
 
-// Data refs
 const home = ref({});
-const news = ref([]);
 const events = ref([]);
+const news = ref([]);
 const gallery = ref({});
 const produkDesa = ref([]);
-const loading = ref({
-  home: true,
-  events: true,
-  news: true,
-  gallery: true,
-  produk: true
-});
+const loading = ref(true);
 
-// Unified fetch function for all data
 const fetchData = async () => {
+  const homeApi = useApiCache('homeData', '/api/profile/home');
+  const eventApi = useApiCache('eventData', '/api/events/preview');
+  const newsApi = useApiCache('newsData', '/api/news/preview');
+  const galleryApi = useApiCache('galleryData', '/api/gallery/highlight');
+  const produkApi = useApiCache('produkData', '/api/produk-desa/preview');
+
   try {
-    // Fetch all data in parallel
     const [homeRes, eventsRes, newsRes, galleryRes, produkRes] = await Promise.all([
-      axios.get('/api/profile/home'),
-      axios.get('/api/events'),
-      axios.get('/api/news/preview'),
-      axios.get('/api/gallery/highlight'),
-      axios.get('/api/produk-desa/preview')
+      homeApi.fetchWithCache(),
+      eventApi.fetchWithCache(),
+      newsApi.fetchWithCache(),
+      galleryApi.fetchWithCache(),
+      produkApi.fetchWithCache()
     ]);
 
-    // Update refs with response data
-    home.value = homeRes.data.data || {};
-    events.value = eventsRes.data.data || [];
-    news.value = newsRes.data.data || [];
-    gallery.value = galleryRes.data.data || { images: [] };
-    produkDesa.value = produkRes.data.data || [];
-  } catch (error) {
-    console.error('Error fetching data:', error);
+    home.value = homeRes;
+    events.value = eventsRes;
+    news.value = newsRes;
+    gallery.value = galleryRes;
+    produkDesa.value = produkRes;
+  } catch (e) {
+    console.error('Fetch error:', e);
   } finally {
-    // Set all loading states to false
-    Object.keys(loading.value).forEach(key => {
-      loading.value[key] = false;
-    });
+    loading.value = false;
   }
 };
 
-onMounted(() => {
-  fetchData();
-});
+onMounted(fetchData);
 </script>
 <!-- Homeview.vue -->
 <template>

@@ -10,6 +10,7 @@ use App\Http\Resources\Profile\ProfileLayout;
 use App\Models\DanaDesa;
 use App\Models\Demografi;
 use App\Models\ProdukHukum;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
 {
@@ -19,7 +20,9 @@ class ProfileController extends Controller
     public function layout()
     {
         try {
-            $profile = Profile::with(['province', 'regency', 'district'])->first();
+            $profile = Cache::remember('profile.layout', 1200, function () {
+                return Profile::with(['province', 'regency', 'district'])->first();
+            });
 
             if (!$profile) {
                 return response()->json([
@@ -44,9 +47,21 @@ class ProfileController extends Controller
     public function landingPage()
     {
         try {
-            $profile = Profile::latest()->first();
+            $data = Cache::remember('profile.landing', 1200, function () {
+                $profile = Profile::latest()->first();
 
-            if (!$profile) {
+                if (!$profile) {
+                    return null;
+                }
+
+                return [
+                    'profile' => $profile,
+                    'produk_hukum' => ProdukHukum::exists(),
+                    'dana_desa' => DanaDesa::exists(),
+                ];
+            });
+
+            if (!$data) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Profile data not found'
@@ -56,10 +71,10 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'name' => $profile->name,
-                    'hero_image' => json_decode($profile->hero_images)[0],
-                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
-                    'dana_desa' => (DanaDesa::exists()) ? true : false,
+                    'name' => $data['profile']->name,
+                    'hero_image' => json_decode($data['profile']->hero_images)[0],
+                    'produk_hukum' => $data['produk_hukum'],
+                    'dana_desa' => $data['dana_desa'],
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -74,7 +89,9 @@ class ProfileController extends Controller
     public function profilePage()
     {
         try {
-            $profile = Profile::latest()->first();
+            $profile = Cache::remember('profile.detail', 1200, function () {
+                return Profile::latest()->first();
+            });
 
             if (!$profile) {
                 return response()->json([
@@ -99,9 +116,22 @@ class ProfileController extends Controller
     public function layananPage()
     {
         try {
-            $profile = Profile::latest()->first();
+            $data = Cache::remember('profile.layanan', 1200, function () {
+                $profile = Profile::latest()->first();
 
-            if (!$profile) {
+                if (!$profile) {
+                    return null;
+                }
+
+                return [
+                    'profile' => $profile,
+                    'produk_hukum' => ProdukHukum::exists(),
+                    'dana_desa' => DanaDesa::exists(),
+                    'demografi' => Demografi::exists(),
+                ];
+            });
+
+            if (!$data) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Profile data not found'
@@ -111,10 +141,10 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'name' => $profile->name,
-                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
-                    'dana_desa' => (DanaDesa::exists()) ? true : false,
-                    'demografi' => (Demografi::exists()) ? true : false,
+                    'name' => $data['profile']->name,
+                    'produk_hukum' => $data['produk_hukum'],
+                    'dana_desa' => $data['dana_desa'],
+                    'demografi' => $data['demografi'],
                 ]
             ], 200);
         } catch (\Exception $e) {

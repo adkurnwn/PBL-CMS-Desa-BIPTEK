@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Gallery\GalleryDetail;
 use App\Http\Resources\Gallery\GalleryHighlight;
-use App\Http\Resources\GalleryResource;
+use Illuminate\Support\Facades\Cache;
 
 class GalleryController extends Controller
 {
@@ -56,7 +56,7 @@ class GalleryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -64,24 +64,26 @@ class GalleryController extends Controller
     public function highlight()
     {
         try {
-            $gallery = Gallery::with('images')->latest()->first();
+            return Cache::remember('gallery.highlight', 600, function () {
+                $gallery = Gallery::with('images')->latest()->first();
 
-            if (!$gallery) {
+                if (!$gallery) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gallery data not found'
+                    ], 404);
+                }
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Gallery data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' =>  new GalleryHighlight($gallery)
-            ], 200);
+                    'success' => true,
+                    'data' => new GalleryHighlight($gallery)
+                ], 200);
+            });
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -110,24 +112,8 @@ class GalleryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Gallery $gallery)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Gallery $gallery)
-    {
-        //
     }
 }

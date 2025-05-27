@@ -2,42 +2,40 @@
 import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
+import { useApiCache } from "@/Composables/UseApiCache";
 
-// Define reactive variables
 const profile = ref({});
 const kepalaDesa = ref({});
 const demografi = ref({});
 const loading = ref(true);
 
-const fetchProfile = async () => {
+const fetchData = async () => {
+    const profileApi = useApiCache("profileData", "/api/profile/profile");
+    const kepalaDesaApi = useApiCache(
+        "kepalaDesaData",
+        "/api/users/kepala-desa"
+    );
+    const demografiApi = useApiCache("demografiData", "/api/demografi/preview");
+
     try {
-        loading.value = true;
+        const [profileRes, kepalaDesaRes, demografiRes] = await Promise.all([
+            profileApi.fetchWithCache(),
+            kepalaDesaApi.fetchWithCache(),
+            demografiApi.fetchWithCache(),
+        ]);
 
-        // Use Promise.all to fetch all data in parallel
-        const [profileResponse, kepalaDesaResponse, demografiResponse] =
-            await Promise.all([
-                axios.get("/api/profile/profile"),
-                axios.get("/api/users/kepala-desa"),
-                axios.get("/api/demografi/preview"),
-            ]);
-
-        // Update each ref with its corresponding data
-        profile.value = profileResponse.data.data || {};
-        kepalaDesa.value = kepalaDesaResponse.data.data || {};
-        demografi.value = demografiResponse.data.data || {};
-
-        loading.value = false;
+        profile.value = profileRes;
+        kepalaDesa.value = kepalaDesaRes;
+        demografi.value = demografiRes;
     } catch (error) {
-        console.error("Error fetching profile data:", error);
+        console.error("Error fetching data:", error);
+    } finally {
         loading.value = false;
     }
 };
 
-onMounted(() => {
-    fetchProfile();
-});
+onMounted(fetchData);
 
-// Compute missionList after profile is loaded
 const missionList = computed(() => {
     if (!profile.value || !profile.value.mission) return [];
 
@@ -116,7 +114,7 @@ const parseJson = (value) => {
                     <div class="relative oval-container xl:ml-4 sm:ml-5">
                         <img
                             :src="`/storage/${kepalaDesa.photo_profile}`"
-                            alt="Kepala Desa"
+                            :alt="`${kepalaDesa.name} Profile`"
                             class="xl:py-5 md:py-7 sm:py-4 py-4 xl:ml-1 md:ml-2 sm:ml-0 xl:w-80 md:w-80 sm:w-72"
                         />
                     </div>

@@ -2,28 +2,25 @@
 import Feedback from "@/Components/Feedback.vue";
 import Navbar from "../Components/Navbar.vue";
 import Footer from "@/Components/Footer.vue";
-import { ref, onMounted, onBeforeUnmount, provide } from "vue";
-import axios from "axios";
+import { ref, onMounted, provide } from "vue";
+import { useApiCache } from "@/Composables/UseApiCache";
 
 const layout = ref({});
 const loading = ref(true);
 
-const fetchProfile = async () => {
+const fetchData = async () => {
+    const layoutApi = useApiCache("layoutData", "/api/profile/layout");
     try {
-        loading.value = true;
-        const response = await axios.get("/api/profile/layout");
-        layout.value = response.data.data;
-        loading.value = false;
+        const response = await layoutApi.fetchWithCache();
+        layout.value = response;
     } catch (error) {
         console.error("Error fetching layout data:", error);
+    } finally {
         loading.value = false;
     }
 };
 
-onMounted(() => {
-    fetchProfile();
-});
-
+onMounted(fetchData);
 provide("layout", layout);
 </script>
 

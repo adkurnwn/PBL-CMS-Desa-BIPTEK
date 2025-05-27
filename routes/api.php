@@ -82,6 +82,7 @@ Route::prefix('feedback')->group(function () {
 Route::prefix('events')->group(function () {
     Route::get('/', [EventController::class, 'index']);
     Route::post('/{event}/reminder', [EventController::class, 'setReminder']);
+    Route::get('/preview', [EventController::class, 'preview']);
 });
 
 Route::prefix('demografi')->group(function () {

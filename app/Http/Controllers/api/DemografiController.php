@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Demografi\DemografiPreview;
 use App\Models\Demografi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DemografiController extends Controller
 {
@@ -43,7 +44,7 @@ class DemografiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -51,24 +52,26 @@ class DemografiController extends Controller
     public function preview()
     {
         try {
-            $demografi = Demografi::latest()->first();
+            return Cache::remember('demografi.preview', 600, function () {
+                $demografi = Demografi::latest()->first();
 
-            if (!$demografi) {
+                if (!$demografi) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Demografi data not found'
+                    ], 404);
+                }
+
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Demografi data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => new DemografiPreview($demografi)
-            ], 200);
+                    'success' => true,
+                    'data' => new DemografiPreview($demografi)
+                ], 200);
+            });
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -96,7 +99,7 @@ class DemografiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }

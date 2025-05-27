@@ -2,7 +2,7 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import useApiFetch from "@/Composables/useApiFetch";
 
 const news = ref([]);
 const categories = ref([]);
@@ -11,6 +11,9 @@ const error = ref(null);
 const pagination = ref(null);
 const searchQuery = ref("");
 const selectedCategory = ref("Semua");
+
+const newsApi = useApiFetch();
+const categoriesApi = useApiFetch();
 
 async function fetchNews({ search = "", category = null, page = 1 } = {}) {
     try {

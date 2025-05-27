@@ -28,7 +28,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             ]);
         });
 
-        // Role management routes
         Route::middleware(['permission:manage_roles'])->group(function () {
             Route::resource('roles', RoleManagementController::class, [
                 'as' => 'dashboard',
@@ -138,9 +137,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
 
         Route::get('/user-profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/user-profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/user-profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-        // Dashboard route with page parameter
         Route::get('/', [ActivityLogController::class, 'index'])->name('dashboard');
         Route::get('/{page}', [ActivityLogController::class, 'index'])->name('dashboard.page');
     });

@@ -3,35 +3,33 @@ import EventCard from "@/Components/EventCard.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { useApiCache } from "@/Composables/UseApiCache";
 
 const gallery = ref({});
 const events = ref([]);
 const news = ref([]);
 const loading = ref(true);
-const fetchInformasi = async () => {
+const fetchData = async () => {
+    const galleryApi = useApiCache("galleryData", "/api/gallery/highlight");
+    const eventsApi = useApiCache("eventsData", "/api/events/preview");
+    const newsApi = useApiCache("newsData", "/api/news/preview?limit=6");
     try {
-        loading.value = true;
-        // Fetch all data in parallel for better performance
         const [galleryRes, eventsRes, newsRes] = await Promise.all([
-            axios.get("/api/gallery/highlight"),
-            axios.get("/api/events"),
-            axios.get("/api/news/preview?limit=6"),
+            galleryApi.fetchWithCache(),
+            eventsApi.fetchWithCache(),
+            newsApi.fetchWithCache(),
         ]);
-
-        gallery.value = galleryRes.data.data || {};
-        events.value = eventsRes.data.data || [];
-        news.value = newsRes.data.data || [];
+        gallery.value = galleryRes;
+        events.value = eventsRes;
+        news.value = newsRes;
     } catch (error) {
-        console.error("Error fetching informasi data:", error);
+        console.error("Error fetching data:", error);
     } finally {
         loading.value = false;
     }
 };
 
-onMounted(() => {
-    fetchInformasi();
-});
+onMounted(fetchData);
 </script>
 
 <template>

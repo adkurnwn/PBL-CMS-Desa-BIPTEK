@@ -6,42 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventEmails;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EventController extends Controller
 {
-    public function index()
-    {
-        try {
-            $events = Event::orderBy('date', 'asc')
-                ->where(function ($query) {
-                    $now = now();
-                    $query->where('date', '>', $now->format('Y-m-d'))
-                        ->orWhere(function ($q) use ($now) {
-                            $q->where('date', '=', $now->format('Y-m-d'))
-                                ->where('time', '>=', $now->format('H:i:s'));
-                        });
-                })
-                ->get();
-
-            if ($events->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No events found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $events
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
+    public function index() {}
 
     public function setReminder(Request $request, Event $event)
     {
@@ -82,6 +51,40 @@ class EventController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mendaftar pengingat event!'
+            ], 500);
+        }
+    }
+
+    public function preview()
+    {
+        try {
+            $events = Event::orderBy('date', 'asc')
+                ->where(function ($query) {
+                    $now = now();
+                    $query->where('date', '>', $now->format('Y-m-d'))
+                        ->orWhere(function ($q) use ($now) {
+                            $q->where('date', '=', $now->format('Y-m-d'))
+                                ->where('time', '>=', $now->format('H:i:s'));
+                        });
+                })
+                ->get();
+
+            if ($events->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No events found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $events
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
