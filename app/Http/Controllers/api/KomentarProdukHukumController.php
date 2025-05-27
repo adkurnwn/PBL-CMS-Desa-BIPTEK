@@ -56,7 +56,7 @@ class KomentarProdukHukumController extends Controller
     {
         return $replies->map(function ($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
-            $reply->replies_count = $this->countAllReplies($reply); // gunakan rekursif
+            $reply->replies_count = $this->countAllReplies($reply);
             if ($reply->replies && $reply->replies->count() > 0) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }
