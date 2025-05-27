@@ -1,10 +1,7 @@
 <?php
 
-use App\Models\News;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     return Inertia::render('FrontEnd/HomeView');
@@ -63,9 +60,16 @@ Route::prefix('laporan-dana-desa')->group(function () {
     })->name('dana-desa.show');
 });
 
+Route::prefix('produk-unggulan')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('FrontEnd/ProdukUnggulan');
+    });
 
-Route::get('/produk-unggulan', function () {
-    return Inertia::render('FrontEnd/ProdukUnggulan');
+    Route::get('/{slug}', function ($slug) {
+        return Inertia::render('FrontEnd/ProdukUnggulanDetail', [
+            'slug' => $slug
+        ]);
+    })->name('produk-desa.detail');
 });
 
 Route::get('/galeri-desa', function () {
@@ -76,11 +80,7 @@ Route::get('/galeri-desa-detail', function () {
     return Inertia::render('FrontEnd/GaleriDetail');
 });
 
-Route::get('/produk-unggulan/{slug}', function ($slug) {
-    return Inertia::render('FrontEnd/ProdukUnggulanDetail', [
-        'slug' => $slug
-    ]);
-})->name('produk-desa.detail');
+
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/dashboard.php';
