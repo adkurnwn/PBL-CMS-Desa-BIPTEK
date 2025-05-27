@@ -135,16 +135,50 @@ class InstallController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'password' => 'required|string|min:8|confirmed',
+            'photo_profile' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
         ]);
 
         try {
             // Create the admin user
-            $user = User::create([
+            $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'status' => true,
-            ]);
+            ];
+
+            // Handle profile photo upload
+            if ($request->hasFile('photo_profile')) {
+                $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
+            } else {
+                // Use a default profile image when none is provided
+                $userData['photo_profile'] = 'profile-photos/default-admin.png';
+
+                // Check if the default image exists in storage, if not, copy it from assets
+                $defaultImagePath = public_path('storage/profile-photos/default-admin.png');
+                $defaultImageDir = dirname($defaultImagePath);
+
+                if (!file_exists($defaultImagePath)) {
+                    // Create directory if it doesn't exist
+                    if (!file_exists($defaultImageDir)) {
+                        mkdir($defaultImageDir, 0755, true);
+                    }
+
+                    // Copy default image from assets (you may need to adjust this path)
+                    $sourceImage = public_path('assets/images/default-admin.png');
+
+                    // If source exists, copy it; otherwise use a placeholder
+                    if (file_exists($sourceImage)) {
+                        copy($sourceImage, $defaultImagePath);
+                    } else {
+                        // Generate a placeholder image (letter avatar)
+                        // This is a simple implementation - you may want to use a more robust solution
+                        $this->generateDefaultAvatar($request->name, $defaultImagePath);
+                    }
+                }
+            }
+
+            $user = User::create($userData);
 
             // Ensure roles are created
             if (!Role::where('name', 'Admin')->exists()) {
@@ -257,5 +291,46 @@ class InstallController extends Controller
             ['key' => 'site_description', 'value' => 'Website Resmi Desa', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'maintenance_mode', 'value' => '0', 'created_at' => now(), 'updated_at' => now()],
         ]);
+    }
+
+    /**
+     * Generate a simple default avatar image with the user's initials
+     *
+     * @param string $name
+     * @param string $outputPath
+     * @return void
+     */
+    private function generateDefaultAvatar($name, $outputPath)
+    {
+        // Get initials from name (up to 2 characters)
+        $initials = strtoupper(mb_substr($name, 0, 1));
+        if (strpos($name, ' ') !== false) {
+            $nameParts = explode(' ', $name);
+            $initials = strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr(end($nameParts), 0, 1));
+        }
+
+        // Create image
+        $image = imagecreatetruecolor(200, 200);
+
+        // Define colors
+        $bgColor = imagecolorallocate($image, 36, 64, 49); // Your accent color #244031
+        $textColor = imagecolorallocate($image, 255, 255, 255);
+
+        // Fill background
+        imagefill($image, 0, 0, $bgColor);
+
+        // Add text
+        $font = 5; // Built-in font size (1-5)
+        $textWidth = imagefontwidth($font) * strlen($initials);
+        $textHeight = imagefontheight($font);
+
+        $centerX = (200 - $textWidth) / 2;
+        $centerY = (200 - $textHeight) / 2;
+
+        imagestring($image, $font, $centerX, $centerY, $initials, $textColor);
+
+        // Save as PNG
+        imagepng($image, $outputPath);
+        imagedestroy($image);
     }
 }

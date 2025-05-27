@@ -7,10 +7,46 @@ const form = useForm({
   email: "",
   password: "",
   password_confirmation: "",
+  photo_profile: null,
 });
 
 const loading = ref(false);
 const errorMessage = ref("");
+const previewUrl = ref(null);
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  // Validate file type
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  if (!validTypes.includes(file.type)) {
+    form.errors.photo_profile = 'Please select a valid image file (JPG, JPEG, or PNG)';
+    return;
+  }
+  
+  // Validate file size (max 2MB)
+  const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+  if (file.size > maxSize) {
+    form.errors.photo_profile = 'File size exceeds 2MB limit';
+    return;
+  }
+
+  // Create preview URL
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value);
+  }
+  previewUrl.value = URL.createObjectURL(file);
+  form.photo_profile = file;
+};
+
+const removePhoto = () => {
+  if (previewUrl.value) {
+    URL.revokeObjectURL(previewUrl.value);
+  }
+  previewUrl.value = null;
+  form.photo_profile = null;
+};
 
 const submit = () => {
   loading.value = true;
@@ -62,63 +98,103 @@ const submit = () => {
             </div>
 
             <!-- Admin user form -->
-            <div class="space-y-6">
-              <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
-                <div class="mt-1">
-                  <input 
-                    id="name" 
-                    v-model="form.name" 
-                    type="text" 
-                    required 
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
-                    placeholder="Nama Admin"
-                  />
+            <div class="md:grid md:grid-cols-2 md:gap-6">
+              <div class="space-y-6">
+                <div>
+                  <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+                  <div class="mt-1">
+                    <input 
+                      id="name" 
+                      v-model="form.name" 
+                      type="text" 
+                      required 
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
+                      placeholder="Nama Admin"
+                    />
+                  </div>
+                  <p v-if="form.errors.name" class="mt-2 text-sm text-red-600">{{ form.errors.name }}</p>
                 </div>
-                <p v-if="form.errors.name" class="mt-2 text-sm text-red-600">{{ form.errors.name }}</p>
+
+                <div>
+                  <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                  <div class="mt-1">
+                    <input 
+                      id="email" 
+                      v-model="form.email" 
+                      type="email" 
+                      required 
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
+                      placeholder="admin@example.com"
+                    />
+                  </div>
+                  <p v-if="form.errors.email" class="mt-2 text-sm text-red-600">{{ form.errors.email }}</p>
+                </div>
+
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                  <div class="mt-1">
+                    <input 
+                      id="password" 
+                      v-model="form.password" 
+                      type="password" 
+                      required 
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
+                      placeholder="Minimal 8 karakter"
+                    />
+                  </div>
+                  <p v-if="form.errors.password" class="mt-2 text-sm text-red-600">{{ form.errors.password }}</p>
+                </div>
+
+                <div>
+                  <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                  <div class="mt-1">
+                    <input 
+                      id="password_confirmation" 
+                      v-model="form.password_confirmation" 
+                      type="password" 
+                      required 
+                      class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
+                      placeholder="Ulangi password"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <div class="mt-1">
-                  <input 
-                    id="email" 
-                    v-model="form.email" 
-                    type="email" 
-                    required 
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
-                    placeholder="admin@example.com"
-                  />
-                </div>
-                <p v-if="form.errors.email" class="mt-2 text-sm text-red-600">{{ form.errors.email }}</p>
-              </div>
-
-              <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <div class="mt-1">
-                  <input 
-                    id="password" 
-                    v-model="form.password" 
-                    type="password" 
-                    required 
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
-                    placeholder="Minimal 8 karakter"
-                  />
-                </div>
-                <p v-if="form.errors.password" class="mt-2 text-sm text-red-600">{{ form.errors.password }}</p>
-              </div>
-
-              <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
-                <div class="mt-1">
-                  <input 
-                    id="password_confirmation" 
-                    v-model="form.password_confirmation" 
-                    type="password" 
-                    required 
-                    class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
-                    placeholder="Ulangi password"
-                  />
+                <!-- Photo Profile Upload -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Foto Profil</label>
+                  <div 
+                    class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:bg-gray-50"
+                    @click="!previewUrl && document.getElementById('photo-upload').click()"
+                  >
+                    <div v-if="!previewUrl" class="space-y-1 text-center">
+                      <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <div class="flex text-sm text-gray-600">
+                        <label for="photo-upload" class="relative cursor-pointer rounded-md font-medium text-accent1 hover:text-accent1/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-accent1">
+                          <span>Upload foto</span>
+                          <input id="photo-upload" name="photo_profile" type="file" class="sr-only" @change="handleFileChange" accept="image/jpeg,image/png,image/jpg" />
+                        </label>
+                        <p class="pl-1">atau drag and drop</p>
+                      </div>
+                      <p class="text-xs text-gray-500">PNG, JPG, JPEG hingga 2MB</p>
+                    </div>
+                    <div v-else class="relative w-full h-64">
+                      <img :src="previewUrl" alt="Preview" class="w-full h-full object-cover rounded-md" />
+                      <button 
+                        type="button" 
+                        @click.stop="removePhoto" 
+                        class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 focus:outline-none"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <p v-if="form.errors.photo_profile" class="mt-2 text-sm text-red-600">{{ form.errors.photo_profile }}</p>
                 </div>
               </div>
             </div>
