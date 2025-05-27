@@ -105,6 +105,7 @@ class InstallController extends Controller
 
             // Update the .env file with database settings
             $this->updateEnvFile([
+                'DB_CONNECTION' => 'mysql', // Change from sqlite to mysql
                 'DB_HOST' => $request->host,
                 'DB_PORT' => $request->port,
                 'DB_DATABASE' => $request->database,
@@ -112,8 +113,9 @@ class InstallController extends Controller
                 'DB_PASSWORD' => $request->password,
             ]);
 
-            // Run migrations
-            Artisan::call('migrate:fresh', ['--force' => true]);
+            // Run migrations on the newly configured MySQL database
+            Artisan::call('config:clear');
+            Artisan::call('migrate:fresh', ['--force' => true, '--database' => 'mysql']);
             Artisan::call('db:seed', ['--force' => true]);
 
             return redirect()->route('install.admin');
