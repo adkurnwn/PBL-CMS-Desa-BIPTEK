@@ -13,7 +13,7 @@ const props = defineProps({
         <div class="grid mt-4 md:mt-10 xl:ml-28 ml-4">
             <img
                 :src="`storage/${layout.logo}`"
-                alt="Logo"
+                :alt="'Logo ' + layout.name"
                 class="w-16 h-17 mb-2"
             />
             <div class="">
@@ -54,9 +54,7 @@ const props = defineProps({
                         <i class="bi bi-telephone text-sm mr-2"></i
                         >{{ layout.phone }}
                     </p>
-                    <p
-                        class="text-white xl:text-base text-xs"
-                    >
+                    <p class="text-white xl:text-base text-xs">
                         <i class="bi bi-envelope text-sm mr-2"></i
                         >{{ layout.email }}
                     </p>
@@ -72,17 +70,11 @@ const props = defineProps({
                 </h1>
                 <div class="ml-10 mt-2 space-y-1 xl:text-base text-xs">
                     <p class="text-white">Berita Desa</p>
-                    <p class="text-white">
-                        Event & Agenda
-                    </p>
+                    <p class="text-white">Event & Agenda</p>
                     <p class="text-white">Produk Hukum</p>
-                    <p class="text-white">
-                        Laporan Dana Desa
-                    </p>
+                    <p class="text-white">Laporan Dana Desa</p>
                     <p class="text-white">Produk Unggul</p>
-                    <p class="text-white">
-                        Feedback & Saran
-                    </p>
+                    <p class="text-white">Feedback & Saran</p>
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ use App\Http\Resources\Profile\ProfileLayout;
 use App\Models\DanaDesa;
 use App\Models\Demografi;
 use App\Models\ProdukHukum;
+use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
 {
@@ -19,7 +20,9 @@ class ProfileController extends Controller
     public function layout()
     {
         try {
-            $profile = Profile::with(['province', 'regency', 'district'])->first();
+            $profile = Cache::remember('profile.layout', 1200, function () {
+                return Profile::with(['province', 'regency', 'district'])->first();
+            });
 
             if (!$profile) {
                 return response()->json([
@@ -41,40 +44,12 @@ class ProfileController extends Controller
         }
     }
 
-    public function landingPage()
-    {
-        try {
-            $profile = Profile::latest()->first();
-
-            if (!$profile) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Profile data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'name' => $profile->name,
-                    'hero_image' => json_decode($profile->hero_images)[0],
-                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
-                    'dana_desa' => (DanaDesa::exists()) ? true : false,
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function profilePage()
     {
         try {
-            $profile = Profile::latest()->first();
+            $profile = Cache::remember('profile.detail', 1200, function () {
+                return Profile::latest()->first();
+            });
 
             if (!$profile) {
                 return response()->json([
@@ -86,36 +61,6 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => new ProfileDetail($profile)
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function layananPage()
-    {
-        try {
-            $profile = Profile::latest()->first();
-
-            if (!$profile) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Profile data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'name' => $profile->name,
-                    'produk_hukum' => (ProdukHukum::exists()) ? true : false,
-                    'dana_desa' => (DanaDesa::exists()) ? true : false,
-                    'demografi' => (Demografi::exists()) ? true : false,
-                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

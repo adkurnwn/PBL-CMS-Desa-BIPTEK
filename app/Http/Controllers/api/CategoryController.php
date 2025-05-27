@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -15,7 +16,10 @@ class CategoryController extends Controller
     {
         try {
             $type = $request->query('type');
-            $categories = Category::where('category_type', $type)->get();
+            $cacheKey = 'categories.index.{$type}';
+            $categories = Cache::remember($cacheKey, 600, function () use ($type) {
+                return Category::where('category_type', $type)->get();
+            });
             if ($categories->isEmpty()) {
                 return response()->json([
                     'success' => false,
@@ -33,37 +37,5 @@ class CategoryController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
     }
 }
