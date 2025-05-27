@@ -71,7 +71,6 @@ class NewsController extends Controller
         }
     }
 
-
     public function preview(Request $request)
     {
         $limit = $request->input('limit', 3);
