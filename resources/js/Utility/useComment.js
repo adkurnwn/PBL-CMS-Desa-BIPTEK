@@ -1,5 +1,13 @@
-import { ref } from 'vue';
-import axios from 'axios';
+import { ref } from "vue";
+import axios from "axios";
+
+export const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("id-ID", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+};
 
 export default function useComments(type, itemId, isModerated = false) {
     const comments = ref([]);
@@ -9,14 +17,14 @@ export default function useComments(type, itemId, isModerated = false) {
     const replyCaptchaData = ref(null);
     const mainCaptchaCode = ref("");
     const replyCaptchaCode = ref("");
-    
+
     // Initialize form data based on the content type
     const commentForm = ref({
         nama_user: "",
         komentar: "",
         captcha: "",
     });
-    
+
     const replyForm = ref({
         nama_user: "",
         komentar: "",
@@ -25,10 +33,10 @@ export default function useComments(type, itemId, isModerated = false) {
     });
 
     // Set the appropriate ID field based on content type
-    if (type === 'news') {
+    if (type === "news") {
         commentForm.value.id_berita = itemId;
         replyForm.value.id_berita = itemId;
-    } else if (type === 'produk-hukum') {
+    } else if (type === "produk-hukum") {
         commentForm.value.id_produk_hukum = itemId;
         replyForm.value.id_produk_hukum = itemId;
     }
@@ -44,28 +52,21 @@ export default function useComments(type, itemId, isModerated = false) {
         if (!text) return "";
         return text.length > length ? text.substring(0, length) + "..." : text;
     };
-
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString("id-ID", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
-
     // API endpoints based on content type
     const getEndpoints = () => {
-        if (type === 'news') {
+        if (type === "news") {
             return {
                 fetchComments: `/api/comments/${itemId}`,
-                submitComment: '/api/comments',
-                fetchReplies: (commentId) => `/api/comments/${itemId}/replies/${commentId}`
+                submitComment: "/api/comments",
+                fetchReplies: (commentId) =>
+                    `/api/comments/${itemId}/replies/${commentId}`,
             };
-        } else if (type === 'produk-hukum') {
+        } else if (type === "produk-hukum") {
             return {
                 fetchComments: `/api/produk-hukum-comments/${itemId}`,
-                submitComment: '/api/produk-hukum-comments',
-                fetchReplies: (commentId) => `/api/produk-hukum-comments/${itemId}/replies/${commentId}`
+                submitComment: "/api/produk-hukum-comments",
+                fetchReplies: (commentId) =>
+                    `/api/produk-hukum-comments/${itemId}/replies/${commentId}`,
             };
         }
     };
@@ -142,14 +143,14 @@ export default function useComments(type, itemId, isModerated = false) {
             id_ref_komentar: commentId,
             captcha: "",
         };
-        
+
         // Add the appropriate ID field based on content type
-        if (type === 'news') {
+        if (type === "news") {
             replyForm.value.id_berita = itemId;
-        } else if (type === 'produk-hukum') {
+        } else if (type === "produk-hukum") {
             replyForm.value.id_produk_hukum = itemId;
         }
-        
+
         refreshCaptcha("reply");
     };
 
@@ -162,11 +163,11 @@ export default function useComments(type, itemId, isModerated = false) {
             id_ref_komentar: null,
             captcha: "",
         };
-        
+
         // Add the appropriate ID field based on content type
-        if (type === 'news') {
+        if (type === "news") {
             replyForm.value.id_berita = itemId;
-        } else if (type === 'produk-hukum') {
+        } else if (type === "produk-hukum") {
             replyForm.value.id_produk_hukum = itemId;
         }
     };
@@ -213,7 +214,9 @@ export default function useComments(type, itemId, isModerated = false) {
         }
 
         try {
-            const response = await axios.get(endpoints.fetchReplies(comment.id));
+            const response = await axios.get(
+                endpoints.fetchReplies(comment.id)
+            );
 
             // Create a map of all replies
             const repliesMap = new Map();
@@ -287,6 +290,6 @@ export default function useComments(type, itemId, isModerated = false) {
         submitReply,
         loadReplies,
         getAllDeeperReplies,
-        initialize
+        initialize,
     };
 }

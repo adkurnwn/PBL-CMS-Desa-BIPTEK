@@ -4,7 +4,7 @@ import { ref, onMounted, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
-import useComments from "@/Utility/useComments";
+import { formatDate } from "@/Utility/useComment";
 
 const props = defineProps({
     slug: {
@@ -50,31 +50,9 @@ const fetchRelatedNews = async () => {
 
 watch(activeTab, fetchRelatedNews);
 
-// Use the comments helper with 'news' type
-const { 
-    comments, 
-    commentForm, 
-    replyForm,
-    submitting,
-    activeReplyId,
-    mainCaptchaData,
-    replyCaptchaData,
-    getAvatar,
-    truncateText,
-    formatDate,
-    submitComment,
-    showReplyForm,
-    cancelReply,
-    submitReply,
-    loadReplies,
-    getAllDeeperReplies,
-    initialize: initializeComments
-} = useComments('news', props.slug, news.value?.is_moderate);
-
 onMounted(() => {
     fetchNewsDetail();
     fetchRelatedNews();
-    initializeComments();
 });
 </script>
 
@@ -218,7 +196,10 @@ onMounted(() => {
                                 </span> -->
 
                                     <!-- Content -->
-                                    <div class="text-sm lg:text-lg text-semiBlack" v-html="news.content"></div>
+                                    <div
+                                        class="text-sm lg:text-lg text-semiBlack"
+                                        v-html="news.content"
+                                    ></div>
 
                                     <!-- Back Button -->
                                     <!-- <div class="mt-8">
@@ -238,7 +219,7 @@ onMounted(() => {
                             >
                                 <Comment
                                     :slug="props.slug"
-                                    :news="news"
+                                    :data="news"
                                     :show-share="true"
                                     :loading="loading"
                                     and

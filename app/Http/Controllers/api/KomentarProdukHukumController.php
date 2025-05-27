@@ -13,7 +13,7 @@ class KomentarProdukHukumController extends Controller
     {
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        $comments = KomentarProdukHukum::where('id_produk_hukum', $slug)
+        $comments = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
             })
@@ -28,7 +28,7 @@ class KomentarProdukHukumController extends Controller
     {
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        $replies = KomentarProdukHukum::where('id_produk_hukum', $slug)
+        $replies = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->whereNotNull('id_ref_komentar')
             ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
