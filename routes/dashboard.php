@@ -144,6 +144,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
 
         Route::get('/user-profile', [UserProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/user-profile', [UserProfileController::class, 'update'])->name('profile.update');
+        Route::post('/user-profile/image', [UserProfileController::class, 'updateImage'])->name('profile.update-image');
 
         Route::middleware(['permission:manage_settings'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
