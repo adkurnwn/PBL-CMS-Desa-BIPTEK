@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 const news = ref([]);
@@ -40,8 +40,13 @@ async function fetchNews({ search = "", category = null, page = 1 } = {}) {
                 total: result.meta.total,
             };
         } else {
-            error.value = result.message || "Gagal memuat berita";
-            console.error("Gagal memuat berita:", result.message);
+            // Handle empty results gracefully
+            news.value = [];
+            pagination.value = null;
+            if (result.message && result.message !== 'No news found') {
+                error.value = result.message;
+                console.error("Gagal memuat berita:", result.message);
+            }
         }
     } catch (err) {
         error.value = "Terjadi kesalahan saat memuat berita";
@@ -172,7 +177,7 @@ onMounted(() => {
                     class="ml-2" 
                     xmlns="http://www.w3.org/2000/svg" 
                     height="24px" 
-                    viewBox="0 -960 960 960" 
+                    viewBox="http://www.w3.org/2000/svg" 
                     width="24px" 
                     fill="244031">
                     <path d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"/>
@@ -205,7 +210,7 @@ onMounted(() => {
                     @click="selectCategory(category.id)"
                     class="hover:underline"
                     :class="{
-                        'font-medium': selectedCategory === category.name,
+                        'font-medium': selectedCategory === category.id,
                     }"
                 >
                     {{ category.name }}

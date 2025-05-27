@@ -44,6 +44,10 @@ const labelClass = computed(() => {
             return 'bg-[#00BFFF]/25 text-[#00BFFF]';
         case 'bendahara desa':
             return 'bg-[#32CD32]/25 text-[#32CD32]';
+        case 'menunggu':
+             return 'bg-yellowLabel text-yellowLabelText';
+        case 'ditanggapi':
+            return 'bg-greenLabel text-greenLabelText';
         default:
             return 'bg-gray-100 text-gray-800';
     }
