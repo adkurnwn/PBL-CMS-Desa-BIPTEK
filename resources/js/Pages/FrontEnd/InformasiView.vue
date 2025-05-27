@@ -3,25 +3,35 @@ import EventCard from "@/Components/EventCard.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
+import useApiFetch from "@/Utility/useApiFetch";
 
-const informasi = ref({});
-const loading = ref(false);
+const gallery = ref({});
+const events = ref([]);
+const news = ref([]);
 
-const fetchInformasi = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get("/api/informasi");
-        informasi.value = response.data;
-        loading.value = false;
-    } catch (error) {
-        console.error("Error fetching informasi data:", error);
-        loading.value = false;
-    }
+const fetchData = async () => {
+    const galleryLoading = ref(true);
+    const eventLoading = ref(true);
+    const newsLoading = ref(true);
+
+    const galleryApi = useApiFetch();
+    const eventsApi = useApiFetch();
+    const newsApi = useApiFetch();
+
+    await Promise.all([
+        galleryApi.fetchData("/api/gallery/highlight"),
+        eventsApi.fetchData("/api/events/preview"),
+        newsApi.fetchData("/api/news/preview?limit=6"),
+    ]);
+    gallery.value = galleryApi.data.value || {};
+    events.value = eventsApi.data.value || [];
+    news.value = newsApi.data.value || [];
+    galleryLoading.value = galleryApi.loading.value;
+    eventLoading.value = eventsApi.loading.value;
+    newsLoading.value = newsApi.loading.value;
 };
 
-onMounted(() => {
-    fetchInformasi();
-});
+onMounted(fetchData);
 </script>
 
 <template>
@@ -33,20 +43,35 @@ onMounted(() => {
             <article
                 class="w-full px-8 flex flex-col pt-32 pb-8 lg:pb-24 bg-type1 font-merriweather"
             >
-                <div class="flex flex-col w-full justify-between space-y-4">
+                <div
+                    v-if="galleryLoading"
+                    class="flex justify-center items-center h-[500px]"
+                >
+                    <p>Memuat galeri...</p>
+                </div>
+
+                <div
+                    v-else-if="!gallery.images || gallery.images.length < 5"
+                    class="flex justify-center items-center h-[500px]"
+                >
+                    <p>Gallery images not available</p>
+                </div>
+
+                <div
+                    v-else
+                    class="flex flex-col w-full justify-between space-y-4"
+                >
                     <div
                         class="flex flex-row w-full h-full justify-between space-x-2"
                     >
                         <img
-                            v-if="informasi.gallery"
-                            :src="`/storage/${informasi.gallery.images[0].path}`"
-                            alt=""
+                            :src="`/storage/${gallery.images[0].path}`"
+                            :alt="gallery.images[0].alt"
                             class="w-3/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-3xl object-cover"
                         />
                         <img
-                            v-if="informasi.gallery"
-                            :src="`/storage/${informasi.gallery.images[1].path}`"
-                            alt=""
+                            :src="`/storage/${gallery.images[1].path}`"
+                            :alt="gallery.images[1].alt"
                             class="w-2/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-3xl object-cover"
                         />
                     </div>
@@ -54,21 +79,18 @@ onMounted(() => {
                         class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:-m-1"
                     >
                         <img
-                            v-if="informasi.gallery"
-                            :src="`/storage/${informasi.gallery.images[2].path}`"
-                            alt=""
+                            :src="`/storage/${gallery.images[2].path}`"
+                            :alt="gallery.images[2].alt"
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover sm:mr-2"
                         />
                         <img
-                            v-if="informasi.gallery"
-                            :src="`/storage/${informasi.gallery.images[3].path}`"
-                            alt=""
+                            :src="`/storage/${gallery.images[3].path}`"
+                            :alt="gallery.images[3].alt"
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover sm:mr-2"
                         />
                         <img
-                            v-if="informasi.gallery"
-                            :src="`/storage/${informasi.gallery.images[4].path}`"
-                            alt=""
+                            :src="`/storage/${gallery.images[4].path}`"
+                            :alt="gallery.images[4].alt"
                             class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-3xl object-cover"
                         />
                     </div>
@@ -92,18 +114,18 @@ onMounted(() => {
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
-                    <div v-if="!informasi.events" class="text-center w-full">
-                        <p>Loading events...</p>
+                    <div v-if="eventLoading" class="text-center w-full">
+                        <p>Memuat events...</p>
                     </div>
                     <div
-                        v-else-if="informasi.events.length === 0"
+                        v-else-if="events.length === 0"
                         class="text-center w-full"
                     >
                         <p>Tidak ada event yang akan datang</p>
                     </div>
                     <template v-else>
                         <EventCard
-                            v-for="eventItem in informasi.events"
+                            v-for="eventItem in events"
                             :key="eventItem.id"
                             :isHome="true"
                             :event="eventItem"
@@ -124,9 +146,19 @@ onMounted(() => {
                 <div
                     class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0"
                 >
+                    <div v-if="newsLoading" class="text-center w-full">
+                        <p>Memuat berita...</p>
+                    </div>
+                    <div
+                        v-else-if="news.length === 0"
+                        class="text-center w-full"
+                    >
+                        <p>Tidak ada berita terbaru</p>
+                    </div>
                     <NewsCard
-                        v-for="newsItem in informasi.news"
-                        :href="`/berita-test/${newsItem.slug}`"
+                        v-else
+                        v-for="newsItem in news"
+                        :href="`/berita/${newsItem.slug}`"
                         :key="newsItem.id"
                         :news="newsItem"
                     />
@@ -141,5 +173,3 @@ onMounted(() => {
         </main>
     </UserLayout>
 </template>
-
-<style scoped></style>

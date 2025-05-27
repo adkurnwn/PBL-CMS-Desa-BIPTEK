@@ -1,10 +1,10 @@
 <script setup>
 import DangerButton from '@/Components/DangerButton.vue';
-import InputError from '@/Components/InputError.vue';
+import InputError from '@/Components/DashboardComponent/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import SecondaryButton from '@/Components/DashboardComponent/SecondaryButton.vue';
+import SingleLineField from '@/Components/DashboardComponent/SingleLineField.vue';
 import { useForm } from '@inertiajs/vue3';
 import { nextTick, ref } from 'vue';
 
@@ -69,19 +69,14 @@ const closeModal = () => {
                 </p>
 
                 <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        value="Password"
-                        class="sr-only"
-                    />
-
-                    <TextInput
+                    <SingleLineField
+                        field-name="Password"
                         id="password"
                         ref="passwordInput"
                         v-model="form.password"
                         type="password"
-                        class="mt-1 block w-3/4"
                         placeholder="Password"
+                        custom-width="75%"
                         @keyup.enter="deleteUser"
                     />
 

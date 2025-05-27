@@ -12,7 +12,7 @@ const props = defineProps({
 <template>
     <div class="min-h-screen bg-accent1">
         <main
-            class="flex flex-col justify-center items-center px-20 py-60 min-h-screen max-md:px-5 max-md:py-24">
+            class="flex flex-col justify-center items-center min-h-screen">
             <slot></slot>
         </main>
     </div>

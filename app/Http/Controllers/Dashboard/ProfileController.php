@@ -53,23 +53,20 @@ class ProfileController extends Controller
             'fasilitas'
         ]);
 
-        // Get the village name for the profile name
         $village = Village::find($request->kelurahan);
         if ($village) {
             $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
         }
 
-        // Handle JSON fields
         $profileData['lembaga'] = json_encode($request->lembaga);
         $profileData['fasilitas'] = json_encode($request->fasilitas);
 
-        // Handle single uploads
         if ($request->hasFile('logo')) {
             if ($profile->logo) $this->mediaService->delete($profile->logo);
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
             $profileData['logo'] = $logoPath;
 
-            $this->updateFaviconFromLogo($logoPath);
+            // Favicon is now handled in SettingsController
         }
 
         if ($request->hasFile('organization_image')) {
@@ -77,7 +74,6 @@ class ProfileController extends Controller
             $profileData['organization_image'] = $this->mediaService->upload($request->file('organization_image'), 'organization-images');
         }
 
-        // Handle hero images
         if ($request->hasFile('hero_images')) {
             $this->mediaService->handleJsonImages($profile, $request->file('hero_images'), 'hero_images', 'hero-images');
         } else {
@@ -97,11 +93,6 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
-        return redirect()->route('dashboard.profiles.index')->with('success', 'Profil Berhasil Diperbarui');
-    }
-
-    protected function updateFaviconFromLogo(string $logoPath)
-    {
-        Storage::disk('public')->put('favicon.png', Storage::disk('public')->get($logoPath));
+        return redirect()->route('dashboard')->with('success', 'Profil Berhasil Diperbarui');
     }
 }

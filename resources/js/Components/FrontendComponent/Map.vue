@@ -211,11 +211,11 @@ const onMapReady = (mapObject) => {
 </script>
 
 <template>
-    <div>
+    <div class="w-full h-[250px] sm:h-[300px] md:h-[400px] xl:h-[450px]">
         <l-map
             v-model:zoom="zoom"
             v-model:center="center"
-            style="height: 500px; width: 100%"
+            style="width: 100%; height: 100%"
             @ready="onMapReady"
         >
             <l-tile-layer

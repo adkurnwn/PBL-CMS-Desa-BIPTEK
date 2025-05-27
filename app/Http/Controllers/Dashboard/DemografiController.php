@@ -20,10 +20,43 @@ class DemografiController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $query = Demografi::query();
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('tahun', 'like', "%{$search}%")
+                    ->orWhere('jumlah_penduduk', 'like', "%{$search}%")
+                    ->orWhere('jumlah_keluarga', 'like', "%{$search}%")
+                    ->orWhere('jumlah_pendatang', 'like', "%{$search}%")
+                    ->orWhere('jumlah_pindah_keluar', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('tahun') && $request->tahun !== null && $request->tahun !== '') {
+            $query->where('tahun', $request->tahun);
+        }
+
+        $sortField = $request->input('sort', 'tahun');
+        $sortDirection = $request->input('direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        $years = Demografi::distinct()->pluck('tahun')->toArray();
+        $yearsFormatted = array_map(function ($year) {
+            return ['id' => $year, 'name' => (string)$year];
+        }, $years);
+
         return Inertia::render('Dashboard/Demografi/Index', [
-            'demografi' => Demografi::all(),
+            'demografi' => $query->get(),
+            'search' => $request->search,
+            'sort' => $sortField,
+            'direction' => $sortDirection,
+            'filters' => [
+                'tahun' => $request->input('tahun', ''),
+            ],
+            'years' => $yearsFormatted,
         ]);
     }
 
@@ -54,8 +87,18 @@ class DemografiController extends Controller
     public function update(UpdateDemografiRequest $request, $slug)
     {
         $demografi = Demografi::where('tahun', $slug)->firstOrFail();
-        $demografiData = $request->all();
 
+        if ($request->tahun != $slug) {
+            $existingDemografi = Demografi::where('tahun', $request->tahun)->first();
+
+            if ($existingDemografi) {
+                return redirect()->back()->withErrors([
+                    'tahun' => 'Data demografi untuk tahun ini sudah ada.'
+                ])->withInput();
+            }
+        }
+
+        $demografiData = $request->all();
         $demografi->update($demografiData);
 
         $this->logHelper->logActivity('update', 'demografi', 'Memperbarui demografi ' . $request->title);

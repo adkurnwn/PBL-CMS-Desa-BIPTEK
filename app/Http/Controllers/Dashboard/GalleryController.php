@@ -11,6 +11,7 @@ use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Requests\Validation\StoreGalleryRequest;
 use App\Http\Requests\Validation\UpdateGalleryRequest;
 
@@ -27,10 +28,53 @@ class GalleryController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get request parameters for search and sorting
+        $search = $request->input('search');
+        $sortField = $request->input('sort', 'title');
+        $sortDirection = $request->input('direction', 'asc');
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('category_id')) {
+            $filters['category_id'] = $request->input('category_id');
+        }
+        
+        // Start building the query
+        $query = Gallery::with(['category', 'images']);
+        
+        // Apply search filter if provided
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Apply category filter if provided
+        if (isset($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+        
+        // Handle sorting
+        if ($sortField === 'category.name') {
+            $query->join('categories', 'galleries.category_id', '=', 'categories.id')
+                ->select('galleries.*')
+                ->orderBy('categories.name', $sortDirection);
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
+        
+        // Paginate the results
+        $galleries = $query->paginate(25)->withQueryString();
+        
         return Inertia::render('Dashboard/Gallery/Index', [
-            'galleries' => Gallery::all(),
+            'galleries' => $galleries,
+            'search' => $search,
+            'sort' => $sortField,
+            'direction' => $sortDirection,
+            'filters' => $filters,
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 
@@ -52,7 +96,6 @@ class GalleryController extends Controller
 
         $gallery = Gallery::create($data);
 
-        // Handle multiple image uploads
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
@@ -83,22 +126,21 @@ class GalleryController extends Controller
         }
 
         $data = $request->all();
-        $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
+        if ($gallery->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(Gallery::class, $request->title);
+        }
         $data['category_id'] = $category_id;
 
         $gallery->update($data);
 
-        // Handle image removals
         if ($request->removed_images) {
             $this->mediaService->handleImageRemovals($gallery, $request->removed_images);
         }
 
-        // Handle updated alt texts for existing images
         if ($request->updated_existing_images) {
             $this->mediaService->handleImageAltTextUpdates($gallery, $request->updated_existing_images);
         }
 
-        // Handle new image uploads
         if ($request->hasFile('images')) {
             $this->mediaService->handleImageUploads($gallery, $request->file('images'), $request->alts);
         }
@@ -107,18 +149,59 @@ class GalleryController extends Controller
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diperbarui');
     }
 
-    public function archive()
+    public function archive(Request $request)
     {
-        Gallery::onlyTrashed()->with('category')->get();
+        // Get request parameters for search and sorting
+        $search = $request->input('search');
+        $sortField = $request->input('sort', 'deleted_at');
+        $sortDirection = $request->input('direction', 'desc');
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('category_id')) {
+            $filters['category_id'] = $request->input('category_id');
+        }
+        
+        // Start building the query
+        $query = Gallery::onlyTrashed()->with(['category', 'images']);
+        
+        // Apply search filter if provided
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Apply category filter if provided
+        if (isset($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+        
+        // Handle sorting
+        if ($sortField === 'category.name') {
+            $query->join('categories', 'galleries.category_id', '=', 'categories.id')
+                ->select('galleries.*')
+                ->orderBy('categories.name', $sortDirection);
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
+        
+        // Paginate the results
+        $galleries = $query->paginate(25)->withQueryString();
+        
         return Inertia::render('Dashboard/Gallery/Archive', [
-            'galleries' => Gallery::onlyTrashed()->with('category')->get(),
+            'galleries' => $galleries,
+            'search' => $search,
+            'sort' => $sortField,
+            'direction' => $sortDirection,
+            'filters' => $filters,
+            'categories' => Category::where('category_type', 1)->get()
         ]);
     }
 
     public function restore($slug)
     {
         $gallery = Gallery::withTrashed()->where('slug', $slug)->firstOrFail();
-        // Restore the gallery
         $gallery->restore();
         $this->logHelper->logActivity('restore', 'gallery', 'Memulihkan gallery ' . $gallery->title);
         return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dipulihkan');

@@ -12,21 +12,74 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\StoreUserManagementRequest;
 use App\Http\Requests\Validation\UpdateUserManagementRequest;
+use App\Services\MediaService;
 
 class UserManagementController extends Controller
 {
     protected $logHelper;
-    public function __construct()
+    protected $mediaService;
+    public function __construct(MediaService $mediaService)
     {
+        $this->mediaService = $mediaService;
         $this->logHelper = new LogActivityHelper();
     }
-    public function index()
+
+    public function index(Request $request)
     {
-        return Inertia::render('Dashboard/UserManagement/Index', [
-            'users' => User::with(['roles', 'position'])->whereDoesntHave('roles', function ($query) {
+        $perPage = $request->input('per_page', 25);
+
+        $search = $request->input('search', '');
+        $positionFilter = $request->input('position_id');
+        $statusFilter = $request->has('status') ? (int)$request->input('status') : null;
+        $sortField = $request->input('sort', 'name');
+        $sortDirection = $request->input('direction', 'asc');
+
+        $allowedSortFields = ['name', 'email', 'status', 'position_id', 'created_at'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'name';
+        }
+
+        $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        $filters = [];
+        if ($positionFilter) {
+            $filters['position_id'] = $positionFilter;
+        }
+        if ($statusFilter !== null) {
+            $filters['status'] = $statusFilter;
+        }
+
+        $usersQuery = User::with(['roles', 'position'])
+            ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'Admin');
-            })->get(),
-            'positions' => Position::all()
+            });
+
+        if (!empty($search)) {
+            $usersQuery->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($positionFilter) {
+            $usersQuery->where('position_id', $positionFilter);
+        }
+
+        if ($statusFilter !== null) {
+            $usersQuery->where('status', $statusFilter);
+        }
+
+        $usersQuery->orderBy($sortField, $sortDirection);
+
+        $users = $usersQuery->paginate($perPage);
+
+        return Inertia::render('Dashboard/UserManagement/Index', [
+            'users' => $users,
+            'search' => $search,
+            'filters' => $filters,
+            'positions' => Position::all(),
+            'sort' => $sortField,
+            'direction' => $sortDirection
         ]);
     }
 
@@ -42,20 +95,20 @@ class UserManagementController extends Controller
         $position = Position::findOrFail($request->position_id);
         $position_id = $position->id;
 
-        // Create user
         $userData = $request->all();
         $userData['status'] = true;
         $userData['position_id'] = $position_id;
         $userData['password'] = Hash::make($request->password);
 
         if ($request->hasFile('photo_profile')) {
-            $path = $request->file('photo_profile')->store('profile-photos', 'public');
-            $userData['photo_profile'] = $path;
+            $userData['photo_profile'] = $this->mediaService->upload(
+                $request->file('photo_profile'),
+                'profile-photos'
+            );
         }
 
         $user = User::create($userData);
 
-        // Assign role based on position name
         if ($position->name === 'Kepala Desa') {
             $user->assignRole('Kepala Desa');
         } else if ($position->name === 'Admin Sistem') {
@@ -81,7 +134,6 @@ class UserManagementController extends Controller
         $position = Position::findOrFail($request->position_id);
         $position_id = $position->id;
 
-        // Get all fields except password and photo_profile
         $userData = $request->except(['password', 'photo_profile']);
         $userData['position_id'] = $position_id;
 
@@ -90,13 +142,11 @@ class UserManagementController extends Controller
         }
 
         if ($request->hasFile('photo_profile')) {
-            // Delete the old photo if it exists
             if ($user->photo_profile) {
                 Storage::disk('public')->delete($user->photo_profile);
             }
             $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
         }
-
         $user->update($userData);
 
         if ($position->name === 'Kepala Desa') {

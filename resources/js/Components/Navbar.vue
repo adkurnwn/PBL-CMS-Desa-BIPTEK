@@ -14,7 +14,7 @@ const currentPath = ref(window.location.pathname);
 const isHomePage = computed(() => currentPath.value === "/");
 const menuItems = [
     { name: "Beranda", link: "/" },
-    { name: "Profil Desa", link: "/profildesa" },
+    { name: "Profil Desa", link: "/profile" },
     { name: "Informasi & Berita", link: "/informasi" },
     { name: "Layanan Publik", link: "/layanan" },
 ];
@@ -24,7 +24,6 @@ const handleScroll = () => {
         isScrolled.value = window.scrollY > 50;
     }
 };
-// Fungsi untuk menentukan apakah menu aktif
 const isActive = (link) => currentPath.value === link;
 
 const toggleMenu = () => {
@@ -53,17 +52,17 @@ onUnmounted(() => {
         <div class="flex items-center space-x-4">
             <img
                 :src="`/storage/${layout.logo}`"
-                alt="Logo"
+                :alt="'Logo ' + layout.name"
                 class="w-10 h-12 md:w-12 md:h-16"
             />
             <div class="flex flex-col">
                 <h1
                     class="text-white font-bold text-base sm:text-2xl lg:text-xl"
                 >
-                    {{ layout.name || "Desa Karanganom" }}
+                    {{ layout.name }}
                 </h1>
                 <p class="text-white text-[12px] sm:text-base lg:text-sm">
-                    {{ layout.kabupaten || "Klaten" }}
+                    {{ layout.kabupaten }}
                 </p>
             </div>
         </div>

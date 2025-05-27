@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/vue3';
+
 defineProps({
     produkDesa: {
         type: Object,
@@ -11,25 +13,25 @@ defineProps({
 });
 </script>
 <template>
-    <div class="w-full lg:w-1/4 p-1">
+    <div class="w-full max-w-sm p-1">
         <div
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300"
         >
             <div class="px-3 mt-5">
                 <img
                     :src="
-                        produkDesa?.image?.path
-                            ? `/storage/${produkDesa.image.path}`
+                        produkDesa?.thumbnail
+                            ? `/storage/${produkDesa.thumbnail}`
                             : '/default-image.jpg'
                     "
-                    :alt="produkDesa?.image?.alt || 'Default Image'"
+                    :alt="produkDesa?.alt || 'Default Image'"
                     class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
                 />
             </div>
             <div class="px-4">
-                <div class="mt-2 space-y-1">
+                <div class="mt-2 space-y-1 ">
                     <h2
-                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2"
+                        class="px-1 text-lg nd:text-2xl font-semibold text-accent2 line-clamp-2 min-h-14"
                     >
                         {{ produkDesa?.name || "Unnamed Product" }}
                     </h2>
@@ -40,11 +42,14 @@ defineProps({
                 <div
                     class="flex flex-row justify-center py-4 hover:scale-105 transition-transform"
                 >
-                    <button
+                    <Link
+                        :href="`/produk-unggulan/${produkDesa.slug}`"
                         class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
                     >
                         Lihat Katalog
-                    </button>
+                    </Link>
+
+                    
                 </div>
             </div>
         </div>

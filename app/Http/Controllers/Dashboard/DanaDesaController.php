@@ -5,27 +5,80 @@ namespace App\Http\Controllers\Dashboard;
 use Inertia\Inertia;
 use App\Models\DanaDesa;
 use App\Helpers\SlugHelper;
-use Illuminate\Http\Request;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreDanaDesaRequest;
-use App\Http\Requests\UpdateDanaDesaRequest;
+use App\Http\Requests\Validation\StoreDanaDesaRequest;
+use App\Http\Requests\Validation\UpdateDanaDesaRequest;
+use App\Services\MediaService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DanaDesaController extends Controller
 {
+    protected $mediaService;
     protected $logHelper;
 
-    public function __construct()
+    public function __construct(MediaService $mediaService)
     {
+        $this->mediaService = $mediaService;
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get query parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $perPage = 25;
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('year')) {
+            $filters['year'] = $request->input('year');
+        }
+        
+        // Start building the query
+        $query = DanaDesa::query();
+        
+        // Apply search
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply year filter if provided
+        if (isset($filters['year'])) {
+            $query->whereYear('date', $filters['year']);
+        }
+        
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+        
+        // Get paginated results - ensure to use the current page from request
+        $page = $request->input('page', 1);
+        $danaDesa = $query->paginate($perPage, ['*'], 'page', $page)->withQueryString();
+        
+        // Get available years for the filter - using date column
+        $availableYears = DanaDesa::select(DB::raw('YEAR(date) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(function($year) {
+                return ['id' => $year, 'name' => $year];
+            })
+            ->toArray();
+        
         return Inertia::render('Dashboard/DanaDesa/Index', [
-            'danaDesa' => DanaDesa::all(),
+            'danaDesa' => $danaDesa,
+            'availableYears' => $availableYears,
+            'search' => $search,
+            'filters' => $filters,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -41,14 +94,11 @@ class DanaDesaController extends Controller
         $data['user_id'] = Auth::id();
 
         if ($request->hasFile('file')) {
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'dana-desa-documents'
+            );
         }
 
         DanaDesa::create($data);
@@ -70,21 +120,17 @@ class DanaDesaController extends Controller
         $danaDesa = DanaDesa::where('slug', $slug)->firstOrFail();
 
         $data = $request->all();
-        $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
+        if ($danaDesa->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
+        }
 
         if ($request->hasFile('file')) {
-            if ($danaDesa->file) {
-                Storage::disk('public')->delete($danaDesa->file);
-            }
-
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('dana-desa-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'dana-desa-documents',
+                $danaDesa->file
+            );
         } else {
             unset($data['file']);
         }

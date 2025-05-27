@@ -11,24 +11,81 @@ use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Validation\StoreProdukHukumRequest;
 use App\Http\Requests\Validation\UpdateProdukHukumRequest;
+use App\Services\MediaService;
 
 class ProdukHukumController extends Controller
 {
+    protected $mediaService;
     protected $categoryService;
     protected $logHelper;
 
-    public function __construct(CategoryService $categoryService)
+    public function __construct(CategoryService $categoryService, MediaService $mediaService)
     {
+        $this->mediaService = $mediaService;
         $this->categoryService = $categoryService;
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get query parameters
+        $search = $request->input('search');
+        $filters = $request->except(['search', 'sort', 'direction', 'page', '_token']);
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $perPage = 10;
+
+        // Start building the query
+        $query = ProdukHukum::with('category');
+
+        // Apply search
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // Apply filters
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if ($key === 'category_id' && !empty($value)) {
+                    $query->where('category_id', $value);
+                }
+                
+                if ($key === 'year' && !empty($value)) {
+                    // Use the date column instead of created_at
+                    $query->whereYear('date', $value);
+                }
+            }
+        }
+
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+
+        // Get paginated results
+        $produkHukum = $query->paginate($perPage)->withQueryString();
+
+        // Get available years for the filter - using date column
+        $availableYears = ProdukHukum::select(DB::raw('YEAR(date) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(function($year) {
+                return ['id' => $year, 'name' => $year];
+            })
+            ->toArray();
+
         return inertia('Dashboard/ProdukHukum/Index', [
-            'produkHukum' => ProdukHukum::with('category')->get()
+            'produkHukum' => $produkHukum,
+            'categories' => Category::where('category_type', 0)->get(),
+            'availableYears' => $availableYears,
+            'search' => $search,
+            'filters' => $filters,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -49,14 +106,11 @@ class ProdukHukumController extends Controller
         $data['category_id'] = $category_id;
 
         if ($request->hasFile('file')) {
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
-            $data['file'] = $path;
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $data['slug'],
+                'produk-hukum-documents'
+            );
         }
 
         ProdukHukum::create($data);
@@ -90,24 +144,25 @@ class ProdukHukumController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('file')) {
+            $data['file'] = $this->mediaService->handleDocumentUpload(
+                $request->file('file'),
+                $request->title,
+                'produk-hukum-documents',
+                $produkHukum->file
+            );
+
             // Delete the old file if it exists
             if ($produkHukum->file) {
                 Storage::disk('public')->delete($produkHukum->file);
             }
 
-            // Generate a sanitized filename from the title
-            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $request->title);
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $filename = $sanitizedTitle . '.' . $extension;
-
-            // Store the file with the custom filename
-            $path = $request->file('file')->storeAs('produk-hukum-documents', $filename, 'public');
-            $data['file'] = $path;
         } else {
             unset($data['file']);
         }
 
-        $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
+        if ($produkHukum->title !== $request->title) {
+            $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
+        }
         $data['category_id'] = $category_id;
 
         $produkHukum->update($data);

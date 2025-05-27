@@ -2,16 +2,26 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import CategoryInput from "@/Components/CategoryInput.vue";
+import InputError from "@/Components/DashboardComponent/InputError.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
+import CategoryInput from "@/Components/DashboardComponent/CategoryInput.vue";
+import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
+import FileField from "@/Components/DashboardComponent/FileField.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import { onMounted } from "vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import TextAreaInput from "@/Components/DashboardComponent/TextAreaInput.vue";
 
 const props = defineProps({
     categories: {
         type: Array,
         required: true,
+    },
+    unused_categories: {
+        type: Array,
+        default: () => [],
     },
 });
 
@@ -31,6 +41,7 @@ const form = useForm({
         new_category: "",
         edit_category_id: "",
         new_category_name: "",
+        deleting_category_id: [],
     },
     file: null,
     link: "",
@@ -38,8 +49,8 @@ const form = useForm({
     is_moderate: true,
 });
 
-const handleFileChange = (e) => {
-    form.file = e.target.files[0];
+const handleFileChange = (file) => {
+    form.file = file;
 };
 
 const submit = () => {
@@ -52,144 +63,131 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Create Produk Hukum" />
+    <Head title="Tambah Produk Hukum" />
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Create New Produk Hukum
-            </h2>
+            <HeadingMenu title="Tambah Produk Hukum" :hasRightContent="false">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="http://www.w3.org/2000/svg 0 -960 960 24px"
+                        fill="#40483D">
+                        <path
+                            d="M160-120v-80h480v80H160Zm226-194L160-540l84-86 228 226-86 86Zm254-254L414-796l86-84 226 226-86 86Zm184 408L302-682l56-56 522 522-56 56Z" />
+                    </svg>
+                </template>
+            </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <form
-                            @submit.prevent="submit"
-                            enctype="multipart/form-data"
-                        >
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Name Field -->
+        <template #subtitle-area>
+            Tambah Produk Hukum
+        </template>
+
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                    <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column -->
                                 <div>
-                                    <InputLabel for="title" value="Title" />
-                                    <TextInput
-                                        id="title"
-                                        v-model="form.title"
-                                        type="text"
-                                        class="mt-1 block w-full"
-                                        required
+                                    <SingleLineField 
+                                        id="title" 
+                                        v-model="form.title" 
+                                        type="text" 
+                                        fieldName="Judul" 
+                                        required 
+                                        custom-width="100%" 
                                     />
-                                    <InputError
-                                        :message="form.errors.title"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.title" class="mt-2" />
                                 </div>
 
+                                <!-- Date Field -->
                                 <div>
-                                    <InputLabel for="link" value="Link" />
-                                    <TextInput
-                                        id="link"
-                                        v-model="form.link"
-                                        type="text"
-                                        class="mt-1 block w-full"
+                                    <SingleLineField 
+                                        id="date" 
+                                        v-model="form.date" 
+                                        type="date" 
+                                        fieldName="Tanggal" 
+                                        required 
+                                        custom-width="100%" 
                                     />
-                                    <InputError
-                                        :message="form.errors.link"
-                                        class="mt-2"
-                                    />
+                                    <InputError :message="form.errors.date" class="mt-2" />
                                 </div>
 
-                                <div>
-                                    <InputLabel
-                                        for="description"
-                                        value="Description"
-                                    />
-                                    <textarea
-                                        id="description"
-                                        v-model="form.description"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required
-                                    ></textarea>
-                                    <InputError
-                                        :message="form.errors.description"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <div>
-                                    <InputLabel for="file" value="File" />
-                                    <input
-                                        id="file"
-                                        type="file"
-                                        @input="handleFileChange"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                    />
-                                    <InputError
-                                        :message="form.errors.file"
-                                        class="mt-2"
-                                    />
-                                </div>
-
-                                <CategoryInput
-                                    v-model="form.category"
+                                <!-- Updated Category Input with new styling -->
+                                <CategoryInput 
+                                    v-model="form.category" 
                                     :categories="categories"
-                                    :errors="form.errors"
+                                    :unused_categories="unused_categories" 
+                                    :errors="form.errors" 
+                                    fieldName="Kategori"
+                                    customWidth="100%"
                                 />
-
-                                <!-- Add Date Field -->
-                                <div>
-                                    <InputLabel for="date" value="Date" />
-                                    <TextInput
-                                        id="date"
-                                        v-model="form.date"
-                                        type="date"
-                                        class="mt-1 block w-full"
-                                        required
-                                    />
-                                    <InputError
-                                        :message="form.errors.date"
-                                        class="mt-2"
-                                    />
-                                </div>
                             </div>
 
-                            <div>
-                                <div class="flex items-center mt-4">
-                                    <InputLabel
-                                        for="is_moderate"
-                                        value="Is Moderate"
-                                        class="block mr-4"
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- Second column -->
+                                <div>
+                                    <SingleLineField 
+                                        id="link" 
+                                        v-model="form.link" 
+                                        type="text" 
+                                        fieldName="Link" 
+                                        custom-width="100%" 
                                     />
-                                    <input
+                                    <InputError :message="form.errors.link" class="mt-2" />
+                                </div>
+
+                                <!-- Updated Checkbox Field -->
+                                <div>
+                                    <CheckboxField
                                         id="is_moderate"
                                         v-model="form.is_moderate"
-                                        type="checkbox"
-                                        class="rounded border-gray-300"
+                                        fieldName="Moderasi Komentar"
+                                        labelText="Hidupkan moderasi komentar untuk Produk Hukum ini"
+                                        custom-width="100%"
                                     />
+                                    <InputError :message="form.errors.is_moderate" class="mt-2" />
                                 </div>
-                                <InputError
-                                    :message="form.errors.is_moderate"
-                                    class="mt-2"
-                                />
-                            </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Create Produk Hukum
-                                </PrimaryButton>
-                                <Link
-                                    :href="
-                                        route('dashboard.produk-hukum.index')
-                                    "
-                                >
-                                    <PrimaryButton type="button"
-                                        >Cancel</PrimaryButton
-                                    >
-                                </Link>
+                                <!-- Updated File Field -->
+                                <div>
+                                    <FileField
+                                        id="file"
+                                        v-model="form.file"
+                                        fieldName="File"
+                                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        custom-width="100%"
+                                        @update:modelValue="handleFileChange"
+                                    />
+                                    <InputError :message="form.errors.file" class="mt-2" />
+                                </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="mt-[15px]">
+                            <TextAreaInput 
+                                id="description" 
+                                v-model="form.description" 
+                                type="text" 
+                                fieldName="Deskripsi" 
+                                required 
+                                custom-width="100%" 
+                            />
+                            <InputError :message="form.errors.description" class="mt-2" />
+                        </div>
+
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.produk-hukum.index')" class="mr-[15px]">
+                                <SecondaryButton type="button">
+                                    BATAL
+                                </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                SIMPAN
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

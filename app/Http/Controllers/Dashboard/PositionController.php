@@ -63,16 +63,46 @@ class PositionController extends Controller
     public function destroy(Position $position)
     {
         if (in_array($position->name, ['Admin Sistem', 'Kepala Desa'])) {
-            return back()->with('error', 'Cannot delete core positions');
+            return back()->with('error', 'Tidak dapat menghapus posisi ini');
         }
 
         if ($position->users()->count() > 0) {
-            return back()->with('error', 'Cannot delete position that is assigned to users');
+            return back()->with('error', 'Tidak dapat menghapus posisi yang sedang digunakan oleh pengguna');
         }
 
         $position->delete();
 
         $this->logHelper->logActivity('delete', 'position', 'Menghapus posisi ' . $position->name);
         return back()->with('success', 'Posisi Berhasil Dihapus');
+    }
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $perPage = $request->input('per_page', 25);
+
+        $positionsQuery = Position::query();
+
+        if (!empty($search)) {
+            $positionsQuery->where('name', 'like', "%{$search}%")
+                ->orWhere('job_description', 'like', "%{$search}%");
+        }
+
+        $positionsQuery->orderBy($sort, $direction);
+
+        $positions = $positionsQuery->paginate($perPage)->withQueryString();
+
+        return Inertia::render('Dashboard/UserManagement/Positions/Index', [
+            'positions' => $positions,
+            'search' => $search,
+            'sort' => $sort,
+            'direction' => $direction,
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error')
+            ]
+        ]);
     }
 }

@@ -1,8 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 
 const props = defineProps({
     comments: Object, // Will contain paginated comments data
@@ -48,14 +49,27 @@ const formatDate = (date) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Moderasi Komentar Produk Hukum
-            </h2>
+            <HeadingMenu title="Moderasi Komentar Produk Hukum" :hasRightContent="false">
+                <template #icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="37" height="38" viewBox="0 0 37 38" fill="none">
+                        <mask id="mask0_1448_7519" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
+                            width="37" height="38">
+                            <rect y="0.5" width="37" height="37" fill="#D9D9D9" />
+                        </mask>
+                        <g mask="url(#mask0_1448_7519)">
+                            <path
+                                d="M27.75 32.8753L25.5917 30.717L28.0198 28.2503H21.5833V25.167H28.0198L25.5917 22.7003L27.75 20.542L33.9167 26.7087L27.75 32.8753ZM4.625 32.8753V9.75033C4.625 8.90241 4.92691 8.17654 5.53073 7.57272C6.13455 6.9689 6.86042 6.66699 7.70833 6.66699H26.2083C27.0562 6.66699 27.7821 6.9689 28.3859 7.57272C28.9898 8.17654 29.2917 8.90241 29.2917 9.75033V17.5743C29.0347 17.5229 28.7778 17.4908 28.5208 17.4779C28.2639 17.4651 28.0069 17.4587 27.75 17.4587C25.1549 17.4587 22.9644 18.358 21.1786 20.1566C19.3929 21.9552 18.5 24.1392 18.5 26.7087C18.5 26.9656 18.5064 27.2225 18.5193 27.4795C18.5321 27.7364 18.5642 27.9934 18.6156 28.2503H9.25L4.625 32.8753Z"
+                                fill="#4C7660" />
+                        </g>
+                    </svg>
+
+                </template>
+            </HeadingMenu>
         </template>
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-sm  ">
                     <div class="p-6">
                         <!-- Comments List -->
                         <div class="space-y-6">
