@@ -40,7 +40,7 @@ Route::prefix('produk-hukum')->group(function () {
     })->name('produk-hukum');
 
     Route::get('/{slug}', function ($slug) {
-        return Inertia::render('FrontEnd/ProdukHukumDetail', [
+        return Inertia::render('FrontEnd/ProdukHukumDetailTest', [
             'slug' => $slug
         ]);
     })->name('produk-hukum.show');
