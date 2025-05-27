@@ -1,10 +1,22 @@
 <?php
 
-use App\Models\News;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\InstallController;
+
+// routes/web.php
+
+Route::prefix('install')->name('install.')->group(function () {
+    Route::get('/', [InstallController::class, 'index'])->name('index');
+    Route::get('/requirements', [InstallController::class, 'requirements'])->name('requirements');
+    Route::get('/permissions', [InstallController::class, 'permissions'])->name('permissions');
+    Route::get('/database', [InstallController::class, 'database'])->name('database');
+    Route::post('/database', [InstallController::class, 'setDatabase'])->name('setDatabase');
+    Route::get('/admin', [InstallController::class, 'admin'])->name('admin');
+    Route::post('/admin', [InstallController::class, 'setAdmin'])->name('setAdmin');
+    Route::get('/finish', [InstallController::class, 'finish'])->name('finish');
+});
+
 
 Route::get('/', function () {
     return Inertia::render('FrontEnd/HomeView');
