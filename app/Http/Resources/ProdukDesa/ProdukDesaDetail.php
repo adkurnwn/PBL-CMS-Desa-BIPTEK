@@ -17,6 +17,7 @@ class ProdukDesaDetail extends JsonResource
         return [
             'name' => $this->product_name,
             'price' => 'Rp ' . number_format($this->price, 0, ',', '.'),
+            'nama_penjual' => $this->nama_penjual,
             'alamat' => $this->alamat_penjual,
             'phone' => $this->kontak_penjual,
             'description' => $this->description,

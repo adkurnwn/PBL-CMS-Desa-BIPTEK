@@ -412,11 +412,7 @@ onMounted(() => {
                                 </span> -->
 
                                     <!-- Content -->
-                                    <div
-                                        class="text-sm lg:text-lg text-semiBlack"
-                                    >
-                                        {{ news.content }}
-                                    </div>
+                                    <div class="text-sm lg:text-lg text-semiBlack" v-html="news.content"></div>
 
                                     <!-- Back Button -->
                                     <!-- <div class="mt-8">

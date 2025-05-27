@@ -50,8 +50,17 @@ Route::get('/event-test', function () {
     return Inertia::render('FrontEnd/EventListTest');
 })->name('event-test');
 
-Route::get('/laporan-dana-desa', function () {
-    return Inertia::render('FrontEnd/LaporanDana');
+
+Route::prefix('laporan-dana-desa')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('FrontEnd/LaporanDana');
+    })->name('dana-desa');
+
+    Route::get('/{slug}', function ($slug) {
+        return Inertia::render('FrontEnd/LaporanDanaDetail', [
+            'slug' => $slug
+        ]);
+    })->name('dana-desa.show');
 });
 
 

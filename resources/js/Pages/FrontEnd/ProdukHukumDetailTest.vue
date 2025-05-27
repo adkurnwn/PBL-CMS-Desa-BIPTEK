@@ -126,11 +126,11 @@
             </div> -->
 
             <!-- Back Button -->
-            <!-- <div class="mt-8">
+            <div class="mt-8">
               <Link href="/produk-hukum-test" class="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Documents List
               </Link>
-            </div> -->
+            </div>
         </div>
 
         <div class="mt-12">

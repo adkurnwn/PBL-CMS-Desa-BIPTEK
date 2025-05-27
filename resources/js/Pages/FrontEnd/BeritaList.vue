@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted,computed } from "vue";
 import axios from "axios";
 
 const news = ref([]);
