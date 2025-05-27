@@ -89,8 +89,9 @@ onMounted(fetchData());
                         :produkDesa="produkDesa"
                     />
                 </div>
-                <h1
+                <a
                     class="flex text-secondary xl:text-xl sm:text-lg text-xs justify-end mt-3"
+                    href="/produk-unggulan"
                 >
                     Selengkapnya
                     <svg
@@ -104,7 +105,7 @@ onMounted(fetchData());
                             d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
                         />
                     </svg>
-                </h1>
+                </a>
             </article>
             <!--Layanan Publik-->
             <article
