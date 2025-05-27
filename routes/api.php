@@ -23,9 +23,7 @@ Route::get('villages/{district_id}', [RegionController::class, 'getVillages']);
 
 Route::prefix('profile')->group(function () {
     Route::get('/layout', [ProfileController::class, 'layout']);
-    Route::get('/home', [ProfileController::class, 'landingPage']);
     Route::get('/profile', [ProfileController::class, 'profilePage']);
-    Route::get('/layanan', [ProfileController::class, 'layananPage']);
 });
 
 Route::prefix('users')->group(function () {

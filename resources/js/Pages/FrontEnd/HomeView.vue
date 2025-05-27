@@ -4,56 +4,57 @@ import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
-import { useApiCache } from '@/Composables/UseApiCache';
+import useApiFetch from '@/Utility/useApiFetch';
 
-const home = ref({});
 const events = ref([]);
 const news = ref([]);
 const gallery = ref({});
 const produkDesa = ref([]);
-const loading = ref(true);
 
 const fetchData = async () => {
-  const homeApi = useApiCache('homeData', '/api/profile/home');
-  const eventApi = useApiCache('eventData', '/api/events/preview');
-  const newsApi = useApiCache('newsData', '/api/news/preview');
-  const galleryApi = useApiCache('galleryData', '/api/gallery/highlight');
-  const produkApi = useApiCache('produkData', '/api/produk-desa/preview');
+    const eventApi = useApiFetch();
+    const newsApi = useApiFetch();
+    const galleryApi = useApiFetch();
+    const produkApi = useApiFetch();
 
-  try {
-    const [homeRes, eventsRes, newsRes, galleryRes, produkRes] = await Promise.all([
-      homeApi.fetchWithCache(),
-      eventApi.fetchWithCache(),
-      newsApi.fetchWithCache(),
-      galleryApi.fetchWithCache(),
-      produkApi.fetchWithCache()
+    const eventsLoading = ref(true);
+    const newsLoading = ref(true);
+    const galleryLoading = ref(true);
+    const produkLoading = ref(true);
+
+    await Promise.all([
+      eventApi.fetchData('/api/events/preview'),
+      newsApi.fetchData('/api/news/preview'),
+      galleryApi.fetchData('/api/gallery/highlight'),
+      produkApi.fetchData('/api/produk-desa/preview')
     ]);
 
-    home.value = homeRes;
-    events.value = eventsRes;
-    news.value = newsRes;
-    gallery.value = galleryRes;
-    produkDesa.value = produkRes;
-  } catch (e) {
-    console.error('Fetch error:', e);
-  } finally {
-    loading.value = false;
-  }
+    events.value = eventApi.data.value || [];
+    news.value = newsApi.data.value || [];
+    gallery.value = galleryApi.data.value || {};
+    produkDesa.value = produkApi.data.value || [];
+
+    eventsLoading.value = eventApi.loading.value;
+    newsLoading.value = newsApi.loading.value;
+    galleryLoading.value = galleryApi.loading.value;
+    produkLoading.value = produkApi.loading.value;
 };
 
-onMounted(fetchData);
+onMounted(() => {
+  fetchData();
+});
 </script>
 <!-- Homeview.vue -->
 <template>
-  <UserLayout>
+  <UserLayout v-slot="{ layout }">
     <header class="relative flex flex-col items-center justify-center w-full h-screen bg-red-100">
-      <img :src="`/storage/${home.hero_image}`" alt="Hero Image" class="absolute z-0 w-full h-screen object-cover" />
+      <img :src="`/storage/${layout.hero_image}`" alt="Hero Image" class="absolute z-0 w-full h-screen object-cover" />
       <div class="absolute bg-black z-0 w-full h-screen opacity-60">
 
       </div>
       <div class="absolute z-10 font-merriweather text-type1 mt-4 px-6 md:px-0">
         <h1 class=" justify-center items-center text-center text-4xl md:text-6xl font-semibold">Selamat Datang</h1>
-        <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber informasi terbaru tentang pemerintahan di {{ home.name }}</h2>
+        <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
       </div>
     </header>
     <main class="max-w-screen-2xl mx-auto w-full">
@@ -62,7 +63,7 @@ onMounted(fetchData);
         <!-- Text Section -->
         <section class="flex flex-col  w-2/3 space-y-3 md:mx-8">
           <h1 class="text-xl md:text-3xl font-semibold text-accent2 text-center lg:text-left">
-            Selamat datang di website resmi Pemerintah {{ home.name }}!
+            Selamat datang di website resmi Pemerintah {{ layout.name }}!
           </h1>
           <div class="space-y-3 md:text-xl text-semiBlack text-justify font-thin">
             <p>
@@ -88,7 +89,14 @@ onMounted(fetchData);
         </h1>
 
         <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
+            <div v-if="newsLoading" class="text-center w-full">
+                <p>Memuat berita...</p>
+            </div>
+            <div v-else-if="news.length === 0" class="text-center w-full">
+                <p>Tidak ada berita terbaru</p>
+            </div>
           <NewsCard
+              v-else
               v-for="newsItem in news"
               :key="newsItem.id"
               :href="`/berita/${newsItem.slug}`"
@@ -135,7 +143,7 @@ onMounted(fetchData);
         </h2>
 
         <!-- Loading state -->
-        <div v-if="homeLoading" class="flex justify-center py-8">
+        <div v-if="!gallery || Object.keys(gallery).length === 0" class="text-center py-8">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent2"></div>
         </div>
 
@@ -196,7 +204,14 @@ onMounted(fetchData);
           <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
         </h2>
         <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2 w-max-full">
+            <div v-if="eventsLoading" class="text-center w-full col-span-2">
+                <p>Memuat produk unggulan...</p>
+            </div>
+            <div v-else-if="produkDesa.length === 0" class="text-center w-full col-span-2">
+                <p>Tidak ada produk unggulan</p>
+            </div>
           <ProductCard
+          v-else
           v-for="produkDesa in produkDesa"
                 :key="produkDesa.id"
                 :produkDesa="produkDesa"
@@ -231,7 +246,7 @@ onMounted(fetchData);
             </div>
           </div>
 
-          <a v-if="home.produk_hukum" href="/produk-hukum" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+          <a v-if="layout.produk_hukum" href="/produk-hukum" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
               <div>
                 <svg xmlns=w3.org/2000/svg height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">
@@ -245,7 +260,7 @@ onMounted(fetchData);
               </div>
             </div>
           </a>
-          <a v-if="home.dana_desa" href="/dana-desa" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+          <a v-if="layout.dana_desa" href="/dana-desa" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
             <div class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
               <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" class="text-accent1">
                 <path d="M450-240h60v-40h60q12.75 0 21.38-8.63Q600-297.25 600-310v-130q0-12.75-8.62-21.38Q582.75-470 570-470H420v-70h180v-60h-90v-40h-60v40h-60q-12.75 0-21.37 8.62Q360-582.75 360-570v130q0 12.75 8.63 21.37Q377.25-410 390-410h150v70H360v60h90v40ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h341l239 239v501q0 24-18 42t-42 18H220Zm0-60h520v-474L534-820H220v680Zm0 0v-680 680Z"/>

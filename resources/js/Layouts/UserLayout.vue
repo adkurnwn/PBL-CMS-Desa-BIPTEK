@@ -3,21 +3,14 @@ import Feedback from "@/Components/Feedback.vue";
 import Navbar from "../Components/Navbar.vue";
 import Footer from "@/Components/Footer.vue";
 import { ref, onMounted, provide } from "vue";
-import { useApiCache } from "@/Composables/UseApiCache";
+import { useApiCache } from "@/Utility/useApiCache";
 
 const layout = ref({});
-const loading = ref(true);
 
 const fetchData = async () => {
     const layoutApi = useApiCache("layoutData", "/api/profile/layout");
-    try {
-        const response = await layoutApi.fetchWithCache();
-        layout.value = response;
-    } catch (error) {
-        console.error("Error fetching layout data:", error);
-    } finally {
-        loading.value = false;
-    }
+    await layoutApi.fetchWithCache();
+    layout.value = layoutApi.data.value || {};
 };
 
 onMounted(fetchData);
@@ -33,7 +26,7 @@ provide("layout", layout);
             </div>
 
             <!-- Page Content -->
-            <slot />
+            <slot :layout="layout"></slot>
 
             <Feedback />
             <Footer :layout="layout" />

@@ -1,100 +1,56 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
+import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
 import { ref, onMounted } from "vue";
-import useApiFetch from "@/Composables/useApiFetch";
+import useFilter from "@/Utility/useFilter";
 
 const news = ref([]);
 const categories = ref([]);
-const loading = ref(true);
 const error = ref(null);
 const pagination = ref(null);
-const searchQuery = ref("");
-const selectedCategory = ref("Semua");
-
 const newsApi = useApiFetch();
 const categoriesApi = useApiFetch();
 
+const {
+    searchQuery,
+    selectedCategory,
+    handleSearch,
+    selectCategory,
+    goToPage,
+} = useFilter(fetchNews);
+
 async function fetchNews({ search = "", category = null, page = 1 } = {}) {
-    try {
-        loading.value = true;
-        error.value = null;
+    const newsLoading = ref(true);
+    const params = new URLSearchParams();
 
-        const params = new URLSearchParams();
-
-        if (search) params.append("search", search);
-        if (category && category !== "Semua") {
-            if (category === "Populer") {
-                params.append("sort", "views");
-            } else {
-                params.append("category", category);
-            }
-        }
-        params.append("page", page);
-
-        const response = await fetch(`/api/news?${params.toString()}`);
-        const result = await response.json();
-
-        if (result.success) {
-            news.value = result.data;
-            pagination.value = {
-                current_page: result.meta.current_page,
-                last_page: result.meta.last_page,
-                total: result.meta.total,
-            };
+    if (search) params.append("search", search);
+    if (category && category !== "Semua") {
+        if (category === "Populer") {
+            params.append("sort", "views");
         } else {
-            error.value = result.message || "Gagal memuat berita";
-            console.error("Gagal memuat berita:", result.message);
+            params.append("category", category);
         }
-    } catch (err) {
-        error.value = "Terjadi kesalahan saat memuat berita";
-        console.error("Error fetching news:", err);
-    } finally {
-        loading.value = false;
     }
+    params.append("page", page);
+
+    await newsApi.fetchData(`/api/news?${params.toString()}`);
+
+    if (newsApi.data.value) {
+        news.value = newsApi.data.value;
+        pagination.value = newsApi.pagination.value;
+    }
+
+    error.value = newsApi.error.value;
+    newsLoading.value = newsApi.loading.value;
 }
 
 const fetchCategories = async () => {
-    try {
-        const response = await axios.get("/api/categories?type=1");
-        categories.value = response.data.data;
-    } catch (err) {
-        console.error("Error fetching categories:", err);
-    }
-};
-
-// Function to handle search button click
-const handleSearch = () => {
-    fetchNews({
-        search: searchQuery.value,
-        category:
-            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
-    });
-};
-
-// Function to handle category selection
-const selectCategory = (category) => {
-    selectedCategory.value = category;
-    fetchNews({
-        search: searchQuery.value,
-        category: category !== "Semua" ? category : null,
-    });
-};
-
-// Function to handle pagination
-const goToPage = (page) => {
-    fetchNews({
-        search: searchQuery.value,
-        category:
-            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
-        page,
-    });
-    // Scroll to top when changing pages
-    window.scrollTo(0, 0);
+    await categoriesApi.fetchData("/api/categories?type=1");
+    categories.value = categoriesApi.data.value;
 };
 
 onMounted(() => {
-    // Initial data fetch without parameters
     fetchNews();
     fetchCategories();
 });
@@ -198,7 +154,7 @@ onMounted(() => {
             <article>
                 <!-- Loading State -->
                 <div
-                    v-if="loading"
+                    v-if="newsLoading"
                     class="flex justify-center items-center py-12"
                 >
                     <div

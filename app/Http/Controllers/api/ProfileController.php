@@ -44,48 +44,6 @@ class ProfileController extends Controller
         }
     }
 
-    public function landingPage()
-    {
-        try {
-            $data = Cache::remember('profile.landing', 1200, function () {
-                $profile = Profile::latest()->first();
-
-                if (!$profile) {
-                    return null;
-                }
-
-                return [
-                    'profile' => $profile,
-                    'produk_hukum' => ProdukHukum::exists(),
-                    'dana_desa' => DanaDesa::exists(),
-                ];
-            });
-
-            if (!$data) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Profile data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'name' => $data['profile']->name,
-                    'hero_image' => json_decode($data['profile']->hero_images)[0],
-                    'produk_hukum' => $data['produk_hukum'],
-                    'dana_desa' => $data['dana_desa'],
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function profilePage()
     {
         try {
@@ -103,49 +61,6 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => new ProfileDetail($profile)
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function layananPage()
-    {
-        try {
-            $data = Cache::remember('profile.layanan', 1200, function () {
-                $profile = Profile::latest()->first();
-
-                if (!$profile) {
-                    return null;
-                }
-
-                return [
-                    'profile' => $profile,
-                    'produk_hukum' => ProdukHukum::exists(),
-                    'dana_desa' => DanaDesa::exists(),
-                    'demografi' => Demografi::exists(),
-                ];
-            });
-
-            if (!$data) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Profile data not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'name' => $data['profile']->name,
-                    'produk_hukum' => $data['produk_hukum'],
-                    'dana_desa' => $data['dana_desa'],
-                    'demografi' => $data['demografi'],
-                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

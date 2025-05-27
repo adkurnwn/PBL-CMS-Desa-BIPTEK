@@ -1,32 +1,24 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import ProductCard from "@/Components/ProductCard.vue";
+import useApiFetch from "@/Utility/useApiFetch";
 import { ref, onMounted } from "vue";
 
-const loading = ref(false);
-const desa = ref({});
 const produkDesa = ref({});
+
 const fetchData = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get("/api/produk-desa/preview");
-        const desaResponse = await axios.get("/api/profile/layanan");
-        desa.value = desaResponse.data.data || {};
-        produkDesa.value = response.data.data || {};
-        loading.value = false;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        loading.value = false;
-    }
+    const produkDesaLoading = ref(true);
+    const produkDesaApi = useApiFetch();
+    await produkDesaApi.fetchData("/api/produk-desa");
+    produkDesa.value = produkDesaApi.data.value || [];
+    produkDesaLoading.value = produkDesaApi.loading.value;
 };
 
-onMounted(() => {
-    fetchData();
-});
+onMounted(fetchData());
 </script>
 <!-- Homeview.vue -->
 <template>
-    <UserLayout>
+    <UserLayout v-slot="{ layout }">
         <main
             class="flex flex-col items-center justify-center max-w-7xl mx-auto w-full font-merriweather"
         >
@@ -45,12 +37,12 @@ onMounted(() => {
                     <h1
                         class="text-accent2 font-bold xl:text-3xl sm:text-xl text-md"
                     >
-                        Layanan Publik {{ desa.name }}
+                        Layanan Publik {{ layout.name }}
                     </h1>
                     <p class="text-accent1 xl:text-xl sm:text-lg text-xs">
                         Kami berkomitmen untuk memberikan layanan yang
                         transparan, informatif, dan bermanfaat bagi seluruh
-                        masyarakat {{ desa.name }}.
+                        masyarakat {{ layout.name }}.
                     </p>
                     <p class="text-accent1 xl:text-xl sm:text-lg text-xs">
                         Masyarakat dapat menemukan informasi mengenai Laporan
@@ -78,7 +70,20 @@ onMounted(() => {
                 <div
                     class="grid grid-cols-2 gap-1 xl:flex xl:flex-row justify-center -m-1 mt-1"
                 >
+                    <div
+                        v-if="produkDesaLoading"
+                        class="text-center w-full col-span-2"
+                    >
+                        <p>Memuat produk desa...</p>
+                    </div>
+                    <div
+                        v-else-if="produkDesa.length === 0"
+                        class="text-center w-full col-span-2"
+                    >
+                        <p>Produk desa tidak tersedia.</p>
+                    </div>
                     <ProductCard
+                        v-else
                         v-for="produkDesa in produkDesa"
                         :key="produkDesa.id"
                         :produkDesa="produkDesa"
@@ -123,7 +128,7 @@ onMounted(() => {
                 >
                     <!-- Grid 1 -->
                     <div
-                        v-if="desa.produk_hukum"
+                        v-if="layout.produk_hukum"
                         class="bg-secondary text-accent1 text-center p-4 rounded-lg shadow-lg xl:w-8/12 sm:w-64 w-72 xl:h-40 sm:h-40 h-32"
                     >
                         <svg
@@ -150,7 +155,7 @@ onMounted(() => {
                     </div>
                     <!-- Grid 2 -->
                     <div
-                        v-if="desa.dana_desa"
+                        v-if="layout.dana_desa"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-40 sm:h-40 h-32 text-center"
                     >
                         <svg
@@ -177,7 +182,7 @@ onMounted(() => {
                     </div>
                     <!-- Grid 3 -->
                     <div
-                        v-if="desa.demografi"
+                        v-if="layout.demografi"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-40 sm:h-40 h-32 text-center"
                     >
                         <svg
