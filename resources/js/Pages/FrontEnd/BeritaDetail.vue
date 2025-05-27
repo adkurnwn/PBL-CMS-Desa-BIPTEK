@@ -2,8 +2,9 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted, watch } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
-import axios from "axios";
 import Comment from "@/Components/Comment.vue";
+import useApiFetch from "@/Utility/useApiFetch";
+import useComments from "@/Utility/useComments";
 
 const props = defineProps({
     slug: {
@@ -15,260 +16,65 @@ const props = defineProps({
 const news = ref({});
 const loading = ref(true);
 const error = ref(null);
-const comments = ref([]);
-const submitting = ref(false);
-const commentForm = ref({
-    nama_user: "",
-    komentar: "",
-    id_berita: props.slug,
-    captcha: "",
-});
-const replyForm = ref({
-    nama_user: "",
-    komentar: "",
-    id_berita: props.slug,
-    id_ref_komentar: null,
-    captcha: "",
-});
-const activeReplyId = ref(null);
-const mainCaptchaData = ref(null);
-const replyCaptchaData = ref(null);
-const mainCaptchaCode = ref("");
-const replyCaptchaCode = ref("");
 
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
-};
-
-const truncateText = (text, length) => {
-    if (!text) return "";
-    return text.length > length ? text.substring(0, length) + "..." : text;
-};
-
-const getAvatar = (name) => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        name
-    )}&background=random`;
-};
-
-const activeTab = ref("terkini"); // Default to "Terkini"
-const relatedNews = ref([]);
-const relatedNewsLoading = ref(true);
-
+// News fetch logic
+const newsApi = useApiFetch();
 const fetchNewsDetail = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get(`/api/news/${props.slug}`);
-        news.value = response.data.data;
-    } catch (err) {
-        error.value = "Failed to load news";
-        console.error("Error fetching news:", err);
-    } finally {
-        loading.value = false;
-    }
+    await newsApi.fetchData(`/api/news/${props.slug}`);
+    news.value = newsApi.data.value || {};
+    error.value = newsApi.error.value;
+    loading.value = newsApi.loading.value;
 };
 
+// Related news logic
+const activeTab = ref("terkini");
+const relatedNewsApi = useApiFetch();
+const relatedNewsLoading = ref(true);
+const relatedNews = ref([]);
 const fetchRelatedNews = async () => {
-    try {
-        relatedNewsLoading.value = true;
-        const response = await axios.get("/api/news");
-        let newsData = response.data.data;
+    relatedNewsLoading.value = true;
 
-        // Sort the news based on the active tab
-        if (activeTab.value === "terkini") {
-            // Sort by latest (descending by created_at)
-            newsData = newsData.sort(
-                (a, b) => new Date(b.created_at) - new Date(a.created_at)
-            );
-        } else if (activeTab.value === "populer") {
-            // Sort by most views (descending by views)
-            newsData = newsData.sort((a, b) => b.views - a.views);
-        }
+    const endpoint =
+        activeTab.value === "populer"
+            ? "/api/news/preview?sort=views&limit=6"
+            : "/api/news/preview?limit=6";
 
-        relatedNews.value = Array.isArray(newsData) ? newsData.slice(0, 6) : [];
-    } catch (err) {
-        console.error("Error fetching related news:", err);
-    } finally {
-        relatedNewsLoading.value = false;
+    await relatedNewsApi.fetchData(endpoint);
+
+    if (relatedNewsApi.data.value) {
+        relatedNews.value = relatedNewsApi.data.value || [];
     }
+
+    relatedNewsLoading.value = relatedNewsApi.loading.value;
 };
 
 watch(activeTab, fetchRelatedNews);
-const fetchComments = async () => {
-    try {
-        const response = await axios.get(`/api/comments/${props.slug}`);
-        // Only map top-level comments (those without parent)
-        comments.value = response.data
-            .filter((comment) => !comment.id_ref_komentar)
-            .map((comment) => ({
-                ...comment,
-                showReplies: false,
-                replies: [],
-            }));
-    } catch (err) {
-        console.error("Error fetching comments:", err);
-    }
-};
 
-const refreshCaptcha = async (type = "main") => {
-    try {
-        const response = await axios.get("/captcha/api/default");
-        if (type === "main") {
-            mainCaptchaData.value = response.data;
-            mainCaptchaCode.value = response.data.code;
-        } else {
-            replyCaptchaData.value = response.data;
-            replyCaptchaCode.value = response.data.code;
-        }
-    } catch (err) {
-        console.error("Error loading captcha:", err);
-    }
-};
-
-const submitComment = async () => {
-    try {
-        submitting.value = true;
-        const response = await axios.post("/api/comments", {
-            ...commentForm.value,
-            captcha: commentForm.value.captcha,
-            code: mainCaptchaCode.value,
-        });
-
-        if (!news.value.is_moderate) {
-            await fetchComments();
-        }
-
-        commentForm.value.komentar = "";
-        commentForm.value.captcha = "";
-        alert(response.data.message);
-    } catch (err) {
-        console.error("Error submitting comment:", err);
-        await refreshCaptcha("main"); // Refresh on error
-        commentForm.value.captcha = ""; // Clear invalid captcha
-        alert(err.response?.data?.message || "Failed to submit comment");
-    } finally {
-        submitting.value = false;
-    }
-};
-
-const showReplyForm = (commentId) => {
-    activeReplyId.value = commentId;
-    replyForm.value = {
-        nama_user: "",
-        komentar: "",
-        id_berita: props.slug,
-        id_ref_komentar: commentId,
-        captcha: "",
-    };
-    refreshCaptcha("reply"); // Get new captcha for reply form
-};
-
-const cancelReply = () => {
-    activeReplyId.value = null;
-    replyForm.value = {
-        nama_user: "",
-        komentar: "",
-        id_berita: props.slug,
-        id_ref_komentar: null,
-        captcha: "",
-    };
-};
-
-const submitReply = async (commentId) => {
-    try {
-        submitting.value = true;
-        const response = await axios.post("/api/comments", {
-            ...replyForm.value,
-            captcha: replyForm.value.captcha,
-            code: replyCaptchaCode.value,
-        });
-
-        if (!news.value.is_moderate) {
-            await fetchComments();
-        }
-
-        cancelReply();
-        alert(response.data.message);
-    } catch (err) {
-        console.error("Error submitting reply:", err);
-        await refreshCaptcha("reply"); // Refresh on error
-        replyForm.value.captcha = ""; // Clear invalid captcha
-        alert(err.response?.data?.message || "Failed to submit reply");
-    } finally {
-        submitting.value = false;
-    }
-};
-
-const getParentUser = (reply) => {
-    return reply.parent_user || "Unknown";
-};
-
-const loadReplies = async (comment) => {
-    if (comment.showReplies) {
-        comment.showReplies = false;
-        return;
-    }
-
-    try {
-        const response = await axios.get(
-            `/api/comments/${props.slug}/replies/${comment.id}`
-        );
-
-        // Create a map of all replies
-        const repliesMap = new Map();
-        response.data.forEach((reply) => {
-            repliesMap.set(reply.id, { ...reply, replies: [] });
-        });
-
-        // Build reply tree
-        response.data.forEach((reply) => {
-            const replyObj = repliesMap.get(reply.id);
-            if (reply.id_ref_komentar === comment.id) {
-                // Direct replies to main comment
-                if (!comment.replies) comment.replies = [];
-                comment.replies.push(replyObj);
-            } else {
-                // Nested replies
-                const parentReply = repliesMap.get(reply.id_ref_komentar);
-                if (parentReply) {
-                    if (!parentReply.replies) parentReply.replies = [];
-                    parentReply.replies.push(replyObj);
-                }
-            }
-        });
-
-        comment.showReplies = true;
-    } catch (err) {
-        console.error("Error loading replies:", err);
-        alert("Failed to load replies");
-    }
-};
-
-const getAllDeeperReplies = (reply) => {
-    let allReplies = [];
-
-    const collectReplies = (r) => {
-        if (r.replies?.length) {
-            r.replies.forEach((nestedReply) => {
-                allReplies.push(nestedReply);
-                collectReplies(nestedReply);
-            });
-        }
-    };
-
-    collectReplies(reply);
-    return allReplies;
-};
+// Use the comments helper with 'news' type
+const { 
+    comments, 
+    commentForm, 
+    replyForm,
+    submitting,
+    activeReplyId,
+    mainCaptchaData,
+    replyCaptchaData,
+    getAvatar,
+    truncateText,
+    formatDate,
+    submitComment,
+    showReplyForm,
+    cancelReply,
+    submitReply,
+    loadReplies,
+    getAllDeeperReplies,
+    initialize: initializeComments
+} = useComments('news', props.slug, news.value?.is_moderate);
 
 onMounted(() => {
     fetchNewsDetail();
     fetchRelatedNews();
-    fetchComments();
-    refreshCaptcha("main");
+    initializeComments();
 });
 </script>
 

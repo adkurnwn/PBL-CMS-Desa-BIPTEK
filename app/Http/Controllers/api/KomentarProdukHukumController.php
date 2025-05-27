@@ -67,7 +67,7 @@ class KomentarProdukHukumController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'id_produk_hukum' => 'required|exists:produk_hukum,id',
+            'id_produk_hukum' => 'required|string',
             'nama_user' => 'required|string|max:50',
             'komentar' => 'required|string',
             'id_ref_komentar' => 'nullable|exists:komentar_produk_hukum,id',
@@ -78,10 +78,10 @@ class KomentarProdukHukumController extends Controller
             'captcha.captcha_api' => 'Invalid captcha code'
         ]);
 
-        $produkhukum = ProdukHukum::findOrFail($request->id_produk_hukum);
+        $produkhukum = ProdukHukum::where('slug', $request->id_produk_hukum)->firstOrFail();
 
         $comment = KomentarProdukHukum::create([
-            'id_produk_hukum' => $request->id_produk_hukum,
+            'id_produk_hukum' => $produkhukum->id,
             'nama_user' => $request->nama_user,
             'komentar' => $request->komentar,
             'id_ref_komentar' => $request->id_ref_komentar,

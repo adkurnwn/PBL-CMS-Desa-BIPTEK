@@ -1,8 +1,9 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
-import { Link } from "@inertiajs/vue3";
 import axios from "axios";
+import useComments from "@/Utility/useComments";
+import useApiFetch from "@/Utility/useApiFetch";
 
 const props = defineProps({
     slug: {
@@ -14,34 +15,34 @@ const props = defineProps({
 const dokumen = ref({});
 const loading = ref(true);
 const error = ref(null);
+const dokumenApi = useApiFetch();
 
-const comments = ref([]);
-const submitting = ref(false);
-const activeReplyId = ref(null);
-const mainCaptchaData = ref(null);
-const replyCaptchaData = ref(null);
-const mainCaptchaCode = ref("");
-const replyCaptchaCode = ref("");
-const commentForm = ref({
-    nama_user: "",
-    komentar: "",
-    id_produk_hukum: props.id,
-    captcha: "",
-});
-const replyForm = ref({
-    nama_user: "",
-    komentar: "",
-    id_produk_hukum: props.id,
-    id_ref_komentar: null,
-    captcha: "",
-});
+// Use the comments helper with 'produk-hukum' type
+const {
+    comments,
+    commentForm,
+    replyForm,
+    submitting,
+    activeReplyId,
+    mainCaptchaData,
+    replyCaptchaData,
+    getAvatar,
+    truncateText,
+    formatDate,
+    submitComment,
+    showReplyForm,
+    cancelReply,
+    submitReply,
+    loadReplies,
+    getAllDeeperReplies,
+    initialize: initializeComments,
+} = useComments("produk-hukum", props.slug, dokumen.value?.is_moderate);
 
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+const fetchDokumen = async () => {
+    await dokumenApi.fetchData(`/api/produk-hukum/${props.slug}`);
+    dokumen.value = dokumenApi.data.value || {};
+    error.value = dokumenApi.error.value;
+    loading.value = dokumenApi.loading.value;
 };
 
 const isPreviewable = (filePath) => {
@@ -50,183 +51,9 @@ const isPreviewable = (filePath) => {
     return previewableExtensions.includes(`.${fileExtension}`);
 };
 
-const getAvatar = (name) => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        name
-    )}&background=random`;
-};
-
-const truncateText = (text, length) => {
-    if (!text) return "";
-    return text.length > length ? text.substring(0, length) + "..." : text;
-};
-
-const fetchDokumen = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get(`/api/produk-hukum/${props.slug}`);
-        dokumen.value = response.data.data;
-    } catch (err) {
-        error.value = "Gagal memuat dokumen";
-        console.error("Error fetching document:", err);
-    } finally {
-        loading.value = false;
-    }
-};
-
-const fetchComments = async () => {
-    try {
-        const response = await axios.get(
-            `/api/produk-hukum-comments/${props.id}`
-        );
-        comments.value = response.data
-            .filter((comment) => !comment.id_ref_komentar)
-            .map((comment) => ({
-                ...comment,
-                showReplies: false,
-                replies: [],
-            }));
-    } catch (err) {
-        console.error("Error fetching comments:", err);
-    }
-};
-
-const refreshCaptcha = async (type = "main") => {
-    try {
-        const response = await axios.get("/captcha/api/default");
-        if (type === "main") {
-            mainCaptchaData.value = response.data;
-            mainCaptchaCode.value = response.data.code;
-        } else {
-            replyCaptchaData.value = response.data;
-            replyCaptchaCode.value = response.data.code;
-        }
-    } catch (err) {
-        console.error("Error loading captcha:", err);
-    }
-};
-
-const submitComment = async () => {
-    try {
-        submitting.value = true;
-        const response = await axios.post("/api/produk-hukum-comments", {
-            ...commentForm.value,
-            code: mainCaptchaCode.value,
-        });
-
-        commentForm.value.komentar = "";
-        commentForm.value.nama_user = "";
-        commentForm.value.captcha = "";
-
-        if (!dokumen.value.is_moderate) {
-            await fetchComments();
-        }
-
-        alert(response.data.message);
-    } catch (err) {
-        console.error("Error submitting comment:", err);
-        commentForm.value.captcha = ""; // Clear captcha input
-        alert(err.response?.data?.message || "Gagal mengirim komentar");
-    } finally {
-        submitting.value = false;
-        refreshCaptcha("main"); // Always refresh captcha after submit attempt
-    }
-};
-
-const showReplyForm = (commentId) => {
-    activeReplyId.value = commentId;
-    replyForm.value = {
-        nama_user: "",
-        komentar: "",
-        id_produk_hukum: props.id,
-        id_ref_komentar: commentId,
-        captcha: "",
-    };
-    refreshCaptcha("reply");
-};
-
-const cancelReply = () => {
-    activeReplyId.value = null;
-    replyForm.value = {
-        nama_user: "",
-        komentar: "",
-        id_produk_hukum: props.id,
-        id_ref_komentar: null,
-        captcha: "",
-    };
-};
-
-const submitReply = async (commentId) => {
-    try {
-        submitting.value = true;
-        const response = await axios.post("/api/produk-hukum-comments", {
-            ...replyForm.value,
-            code: replyCaptchaCode.value,
-        });
-
-        if (!dokumen.value.is_moderate) {
-            const comment = comments.value.find(
-                (c) => c.id === replyForm.value.id_ref_komentar
-            );
-            if (comment && comment.showReplies) {
-                await loadReplies(comment);
-            } else {
-                await fetchComments();
-            }
-        }
-
-        cancelReply();
-        alert(response.data.message);
-    } catch (err) {
-        console.error("Error submitting reply:", err);
-        replyForm.value.captcha = ""; // Clear captcha input
-        alert(err.response?.data?.message || "Gagal mengirim balasan");
-    } finally {
-        submitting.value = false;
-        refreshCaptcha("reply"); // Always refresh captcha after submit attempt
-    }
-};
-
-const loadReplies = async (comment) => {
-    if (comment.showReplies) {
-        comment.showReplies = false;
-        comment.replies = [];
-        return;
-    }
-
-    try {
-        const response = await axios.get(
-            `/api/produk-hukum-comments/${props.id}/replies/${comment.id}`
-        );
-
-        comment.replies = response.data;
-        comment.showReplies = true;
-    } catch (err) {
-        console.error("Error loading replies:", err);
-        alert("Gagal memuat balasan");
-    }
-};
-
-const getAllDeeperReplies = (reply) => {
-    let allReplies = [];
-
-    const collectReplies = (r) => {
-        if (r.replies && Array.isArray(r.replies)) {
-            r.replies.forEach((nestedReply) => {
-                allReplies.push(nestedReply);
-                collectReplies(nestedReply);
-            });
-        }
-    };
-
-    collectReplies(reply);
-    return allReplies;
-};
-
 onMounted(() => {
     fetchDokumen();
-    fetchComments();
-    refreshCaptcha("main");
+    initializeComments();
 });
 </script>
 
@@ -385,7 +212,7 @@ onMounted(() => {
 
                     <!-- Back Button -->
                     <!-- <div class="mt-8">
-              <Link href="/produk-hukum-test" class="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/produk-hukum" class="text-blue-600 hover:text-blue-800 font-medium">
                 ← Back to Documents List
               </Link>
             </div> -->
