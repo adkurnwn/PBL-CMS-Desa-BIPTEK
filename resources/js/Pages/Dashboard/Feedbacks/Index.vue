@@ -70,7 +70,7 @@ const sortDirection = ref(props.direction || 'desc');
 // Table headers for feedback data
 const tableHeaders = [
     {
-        label: 'Judul',
+        label: 'Komentar Pengguna',
         field: 'judul',
         sortable: true,
         nowrap: false,
@@ -81,7 +81,7 @@ const tableHeaders = [
         label: 'Tanggal',
         field: 'created_at',
         sortable: true,
-        width: '10%'
+        width: '15%'
     },
     {
         label: 'Status',
@@ -92,13 +92,13 @@ const tableHeaders = [
             { id: 'Menunggu', name: 'Menunggu' },
             { id: 'Ditanggapi', name: 'Ditanggapi' }
         ],
-        width: '10%'
+        width: '15%'
     },
     {
         label: 'Aksi',
         field: 'actions',
         sortable: false,
-        width: '10%'
+        width: '15%'
     },
 ];
 
@@ -298,7 +298,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                         :white-background="true" empty-state-message="No feedbacks found"
                         @filter-changed="handleFilterChange" @sort="handleSort">
 
-                        <template #['item.Judul']="{ item }">
+                        <template #['item.Komentar_Pengguna']="{ item }">
                             <Feedbacks :name="item.nama_user" :title="item.judul" :description="item.isi"></Feedbacks>
                         </template>
 

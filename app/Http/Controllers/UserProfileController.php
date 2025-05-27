@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ProfileController extends Controller
+class UserProfileController extends Controller
 {
     /**
      * Display the user's profile form.

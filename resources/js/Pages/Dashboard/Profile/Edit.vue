@@ -115,11 +115,16 @@ const regencyName = ref('');
 const districtName = ref('');
 const villageName = ref('');
 
-// Modify the fetch methods to store the names
+// Modify the fetch methods to handle the API response structure
 const fetchProvinces = async () => {
     try {
         const response = await axios.get("/api/provinces");
-        provinces.value = response.data;
+        // Handle the response structure with success and data properties
+        if (response.data.success) {
+            provinces.value = response.data.data;
+        } else {
+            provinces.value = [];
+        }
         
         // Get the province name if we have a province ID
         if (props.profile.provinsi) {
@@ -133,6 +138,7 @@ const fetchProvinces = async () => {
         }
     } catch (error) {
         console.error("Error fetching provinces:", error);
+        provinces.value = [];
         loadingRegions.value = false;
     }
 };
@@ -145,7 +151,12 @@ const fetchRegencies = async (provinceId) => {
     
     try {
         const response = await axios.get(`/api/regencies/${provinceId}`);
-        regencies.value = response.data;
+        // Handle the response structure with success and data properties
+        if (response.data.success) {
+            regencies.value = response.data.data;
+        } else {
+            regencies.value = [];
+        }
         
         // Get the regency name if we have a regency ID
         if (props.profile.kabupaten) {
@@ -159,6 +170,7 @@ const fetchRegencies = async (provinceId) => {
         }
     } catch (error) {
         console.error("Error fetching regencies:", error);
+        regencies.value = [];
         loadingRegions.value = false;
     }
 };
@@ -171,7 +183,12 @@ const fetchDistricts = async (regencyId) => {
     
     try {
         const response = await axios.get(`/api/districts/${regencyId}`);
-        districts.value = response.data;
+        // Handle the response structure with success and data properties
+        if (response.data.success) {
+            districts.value = response.data.data;
+        } else {
+            districts.value = [];
+        }
         
         // Get the district name if we have a district ID
         if (props.profile.kecamatan) {
@@ -185,6 +202,7 @@ const fetchDistricts = async (regencyId) => {
         }
     } catch (error) {
         console.error("Error fetching districts:", error);
+        districts.value = [];
         loadingRegions.value = false;
     }
 };
@@ -197,7 +215,12 @@ const fetchVillages = async (districtId) => {
     
     try {
         const response = await axios.get(`/api/villages/${districtId}`);
-        villages.value = response.data;
+        // Handle the response structure with success and data properties
+        if (response.data.success) {
+            villages.value = response.data.data;
+        } else {
+            villages.value = [];
+        }
         
         // Get the village name if we have a village ID
         if (props.profile.kelurahan) {
@@ -209,6 +232,7 @@ const fetchVillages = async (districtId) => {
         loadingRegions.value = false;
     } catch (error) {
         console.error("Error fetching villages:", error);
+        villages.value = [];
         loadingRegions.value = false;
     }
 };
