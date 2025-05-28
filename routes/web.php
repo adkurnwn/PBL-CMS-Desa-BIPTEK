@@ -14,9 +14,14 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::post('/database', [InstallController::class, 'setDatabase'])->name('setDatabase');
     Route::get('/admin', [InstallController::class, 'admin'])->name('admin');
     Route::post('/admin', [InstallController::class, 'setAdmin'])->name('setAdmin');
+    Route::get('/setup-profile', [InstallController::class, 'setupProfile'])->name('setupProfile');
+    Route::post('/setup-profile', [InstallController::class, 'storeProfile'])->name('storeProfile');
     Route::get('/finish', [InstallController::class, 'finish'])->name('finish');
 });
 
+Route::fallback(function ($name = null) {
+    return app()->make(InstallController::class)->handleProfileNotFound($name);
+});
 
 Route::get('/', function () {
     return Inertia::render('FrontEnd/HomeView');

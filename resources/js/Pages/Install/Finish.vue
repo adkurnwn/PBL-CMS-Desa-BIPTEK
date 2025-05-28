@@ -15,7 +15,7 @@ import { Link } from "@inertiajs/vue3";
                     Instalasi Selesai
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 5/5: Website CMS Desa siap digunakan
+                    Langkah 6/6: Website CMS Desa siap digunakan
                 </h2>
             </div>
 
@@ -159,6 +159,14 @@ import { Link } from "@inertiajs/vue3";
                             class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
                         >
                             5
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">Admin</div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            6
                         </div>
                         <div class="text-xs mt-2 text-gray-600 font-bold">
                             Selesai

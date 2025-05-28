@@ -204,14 +204,114 @@ class InstallController extends Controller
         }
     }
 
+    public function setupProfile()
+    {
+        return Inertia::render('Install/SetupProfile');
+    }
+
     public function finish()
     {
+        // Check if profile exists
+        if (\App\Models\Profile::count() === 0) {
+            return redirect()->route('install.setupProfile')
+                ->with('warning', 'Please complete your village profile setup before finishing installation.');
+        }
+
         Artisan::call('storage:link', ['--force' => true]);
         Artisan::call('config:cache');
         Artisan::call('route:cache');
         Artisan::call('view:cache');
 
         return Inertia::render('Install/Finish');
+    }
+
+    /**
+     * Setup Profile Desa and handle not found errors
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'logo' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+            'provinsi' => 'required|string',
+            'kabupaten' => 'required|string',
+            'kecamatan' => 'required|string',
+            'kelurahan' => 'required|string',
+            'hero_images' => 'required|array',
+            'hero_images.*' => 'image|max:2048|mimes:jpg,jpeg,png',
+            'organization_image' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+            'history' => 'required|string',
+            'vision' => 'required|string',
+            'mission' => 'required|string',
+        ]);
+
+        try {
+            // Upload logo
+            $logoPath = $request->file('logo')->store('profile-logo', 'public');
+
+            // Upload organization image
+            $organizationImagePath = $request->file('organization_image')->store('organization-images', 'public');
+
+            // Upload hero images
+            $heroImages = [];
+            foreach ($request->file('hero_images') as $image) {
+                $heroImages[] = $image->store('hero-images', 'public');
+            }
+
+            // Create profile
+            $profile = \App\Models\Profile::create([
+                'id' => 1,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'logo' => $logoPath,
+                'provinsi' => $request->provinsi,
+                'kabupaten' => $request->kabupaten,
+                'kecamatan' => $request->kecamatan,
+                'kelurahan' => $request->kelurahan,
+                'hero_images' => json_encode($heroImages),
+                'organization_image' => $organizationImagePath,
+                'lembaga' => json_encode([]),
+                'fasilitas' => json_encode([]),
+                'history' => $request->history,
+                'vision' => $request->vision,
+                'mission' => $request->mission,
+                'primary_color' => '#000000',
+                'secondary_color' => '#000000',
+            ]);
+
+            return redirect()->route('install.finish');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to setup profile: ' . $e->getMessage()]);
+        }
+    }
+
+    public function handleProfileNotFound($name = null)
+    {
+        // Check if the system has been installed but profile doesn't exist
+        if (env('APP_INSTALLED') === 'true') {
+            if (\App\Models\Profile::count() === 0) {
+                // Redirect to profile setup if no profile exists
+                return redirect()->route('install.setupProfile')
+                    ->with('warning', 'Please complete your village profile setup first.');
+            }
+        }
+
+        // If system is not installed, redirect to installation
+        if (env('APP_INSTALLED') !== 'true') {
+            return redirect()->route('install.index');
+        }
+
+        // Generic not found response
+        return response()->view('errors.404', [
+            'message' => 'The requested resource "' . ($name ?? 'Unknown') . '" was not found.',
+            'suggestion' => 'Please check the URL or return to the dashboard.'
+        ], 404);
     }
 
     private function testConnection($host, $port, $username, $password, $database)
