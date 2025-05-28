@@ -23,7 +23,7 @@ class StoreProdukDesaRequest extends FormRequest
     {
         return [
             'product_name' => 'required|string|max:255',
-            'price' => 'required|decimal:0',
+            'price' => 'required|decimal:0|max:9999999999',
             'instagram' => 'nullable|url',
             'facebook' => 'nullable|url',
             'x' => 'nullable|url',

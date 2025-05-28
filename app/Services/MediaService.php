@@ -259,4 +259,34 @@ class MediaService
 
         return $images;
     }
+
+    public function renameExistingFile($existingFilePath, $newTitle, $path, $disk = 'public')
+    {
+        try {
+            $storage = Storage::disk($disk);
+
+            // Only proceed if the file exists
+            if (!$storage->exists($existingFilePath)) {
+                return $existingFilePath; // Return original path if file doesn't exist
+            }
+
+            // Get file extension from existing file
+            $extension = pathinfo($existingFilePath, PATHINFO_EXTENSION);
+
+            // Create new sanitized filename
+            $sanitizedTitle = str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $newTitle);
+            $newFilename = $sanitizedTitle . '.' . $extension;
+            $newFilePath = $path . '/' . $newFilename;
+
+            // Copy old file to new location
+            $storage->copy($existingFilePath, $newFilePath);
+
+            // Delete the old file
+            $storage->delete($existingFilePath);
+
+            return $newFilePath;
+        } catch (\Exception $e) {
+            return $existingFilePath; // Return original path in case of error
+        }
+    }
 }
