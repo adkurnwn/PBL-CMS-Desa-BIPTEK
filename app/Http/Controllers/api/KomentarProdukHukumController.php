@@ -13,7 +13,7 @@ class KomentarProdukHukumController extends Controller
     {
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        $comments = KomentarProdukHukum::where('id_produk_hukum', $slug)
+        $comments = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
             })
@@ -28,7 +28,7 @@ class KomentarProdukHukumController extends Controller
     {
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
 
-        $replies = KomentarProdukHukum::where('id_produk_hukum', $slug)
+        $replies = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->whereNotNull('id_ref_komentar')
             ->when($produkHukum->is_moderate, function ($query) {
                 $query->where('is_approved', true);
@@ -56,7 +56,7 @@ class KomentarProdukHukumController extends Controller
     {
         return $replies->map(function ($reply) {
             $reply->parent_user = $reply->parent ? $reply->parent->nama_user : 'Unknown';
-            $reply->replies_count = $this->countAllReplies($reply); // gunakan rekursif
+            $reply->replies_count = $this->countAllReplies($reply);
             if ($reply->replies && $reply->replies->count() > 0) {
                 $reply->replies = $this->addParentUserNames($reply->replies);
             }
@@ -67,7 +67,7 @@ class KomentarProdukHukumController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'id_produk_hukum' => 'required|exists:produk_hukum,id',
+            'id_produk_hukum' => 'required|string',
             'nama_user' => 'required|string|max:50',
             'komentar' => 'required|string',
             'id_ref_komentar' => 'nullable|exists:komentar_produk_hukum,id',
@@ -78,10 +78,10 @@ class KomentarProdukHukumController extends Controller
             'captcha.captcha_api' => 'Invalid captcha code'
         ]);
 
-        $produkhukum = ProdukHukum::findOrFail($request->id_produk_hukum);
+        $produkhukum = ProdukHukum::where('slug', $request->id_produk_hukum)->firstOrFail();
 
         $comment = KomentarProdukHukum::create([
-            'id_produk_hukum' => $request->id_produk_hukum,
+            'id_produk_hukum' => $produkhukum->id,
             'nama_user' => $request->nama_user,
             'komentar' => $request->komentar,
             'id_ref_komentar' => $request->id_ref_komentar,

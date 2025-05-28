@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Event\EventPreview;
 use App\Models\Event;
 use App\Models\EventEmails;
 use Illuminate\Http\Request;
@@ -10,7 +11,54 @@ use Illuminate\Support\Facades\Cache;
 
 class EventController extends Controller
 {
-    public function index() {}
+    public function index(Request $request)
+    {
+        try {
+            $search = $request->query('search');
+            $sort = $request->query('sort');
+
+            $query = Event::query();
+
+            // Search by title or content
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%');
+                });
+            }
+
+            if ($sort === 'terlama') {
+                $query->oldest();
+            } else {
+                $query->latest();
+            }
+
+            $events = $query->latest()->paginate(12);
+
+            if ($events->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No news found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => EventPreview::collection($events),
+                'meta' => [
+                    'current_page' => $events->currentPage(),
+                    'last_page' => $events->lastPage(),
+                    'per_page' => $events->perPage(),
+                    'total' => $events->total(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => app()->environment('production') ? null : $e->getMessage()
+            ], 500);
+        }
+    }
 
     public function setReminder(Request $request, Event $event)
     {

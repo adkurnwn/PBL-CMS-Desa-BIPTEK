@@ -33,45 +33,45 @@ class DanaDesaController extends Controller
         $sort = $request->input('sort', 'created_at');
         $direction = $request->input('direction', 'desc');
         $perPage = 25;
-        
+
         // Get filter parameters
         $filters = [];
         if ($request->has('year')) {
             $filters['year'] = $request->input('year');
         }
-        
+
         // Start building the query
         $query = DanaDesa::query();
-        
+
         // Apply search
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%");
             });
         }
-        
+
         // Apply year filter if provided
         if (isset($filters['year'])) {
             $query->whereYear('date', $filters['year']);
         }
-        
+
         // Apply sorting
         $query->orderBy($sort, $direction);
-        
+
         // Get paginated results - ensure to use the current page from request
         $page = $request->input('page', 1);
         $danaDesa = $query->paginate($perPage, ['*'], 'page', $page)->withQueryString();
-        
+
         // Get available years for the filter - using date column
         $availableYears = DanaDesa::select(DB::raw('YEAR(date) as year'))
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
-            ->map(function($year) {
+            ->map(function ($year) {
                 return ['id' => $year, 'name' => $year];
             })
             ->toArray();
-        
+
         return Inertia::render('Dashboard/DanaDesa/Index', [
             'danaDesa' => $danaDesa,
             'availableYears' => $availableYears,
@@ -120,7 +120,9 @@ class DanaDesaController extends Controller
         $danaDesa = DanaDesa::where('slug', $slug)->firstOrFail();
 
         $data = $request->all();
-        if ($danaDesa->title !== $request->title) {
+        $titleChanged = $danaDesa->title !== $request->title;
+
+        if ($titleChanged) {
             $data['slug'] = SlugHelper::generateUniqueSlug(DanaDesa::class, $request->title);
         }
 
@@ -130,6 +132,12 @@ class DanaDesaController extends Controller
                 $request->title,
                 'dana-desa-documents',
                 $danaDesa->file
+            );
+        } elseif ($titleChanged && $danaDesa->file) {
+            $data['file'] = $this->mediaService->renameExistingFile(
+                $danaDesa->file,
+                $request->title,
+                'dana-desa-documents'
             );
         } else {
             unset($data['file']);

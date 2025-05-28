@@ -22,7 +22,7 @@ class ProdukDesaController extends Controller
         $this->logHelper = new LogActivityHelper();
         $this->mediaService = new MediaService();
     }
-    
+
     public function index(Request $request)
     {
         // Get search parameters
@@ -39,10 +39,10 @@ class ProdukDesaController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('product_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('nama_penjual', 'like', "%{$search}%")
-                  ->orWhere('kontak_penjual', 'like', "%{$search}%")
-                  ->orWhere('alamat_penjual', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('nama_penjual', 'like', "%{$search}%")
+                    ->orWhere('kontak_penjual', 'like', "%{$search}%")
+                    ->orWhere('alamat_penjual', 'like', "%{$search}%");
             });
         }
 
@@ -87,7 +87,7 @@ class ProdukDesaController extends Controller
     public function store(StoreProdukDesaRequest $request)
     {
         $dataProduk = $request->all();
-        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->title);
+        $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->product_name);
         $dataProduk['user_id'] = Auth::id();
 
         $produkDesa = ProdukDesa::create($dataProduk);
@@ -96,7 +96,7 @@ class ProdukDesaController extends Controller
             $this->mediaService->handleImageUploads($produkDesa, $request->file('images'), [], 'produk-desa-images');
         }
 
-        $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->title);
+        $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->product_name);
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa Berhasil Ditambahkan');
     }
 
@@ -104,7 +104,7 @@ class ProdukDesaController extends Controller
     {
         $produkDesa = ProdukDesa::where('slug', $slug)->firstOrFail();
 
-        $this->logHelper->logActivity('view', 'produk_desa', 'Melihat produk desa ' . $produkDesa->title);
+        $this->logHelper->logActivity('view', 'produk_desa', 'Melihat produk desa ' . $produkDesa->product_name);
         return Inertia::render('Dashboard/ProdukDesa/Edit', [
             'produkDesa' => $produkDesa->load('images'),
 
