@@ -38,6 +38,7 @@ const {
     mainCaptchaData,
     replyCaptchaData,
     getAvatar,
+    refreshCaptcha,
     truncateText,
     formatDate,
     submitComment,
