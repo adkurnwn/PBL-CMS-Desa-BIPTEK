@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Event\EventPreview;
 use App\Models\Event;
 use App\Models\EventEmails;
 use Illuminate\Http\Request;
@@ -21,8 +22,7 @@ class EventController extends Controller
             // Search by title or content
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', '%' . $search . '%')
-                        ->orWhere('content', 'like', '%' . $search . '%');
+                    $q->where('title', 'like', '%' . $search . '%');
                 });
             }
 
@@ -43,7 +43,7 @@ class EventController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $events,
+                'data' => EventPreview::collection($events),
                 'meta' => [
                     'current_page' => $events->currentPage(),
                     'last_page' => $events->lastPage(),
