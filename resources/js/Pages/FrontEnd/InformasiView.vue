@@ -3,35 +3,35 @@ import EventCard from "@/Components/EventCard.vue";
 import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import useApiFetch from "@/Utility/useApiFetch";
 
 const gallery = ref({});
 const events = ref([]);
 const news = ref([]);
-const loading = ref(true);
-const fetchInformasi = async () => {
-    try {
-        loading.value = true;
-        // Fetch all data in parallel for better performance
-        const [galleryRes, eventsRes, newsRes] = await Promise.all([
-            axios.get("/api/gallery/highlight"),
-            axios.get("/api/events"),
-            axios.get("/api/news/preview?limit=6"),
-        ]);
 
-        gallery.value = galleryRes.data.data || {};
-        events.value = eventsRes.data.data || [];
-        news.value = newsRes.data.data || [];
-    } catch (error) {
-        console.error("Error fetching informasi data:", error);
-    } finally {
-        loading.value = false;
-    }
+const fetchData = async () => {
+    const galleryLoading = ref(true);
+    const eventLoading = ref(true);
+    const newsLoading = ref(true);
+
+    const galleryApi = useApiFetch();
+    const eventsApi = useApiFetch();
+    const newsApi = useApiFetch();
+
+    await Promise.all([
+        galleryApi.fetchData("/api/gallery/highlight"),
+        eventsApi.fetchData("/api/events/preview"),
+        newsApi.fetchData("/api/news/preview?limit=6"),
+    ]);
+    gallery.value = galleryApi.data.value || {};
+    events.value = eventsApi.data.value || [];
+    news.value = newsApi.data.value || [];
+    galleryLoading.value = galleryApi.loading.value;
+    eventLoading.value = eventsApi.loading.value;
+    newsLoading.value = newsApi.loading.value;
 };
 
-onMounted(() => {
-    fetchInformasi();
-});
+onMounted(fetchData);
 </script>
 
 <template>
@@ -44,10 +44,10 @@ onMounted(() => {
                 class="w-full px-8 flex flex-col pt-32 pb-8 lg:pb-24 bg-type1 font-merriweather"
             >
                 <div
-                    v-if="loading"
+                    v-if="galleryLoading"
                     class="flex justify-center items-center h-[500px]"
                 >
-                    <p>Loading gallery...</p>
+                    <p>Memuat galeri...</p>
                 </div>
 
                 <div
@@ -114,8 +114,8 @@ onMounted(() => {
                 <div
                     class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
                 >
-                    <div v-if="loading" class="text-center w-full">
-                        <p>Loading events...</p>
+                    <div v-if="eventLoading" class="text-center w-full">
+                        <p>Memuat events...</p>
                     </div>
                     <div
                         v-else-if="events.length === 0"
@@ -146,7 +146,17 @@ onMounted(() => {
                 <div
                     class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0"
                 >
+                    <div v-if="newsLoading" class="text-center w-full">
+                        <p>Memuat berita...</p>
+                    </div>
+                    <div
+                        v-else-if="news.length === 0"
+                        class="text-center w-full"
+                    >
+                        <p>Tidak ada berita terbaru</p>
+                    </div>
                     <NewsCard
+                        v-else
                         v-for="newsItem in news"
                         :href="`/berita/${newsItem.slug}`"
                         :key="newsItem.id"
@@ -163,5 +173,3 @@ onMounted(() => {
         </main>
     </UserLayout>
 </template>
-
-<style scoped></style>

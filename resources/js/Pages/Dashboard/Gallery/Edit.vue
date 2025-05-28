@@ -5,11 +5,14 @@ import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
-import CategoryInput from "@/Components/CategoryInput.vue";
+import CategoryInput from "@/Components/DashboardComponent/CategoryInput.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
-import ImageEditor from "@/Components/ImageEditor.vue";
+import ImageEditor from "@/Components/DashboardComponent/ImageEditor.vue";
 import { ref } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
+import TextAreaInput from "@/Components/DashboardComponent/TextAreaInput.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
     gallery: {
@@ -85,7 +88,6 @@ const submit = () => {
 </script>
 
 <template>
-
     <Head title="Edit Galeri" />
     <AuthenticatedLayout>
         <template #header>
@@ -96,53 +98,84 @@ const submit = () => {
                         <path
                             d="M360-400h400L622-580l-92 120-62-80-108 140Zm-40 160q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z" />
                     </svg>
-
                 </template>
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <form @submit.prevent="submit" enctype="multipart/form-data">
-                            <div class="grid grid-cols-2 gap-4">
-                                <!-- Name Field -->
+        <template #subtitle-area>
+            Edit Galeri
+        </template>
+
+        <div class="h-full pb-[48px] pt-[27px]">
+            <div class="overflow-hidden bg-white">
+                <div class="">
+                    <form @submit.prevent="submit" enctype="multipart/form-data">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-[22px] gap-y-[15px]">
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- First column -->
                                 <div>
-                                    <InputLabel for="title" value="Title" />
-                                    <TextInput id="title" v-model="form.title" type="text" class="mt-1 block w-full"
-                                        required />
+                                    <SingleLineField
+                                        id="title"
+                                        v-model="form.title"
+                                        type="text"
+                                        fieldName="Edit"
+                                        required
+                                        custom-width="100%"
+                                    />
                                     <InputError :message="form.errors.title" class="mt-2" />
                                 </div>
+                            </div>
 
-                                <CategoryInput v-model="form.category" :categories="categories"
-                                    :unused_categories="unused_categories" :errors="form.errors" />
-
+                            <div class="flex flex-col gap-y-[15px]">
+                                <!-- Second column - placeholder for future fields -->
                                 <div>
-                                    <InputLabel for="description" value="Description" />
-                                    <textarea id="description" v-model="form.description" type="text"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required></textarea>
-                                    <InputError :message="form.errors.description" class="mt-2" />
+                                    <!-- Updated Category Input with new styling -->
+                                <CategoryInput
+                                    v-model="form.category"
+                                    :categories="categories"
+                                    :unused_categories="unused_categories"
+                                    :errors="form.errors"
+                                    fieldName="Kategori"
+                                    customWidth="100%"
+                                />
                                 </div>
-
-                                <ImageEditor label="Images" v-model="form.images" v-model:alts="form.alts"
-                                    :existingImages="gallery.images" v-model:removedImages="form.removed_images"
-                                    v-model:existingImages="form.updated_existing_images
-                                        " v-model:bulkAltText="form.bulk_alt_text" :defaultAltText="form.title"
-                                    :alt-error="form.errors.alts" :error="form.errors" :required="true" />
                             </div>
+                        </div>
 
-                            <div class="mt-6">
-                                <PrimaryButton :disabled="form.processing">
-                                    Edit Gallery
-                                </PrimaryButton>
-                                <Link :href="route('dashboard.galleries.index')">
-                                <PrimaryButton type="button">Cancel</PrimaryButton>
-                                </Link>
-                            </div>
-                        </form>
-                    </div>
+                        <!-- Description Field -->
+                        <div class="mt-[15px]">
+                            <TextAreaInput
+                                id="description"
+                                v-model="form.description"
+                                type="text"
+                                fieldName="Deskripsi"
+                                required
+                                custom-width="100%"
+                            />
+                            <InputError :message="form.errors.description" class="mt-2" />
+                        </div>
+
+                        <!-- Image Editor - keeping existing functionality -->
+                        <div class="mt-[15px]">
+                            <ImageEditor label="Gambar" v-model="form.images" v-model:alts="form.alts"
+                                :existingImages="gallery.images" v-model:removedImages="form.removed_images"
+                                v-model:existingImages="form.updated_existing_images"
+                                max-images="25"
+                                v-model:bulkAltText="form.bulk_alt_text" :defaultAltText="form.title"
+                                :alt-error="form.errors.alts" :error="form.errors" :required="true" />
+                        </div>
+
+                        <div class="mt-[15px] flex justify-end">
+                            <Link :href="route('dashboard.galleries.index')" class="mr-[15px]">
+                                <SecondaryButton type="button">
+                                    BATAL
+                                </SecondaryButton>
+                            </Link>
+                            <PrimaryButton :disabled="form.processing">
+                                SIMPAN
+                            </PrimaryButton>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

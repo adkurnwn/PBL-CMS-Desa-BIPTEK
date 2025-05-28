@@ -1,20 +1,218 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, Link, useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import Search from "@/Components/DashboardComponent/Search.vue";
+import DropdownFilter from "@/Components/DashboardComponent/DropdownFilter.vue";
+import TopButton from "@/Components/DashboardComponent/TopButton.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import IconAksi from "@/Components/DashboardComponent/IconAksi.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import { ref, computed, watch } from "vue";
+
 const props = defineProps({
-    danaDesa: Array,
+    danaDesa: {
+        type: Object,
+        default: () => ({
+            data: [],
+            meta: {
+                current_page: 1,
+                last_page: 1,
+                total: 0,
+                per_page: 25
+            }
+        })
+    },
+    search: {
+        type: String,
+        default: ''
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
+    },
+    sort: {
+        type: String,
+        default: 'created_at'
+    },
+    direction: {
+        type: String,
+        default: 'desc'
+    },
+    availableYears: {
+        type: Array,
+        default: () => []
+    },
 });
+
+const form = useForm({});
+
+// State variables for search, filter, and sort
+const searchQuery = ref(props.search || '');
+const filterState = ref(props.filters || {});
+const sortField = ref(props.sort || 'created_at');
+const sortDirection = ref(props.direction || 'desc');
+
+// Table headers configuration
+const tableHeaders = [
+    {
+        label: 'Judul',
+        field: 'title',
+        sortable: true,
+        width: '55%',
+        truncate: true,
+    },
+    {
+        label: 'Tanggal',
+        field: 'created_at',
+        sortable: true,
+        width: '30%'
+    },
+    {
+        label: 'Aksi',
+        field: 'actions',
+        sortable: false,
+        width: '15%'
+    },
+];
+
+// Filter fields configuration
+const filterFields = computed(() => [
+    {
+        id: 'year',
+        name: 'Tahun',
+        options: props.availableYears.length > 0 
+            ? props.availableYears 
+            : [{ id: new Date().getFullYear(), name: new Date().getFullYear().toString() }]
+    }
+]);
+
+// Handle search functionality
+const handleSearch = (query) => {
+    searchQuery.value = query; // Ensure the searchQuery is updated
+    
+    router.get(route('dashboard.dana-desa.index'), {
+        search: query,
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['danaDesa', 'search'] // Make sure 'search' is included
+    });
+};
+
+// Handle filter changes
+const handleFilterChange = (newFilters) => {
+    filterState.value = newFilters;
+    
+    router.get(route('dashboard.dana-desa.index'), {
+        search: searchQuery.value,
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    });
+};
+
+// Handle sort functionality
+const handleSort = (field) => {
+    // If clicking on the same field, toggle direction
+    if (field === sortField.value) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    } else {
+        // New field, default to ascending
+        sortField.value = field;
+        sortDirection.value = 'asc';
+    }
+
+    // Navigate with updated sort params
+    router.get(route('dashboard.dana-desa.index'), {
+        search: searchQuery.value,
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    }, {
+        preserveScroll: true,
+        preserveState: true
+    });
+};
+
+// Handle page change - update to include all parameters correctly
+const handlePageChange = (page) => {
+    router.get(route('dashboard.dana-desa.index'), {
+        search: searchQuery.value,
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        page: page,
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['danaDesa'] // Only update the data, not the whole page
+    });
+};
+
+// Format the dana desa data for the table
+const danaDesaItems = computed(() => {
+    if (!props.danaDesa || !props.danaDesa.data) {
+        return [];
+    }
+    
+    return props.danaDesa.data.map(item => {
+        // Format dates 
+        const itemDate = item.date ? new Date(item.date) : new Date(item.created_at);
+        
+        const formatDateTime = (date) => {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            
+            return `${day}/${month}/${year}`;
+        };
+        
+        return {
+            ...item,
+            created_at: formatDateTime(itemDate),
+        };
+    });
+});
+
+// Watch for external search changes
+watch(() => props.search, (newValue) => {
+    if (newValue !== searchQuery.value) {
+        searchQuery.value = newValue;
+    }
+}, { immediate: true });
+
+// Watch for external sort changes
+watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
+    if (newSort !== sortField.value) {
+        sortField.value = newSort;
+    }
+    if (newDirection !== sortDirection.value) {
+        sortDirection.value = newDirection;
+    }
+}, { immediate: true });
+
+// Watch for external filter changes
+watch(() => props.filters, (newValue) => {
+    if (JSON.stringify(newValue) !== JSON.stringify(filterState.value)) {
+        filterState.value = { ...newValue };
+    }
+}, { deep: true });
 </script>
 
 <template>
-
-    <Head title="Dana Desa" />
+    <Head title="Laporan Dana Desa" />
 
     <AuthenticatedLayout>
         <template #header>
-            <HeadingMenu title="Dana Desa" :hasRightContent="true">
+            <HeadingMenu title="Laporan Dana Desa">
                 <template #icon>
                     <svg width="37" height="38" viewBox="0 0 37 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <mask id="mask0_1439_7132" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0"
@@ -27,58 +225,77 @@ const props = defineProps({
                                 fill="#4C7660" />
                         </g>
                     </svg>
-
-                </template>
-                <template #right-content>
-                    <Link :href="route('dashboard.dana-desa.create')">
-                    <PrimaryButton>Create New Dana Desa</PrimaryButton>
-                    </Link>
                 </template>
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Judul
-                                    </th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="dana_desa in danaDesa" :key="dana_desa.id">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ dana_desa.title }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <Link
-                                            :href="
-                                                route(
-                                                    'dashboard.dana-desa.edit',
-                                                    dana_desa.slug
-                                                )
-                                            "
-                                        >
-                                            <PrimaryButton>
-                                                Edit Dana Desa
-                                            </PrimaryButton>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <template #search-area>
+            <Search 
+                v-model="searchQuery" 
+                placeholder="Cari dana desa..." 
+                @search="handleSearch" 
+            />
+            <DropdownFilter 
+                placeholder="Filter..." 
+                :filter-fields="filterFields" 
+                v-model:filters="filterState"
+                @filter-changed="handleFilterChange" 
+                width="250px" 
+                dropdownTitle="Filter berdasarkan"
+                activeFiltersTitle="Filter yang aktif" 
+                :close-on-select="false"
+            />
+            <Link :href="route('dashboard.dana-desa.create')">
+                <TopButton></TopButton>
+            </Link>
+        </template>
+
+        <template #table-content>
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm h-full">
+                    <Tabel 
+                        :headers="tableHeaders" 
+                        :items="danaDesaItems" 
+                        :pagination="true"
+                        :items-per-page="danaDesa.per_page || 25" 
+                        :current-page="danaDesa.current_page || 1"
+                        :total-pages="danaDesa.last_page || 1" 
+                        :total-items="danaDesa.total || 0"
+                        :filters="filterState" 
+                        :sort-field="sortField" 
+                        :sort-direction="sortDirection"
+                        empty-state-message="Tidak ada dana desa yang ditemukan."
+                        @sort="handleSort" 
+                        @filter-changed="handleFilterChange" 
+                        @page-changed="handlePageChange"
+                    >
+                        <!-- Custom template for Judul column -->
+                        <template #['item.Judul']="{ item }">
+                            <span class="text-TableText">{{ item.title }}</span>
+                        </template>
+
+                        <!-- Custom template for Tanggal column -->
+                        <template #['item.Tanggal']="{ item }">
+                            <div class="flex flex-col">
+                                <span class="text-[#404DBD] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
+                                    {{ item.created_at }}
+                                </span>
+                            </div>
+                        </template>
+
+                        <!-- Custom template for the Actions column -->
+                        <template #['item.Aksi']="{ item }">
+                            <div class="flex justify-left gap-2">
+                                <Link :href="route('dashboard.dana-desa.edit', item.slug)">
+                                    <button class="w-[21px] h-[21px] flex items-center justify-center hover:opacity-80 transition-opacity">
+                                        <IconAksi type="edit" />
+                                    </button>
+                                </Link>
+                            </div>
+                        </template>
+                    </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>

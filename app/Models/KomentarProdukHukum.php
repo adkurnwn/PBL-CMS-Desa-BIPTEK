@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class KomentarProdukHukum extends Model
 {
     protected $table = 'komentar_produk_hukum';
+    protected $hidden = ['updated_at'];
 
     protected $fillable = [
         'id_produk_hukum',

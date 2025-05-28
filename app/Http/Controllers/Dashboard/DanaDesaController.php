@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\StoreDanaDesaRequest;
 use App\Http\Requests\Validation\UpdateDanaDesaRequest;
 use App\Services\MediaService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DanaDesaController extends Controller
 {
@@ -24,10 +26,59 @@ class DanaDesaController extends Controller
         $this->logHelper = new LogActivityHelper();
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // Get query parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $perPage = 25;
+        
+        // Get filter parameters
+        $filters = [];
+        if ($request->has('year')) {
+            $filters['year'] = $request->input('year');
+        }
+        
+        // Start building the query
+        $query = DanaDesa::query();
+        
+        // Apply search
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply year filter if provided
+        if (isset($filters['year'])) {
+            $query->whereYear('date', $filters['year']);
+        }
+        
+        // Apply sorting
+        $query->orderBy($sort, $direction);
+        
+        // Get paginated results - ensure to use the current page from request
+        $page = $request->input('page', 1);
+        $danaDesa = $query->paginate($perPage, ['*'], 'page', $page)->withQueryString();
+        
+        // Get available years for the filter - using date column
+        $availableYears = DanaDesa::select(DB::raw('YEAR(date) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(function($year) {
+                return ['id' => $year, 'name' => $year];
+            })
+            ->toArray();
+        
         return Inertia::render('Dashboard/DanaDesa/Index', [
-            'danaDesa' => DanaDesa::all(),
+            'danaDesa' => $danaDesa,
+            'availableYears' => $availableYears,
+            'search' => $search,
+            'filters' => $filters,
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 

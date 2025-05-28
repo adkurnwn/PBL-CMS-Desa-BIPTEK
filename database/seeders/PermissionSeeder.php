@@ -12,6 +12,7 @@ class PermissionSeeder extends Seeder
     {
         // Create permissions for each feature
         $features = [
+            'home',
             'users',
             'positions',
             'roles',
@@ -28,6 +29,8 @@ class PermissionSeeder extends Seeder
             'feedbacks',
             'activity-logs',
             'recovery',
+            'settings',
+            'statistics',
         ];
 
         foreach ($features as $feature) {

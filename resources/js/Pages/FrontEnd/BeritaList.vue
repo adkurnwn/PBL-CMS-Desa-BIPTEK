@@ -1,129 +1,56 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
+import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 
 const news = ref([]);
 const categories = ref([]);
-const loading = ref(true);
 const error = ref(null);
 const pagination = ref(null);
-const searchQuery = ref("");
-const selectedCategory = ref("Semua");
+const newsApi = useApiFetch();
+const categoriesApi = useApiFetch();
+
+const {
+    searchQuery,
+    selectedCategory,
+    handleSearch,
+    selectCategory,
+    goToPage,
+} = useFilter(fetchNews);
 
 async function fetchNews({ search = "", category = null, page = 1 } = {}) {
-    try {
-        loading.value = true;
-        error.value = null;
+    const newsLoading = ref(true);
+    const params = new URLSearchParams();
 
-        const params = new URLSearchParams();
-
-        if (search) params.append("search", search);
-        if (category && category !== "Semua") {
-            if (category === "Populer") {
-                params.append("sort", "views");
-            } else {
-                params.append("category", category);
-            }
-        }
-        params.append("page", page);
-
-        const response = await fetch(`/api/news?${params.toString()}`);
-        const result = await response.json();
-
-        if (result.success) {
-            news.value = result.data;
-            pagination.value = {
-                current_page: result.meta.current_page,
-                last_page: result.meta.last_page,
-                total: result.meta.total,
-            };
+    if (search) params.append("search", search);
+    if (category && category !== "Semua") {
+        if (category === "Populer") {
+            params.append("sort", "views");
         } else {
-            error.value = result.message || "Gagal memuat berita";
-            console.error("Gagal memuat berita:", result.message);
+            params.append("category", category);
         }
-    } catch (err) {
-        error.value = "Terjadi kesalahan saat memuat berita";
-        console.error("Error fetching news:", err);
-    } finally {
-        loading.value = false;
     }
+    params.append("page", page);
+
+    await newsApi.fetchData(`/api/news?${params.toString()}`);
+
+    if (newsApi.data.value) {
+        news.value = newsApi.data.value;
+        pagination.value = newsApi.pagination.value;
+    }
+
+    error.value = newsApi.error.value;
+    newsLoading.value = newsApi.loading.value;
 }
 
 const fetchCategories = async () => {
-    try {
-        const response = await axios.get("/api/categories?type=1");
-        categories.value = response.data.data;
-    } catch (err) {
-        console.error("Error fetching categories:", err);
-    }
+    await categoriesApi.fetchData("/api/categories?type=1");
+    categories.value = categoriesApi.data.value;
 };
-
-// Function to handle search button click
-const handleSearch = () => {
-    fetchNews({
-        search: searchQuery.value,
-        category:
-            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
-    });
-};
-
-// Function to handle category selection
-const selectCategory = (category) => {
-    selectedCategory.value = category;
-    fetchNews({
-        search: searchQuery.value,
-        category: category !== "Semua" ? category : null,
-    });
-};
-
-// Function to handle pagination
-const goToPage = (page) => {
-    fetchNews({
-        search: searchQuery.value,
-        category:
-            selectedCategory.value !== "Semua" ? selectedCategory.value : null,
-        page,
-    });
-    // Scroll to top when changing pages
-    window.scrollTo(0, 0);
-};
-
-const paginationNumbers = computed(() => {
-    if (!pagination.value) return [];
-    const total = pagination.value.last_page;
-    const current = pagination.value.current_page;
-    const delta = 1;
-    const range = [];
-    const rangeWithDots = [];
-    let l;
-
-    for (let i = 1; i <= total; i++) {
-        if (
-            i === 1 ||
-            i === total ||
-            (i >= current - delta && i <= current + delta)
-        ) {
-            range.push(i);
-        }
-    }
-     for (let i of range) {
-        if (l) {
-            if (i - l === 2) {
-                rangeWithDots.push(l + 1);
-            } else if (i - l > 2) {
-                rangeWithDots.push("...");
-            }
-        }
-        rangeWithDots.push(i);
-        l = i;
-    }
-    return rangeWithDots;
-});
 
 onMounted(() => {
-    // Initial data fetch without parameters
     fetchNews();
     fetchCategories();
 });
@@ -154,29 +81,35 @@ onMounted(() => {
                     class="absolute right-20 mt-6 transform text-accent1"
                     @click="handleSearch"
                 >
-                <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    height="24px" 
-                    viewBox="0 -960 960 960" 
-                    width="24px" 
-                    fill="244031">
-                    <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
-                </svg>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="0 -960 960 960"
+                        width="24px"
+                        fill="244031"
+                    >
+                        <path
+                            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
+                        />
+                    </svg>
                 </button>
                 <!-- Button Filter Waktu Berita -->
                 <button
                     @click="openFilter"
                     class="transform mt-6 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
                 >
-                <svg 
-                    class="ml-2" 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    height="24px" 
-                    viewBox="0 -960 960 960" 
-                    width="24px" 
-                    fill="244031">
-                    <path d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"/>
-                </svg>
+                    <svg
+                        class="ml-2"
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="http://www.w3.org/2000/svg"
+                        width="24px"
+                        fill="244031"
+                    >
+                        <path
+                            d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"
+                        />
+                    </svg>
                 </button>
             </div>
             <!-- Kategori Berita -->
@@ -205,7 +138,7 @@ onMounted(() => {
                     @click="selectCategory(category.id)"
                     class="hover:underline"
                     :class="{
-                        'font-medium': selectedCategory === category.name,
+                        'font-medium': selectedCategory === category.id,
                     }"
                 >
                     {{ category.name }}
@@ -220,8 +153,8 @@ onMounted(() => {
             <article>
                 <!-- Loading State -->
                 <div
-                    v-if="loading"
-                    class="flex justify-center items-center py-40"
+                    v-if="newsLoading"
+                    class="flex justify-center items-center py-12"
                 >
                     <div
                         class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"

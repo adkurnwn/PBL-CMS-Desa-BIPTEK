@@ -92,34 +92,32 @@ const submit = () => {
 
                             <!-- Job Description Field -->
                             <div>
-                                <div class="flex items-center pr-[12px]">
-                                    <div class="flex-grow">
-                                        <SingleLineField id="job_description" v-model="newJobDescription" type="text"
-                                            fieldName="Deskripsi Pekerjaan"
-                                            placeholder="Masukkan item deskripsi pekerjaan" custom-width="100%" />
-                                    </div>
-                                    <div class="py-[12px] mt-[37px]">
-                                        <PrimaryButton type="button" @click="addJobDescription">
-                                            ADD
-                                        </PrimaryButton>
+                                <div class="">
+                                    <div class="">
+                                        <SingleLineField id="job_description" v-model="newJobDescription" type="add"
+                                            fieldName="Deskripsi Pekerjaan" placeholder="Masukkan Deskripsi Pekerjaan"
+                                            custom-width="100%" @click="addJobDescription" />
                                     </div>
                                 </div>
 
                                 <!-- Display job descriptions as tags -->
-                                <div class="mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.6px] 3xl:mt-[1.8px] 4xl:mt-[2px] flex flex-wrap gap-[6.7px] sm:gap-[7.5px] md:gap-[8.5px] lg:gap-[9.2px] xl:gap-[10px] 2xl:gap-[11.5px] 3xl:gap-[13.3px] 4xl:gap-[15px]" v-if="form.job_descriptions.length > 0">
+                                <div class="mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.6px] 3xl:mt-[1.8px] 4xl:mt-[2px] flex flex-wrap gap-[6.7px] sm:gap-[7.5px] md:gap-[8.5px] lg:gap-[9.2px] xl:gap-[10px] 2xl:gap-[11.5px] 3xl:gap-[13.3px] 4xl:gap-[15px]"
+                                    v-if="form.job_descriptions.length > 0">
                                     <div v-for="(description, index) in form.job_descriptions" :key="index"
-                                        class="bg-[#f3f4f6] h-[18.7px] sm:h-[21.1px] md:h-[23.7px] lg:h-[25.7px] xl:h-[28px] 2xl:h-[32px] 3xl:h-[37px] 4xl:h-[42px] px-[1.3px] sm:px-[1.5px] md:px-[1.7px] lg:px-[1.8px] xl:px-[2px] 2xl:px-[2.3px] 3xl:px-[2.6px] 4xl:px-[3px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex items-center gap-[0.9px] sm:gap-[1px] md:gap-[1.1px] lg:gap-[1.2px] xl:gap-[1.33px] 2xl:gap-[1.6px] 3xl:gap-[1.8px] 4xl:gap-[2px] shadow-[0_0.9px_0.9px_0px_rgba(0,0,0,0.25)] sm:shadow-[0_1px_1px_0px_rgba(0,0,0,0.25)] md:shadow-[0_1.1px_1.1px_0px_rgba(0,0,0,0.25)] lg:shadow-[0_1.2px_1.2px_0px_rgba(0,0,0,0.25)] xl:shadow-[0_1.33px_1.33px_0px_rgba(0,0,0,0.25)] 2xl:shadow-[0_1.6px_1.6px_0px_rgba(0,0,0,0.25)] 3xl:shadow-[0_1.8px_1.8px_0px_rgba(0,0,0,0.25)] 4xl:shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]">
-                                        <span class="text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">{{ description }}</span>
+                                        class="bg-[#f3f4f6] h-[18.7px] sm:h-[21.1px] md:h-[23.7px] lg:h-[25.7px] xl:h-[28px] 2xl:h-[32px] 3xl:h-[37px] 4xl:h-[42px] px-[6px] sm:px-[7px] md:px-[8px] lg:px-[9px] xl:px-[10px] 2xl:px-[11.5px] 3xl:px-[13.3px] 4xl:px-[15px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex items-center gap-[0.9px] sm:gap-[1px] md:gap-[1.1px] lg:gap-[1.2px] xl:gap-[1.33px] 2xl:gap-[1.6px] 3xl:gap-[1.8px] 4xl:gap-[2px] shadow-[0_0.9px_0.9px_0px_rgba(0,0,0,0.25)] sm:shadow-[0_1px_1px_0px_rgba(0,0,0,0.25)] md:shadow-[0_1.1px_1.1px_0px_rgba(0,0,0,0.25)] lg:shadow-[0_1.2px_1.2px_0px_rgba(0,0,0,0.25)] xl:shadow-[0_1.33px_1.33px_0px_rgba(0,0,0,0.25)] 2xl:shadow-[0_1.6px_1.6px_0px_rgba(0,0,0,0.25)] 3xl:shadow-[0_1.8px_1.8px_0px_rgba(0,0,0,0.25)] 4xl:shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]">
+                                        <span
+                                            class="text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">{{
+                                            description }}</span>
                                         <button type="button"
-                                            class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px] flex items-center justify-center focus:outline-none"
+                                            class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px] flex items-center justify-center focus:outline-none ml-[4px]"
                                             @click="removeJobDescription(index)">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none"
                                                 class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px]">
-                                                <mask id="mask0_1715_7284" style="mask-type:alpha"
+                                                <mask id="mask0_job_description" style="mask-type:alpha"
                                                     maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20">
                                                     <rect width="20" height="20" fill="#D9D9D9" />
                                                 </mask>
-                                                <g mask="url(#mask0_1715_7284)">
+                                                <g mask="url(#mask0_job_description)">
                                                     <path
                                                         d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
                                                         fill="#DC3545" />
@@ -128,7 +126,8 @@ const submit = () => {
                                         </button>
                                     </div>
                                 </div>
-                                <p class="text-menuText text-[6.2px] sm:text-[7px] md:text-[8px] lg:text-[8.7px] xl:text-[9.33px] 2xl:text-[10.8px] 3xl:text-[12.4px] 4xl:text-[14px] ml-[5.3px] sm:ml-[6px] md:ml-[6.7px] lg:ml-[7.3px] xl:ml-[8px] 2xl:ml-[9.3px] 3xl:ml-[10.7px] 4xl:ml-[12px]" v-else>
+                                <p class="text-menuText text-[6.2px] sm:text-[7px] md:text-[8px] lg:text-[8.7px] xl:text-[9.33px] 2xl:text-[10.8px] 3xl:text-[12.4px] 4xl:text-[14px] ml-[5.3px] sm:ml-[6px] md:ml-[6.7px] lg:ml-[7.3px] xl:ml-[8px] 2xl:ml-[9.3px] 3xl:ml-[10.7px] 4xl:ml-[12px]"
+                                    v-else>
                                     Tambahkan minimal satu deskripsi pekerjaan untuk posisi ini
                                 </p>
                                 <InputError :message="form.errors.job_descriptions" class="mt-2" />

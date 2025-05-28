@@ -32,7 +32,6 @@ class NewsController extends Controller
                 });
             }
 
-            // Filter by category_id
             if ($category) {
                 $query->where('category_id', $category);
             }
@@ -71,16 +70,21 @@ class NewsController extends Controller
         }
     }
 
-
     public function preview(Request $request)
     {
         $limit = $request->input('limit', 3);
+        $sort = $request->input('sort', 'created_at');
         try {
-            $news = News::with(['images', 'category', 'user:id,name'])
-                ->where('is_draft', false)
-                ->orderBy('created_at', 'desc')
-                ->take($limit)
-                ->get();
+            $query = News::with(['images', 'category', 'user:id,name'])
+                ->where('is_draft', false);
+
+            if ($sort === 'views') {
+                $query->orderBy('views', 'desc');
+            } else {
+                $query->latest();
+            }
+
+            $news = $query->take($limit)->get();
 
             if ($news->isEmpty()) {
                 return response()->json([

@@ -9,15 +9,20 @@ use App\Http\Controllers\Controller;
 
 class ActivityLogController extends Controller
 {
-    public function index(Request $request, $page = 1)
+    public function index(Request $request, $page = null)
     {
-        $perPage = 25;
-        $sortField = 'time';
-        $sortDirection = $request->input('direction', 'desc');
-        $searchQuery = $request->input('search', '');
-
-        $query = ActivityLog::with(['user' => function ($query) {
-            $query->select('id', 'name', 'photo_profile');
+        // Get page from request parameter or route parameter
+        $page = $request->input('page', $page ?? 1);
+        $page = (int)$page;
+        
+        $perPage = 25; // Show a reasonable amount of records per page
+        $sortField = 'time'; // Always sort by time/created_at
+        $sortDirection = $request->input('direction', 'desc'); // Default direction is descending
+        $searchQuery = $request->input('search', ''); // Get search query from request
+        
+        // Create query with sorting and ensure user relationship includes photo_profile
+        $query = ActivityLog::with(['user' => function($query) {
+            $query->select('id', 'name', 'photo_profile'); // Include photo_profile
         }]);
 
         if (!empty($searchQuery)) {
@@ -32,11 +37,14 @@ class ActivityLogController extends Controller
         }
 
         $query->orderBy('created_at', $sortDirection);
-        $logs = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        // Paginate results with proper page parameter
+        $logs = $query->paginate($perPage, ['*'], 'page', $page)
+                     ->withQueryString(); // Preserve query parameters in pagination links
 
-        return Inertia::render('Dashboard/Dashboard', [
+        return Inertia::render('Dashboard/Home/LogActivity', [
             'logs' => $logs,
-            'currentPage' => (int)$page,
+            'currentPage' => $logs->currentPage(),
             'sortField' => $sortField,
             'sortDirection' => $sortDirection,
             'search' => $searchQuery,

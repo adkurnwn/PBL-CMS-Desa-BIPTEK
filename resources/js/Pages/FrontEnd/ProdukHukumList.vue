@@ -2,12 +2,23 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import useApiFetch from "@/Utility/useApiFetch";
+import useFilter from "@/Utility/useFilter";
 
 const produkHukum = ref([]);
-const loading = ref(true);
+const categories = ref([]);
 const error = ref(null);
 const pagination = ref(null);
+const produkHukumApi = useApiFetch();
+const categoriesApi = useApiFetch();
+
+const {
+    searchQuery,
+    selectedCategory,
+    handleSearch,
+    selectCategory,
+    goToPage,
+} = useFilter(fetchProdukHukum);
 
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString("id-ID", {
@@ -17,26 +28,43 @@ const formatDate = (date) => {
     });
 };
 
-const fetchData = async () => {
-    try {
-        loading.value = true;
-        const response = await axios.get("/api/produk-hukum");
-        produkHukum.value = response.data.data;
-        pagination.value = {
-            current_page: response.data.meta.current_page,
-            last_page: response.data.meta.last_page,
-            total: response.data.meta.total,
-        };
-    } catch (err) {
-        error.value = "Gagal memuat dokumen";
-        console.error("Error fetching documents:", err);
-    } finally {
-        loading.value = false;
+async function fetchProdukHukum({
+    search = "",
+    category = null,
+    page = 1,
+} = {}) {
+    const produkHukumLoading = ref(true);
+    const params = new URLSearchParams();
+
+    if (search) params.append("search", search);
+    if (category && category !== "Semua") {
+        if (category === "Populer") {
+            params.append("sort", "views");
+        } else {
+            params.append("category", category);
+        }
     }
+    params.append("page", page);
+
+    await produkHukumApi.fetchData(`/api/produk-hukum?${params.toString()}`);
+
+    if (produkHukumApi.data.value) {
+        produkHukum.value = produkHukumApi.data.value;
+        pagination.value = produkHukumApi.pagination.value;
+    }
+
+    error.value = produkHukumApi.error.value;
+    produkHukumLoading.value = produkHukumApi.loading.value;
+}
+
+const fetchCategories = async () => {
+    await categoriesApi.fetchData("/api/categories?type=0");
+    categories.value = categoriesApi.data.value;
 };
 
 onMounted(() => {
-    fetchData();
+    fetchProdukHukum();
+    fetchCategories();
 });
 </script>
 
@@ -52,41 +80,51 @@ onMounted(() => {
                     <span class="material-symbols-outlined mr-2 text-[1.3em] align-middle">description</span>
                     Produk Hukum Desa Pao-Pao
                     </h1>
-                <!-- Filter Bar -->
-                <div class="flex flex-wrap gap-2">
-                    <!-- Nomor Peraturan -->
-                    <div class="relative">
-                        <input
-                            type="text"
-                            placeholder="Cari nomor peraturan..."
-                            class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
-                        />
-                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
-                    </div>
-                    <!-- Judul -->
-                    <div class="relative">
-                        <input
-                            type="text"
-                            placeholder="Cari judul..."
-                            class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 xl:w-44 sm:w-28"
-                        />
-                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
-                    </div>
-                    <!-- Kategori -->
-                    <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 xl:w-40 sm:w-36">
-                    <option>Kategori</option>
-                    <!-- Tambahkan opsi lain -->
-                    </select>
-                    <!-- Tahun Penetapan -->
-                    <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 xl:w-40 sm:w-36">
-                        <option>Tahun Penetapan</option>
-                    </select>
+                    <!-- Filter Bar -->
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <!-- Nomor Peraturan -->
+                        <div class="relative">
+                            <input
+                                type="text"
+                                placeholder="Cari nomor peraturan..."
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
+                            />
+                            <span
+                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
+                                >search</span
+                            >
+                        </div>
+                        <!-- Judul -->
+                        <div class="relative">
+                            <input
+                                type="text"
+                                placeholder="Cari judul..."
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
+                            />
+                            <span
+                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
+                                >search</span
+                            >
+                        </div>
+                        <!-- Kategori -->
+                        <select
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-36"
+                        >
+                            <option>Kategori</option>
+                            <!-- Tambahkan opsi lain sesuai kebutuhan -->
+                        </select>
+                        <!-- Tahun Penetapan -->
+                        <select
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-40"
+                        >
+                            <option>Tahun Penetapan</option>
+                        </select>
                     </div>
                 </div>
 
                 <!-- Loading State -->
                 <div
-                    v-if="loading"
+                    v-if="produkHukumLoading"
                     class="flex justify-center items-center py-12"
                 >
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -167,9 +205,44 @@ onMounted(() => {
                 <!-- Pagination (if available from API) -->
                 <div
                     v-if="pagination && pagination.last_page > 1"
-                    class="mt-8 flex justify-center"
+                    class="mt-8 flex justify-center space-x-2"
                 >
-                    <!-- Add pagination controls here -->
+                    <button
+                        @click="goToPage(1)"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        :disabled="pagination.current_page === 1"
+                    >
+                        First
+                    </button>
+                    <button
+                        @click="goToPage(pagination.current_page - 1)"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        :disabled="pagination.current_page === 1"
+                    >
+                        Prev
+                    </button>
+                    <span class="px-3 py-1">
+                        Page {{ pagination.current_page }} of
+                        {{ pagination.last_page }}
+                    </span>
+                    <button
+                        @click="goToPage(pagination.current_page + 1)"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        :disabled="
+                            pagination.current_page === pagination.last_page
+                        "
+                    >
+                        Next
+                    </button>
+                    <button
+                        @click="goToPage(pagination.last_page)"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        :disabled="
+                            pagination.current_page === pagination.last_page
+                        "
+                    >
+                        Last
+                    </button>
                 </div>
             </div>
         </div>

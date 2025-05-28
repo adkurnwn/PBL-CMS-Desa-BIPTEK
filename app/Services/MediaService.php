@@ -5,6 +5,7 @@ namespace App\Services;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
+use App\Models\Image as ImageModel;
 
 class MediaService
 {
@@ -83,9 +84,20 @@ class MediaService
             ];
 
             if (method_exists($model, 'images')) {
-                $createdImages[] = $model->images()->create($imageData);
+                $createdImage = $model->images()->create($imageData);
+                // Return data in format expected by controller
+                $createdImages[] = [
+                    'path' => $filePath,
+                    'alt' => $altText,
+                    'id' => $createdImage->id
+                ];
             } elseif (method_exists($model, 'gambarProduk')) {
-                $createdImages[] = $model->gambarProduk()->create($imageData);
+                $createdImage = $model->gambarProduk()->create($imageData);
+                $createdImages[] = [
+                    'path' => $filePath,
+                    'alt' => $altText,
+                    'id' => $createdImage->id
+                ];
             }
         }
 
@@ -146,39 +158,42 @@ class MediaService
             $this->delete($model->$column, $disk);
         }
 
-        $videoPath = $this->upload($video, $path, $disk);
-        $model->update([$column => $videoPath]);
+        // Generate unique filename with proper extension
+        $extension = $video->getClientOriginalExtension();
+        $filename = uniqid() . '_' . time() . '.' . $extension;
+        $fullPath = $path . '/' . $filename;
 
-        return $videoPath;
+        // Store the video file
+        $video->storeAs($path, $filename, $disk);
+
+        // Update model with new path
+        $model->update([$column => $fullPath]);
+
+        return $fullPath;
     }
 
-    public function handleJsonImages($model, $files, $column, $path, $disk = 'public')
+    public function handleVideoRemoval($model, $column = 'video', $disk = 'public')
     {
-        $images = json_decode($model->$column) ?? [];
-
-        foreach ($files as $index => $file) {
-            if (isset($images[$index])) {
-                $this->delete($images[$index], $disk);
-            }
-
-            $storedPath = $this->upload($file, $path, $disk);
-            $images[$index] = $storedPath;
+        if (!empty($model->$column)) {
+            $this->delete($model->$column, $disk);
+            $model->update([$column => null]);
+            return true;
         }
-
-        $images = array_values($images);
-        $model->update([$column => json_encode($images)]);
-
-        return $images;
+        return false;
     }
 
     public function deleteAllMedia($model)
     {
-        foreach ($model->images as $image) {
-            $this->delete($image->path);
-            $image->delete();
+        // Delete all images
+        if (method_exists($model, 'images')) {
+            foreach ($model->images as $image) {
+                $this->delete($image->path);
+                $image->delete();
+            }
         }
 
-        if ($model->video) {
+        // Delete video if exists
+        if (!empty($model->video)) {
             $this->delete($model->video);
         }
     }
@@ -219,5 +234,29 @@ class MediaService
         $filePath = $file->storeAs($path, $filename, $disk);
 
         return $filePath;
+    }
+
+    public function handleJsonImages($model, $files, $column, $path, $disk = 'public')
+    {
+        // Get existing images from JSON
+        $images = json_decode($model->$column) ?? [];
+
+        // Process each file
+        foreach ($files as $index => $file) {
+            if (isset($images[$index])) {
+                $this->delete($images[$index], $disk);
+            }
+
+            $storedPath = $this->upload($file, $path, $disk);
+            $images[$index] = $storedPath;
+        }
+
+        // Ensure array is sequential
+        $images = array_values($images);
+
+        // Update model with JSON
+        $model->update([$column => json_encode($images)]);
+
+        return $images;
     }
 }

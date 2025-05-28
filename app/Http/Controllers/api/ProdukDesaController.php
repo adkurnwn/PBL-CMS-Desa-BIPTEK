@@ -50,7 +50,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -60,7 +60,7 @@ class ProdukDesaController extends Controller
         try {
             $produkDesa = ProdukDesa::with(['images', 'user:id,name'])
                 ->orderBy('created_at', 'desc')
-                ->take(3)
+                ->take(4)
                 ->get();
 
             if ($produkDesa->isEmpty()) {
@@ -78,7 +78,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }
@@ -108,7 +108,7 @@ class ProdukDesaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
+                'error' => app()->environment('production') ? null : $e->getMessage()
             ], 500);
         }
     }

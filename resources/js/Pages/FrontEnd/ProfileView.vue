@@ -2,81 +2,30 @@
 import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
+import { useApiCache } from "@/Utility/useApiCache";
+import { parseFasilitas, parseMisi } from "@/Utility/useParser";
 
-// Define reactive variables
 const profile = ref({});
-const kepalaDesa = ref({});
 const demografi = ref({});
-const loading = ref(true);
 
-const fetchProfile = async () => {
-    try {
-        loading.value = true;
+const fetchData = async () => {
+    const profileApi = useApiCache("profileData", "/api/profile/profile");
+    const demografiApi = useApiCache("demografiData", "/api/demografi/preview");
 
-        // Use Promise.all to fetch all data in parallel
-        const [profileResponse, kepalaDesaResponse, demografiResponse] =
-            await Promise.all([
-                axios.get("/api/profile/profile"),
-                axios.get("/api/users/kepala-desa"),
-                axios.get("/api/demografi/preview"),
-            ]);
+    await Promise.all([
+        profileApi.fetchWithCache(),
+        demografiApi.fetchWithCache(),
+    ]);
 
-        // Update each ref with its corresponding data
-        profile.value = profileResponse.data.data || {};
-        kepalaDesa.value = kepalaDesaResponse.data.data || {};
-        demografi.value = demografiResponse.data.data || {};
-
-        loading.value = false;
-    } catch (error) {
-        console.error("Error fetching profile data:", error);
-        loading.value = false;
-    }
+    profile.value = profileApi.data.value || {};
+    demografi.value = demografiApi.data.value || {};
 };
 
-onMounted(() => {
-    fetchProfile();
-});
-
-// Compute missionList after profile is loaded
-const missionList = computed(() => {
-    if (!profile.value || !profile.value.mission) return [];
-
-    if (typeof profile.value.mission === "string") {
-        return profile.value.mission
-            .split(/\d+\.\s/)
-            .filter((item) => item.trim() !== "");
-    }
-
-    return [];
-});
-
-const parseFasilitas = computed(() => {
-    if (!profile.value || !profile.value.fasilitas) return [];
-
-    if (typeof profile.value.fasilitas === "string") {
-        try {
-            return JSON.parse(profile.value.fasilitas);
-        } catch (e) {
-            console.error("Error parsing fasilitas:", e);
-            return [];
-        }
-    }
-
-    return Array.isArray(profile.value.fasilitas)
-        ? profile.value.fasilitas
-        : [];
-});
-
-const parseJson = (value) => {
-    if (typeof value === "string") {
-        try {
-            return JSON.parse(value);
-        } catch (e) {
-            return [];
-        }
-    }
-    return Array.isArray(value) ? value : [];
-};
+onMounted(fetchData);
+const missionList = computed(() => parseMisi(profile.value.mission || ""));
+const fasilitasList = computed(() =>
+    parseFasilitas(profile.value.fasilitas || "")
+);
 </script>
 <!-- Profileview.vue -->
 <template>
@@ -115,8 +64,8 @@ const parseJson = (value) => {
                     <!-- Lingkaran Putih -->
                     <div class="relative oval-container xl:ml-4 sm:ml-5">
                         <img
-                            :src="`/storage/${kepalaDesa.photo_profile}`"
-                            alt="Kepala Desa"
+                            :src="`/storage/${profile.kepala_desa_image}`"
+                            :alt="`${profile.kepala_desa_name} Profile`"
                             class="xl:py-5 md:py-7 sm:py-4 py-4 xl:ml-1 md:ml-2 sm:ml-0 xl:w-80 md:w-80 sm:w-72"
                         />
                     </div>
@@ -127,7 +76,7 @@ const parseJson = (value) => {
                         <p
                             class="font-bold xl:text-xl md:text-xl sm:text-md text-sm"
                         >
-                            {{ kepalaDesa.name }}
+                            {{ profile.kepala_desa_name }}
                         </p>
                         <p
                             class="italic xl:text-md md:text-md sm:text-xs text-xs"
@@ -335,7 +284,7 @@ const parseJson = (value) => {
                         class="list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-3xl xl:space-y-2 sm:space-y-1 xl:mr-0 sm:mr-5 -mt-96"
                     >
                         <li
-                            v-for="(fasilitas, index) in parseFasilitas"
+                            v-for="(fasilitas, index) in fasilitasList"
                             :key="index"
                         >
                             {{ fasilitas }}

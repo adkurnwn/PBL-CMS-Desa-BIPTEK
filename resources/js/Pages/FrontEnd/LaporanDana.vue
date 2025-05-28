@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import UserLayout from '@/Layouts/UserLayout.vue';
-
-</script>
-
 <template>
   <UserLayout>
     <div class="min-h-screen bg-type1">
@@ -10,8 +5,8 @@ import UserLayout from '@/Layouts/UserLayout.vue';
         <div class="flex flex-col items-center justify-center mb-12">
           <h1 class="text-2xl font-bold text-accent1">Laporan Dana Desa</h1>
         </div>
-        <div class="flex xl:flex-row sm:flex-col items-center justify-between mt-4 mb-8 gap-4">
-          <h1 class="xl:text-xl sm:text-md text-accent2 flex items-center xl:mr-0 sm:mr-96">
+        <div class="flex items-center justify-between mt-4 mb-8">
+          <h1 class="text-xl text-accent2 flex items-center">
             <span class="material-symbols-outlined mr-2 text-[1.3em] align-middle">description</span>
             Laporan Dana Desa
           </h1>
@@ -22,7 +17,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
               <input
                 type="text"
                 placeholder="Cari laporan dana desa..."
-                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 xl:w-80 sm:w-96"
+                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-80"
               />
               <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
             </div>

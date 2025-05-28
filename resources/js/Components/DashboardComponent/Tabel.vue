@@ -81,6 +81,11 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     },
+    // Add prop to control row background
+    whiteBackground: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const emit = defineEmits(['page-changed', 'sort', 'filter-changed']);
@@ -313,8 +318,7 @@ const truncateText = (text) => {
 //   multiline: false,         // Whether to allow multiple lines (default: false)
 // }]
 
-// Modify this function to check if text should be truncated
-// Default to true if not specified
+// Modify this function to make truncation the default behavior
 const shouldTruncate = (header) => {
     // If truncate property is explicitly set to false, don't truncate
     // Otherwise, truncate by default (if truncate is undefined or true)
@@ -326,6 +330,20 @@ const isMultiline = (header) => {
     // If multiline is true, allow multiple lines
     // Default to false if not specified
     return header.multiline === true;
+};
+
+// New helper function to normalize slot names (replace spaces with underscores)
+const normalizeSlotName = (headerLabel) => {
+    if (!headerLabel) return '';
+    return headerLabel.replace(/\s+/g, '_');
+};
+
+// Function to determine row background class
+const getRowBackgroundClass = (rowIndex) => {
+    if (props.whiteBackground) {
+        return 'bg-white';
+    }
+    return rowIndex % 2 !== 0 ? 'bg-menuBG' : 'bg-white';
 };
 
 </script>
@@ -407,7 +425,7 @@ const isMultiline = (header) => {
                         <tr
                             v-for="(item, rowIndex) in items"
                             :key="`row-${rowIndex}`"
-                            :class="{ 'bg-menuBG': rowIndex % 2 !== 0, 'bg-white': rowIndex % 2 === 0 }"
+                            :class="getRowBackgroundClass(rowIndex)"
                             class="h-[35px] sm:h-[40px] md:h-[45px] lg:h-[50px] xl:h-[54px] 2xl:h-[70px] 3xl:h-[90px] 4xl:h-[107px] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
                         >
                             <td 
@@ -423,8 +441,8 @@ const isMultiline = (header) => {
                                 class="text-TableText"
                                 :style="styleObjectToString(header.style)"
                             >
-                                <!-- Use format that matches how it's used in Dashboard.vue and elsewhere -->
-                                <slot :name="`item.${header.label}`" :item="item" :header="header">
+                                <!-- Use normalized slot name for multi-word header labels -->
+                                <slot :name="`item.${normalizeSlotName(header.label)}`" :item="item" :header="header">
                                     <!-- Add special handling for job_description field -->
                                     <div v-if="getFieldName(header) === 'job_description'">
                                         <ul class="list-disc ml-5">

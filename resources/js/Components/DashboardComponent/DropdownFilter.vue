@@ -246,7 +246,7 @@ export default {
 
 <template>
     <div class="dropdown-container w-[120px] h-[27px] sm:w-[125px] sm:h-[30px] md:w-[130px] md:h-[35px] xl:w-[133px] xl:h-[29px] 2xl:w-[150px] 2xl:h-[35px] 3xl:w-[175px] 3xl:h-[40px] 4xl:w-[200px] 4xl:h-[44px]">
-        <div class="relative flex items-center w-full h-full gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
+        <div class="relative flex items-center w-full h-full gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
             <!-- Modified to not use @click.stop which prevents event bubbling needed for outside click detection -->
             <input @click="toggleDropdown" type="text" v-model="displayValue" :placeholder="placeholder" readonly
                 class="w-full h-full pl-[25px] sm:pl-[27px] md:pl-[30px] xl:pl-[28px] 2xl:pl-[32px] 3xl:pl-[35px] 4xl:pl-12 

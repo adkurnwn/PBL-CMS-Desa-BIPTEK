@@ -44,9 +44,9 @@ defineProps({
                 >
                     <Link
                         :href="`/produk-unggulan/${produkDesa.slug}`"
-                        class="w-full bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
+                        class="flex w-full mx-auto justify-center bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
                     >
-                        Lihat Katalog
+                        <p>Lihat Katalog</p>
                     </Link>
 
                     
