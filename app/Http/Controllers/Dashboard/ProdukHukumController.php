@@ -54,7 +54,7 @@ class ProdukHukumController extends Controller
                 if ($key === 'category_id' && !empty($value)) {
                     $query->where('category_id', $value);
                 }
-                
+
                 if ($key === 'year' && !empty($value)) {
                     // Use the date column instead of created_at
                     $query->whereYear('date', $value);
@@ -73,7 +73,7 @@ class ProdukHukumController extends Controller
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
-            ->map(function($year) {
+            ->map(function ($year) {
                 return ['id' => $year, 'name' => $year];
             })
             ->toArray();
@@ -135,6 +135,7 @@ class ProdukHukumController extends Controller
     {
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? [], 0);
+        $titleChanged = $produkHukum->title !== $request->title;
 
         if (!empty($request->category['deleting_category_id'])) {
             $deletionResults = $this->categoryService->handleCategoryDeletion($request->category['deleting_category_id'], 0);
@@ -150,19 +151,20 @@ class ProdukHukumController extends Controller
                 'produk-hukum-documents',
                 $produkHukum->file
             );
-
-            // Delete the old file if it exists
-            if ($produkHukum->file) {
-                Storage::disk('public')->delete($produkHukum->file);
-            }
-
+        } elseif ($titleChanged && $produkHukum->file) {
+            $data['file'] = $this->mediaService->renameExistingFile(
+                $produkHukum->file,
+                $request->title,
+                'produk-hukum-documents'
+            );
         } else {
             unset($data['file']);
         }
 
-        if ($produkHukum->title !== $request->title) {
+        if ($titleChanged) {
             $data['slug'] = SlugHelper::generateUniqueSlug(ProdukHukum::class, $request->title);
         }
+
         $data['category_id'] = $category_id;
 
         $produkHukum->update($data);
