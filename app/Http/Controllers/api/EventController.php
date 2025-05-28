@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Cache;
 
 class EventController extends Controller
 {
-    public function index() {}
+    public function index() {
+        
+    }
 
     public function setReminder(Request $request, Event $event)
     {
