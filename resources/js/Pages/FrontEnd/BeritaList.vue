@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 
 const news = ref([]);
@@ -236,7 +236,7 @@ onMounted(() => {
                 <!-- News Grid -->
                 <div
                     v-else
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 xl:max-w-6xl max-w-xl mb-20"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 xl:max-w-6xl max-w-xl mb-4"
                 >
                     <NewsCard
                         v-for="newsItem in news"
@@ -257,24 +257,25 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <!-- Pagination (if needed) -->
-                <div
-                    v-if="pagination && pagination.last_page > 1"
-                    class="my-8 flex justify-center space-x-2"
-                >
+                <!-- Pagination -->
+                <div class="flex justify-center gap-2 mb-10">
                     <button
-                        v-for="page in pagination.last_page"
-                        :key="page"
-                        @click="goToPage(page)"
-                        class="px-3 py-1 rounded"
-                        :class="
-                            page === pagination.current_page
-                                ? 'bg-accent1 text-white'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        "
-                    >
-                        {{ page }}
-                    </button>
+                        class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="page === 1"
+                        @click="page--"
+                    >&lt;</button>
+                    <button
+                        v-for="p in totalPages"
+                        :key="p"
+                        class="w-7 h-7 rounded-full flex items-center justify-center text-xs"
+                        :class="page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                        @click="page = p"
+                    >{{ p }}</button>
+                    <button
+                        class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="page === totalPages"
+                        @click="page++"
+                    >&gt;</button>
                 </div>
             </article>
         </main>

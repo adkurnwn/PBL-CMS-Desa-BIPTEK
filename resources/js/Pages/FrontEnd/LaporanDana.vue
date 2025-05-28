@@ -27,7 +27,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
               <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
             </div>
               <!-- Tahun Penetapan -->
-              <select class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-40">
+              <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 w-40">
                 <option>Tahun</option>
               </select>
           </div>

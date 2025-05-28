@@ -43,61 +43,44 @@ onMounted(() => {
 <template>
     <UserLayout>
         <div class="min-h-screen bg-gray-100">
-            <div
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-40 font-merriweather"
-            >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-40 font-merriweather">
                 <div class="flex flex-col items-center justify-center mb-12">
-                    <h1 class="text-2xl font-bold text-accent1">
-                        Produk Hukum
-                    </h1>
+                    <h1 class="text-2xl font-bold text-accent1">Produk Hukum</h1>
                 </div>
-                <div class="flex items-center justify-between mt-4 mb-8">
-                    <h1 class="text-xl text-accent2 flex items-center">
-                        <span
-                            class="material-symbols-outlined mr-2 text-[1.3em] align-middle"
-                            >description</span
-                        >
-                        Produk Hukum Desa Pao-Pao
+                <div class="flex xl:flex-row sm:flex-col items-center justify-between mt-4 mb-8 gap-4">
+                    <h1 class="xl:text-xl sm:text-md text-accent2 flex items-center xl:mr-0 sm:mr-80">
+                    <span class="material-symbols-outlined mr-2 text-[1.3em] align-middle">description</span>
+                    Produk Hukum Desa Pao-Pao
                     </h1>
-                    <!-- Filter Bar -->
-                    <div class="flex flex-wrap gap-2 text-sm">
-                        <!-- Nomor Peraturan -->
-                        <div class="relative">
-                            <input
-                                type="text"
-                                placeholder="Cari nomor peraturan..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
-                            />
-                            <span
-                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
-                                >search</span
-                            >
-                        </div>
-                        <!-- Judul -->
-                        <div class="relative">
-                            <input
-                                type="text"
-                                placeholder="Cari judul..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
-                            />
-                            <span
-                                class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
-                                >search</span
-                            >
-                        </div>
-                        <!-- Kategori -->
-                        <select
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-36"
-                        >
-                            <option>Kategori</option>
-                            <!-- Tambahkan opsi lain sesuai kebutuhan -->
-                        </select>
-                        <!-- Tahun Penetapan -->
-                        <select
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-40"
-                        >
-                            <option>Tahun Penetapan</option>
-                        </select>
+                <!-- Filter Bar -->
+                <div class="flex flex-wrap gap-2">
+                    <!-- Nomor Peraturan -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            placeholder="Cari nomor peraturan..."
+                            class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
+                        />
+                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
+                    </div>
+                    <!-- Judul -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            placeholder="Cari judul..."
+                            class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 xl:w-44 sm:w-28"
+                        />
+                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
+                    </div>
+                    <!-- Kategori -->
+                    <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 xl:w-40 sm:w-36">
+                    <option>Kategori</option>
+                    <!-- Tambahkan opsi lain -->
+                    </select>
+                    <!-- Tahun Penetapan -->
+                    <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 xl:w-40 sm:w-36">
+                        <option>Tahun Penetapan</option>
+                    </select>
                     </div>
                 </div>
 
@@ -106,9 +89,7 @@ onMounted(() => {
                     v-if="loading"
                     class="flex justify-center items-center py-12"
                 >
-                    <div
-                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-                    ></div>
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
 
                 <!-- Error State -->

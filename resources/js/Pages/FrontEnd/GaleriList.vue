@@ -114,7 +114,7 @@ const totalPages = 2;
                     Album Desa
                 </h1>
             </article> 
-            <article class="w-full mt-7 px-20 mb-10">
+            <article class="w-full mt-5 px-20 mb-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div
                     v-for="album in albums"
@@ -150,17 +150,60 @@ const totalPages = 2;
                 </div>
             </div>
             <!-- Pagination -->
-            <div class="flex justify-center mt-8 gap-2">
-                <button class="px-2 py-1 rounded-2xl text-white bg-accent2" :disabled="page === 1" @click="page--">&lt;</button>
+            <div class="flex justify-center mt-5 gap-2">
                 <button
-                v-for="p in totalPages"
-                :key="p"
-                class="px-3 py-1 rounded-2xl border text-accent2"
-                :class="{'bg-accent2 text-white': page === p}"
-                @click="page = p"
+                    class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                    :disabled="page === 1"
+                    @click="page--"
+                >&lt;</button>
+                <button
+                    v-for="p in totalPages"
+                    :key="p"
+                    class="w-7 h-7 rounded-full flex items-center justify-center text-xs"
+                    :class="page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                    @click="page = p"
                 >{{ p }}</button>
-                <button class="px-2 py-1 rounded-2xl border text-white bg-accent2" :disabled="page === totalPages" @click="page++">&gt;</button>
-            </div>
+                <button
+                    class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                    :disabled="page === totalPages"
+                    @click="page++"
+                >&gt;</button>
+                </div>
+            </article>
+            <!--Galeri Terkni-->
+            <article class="w-full px-20 flex flex-col pb-8 lg:pb-24 bg-type1 font-merriweather space-y-5">
+              <h1 class="text-xl font-bold text-gray-800">
+                Galeri Terkini
+              </h1>
+                <div class="flex flex-row w-full h-full justify-between space-x-5">
+                    <img
+                        src="../../../images/GALERI_DESA2.png"
+                        alt="Gambar 1"
+                        class="w-3/5 h-[150px] sm:h-[225px] md:h-[300px] rounded-2xl object-cover"
+                    />
+                    <img
+                        src="../../../images/GALERI_DESA2.png"
+                        alt="Gambar 2"
+                        class="w-2/5 h-[150px] sm:h-[225px] md:h-[300px] rounded-2xl object-cover"
+                    />
+                </div>
+                <div class="flex flex-col sm:flex-row w-full justify-between space-x-5">
+                    <img
+                        src="../../../images/GALERI_DESA2.png"
+                        alt="Gambar 3"
+                        class="w-full sm:w-1/3 h-[200px] lg:w-96 rounded-xl object-cover"
+                    />
+                    <img
+                        src="../../../images/GALERI_DESA2.png"
+                        alt="Gambar 4"
+                        class="w-full sm:w-1/3 h-[200px] lg:w-96 rounded-xl object-cover"
+                    />
+                    <img
+                        src="../../../images/GALERI_DESA2.png"
+                        alt="Gambar 5"
+                        class="w-full sm:w-1/3 h-[200px] lg:w-96 rounded-xl object-cover"
+                    />
+                </div>
             </article>
         </main>
     </UserLayout>
