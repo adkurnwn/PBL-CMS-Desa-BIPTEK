@@ -257,31 +257,20 @@ class InstallController extends Controller
         ]);
 
         try {
-            // Upload logo
-            $logoPath = $request->file('logo')->store('profile-logo', 'public');
+            // Get village name for profile name
+            $village = \App\Models\Region\Village::find($request->kelurahan);
+            $profileName = $village ? "Desa " . ucwords(strtolower($village->name)) : $request->name;
 
-            // Upload organization image
-            $organizationImagePath = $request->file('organization_image')->store('organization-images', 'public');
-
-            // Upload hero images
-            $heroImages = [];
-            foreach ($request->file('hero_images') as $image) {
-                $heroImages[] = $image->store('hero-images', 'public');
-            }
-
-            // Create profile
-            $profile = \App\Models\Profile::create([
+            // Create base profile data
+            $profileData = [
                 'id' => 1,
-                'name' => $request->name,
+                'name' => $profileName,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'logo' => $logoPath,
                 'provinsi' => $request->provinsi,
                 'kabupaten' => $request->kabupaten,
                 'kecamatan' => $request->kecamatan,
                 'kelurahan' => $request->kelurahan,
-                'hero_images' => json_encode($heroImages),
-                'organization_image' => $organizationImagePath,
                 'lembaga' => json_encode([]),
                 'fasilitas' => json_encode([]),
                 'history' => $request->history,
@@ -289,7 +278,50 @@ class InstallController extends Controller
                 'mission' => $request->mission,
                 'primary_color' => '#000000',
                 'secondary_color' => '#000000',
-            ]);
+            ];
+
+            // Handle logo upload
+            if ($request->hasFile('logo')) {
+                $logoPath = $request->file('logo')->store('profile-logo', 'public');
+                $profileData['logo'] = $logoPath;
+
+                // Optionally set as favicon (if needed as in ProfileController)
+                // This would be handled in SettingsController
+            }
+
+            // Handle organization image
+            if ($request->hasFile('organization_image')) {
+                $orgImagePath = $request->file('organization_image')->store('organization-images', 'public');
+                $profileData['organization_image'] = $orgImagePath;
+            }
+
+            // Handle hero images
+            $heroImages = [];
+            if ($request->hasFile('hero_images')) {
+                foreach ($request->file('hero_images') as $image) {
+                    $heroImages[] = $image->store('hero-images', 'public');
+                }
+            } else {
+                // Check for individual hero image uploads
+                for ($i = 1; $i <= 3; $i++) {
+                    if ($request->hasFile("hero_image_$i")) {
+                        $heroImages[] = $request->file("hero_image_$i")->store('hero-images', 'public');
+                    }
+                }
+            }
+            $profileData['hero_images'] = json_encode($heroImages);
+
+            // Create the profile
+            $profile = \App\Models\Profile::create($profileData);
+
+            // Create log entry of this action
+            $logHelper = new \App\Helpers\LogActivityHelper();
+            $logHelper->logActivity('create', 'profile', 'Membuat profil desa ' . $profileName);
+
+            // Ensure storage link is created
+            if (!file_exists(public_path('storage'))) {
+                Artisan::call('storage:link', ['--force' => true]);
+            }
 
             return redirect()->route('install.finish');
         } catch (\Exception $e) {

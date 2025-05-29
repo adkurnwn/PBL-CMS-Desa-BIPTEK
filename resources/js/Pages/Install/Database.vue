@@ -415,6 +415,16 @@ const submit = () => {
                             3
                         </div>
                         <div class="text-xs mt-2 text-gray-600 font-bold">
+                            Izin Direktori
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            4
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600 font-bold">
                             Database
                         </div>
                     </div>
@@ -422,7 +432,7 @@ const submit = () => {
                         <div
                             class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
                         >
-                            4
+                            5
                         </div>
                         <div class="text-xs mt-2 text-gray-400">Admin</div>
                     </div>
@@ -430,15 +440,17 @@ const submit = () => {
                         <div
                             class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
                         >
-                            5
+                            6
                         </div>
-                        <div class="text-xs mt-2 text-gray-400">Selesai</div>
+                        <div class="text-xs mt-2 text-gray-400">
+                            Profile Desa
+                        </div>
                     </div>
                     <div class="w-1/5 text-center">
                         <div
                             class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
                         >
-                            6
+                            7
                         </div>
                         <div class="text-xs mt-2 text-gray-400">Selesai</div>
                     </div>

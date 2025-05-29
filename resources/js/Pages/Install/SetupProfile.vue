@@ -17,6 +17,10 @@ const districts = ref([]);
 const villages = ref([]);
 const loadingRegions = ref(true);
 
+// Add these to handle lembaga and fasilitas
+const newLembaga = ref("");
+const newFasilitas = ref("");
+
 // Form
 const form = useForm({
     name: "",
@@ -28,10 +32,20 @@ const form = useForm({
     kecamatan: "",
     kelurahan: "",
     hero_images: [],
+    // Add individual hero images for consistency with Edit component
+    hero_image_1: null,
+    hero_image_2: null,
+    hero_image_3: null,
     organization_image: null,
     history: "",
     vision: "",
     mission: "",
+    // Add these arrays for lembaga and fasilitas
+    lembaga: [],
+    fasilitas: [],
+    // Default colors
+    primary_color: "#000000",
+    secondary_color: "#000000",
 });
 
 // Fetch region data
@@ -133,8 +147,47 @@ const handleDistrictChange = (districtId) => {
     fetchVillages(districtId);
 };
 
+// Add methods for lembaga and fasilitas (from Edit.vue)
+const addLembaga = () => {
+    if (newLembaga.value.trim()) {
+        // Create a new array by spreading the existing items and adding the new one
+        form.lembaga = [...form.lembaga, newLembaga.value];
+        newLembaga.value = "";
+    }
+};
+
+const removeLembaga = (index) => {
+    // Create a new array by filtering out the item at the specified index
+    form.lembaga = form.lembaga.filter((_, i) => i !== index);
+};
+
+const addFasilitas = () => {
+    if (newFasilitas.value.trim()) {
+        // Create a new array by spreading the existing items and adding the new one
+        form.fasilitas = [...form.fasilitas, newFasilitas.value];
+        newFasilitas.value = "";
+    }
+};
+
+const removeFasilitas = (index) => {
+    // Create a new array by filtering out the item at the specified index
+    form.fasilitas = form.fasilitas.filter((_, i) => i !== index);
+};
+
 // Submit the form
 const submit = () => {
+    // Prepare the form for submission
+    // Individual hero images are a fallback if hero_images array is empty
+    const formData = new FormData();
+    for (const key in form) {
+        // Special handling for arrays and objects
+        if (key === "lembaga" || key === "fasilitas") {
+            formData.append(key, JSON.stringify(form[key]));
+        } else {
+            formData.append(key, form[key]);
+        }
+    }
+
     form.post(route("install.storeProfile"), {
         preserveScroll: true,
         forceFormData: true,
@@ -329,6 +382,129 @@ onMounted(() => {
                                     />
                                 </div>
 
+                                <!-- Fasilitas Input -->
+                                <div>
+                                    <div>
+                                        <SingleLineField
+                                            id="fasilitas"
+                                            v-model="newFasilitas"
+                                            type="add"
+                                            fieldName="Fasilitas"
+                                            placeholder="Masukkan fasilitas desa"
+                                            custom-width="100%"
+                                            @click.prevent="addFasilitas"
+                                        />
+                                    </div>
+
+                                    <!-- Display fasilitas as tags -->
+                                    <div
+                                        class="mt-2 flex flex-wrap gap-2"
+                                        v-if="form.fasilitas.length > 0"
+                                    >
+                                        <div
+                                            v-for="(
+                                                fasilitas, index
+                                            ) in form.fasilitas"
+                                            :key="index"
+                                            class="bg-gray-100 px-3 py-1 rounded flex items-center gap-2 shadow-sm"
+                                        >
+                                            <span>{{ fasilitas }}</span>
+                                            <button
+                                                type="button"
+                                                class="w-5 h-5 flex items-center justify-center focus:outline-none"
+                                                @click.prevent="
+                                                    removeFasilitas(index)
+                                                "
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    class="w-4 h-4"
+                                                >
+                                                    <path
+                                                        d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
+                                                        fill="#DC3545"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p
+                                        class="text-gray-500 text-sm ml-2"
+                                        v-else
+                                    >
+                                        Tambahkan fasilitas yang ada di desa
+                                    </p>
+                                    <InputError
+                                        :message="form.errors.fasilitas"
+                                        class="mt-2"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Second Column -->
+                            <div class="space-y-4">
+                                <!-- Lembaga Input -->
+                                <div>
+                                    <div>
+                                        <SingleLineField
+                                            id="lembaga"
+                                            v-model="newLembaga"
+                                            type="add"
+                                            fieldName="Lembaga"
+                                            placeholder="Masukkan nama lembaga desa"
+                                            custom-width="100%"
+                                            @click.prevent="addLembaga"
+                                        />
+                                    </div>
+
+                                    <!-- Display lembaga as tags -->
+                                    <div
+                                        class="mt-2 flex flex-wrap gap-2"
+                                        v-if="form.lembaga.length > 0"
+                                    >
+                                        <div
+                                            v-for="(
+                                                lembaga, index
+                                            ) in form.lembaga"
+                                            :key="index"
+                                            class="bg-gray-100 px-3 py-1 rounded flex items-center gap-2 shadow-sm"
+                                        >
+                                            <span>{{ lembaga }}</span>
+                                            <button
+                                                type="button"
+                                                class="w-5 h-5 flex items-center justify-center focus:outline-none"
+                                                @click.prevent="
+                                                    removeLembaga(index)
+                                                "
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    class="w-4 h-4"
+                                                >
+                                                    <path
+                                                        d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
+                                                        fill="#DC3545"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p
+                                        class="text-gray-500 text-sm ml-2"
+                                        v-else
+                                    >
+                                        Tambahkan lembaga yang ada di desa
+                                    </p>
+                                    <InputError
+                                        :message="form.errors.lembaga"
+                                        class="mt-2"
+                                    />
+                                </div>
+
                                 <div>
                                     <ImageInput
                                         v-model="form.logo"
@@ -341,10 +517,7 @@ onMounted(() => {
                                         class="mt-2"
                                     />
                                 </div>
-                            </div>
 
-                            <!-- Second Column -->
-                            <div class="space-y-4">
                                 <div>
                                     <ImageInput
                                         v-model="form.organization_image"
@@ -360,30 +533,32 @@ onMounted(() => {
                                     />
                                 </div>
 
-                                <div>
-                                    <label
-                                        class="block text-sm font-medium text-gray-700 mb-1"
-                                        >Gambar Hero (3 gambar)</label
-                                    >
-                                    <input
-                                        type="file"
-                                        multiple
-                                        @input="
-                                            form.hero_images =
-                                                $event.target.files
-                                        "
-                                        accept="image/jpeg,image/png,image/jpg"
-                                        required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-accent1 focus:border-accent1"
-                                    />
-                                    <InputError
-                                        :message="
-                                            form.errors['hero_images.0'] ||
-                                            form.errors['hero_images.1'] ||
-                                            form.errors['hero_images.2']
-                                        "
-                                        class="mt-2"
-                                    />
+                                <!-- Updated Hero Images to match Edit.vue -->
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <ImageInput
+                                            v-model="form.hero_image_1"
+                                            label="Hero Image 1"
+                                            :error="form.errors.hero_image_1"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <ImageInput
+                                            v-model="form.hero_image_2"
+                                            label="Hero Image 2"
+                                            :error="form.errors.hero_image_2"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <ImageInput
+                                            v-model="form.hero_image_3"
+                                            label="Hero Image 3"
+                                            :error="form.errors.hero_image_3"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
@@ -406,7 +581,7 @@ onMounted(() => {
                                     <TextAreaInput
                                         id="mission"
                                         v-model="form.mission"
-                                        type="text"
+                                        type="numbers"
                                         fieldName="Misi"
                                         placeholder="Masukkan misi desa (gunakan format list dengan nomor 1., 2., dst)"
                                         required

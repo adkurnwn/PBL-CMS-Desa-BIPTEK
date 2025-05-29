@@ -255,7 +255,7 @@ const canContinue = computed(() => {
                         >
                             4
                         </div>
-                        <div class="text-xs mt-2 text-gray-400">Admin</div>
+                        <div class="text-xs mt-2 text-gray-400">Database</div>
                     </div>
                     <div class="w-1/5 text-center">
                         <div
@@ -263,13 +263,23 @@ const canContinue = computed(() => {
                         >
                             5
                         </div>
-                        <div class="text-xs mt-2 text-gray-400">Selesai</div>
+                        <div class="text-xs mt-2 text-gray-400">Admin</div>
                     </div>
                     <div class="w-1/5 text-center">
                         <div
                             class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
                         >
                             6
+                        </div>
+                        <div class="text-xs mt-2 text-gray-400">
+                            Profile Desa
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
+                        >
+                            7
                         </div>
                         <div class="text-xs mt-2 text-gray-400">Selesai</div>
                     </div>
