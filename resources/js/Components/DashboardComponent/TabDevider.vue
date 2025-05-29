@@ -40,6 +40,12 @@ const handleTabClick = (tab, event) => {
                         : 'text-menuText hover:text-accent1/80'"
                 >
                     {{ tab.name }}
+                    <span 
+                        v-if="tab.badge && tab.badge > 0" 
+                        class="ml-2 inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[10px] font-medium bg-menuText text-white rounded-full"
+                    >
+                        {{ tab.badge }}
+                    </span>
                     <div 
                         v-if="tab.active" 
                         class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1"
@@ -54,6 +60,12 @@ const handleTabClick = (tab, event) => {
                         : 'text-menuText hover:text-accent1/80'"
                 >
                     {{ tab.name }}
+                    <span 
+                        v-if="tab.badge && tab.badge > 0" 
+                        class="ml-2 inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[10px] font-medium bg-menuText text-white rounded-full"
+                    >
+                        {{ tab.badge }}
+                    </span>
                     <div 
                         v-if="tab.active" 
                         class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1"

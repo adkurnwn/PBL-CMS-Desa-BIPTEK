@@ -170,6 +170,10 @@ const handleRemoveExistingVideo = () => {
             </PrimaryButton>
         </template>
 
+        <template #border-shadow>
+
+        </template>
+
         <div class="h-full pb-[48px] pt-[27px]">
             <div class="overflow-hidden bg-white">
                 <div class="">

@@ -121,6 +121,15 @@ onMounted(() => {
                     required
                 />
             </div>
+            <div class="mb-2 lg:mb-4 shadow-inner">
+                <input
+                    v-model="commentForm.email_user"
+                    type="text"
+                    placeholder="Masukkan Email..."
+                    class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                    required
+                />
+            </div>
             <div class="mb-0 lg:mb-4 shadow-inner">
                 <textarea
                     v-model="commentForm.komentar"
@@ -158,7 +167,7 @@ onMounted(() => {
                 class="flex bg-secondary text-white px-2 lg:px-4 py-2 gap-1 rounded text-xs lg:text-sm hover:bg-secondary/75"
                 :disabled="submitting"
             >
-                {{ submitting ? "Mengirim..." : "Kirim Balasan" }}
+                {{ submitting ? "Mengirim..." : "Kirim Komentar" }}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="18px"
@@ -264,6 +273,15 @@ onMounted(() => {
                                     v-model="replyForm.nama_user"
                                     type="text"
                                     placeholder="Masukkan Nama..."
+                                    class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    v-model="replyForm.email_user"
+                                    type="text"
+                                    placeholder="Masukkan Email..."
                                     class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                     required
                                 />
@@ -442,6 +460,15 @@ onMounted(() => {
                                                 v-model="replyForm.nama_user"
                                                 type="text"
                                                 placeholder="Masukkan Nama..."
+                                                class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <input
+                                                v-model="replyForm.email_user"
+                                                type="text"
+                                                placeholder="Masukkan Email..."
                                                 class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                                 required
                                             />
@@ -657,6 +684,17 @@ onMounted(() => {
                                                         "
                                                         type="text"
                                                         placeholder="Masukkan Nama..."
+                                                        class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        v-model="
+                                                            replyForm.email_user
+                                                        "
+                                                        type="text"
+                                                        placeholder="Masukkan Email..."
                                                         class="w-full text-xs lg:text-base p-2 border-1 border-zinc-300 rounded shadow-inner bg-type1"
                                                         required
                                                     />

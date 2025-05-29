@@ -8,7 +8,8 @@ const props = defineProps({
         validator: (value) => [
             'create', 'update', 'delete', 'other', 'mendatang', 'edit', 
             'berlangsung', 'berakhir', 'logout', 'login', 'kepala desa', 
-            'sekretaris desa', 'bendahara desa'
+            'sekretaris desa', 'bendahara desa', 'menunggu', 'ditanggapi',
+            'saran', 'keluhan'
         ].includes(value)
     },
     text: {
@@ -47,6 +48,10 @@ const labelClass = computed(() => {
         case 'menunggu':
              return 'bg-yellowLabel text-yellowLabelText';
         case 'ditanggapi':
+            return 'bg-greenLabel text-greenLabelText';
+        case 'saran':
+            return 'bg-blueLabel text-blueLabelText';
+        case 'keluhan':
             return 'bg-greenLabel text-greenLabelText';
         default:
             return 'bg-gray-100 text-gray-800';

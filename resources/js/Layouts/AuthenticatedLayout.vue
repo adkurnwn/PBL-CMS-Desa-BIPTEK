@@ -145,8 +145,12 @@ const handleSidebarCollapse = (collapsed) => {
                     <slot name="subtitle-area"></slot>
                 </div>
 
-                <div v-if="$slots['search-area']" class=" pt-[2px] pb-[13px] border-MenuBG shadow-sm border-b sm:pb-[14px] md:pb-[15px] lg:pb-[16px] xl:pb-[16.67px] 2xl:pb-[19px] 3xl:pb-[22px] 4xl:pb-[25px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
+                <div v-if="$slots['search-area']" class=" pt-[2px] pb-[13px] sm:pb-[14px] md:pb-[15px] lg:pb-[16px] xl:pb-[16.67px] 2xl:pb-[19px] 3xl:pb-[22px] 4xl:pb-[25px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
                     <slot name="search-area"></slot>
+                </div>
+
+                <div v-if="$slots['border-shadow']" class="border-MenuBG shadow-sm border-b">
+                    <slot name="border-shadow"></slot>
                 </div>
 
                 <div v-if="$slots['table-content']" class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] table-container-slot">
