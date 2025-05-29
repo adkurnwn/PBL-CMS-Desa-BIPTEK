@@ -17,6 +17,7 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/setup-profile', [InstallController::class, 'setupProfile'])->name('setupProfile');
     Route::post('/setup-profile', [InstallController::class, 'storeProfile'])->name('storeProfile');
     Route::get('/finish', [InstallController::class, 'finish'])->name('finish');
+    Route::post('/finalize', [InstallController::class, 'finalize'])->name('finalize');
 });
 
 Route::fallback(function ($name = null) {

@@ -26,7 +26,7 @@ import { Link } from "@inertiajs/vue3";
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             height="80"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="80"
                             class="mx-auto text-green-600 fill-current"
                         >
@@ -107,7 +107,9 @@ import { Link } from "@inertiajs/vue3";
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end">
                     <Link
-                        href="/login"
+                        :href="route('install.finalize')"
+                        method="post"
+                        as="button"
                         class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
                     >
                         Ke Halaman Login

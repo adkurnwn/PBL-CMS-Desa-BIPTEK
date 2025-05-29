@@ -218,15 +218,9 @@ class InstallController extends Controller
                 ->with('warning', 'Please complete your village profile setup before finishing installation.');
         }
 
-        // Mark the application as fully installed here
-        $this->updateEnvFile([
-            'APP_INSTALLED' => 'true',
-        ]);
-
+        // Don't mark as installed yet - we'll do that when they click "Ke Halaman Login"
+        // Keep the storage:link and cache commands
         Artisan::call('storage:link', ['--force' => true]);
-        Artisan::call('config:cache');
-        Artisan::call('route:cache');
-        Artisan::call('view:cache');
 
         return Inertia::render('Install/Finish');
     }
@@ -468,5 +462,25 @@ class InstallController extends Controller
         // Save as PNG
         imagepng($image, $outputPath);
         imagedestroy($image);
+    }
+
+    /**
+     * Mark the installation as completely finished when user navigates to login
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function finalize()
+    {
+        // Force set APP_INSTALLED to true in .env
+        $this->updateEnvFile([
+            'APP_INSTALLED' => 'true',
+        ]);
+
+        // Clear all caches to ensure changes take effect
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        Artisan::call('cache:clear');
+
+        return redirect('/login');
     }
 }
