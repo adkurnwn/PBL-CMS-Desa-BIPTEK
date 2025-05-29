@@ -105,12 +105,14 @@ class InstallController extends Controller
 
             // Update the .env file with database settings
             $this->updateEnvFile([
-                'DB_CONNECTION' => 'mysql', // Change from sqlite to mysql
+                'DB_CONNECTION' => 'mysql',
                 'DB_HOST' => $request->host,
                 'DB_PORT' => $request->port,
                 'DB_DATABASE' => $request->database,
                 'DB_USERNAME' => $request->username,
                 'DB_PASSWORD' => $request->password,
+                'APP_ENV' => 'production',
+                'APP_DEBUG' => 'false',
             ]);
 
             // Run migrations on the newly configured MySQL database
@@ -198,7 +200,7 @@ class InstallController extends Controller
                 'APP_DEBUG' => 'false',
             ]);
 
-            return redirect()->route('install.finish');
+            return redirect()->route('install.setupProfile');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
