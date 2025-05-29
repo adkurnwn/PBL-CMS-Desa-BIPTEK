@@ -194,9 +194,8 @@ class InstallController extends Controller
             // Create default settings if needed
             $this->createDefaultSettings();
 
-            // Mark the application as installed
+            // Remove the APP_INSTALLED setting from here, just set APP_DEBUG to false
             $this->updateEnvFile([
-                'APP_INSTALLED' => 'true',
                 'APP_DEBUG' => 'false',
             ]);
 
@@ -218,6 +217,11 @@ class InstallController extends Controller
             return redirect()->route('install.setupProfile')
                 ->with('warning', 'Please complete your village profile setup before finishing installation.');
         }
+
+        // Mark the application as fully installed here
+        $this->updateEnvFile([
+            'APP_INSTALLED' => 'true',
+        ]);
 
         Artisan::call('storage:link', ['--force' => true]);
         Artisan::call('config:cache');
