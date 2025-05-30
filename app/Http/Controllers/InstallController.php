@@ -388,7 +388,6 @@ class InstallController extends Controller
 
             return redirect()->route('install.finish');
         } catch (\Exception $e) {
-            \Log::error('Profile creation failed: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Failed to setup profile: ' . $e->getMessage()]);
         }
     }
