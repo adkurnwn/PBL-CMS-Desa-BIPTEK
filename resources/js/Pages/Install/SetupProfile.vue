@@ -21,7 +21,7 @@ const loadingRegions = ref(true);
 const newLembaga = ref("");
 const newFasilitas = ref("");
 
-// Form
+// Form - Add missing fields
 const form = useForm({
     name: "",
     email: "",
@@ -31,8 +31,7 @@ const form = useForm({
     kabupaten: "",
     kecamatan: "",
     kelurahan: "",
-    hero_images: [],
-    // Add individual hero images for consistency with Edit component
+    // Change this to individual hero images to match validation
     hero_image_1: null,
     hero_image_2: null,
     hero_image_3: null,
@@ -40,10 +39,8 @@ const form = useForm({
     history: "",
     vision: "",
     mission: "",
-    // Add these arrays for lembaga and fasilitas
     lembaga: [],
     fasilitas: [],
-    // Default colors
     primary_color: "#000000",
     secondary_color: "#000000",
 });
@@ -176,18 +173,6 @@ const removeFasilitas = (index) => {
 
 // Submit the form
 const submit = () => {
-    // Prepare the form for submission
-    // Individual hero images are a fallback if hero_images array is empty
-    const formData = new FormData();
-    for (const key in form) {
-        // Special handling for arrays and objects
-        if (key === "lembaga" || key === "fasilitas") {
-            formData.append(key, JSON.stringify(form[key]));
-        } else {
-            formData.append(key, form[key]);
-        }
-    }
-
     form.post(route("install.storeProfile"), {
         preserveScroll: true,
         forceFormData: true,
@@ -414,27 +399,15 @@ onMounted(() => {
                                                 fasilitas, index
                                             ) in form.fasilitas"
                                             :key="index"
-                                            class="bg-gray-100 px-3 py-1 rounded flex items-center gap-2 shadow-sm"
+                                            class="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                                         >
                                             <span>{{ fasilitas }}</span>
                                             <button
                                                 type="button"
-                                                class="w-5 h-5 flex items-center justify-center focus:outline-none"
-                                                @click.prevent="
-                                                    removeFasilitas(index)
-                                                "
+                                                @click="removeFasilitas(index)"
+                                                class="text-red-500 hover:text-red-700"
                                             >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="none"
-                                                    class="w-4 h-4"
-                                                >
-                                                    <path
-                                                        d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
-                                                        fill="#DC3545"
-                                                    />
-                                                </svg>
+                                                ×
                                             </button>
                                         </div>
                                     </div>
@@ -483,27 +456,15 @@ onMounted(() => {
                                                 lembaga, index
                                             ) in form.lembaga"
                                             :key="index"
-                                            class="bg-gray-100 px-3 py-1 rounded flex items-center gap-2 shadow-sm"
+                                            class="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                                         >
                                             <span>{{ lembaga }}</span>
                                             <button
                                                 type="button"
-                                                class="w-5 h-5 flex items-center justify-center focus:outline-none"
-                                                @click.prevent="
-                                                    removeLembaga(index)
-                                                "
+                                                @click="removeLembaga(index)"
+                                                class="text-red-500 hover:text-red-700"
                                             >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="none"
-                                                    class="w-4 h-4"
-                                                >
-                                                    <path
-                                                        d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
-                                                        fill="#DC3545"
-                                                    />
-                                                </svg>
+                                                ×
                                             </button>
                                         </div>
                                     </div>
@@ -547,7 +508,7 @@ onMounted(() => {
                                     />
                                 </div>
 
-                                <!-- Updated Hero Images to match Edit.vue -->
+                                <!-- Hero Images -->
                                 <div class="grid grid-cols-3 gap-2">
                                     <div>
                                         <ImageInput
@@ -597,7 +558,7 @@ onMounted(() => {
                                         v-model="form.mission"
                                         type="text"
                                         fieldName="Misi"
-                                        placeholder="Masukkan misi desa (gunakan format list dengan nomor 1., 2., dst)"
+                                        placeholder="Masukkan misi desa"
                                         required
                                         custom-width="100%"
                                     />

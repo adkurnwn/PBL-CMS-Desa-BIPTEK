@@ -308,26 +308,30 @@ class InstallController extends Controller
     public function storeProfile(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255', // Make optional since we generate from village
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
-            'logo' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+            'logo' => 'required|image|max:10000|mimes:jpg,jpeg,png',
             'provinsi' => 'required|string',
             'kabupaten' => 'required|string',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
-            'hero_images' => 'required|array',
-            'hero_images.*' => 'image|max:2048|mimes:jpg,jpeg,png',
-            'organization_image' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+            // Change validation to match frontend
+            'hero_image_1' => 'required|image|max:10000|mimes:jpg,jpeg,png',
+            'hero_image_2' => 'required|image|max:10000|mimes:jpg,jpeg,png',
+            'hero_image_3' => 'required|image|max:10000|mimes:jpg,jpeg,png',
+            'organization_image' => 'required|image|max:10000|mimes:jpg,jpeg,png',
             'history' => 'required|string',
             'vision' => 'required|string',
             'mission' => 'required|string',
+            'lembaga' => 'nullable|string', // JSON string from frontend
+            'fasilitas' => 'nullable|string', // JSON string from frontend
         ]);
 
         try {
             // Get village name for profile name
             $village = \App\Models\Region\Village::find($request->kelurahan);
-            $profileName = $village ? "Desa " . ucwords(strtolower($village->name)) : $request->name;
+            $profileName = $village ? "Desa " . ucwords(strtolower($village->name)) : 'Desa Default';
 
             // Create base profile data
             $profileData = [
@@ -339,8 +343,9 @@ class InstallController extends Controller
                 'kabupaten' => $request->kabupaten,
                 'kecamatan' => $request->kecamatan,
                 'kelurahan' => $request->kelurahan,
-                'lembaga' => json_encode([]),
-                'fasilitas' => json_encode([]),
+                // Handle JSON data from frontend
+                'lembaga' => $request->lembaga ?? json_encode([]),
+                'fasilitas' => $request->fasilitas ?? json_encode([]),
                 'history' => $request->history,
                 'vision' => $request->vision,
                 'mission' => $request->mission,
@@ -352,9 +357,6 @@ class InstallController extends Controller
             if ($request->hasFile('logo')) {
                 $logoPath = $request->file('logo')->store('profile-logo', 'public');
                 $profileData['logo'] = $logoPath;
-
-                // Optionally set as favicon (if needed as in ProfileController)
-                // This would be handled in SettingsController
             }
 
             // Handle organization image
@@ -363,18 +365,11 @@ class InstallController extends Controller
                 $profileData['organization_image'] = $orgImagePath;
             }
 
-            // Handle hero images
+            // Handle individual hero images
             $heroImages = [];
-            if ($request->hasFile('hero_images')) {
-                foreach ($request->file('hero_images') as $image) {
-                    $heroImages[] = $image->store('hero-images', 'public');
-                }
-            } else {
-                // Check for individual hero image uploads
-                for ($i = 1; $i <= 3; $i++) {
-                    if ($request->hasFile("hero_image_$i")) {
-                        $heroImages[] = $request->file("hero_image_$i")->store('hero-images', 'public');
-                    }
+            for ($i = 1; $i <= 3; $i++) {
+                if ($request->hasFile("hero_image_$i")) {
+                    $heroImages[] = $request->file("hero_image_$i")->store('hero-images', 'public');
                 }
             }
             $profileData['hero_images'] = json_encode($heroImages);
@@ -393,6 +388,7 @@ class InstallController extends Controller
 
             return redirect()->route('install.finish');
         } catch (\Exception $e) {
+            \Log::error('Profile creation failed: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Failed to setup profile: ' . $e->getMessage()]);
         }
     }
