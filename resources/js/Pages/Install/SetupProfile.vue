@@ -296,7 +296,7 @@ onMounted(() => {
                                         placeholder="Pilih Kabupaten"
                                         :options="
                                             regencies.map((r) => ({
-                                                value: r.id,
+                                                value: r.id, // Add this line
                                                 label: r.name,
                                             }))
                                         "
@@ -324,7 +324,7 @@ onMounted(() => {
                                         placeholder="Pilih Kecamatan"
                                         :options="
                                             districts.map((d) => ({
-                                                value: d.id,
+                                                value: d.id, // Add this line
                                                 label: d.name,
                                             }))
                                         "
@@ -352,7 +352,7 @@ onMounted(() => {
                                         placeholder="Pilih Kelurahan"
                                         :options="
                                             villages.map((v) => ({
-                                                value: v.id,
+                                                value: v.id, // Add this line
                                                 label: v.name,
                                             }))
                                         "

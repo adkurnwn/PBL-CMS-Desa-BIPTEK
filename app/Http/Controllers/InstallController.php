@@ -324,8 +324,8 @@ class InstallController extends Controller
             'history' => 'required|string',
             'vision' => 'required|string',
             'mission' => 'required|string',
-            'lembaga' => 'nullable|string', // JSON string from frontend
-            'fasilitas' => 'nullable|string', // JSON string from frontend
+            'lembaga' => 'nullable|array', // Change to array to match frontend
+            'fasilitas' => 'nullable|array', // Change to array to match frontend
         ]);
 
         try {
@@ -343,9 +343,9 @@ class InstallController extends Controller
                 'kabupaten' => $request->kabupaten,
                 'kecamatan' => $request->kecamatan,
                 'kelurahan' => $request->kelurahan,
-                // Handle JSON data from frontend
-                'lembaga' => $request->lembaga ?? json_encode([]),
-                'fasilitas' => $request->fasilitas ?? json_encode([]),
+                // Handle array data from frontend - encode to JSON like ProfileController
+                'lembaga' => json_encode($request->lembaga ?? []),
+                'fasilitas' => json_encode($request->fasilitas ?? []),
                 'history' => $request->history,
                 'vision' => $request->vision,
                 'mission' => $request->mission,
