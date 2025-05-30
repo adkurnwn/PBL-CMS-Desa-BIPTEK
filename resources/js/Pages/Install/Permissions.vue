@@ -34,7 +34,7 @@ const canContinue = computed(() => {
                     Izin Direktori
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 3/6: Periksa izin direktori untuk proses instalasi
+                    Langkah 3/7: Periksa izin direktori untuk proses instalasi
                 </h2>
             </div>
 
@@ -286,7 +286,7 @@ const canContinue = computed(() => {
                 </div>
                 <div class="relative flex items-center justify-center mt-2">
                     <div class="h-1 w-full bg-gray-200">
-                        <div class="h-1 bg-accent1" style="width: 40%"></div>
+                        <div class="h-1 bg-accent1" style="width: 36%"></div>
                     </div>
                 </div>
             </div>

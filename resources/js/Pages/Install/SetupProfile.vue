@@ -202,8 +202,10 @@ onMounted(() => {
 <template>
     <Head title="Setup Profile Desa" />
 
-    <div class="min-h-screen bg-gray-100 py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div
+        class="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    >
+        <div class="max-w-5xl w-full space-y-8">
             <!-- Header -->
             <div class="text-center">
                 <h1
@@ -212,13 +214,29 @@ onMounted(() => {
                     Setup Profile Desa
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 5/6: Lengkapi profil desa Anda
+                    Langkah 6/7: Lengkapi profil desa Anda
                 </h2>
             </div>
 
             <!-- Content -->
             <div class="bg-white shadow overflow-hidden rounded-lg mt-8">
-                <div class="p-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="text-center mb-8">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="80"
+                            viewBox="0 -960 960 960"
+                            width="80"
+                            class="mx-auto text-accent1 fill-current"
+                        >
+                            <path
+                                d="M400-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM80-160v-112q0-33 17-62t47-44q51-26 115-44t141-18h14q6 0 12 2-8 18-13.5 37.5T404-360h-4q-71 0-127.5 18T180-306q-9 5-14.5 14t-5.5 20v32h252q6 21 16 41.5t22 38.5H80Zm560 40-12-60q-12-5-22.5-10.5T584-204l-58 18-40-68 46-40q-2-14-2-26t2-26l-46-40 40-68 58 18q11-7 21.5-12.5T628-460l12-60h80l12 60q12 5 22.5 10.5T776-436l58-18 40 68-46 40q2 14 2 26t-2 26l46 40-40 68-58-18q-11 7-21.5 12.5T732-180l-12 60h-80Zm40-120q33 0 56.5-23.5T760-320q0-33-23.5-56.5T680-400q-33 0-56.5 23.5T600-320q0 33 23.5 56.5T680-240Z"
+                            />
+                        </svg>
+                        <h3 class="mt-4 text-2xl font-medium text-gray-900">
+                            Profile Desa
+                        </h3>
+                    </div>
                     <form
                         @submit.prevent="submit"
                         enctype="multipart/form-data"
@@ -228,22 +246,6 @@ onMounted(() => {
                         >
                             <!-- First Column -->
                             <div class="space-y-4">
-                                <div>
-                                    <SingleLineField
-                                        id="name"
-                                        v-model="form.name"
-                                        type="text"
-                                        fieldName="Nama Desa"
-                                        placeholder="Masukkan nama desa"
-                                        required
-                                        custom-width="100%"
-                                    />
-                                    <InputError
-                                        :message="form.errors.name"
-                                        class="mt-2"
-                                    />
-                                </div>
-
                                 <div>
                                     <SingleLineField
                                         id="email"
@@ -384,16 +386,22 @@ onMounted(() => {
 
                                 <!-- Fasilitas Input -->
                                 <div>
-                                    <div>
+                                    <div class="flex items-center gap-2">
                                         <SingleLineField
                                             id="fasilitas"
                                             v-model="newFasilitas"
-                                            type="add"
+                                            type="text"
                                             fieldName="Fasilitas"
                                             placeholder="Masukkan fasilitas desa"
                                             custom-width="100%"
-                                            @click.prevent="addFasilitas"
                                         />
+                                        <button
+                                            type="button"
+                                            @click="addFasilitas"
+                                            class="px-3 py-2 bg-accent1 text-white rounded hover:bg-accent1/90"
+                                        >
+                                            Tambah
+                                        </button>
                                     </div>
 
                                     <!-- Display fasilitas as tags -->
@@ -447,16 +455,22 @@ onMounted(() => {
                             <div class="space-y-4">
                                 <!-- Lembaga Input -->
                                 <div>
-                                    <div>
+                                    <div class="flex items-center gap-2">
                                         <SingleLineField
                                             id="lembaga"
                                             v-model="newLembaga"
-                                            type="add"
+                                            type="text"
                                             fieldName="Lembaga"
                                             placeholder="Masukkan nama lembaga desa"
                                             custom-width="100%"
-                                            @click.prevent="addLembaga"
                                         />
+                                        <button
+                                            type="button"
+                                            @click="addLembaga"
+                                            class="px-3 py-2 bg-accent1 text-white rounded hover:bg-accent1/90"
+                                        >
+                                            Tambah
+                                        </button>
                                     </div>
 
                                     <!-- Display lembaga as tags -->
@@ -612,20 +626,129 @@ onMounted(() => {
                                 class="mt-2"
                             />
                         </div>
-
-                        <!-- Submit Buttons -->
-                        <div class="mt-8 flex justify-end space-x-4">
-                            <Link :href="route('install.admin')">
-                                <SecondaryButton type="button"
-                                    >Kembali</SecondaryButton
-                                >
-                            </Link>
-                            <PrimaryButton :disabled="form.processing"
-                                >Simpan Profile</PrimaryButton
-                            >
-                        </div>
                     </form>
                 </div>
+                <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between">
+                    <Link
+                        :href="route('install.admin')"
+                        class="inline-flex justify-center rounded-md border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
+                    >
+                        Kembali
+                    </Link>
+                    <button
+                        type="button"
+                        @click="submit"
+                        :disabled="form.processing"
+                        class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2 disabled:opacity-70"
+                    >
+                        <span v-if="form.processing">
+                            <svg
+                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                ></circle>
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Sedang Memproses...
+                        </span>
+                        <span v-else>Simpan Profil</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Installation progress -->
+            <div class="mt-8">
+                <div class="flex justify-between">
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            1
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">
+                            Selamat Datang
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            2
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">
+                            Persyaratan
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            3
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">
+                            Izin Direktori
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            4
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">Database</div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            5
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600">Admin</div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                        >
+                            6
+                        </div>
+                        <div class="text-xs mt-2 text-gray-600 font-bold">
+                            Profile Desa
+                        </div>
+                    </div>
+                    <div class="w-1/5 text-center">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
+                        >
+                            7
+                        </div>
+                        <div class="text-xs mt-2 text-gray-400">Selesai</div>
+                    </div>
+                </div>
+                <div class="relative flex items-center justify-center mt-2">
+                    <div class="h-1 w-full bg-gray-200">
+                        <div class="h-1 bg-accent1" style="width: 79%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="text-center text-xs text-gray-500">
+                <p>CMS Desa BIPTEK &copy; {{ new Date().getFullYear() }}</p>
+                <p>
+                    Dibuat untuk membantu pembangunan digital desa di Indonesia
+                </p>
             </div>
         </div>
     </div>

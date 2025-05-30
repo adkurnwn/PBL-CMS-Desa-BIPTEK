@@ -45,7 +45,7 @@ const submit = () => {
                     Buat Akun Administrator
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 5/6: Buat pengguna admin untuk mengelola website
+                    Langkah 5/7: Buat pengguna admin untuk mengelola website
                 </h2>
             </div>
 
@@ -285,7 +285,7 @@ const submit = () => {
                         >
                             3
                         </div>
-                        <div class="text-xs mt-2 text-gray-600 font-bold">
+                        <div class="text-xs mt-2 text-gray-600">
                             Izin Direktori
                         </div>
                     </div>
@@ -328,7 +328,7 @@ const submit = () => {
                 </div>
                 <div class="relative flex items-center justify-center mt-2">
                     <div class="h-1 w-full bg-gray-200">
-                        <div class="h-1 bg-accent1" style="width: 75%"></div>
+                        <div class="h-1 bg-accent1" style="width: 64%"></div>
                     </div>
                 </div>
             </div>

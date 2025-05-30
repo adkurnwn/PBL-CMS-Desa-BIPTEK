@@ -105,7 +105,7 @@ const submit = () => {
                     Konfigurasi Database
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 3/6: Atur koneksi database untuk website Anda
+                    Langkah 4/7: Atur koneksi database untuk website Anda
                 </h2>
             </div>
 
@@ -414,7 +414,7 @@ const submit = () => {
                         >
                             3
                         </div>
-                        <div class="text-xs mt-2 text-gray-600 font-bold">
+                        <div class="text-xs mt-2 text-gray-600">
                             Izin Direktori
                         </div>
                     </div>

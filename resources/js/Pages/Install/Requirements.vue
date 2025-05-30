@@ -34,7 +34,7 @@ const canContinue = computed(() => {
                     Persyaratan Sistem
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 2/6: Periksa apakah server Anda memenuhi persyaratan
+                    Langkah 2/7: Periksa apakah server Anda memenuhi persyaratan
                 </h2>
             </div>
 
@@ -229,11 +229,11 @@ const canContinue = computed(() => {
                     </div>
                     <div class="w-1/5 text-center">
                         <div
-                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-accent1 text-white font-bold"
+                            class="w-10 h-10 mx-auto rounded-full flex items-center justify-center bg-gray-200 text-gray-500 font-bold"
                         >
                             3
                         </div>
-                        <div class="text-xs mt-2 text-gray-600 font-bold">
+                        <div class="text-xs mt-2 text-gray-400">
                             Izin Direktori
                         </div>
                     </div>
@@ -274,7 +274,7 @@ const canContinue = computed(() => {
                 </div>
                 <div class="relative flex items-center justify-center mt-2">
                     <div class="h-1 w-full bg-gray-200">
-                        <div class="h-1 bg-accent1" style="width: 25%"></div>
+                        <div class="h-1 bg-accent1" style="width: 21%"></div>
                     </div>
                 </div>
             </div>
