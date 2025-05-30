@@ -109,21 +109,12 @@ const tableHeaders = [
 // Filter fields for the dropdown
 const filterFields = computed(() => [
     {
-        key: 'category_id',
-        label: 'Kategori',
-        type: 'select',
-        options: props.categories?.map(cat => ({
-            id: cat.id,
-            name: cat.name
-        })) || []
-    },
-    {
-        key: 'is_moderate',
-        label: 'Status Moderasi',
+        id: 'is_moderate',
+        name: 'Status Moderasi',
         type: 'select',
         options: [
-            { id: true, name: 'Dimoderasi' },
-            { id: false, name: 'Tidak Dimoderasi' }
+            { id: 'true', name: 'Dimoderasi' },
+            { id: 'false', name: 'Tidak Dimoderasi' }
         ]
     }
 ]);
@@ -234,8 +225,16 @@ const formatDate = (date) => {
 
 // Watch for external filter changes
 watch(() => props.filters, (newValue) => {
-    if (JSON.stringify(newValue) !== JSON.stringify(filterState.value)) {
-        filterState.value = { ...newValue };
+    // Clean up empty filters before comparing
+    const cleanedNewValue = Object.fromEntries(
+        Object.entries(newValue).filter(([key, value]) => value !== '' && value !== null && value !== undefined)
+    );
+    const cleanedCurrentValue = Object.fromEntries(
+        Object.entries(filterState.value).filter(([key, value]) => value !== '' && value !== null && value !== undefined)
+    );
+    
+    if (JSON.stringify(cleanedNewValue) !== JSON.stringify(cleanedCurrentValue)) {
+        filterState.value = { ...cleanedNewValue };
     }
 }, { deep: true });
 

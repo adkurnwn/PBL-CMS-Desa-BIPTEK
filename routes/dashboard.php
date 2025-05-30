@@ -121,6 +121,8 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             Route::get('/comments/news', [KomentarBeritaController::class, 'newsIndex'])->name('dashboard.comments.news');
             Route::get('/comments/news/{news}/edit', [KomentarBeritaController::class, 'edit'])->name('dashboard.comments.news.edit');
             Route::get('/produk-hukum-comments', [KomentarProdukHukumController::class, 'index'])->name('dashboard.produk-hukum.index-comments');
+            Route::get('/produk-hukum-comments/documents', [KomentarProdukHukumController::class, 'documentsIndex'])->name('dashboard.produk-hukum.index-documents');
+            Route::get('/produk-hukum-comments/{produkHukum}/edit', [KomentarProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.index-comments.edit');
             Route::patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
             Route::patch('/produk-hukum-comments/{comment}/approve', [KomentarProdukHukumController::class, 'approve'])->name('dashboard.produk-hukum.index-comments.approve');
             Route::delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');

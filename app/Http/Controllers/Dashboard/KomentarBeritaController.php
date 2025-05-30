@@ -56,13 +56,17 @@ class KomentarBeritaController extends Controller
         // Get pending comments count for badge
         $pendingCommentsCount = KomentarBerita::where('is_approved', false)->count();
 
+        // Clean up filters - only include is_approved, exclude news_id from display filters
+        $filters = array_filter([
+            'is_approved' => $request->is_approved ?? '',
+        ], function($value) {
+            return $value !== '' && $value !== null;
+        });
+
         return Inertia::render('Dashboard/ModerasiKomentar/Index', [
             'comments' => $query->paginate(25)->withQueryString(),
             'search' => $request->search ?? '',
-            'filters' => [
-                'is_approved' => $request->is_approved ?? '',
-                'news_id' => $request->news_id ?? '',
-            ],
+            'filters' => $filters,
             'sort' => $sortField,
             'direction' => $sortDirection,
             'pendingCommentsCount' => $pendingCommentsCount,
@@ -111,9 +115,9 @@ class KomentarBeritaController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        // Handle is_moderate filter
+        // Handle is_moderate filter - convert string to boolean
         if ($request->filled('is_moderate')) {
-            $isModerate = $request->is_moderate === 'true' || $request->is_moderate === true;
+            $isModerate = $request->is_moderate === 'true';
             $query->where('is_moderate', $isModerate);
         }
 
@@ -121,7 +125,7 @@ class KomentarBeritaController extends Controller
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
         
-        $allowedSortFields = ['title', 'created_at', 'comments_count'];
+        $allowedSortFields = ['title', 'created_at', 'comments_count', 'pending_comments_count'];
         if (in_array($sortField, $allowedSortFields)) {
             $query->orderBy($sortField, $sortDirection);
         } else {
@@ -134,13 +138,17 @@ class KomentarBeritaController extends Controller
         // Get all categories for filtering
         $categories = Category::where('category_type', 1)->get();
 
+        // Clean up filters - only include non-empty values
+        $filters = array_filter([
+            'is_moderate' => $request->is_moderate ?? '',
+        ], function($value) {
+            return $value !== '' && $value !== null;
+        });
+
         return Inertia::render('Dashboard/ModerasiKomentar/IndexBerita', [
             'news' => $query->paginate(25)->withQueryString(),
             'search' => $request->search ?? '',
-            'filters' => [
-                'category_id' => $request->category_id ?? '',
-                'is_moderate' => $request->is_moderate ?? '',
-            ],
+            'filters' => $filters,
             'sort' => $sortField,
             'direction' => $sortDirection,
             'pendingCommentsCount' => $pendingCommentsCount,

@@ -63,7 +63,9 @@ const searchQuery = ref(props.search || '');
 // Add filter state - exclude is_approved from filters since it's handled by tabs
 const filterState = ref((() => {
     const filters = { ...props.filters };
+    // Remove both is_approved and news_id from filters since they're handled separately
     delete filters.is_approved;
+    delete filters.news_id;
     return filters;
 })());
 
@@ -113,9 +115,17 @@ const tableHeaders = [
     }
 ];
 
-// Update filterFields to exclude is_approved since it's handled by tabs
+// Update filterFields to include is_approved for the dropdown
 const filterFields = computed(() => [
-    // Remove is_approved from here since it's handled by tabs
+    {
+        id: 'is_approved',
+        name: 'Status Persetujuan',
+        type: 'select',
+        options: [
+            { id: 'pending', name: 'Menunggu' },
+            { id: 'approved', name: 'Disetujui' }
+        ]
+    }
 ]);
 
 const approveComment = (commentId) => {
@@ -297,7 +307,9 @@ const formatDate = (date) => {
 // Watch for external filter changes
 watch(() => props.filters, (newValue) => {
     const filtersWithoutApproval = { ...newValue };
-    delete filtersWithoutApproval.is_approved; // Remove is_approved since it's handled by tabs
+    // Remove both is_approved and news_id since they're handled separately
+    delete filtersWithoutApproval.is_approved;
+    delete filtersWithoutApproval.news_id;
     
     if (JSON.stringify(filtersWithoutApproval) !== JSON.stringify(filterState.value)) {
         filterState.value = { ...filtersWithoutApproval };

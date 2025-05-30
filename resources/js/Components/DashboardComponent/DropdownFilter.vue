@@ -1,5 +1,5 @@
 <script>
-import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
 export default {
     props: {
@@ -77,6 +77,15 @@ export default {
         const currentStep = ref('fields'); // 'fields' or 'values'
         const selectedField = ref(null);
         const displayValue = ref('');
+        const dropdownRef = ref(null);
+        const containerRef = ref(null);
+
+        // Add reactive positioning state
+        const dropdownPosition = ref({
+            left: '0px',
+            right: 'auto',
+            transform: 'none'
+        });
 
         // Determine if any filter is active
         const isActive = computed(() => {
@@ -104,6 +113,51 @@ export default {
             return `${entries.length} filters active`;
         });
 
+        // Add function to calculate dropdown position
+        const calculateDropdownPosition = () => {
+            if (!containerRef.value || !dropdownRef.value) return;
+
+            const container = containerRef.value;
+            const dropdown = dropdownRef.value;
+            const containerRect = container.getBoundingClientRect();
+            const dropdownRect = dropdown.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Reset positioning
+            dropdownPosition.value = {
+                left: '0px',
+                right: 'auto',
+                transform: 'none'
+            };
+
+            // Wait for next tick to get updated dimensions
+            nextTick(() => {
+                const updatedDropdownRect = dropdown.getBoundingClientRect();
+                
+                // Check if dropdown extends beyond right edge
+                if (containerRect.left + updatedDropdownRect.width > viewportWidth - 10) {
+                    // Position dropdown to align with right edge of container
+                    dropdownPosition.value = {
+                        left: 'auto',
+                        right: '0px',
+                        transform: 'none'
+                    };
+                }
+
+                // Check if dropdown extends beyond left edge (when right-aligned)
+                const finalDropdownRect = dropdown.getBoundingClientRect();
+                if (finalDropdownRect.left < 10) {
+                    // Reset to left alignment if right alignment pushes it too far left
+                    dropdownPosition.value = {
+                        left: '0px',
+                        right: 'auto',
+                        transform: 'none'
+                    };
+                }
+            });
+        };
+
         // Toggle dropdown open/closed
         const toggleDropdown = () => {
             if (isOpen.value) {
@@ -112,6 +166,11 @@ export default {
                 isOpen.value = true;
                 currentStep.value = 'fields';
                 selectedField.value = null;
+                
+                // Calculate position after dropdown is rendered
+                nextTick(() => {
+                    calculateDropdownPosition();
+                });
             }
         };
 
@@ -216,11 +275,22 @@ export default {
         // Setup outside click listener when component is mounted
         onMounted(() => {
             document.addEventListener('click', handleOutsideClick);
+            // Add resize listener to recalculate position
+            window.addEventListener('resize', () => {
+                if (isOpen.value) {
+                    calculateDropdownPosition();
+                }
+            });
         });
 
         // Remove event listener when component is unmounted
         onBeforeUnmount(() => {
             document.removeEventListener('click', handleOutsideClick);
+            window.removeEventListener('resize', () => {
+                if (isOpen.value) {
+                    calculateDropdownPosition();
+                }
+            });
         });
 
         return {
@@ -238,14 +308,17 @@ export default {
             removeFilter,
             clearAllFilters,
             getFilterDisplayName,
-            isFieldFiltered
+            isFieldFiltered,
+            dropdownRef,
+            containerRef,
+            dropdownPosition
         };
     }
 }
 </script>
 
 <template>
-    <div class="dropdown-container w-[120px] h-[27px] sm:w-[125px] sm:h-[30px] md:w-[130px] md:h-[35px] xl:w-[133px] xl:h-[29px] 2xl:w-[150px] 2xl:h-[35px] 3xl:w-[175px] 3xl:h-[40px] 4xl:w-[200px] 4xl:h-[44px]">
+    <div ref="containerRef" class="dropdown-container w-[120px] h-[27px] sm:w-[125px] sm:h-[30px] md:w-[130px] md:h-[35px] xl:w-[133px] xl:h-[29px] 2xl:w-[150px] 2xl:h-[35px] 3xl:w-[175px] 3xl:h-[40px] 4xl:w-[200px] 4xl:h-[44px]">
         <div class="relative flex items-center w-full h-full gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
             <!-- Modified to not use @click.stop which prevents event bubbling needed for outside click detection -->
             <input @click="toggleDropdown" type="text" v-model="displayValue" :placeholder="placeholder" readonly
@@ -283,10 +356,16 @@ export default {
                 </svg>
             </div>
 
-            <!-- Dropdown menu -->
+            <!-- Dropdown menu with dynamic positioning -->
             <div v-if="isOpen"
-                class="absolute left-0 right-0 top-full mt-1 bg-menuBG rounded-md shadow-lg z-50 
+                ref="dropdownRef"
+                class="absolute top-full mt-1 bg-menuBG rounded-md shadow-lg z-50 
                        min-w-[180px] sm:min-w-[200px] md:min-w-[220px] xl:min-w-[220px] 2xl:min-w-[230px] 3xl:min-w-[240px] 4xl:min-w-[250px]" 
+                :style="{
+                    left: dropdownPosition.left,
+                    right: dropdownPosition.right,
+                    transform: dropdownPosition.transform
+                }"
                 @click.stop>
                 <div class="p-[8px] sm:p-[9px] md:p-[10px] xl:p-[8px] 2xl:p-[9px] 3xl:p-[10px] 4xl:p-3">
                     <!-- Active filters summary -->
