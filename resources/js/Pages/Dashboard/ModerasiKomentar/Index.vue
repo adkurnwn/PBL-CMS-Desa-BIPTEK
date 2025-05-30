@@ -245,6 +245,32 @@ const handleSort = (field) => {
     });
 };
 
+// Add pagination handling function
+const handlePageChanged = (page) => {
+    const params = {
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        page: page
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Add current tab's is_approved filter if not 'all'
+    if (activeTab.value === 'pending') {
+        params.is_approved = 'pending';
+    } else if (activeTab.value === 'approved') {
+        params.is_approved = 'approved';
+    }
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
 // Watch for search query changes to handle real-time search
 watch(searchQuery, (newValue, oldValue) => {
     if (newValue !== oldValue) {
@@ -325,6 +351,11 @@ watch(() => props.filters, (newValue) => {
                     active: activeTab === 'pending',
                     onClick: () => handleTabChange('pending'),
                     badge: pendingCommentsCount
+                },
+                {
+                    name: 'Daftar Berita',
+                    href: route('dashboard.comments.news'),
+                    active: false
                 }
             ]" />
         </template>
@@ -355,7 +386,7 @@ watch(() => props.filters, (newValue) => {
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
                         :white-background="true" empty-state-message="No comments found"
-                        @filter-changed="handleFilterChange" @sort="handleSort">
+                        @filter-changed="handleFilterChange" @sort="handleSort" @page-changed="handlePageChanged">
 
                         <template #['item.Komentar_Pengguna']="{ item }">
                             <Comments 

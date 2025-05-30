@@ -118,6 +118,8 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
 
         Route::middleware(['permission:manage_comments'])->group(function () {
             Route::get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
+            Route::get('/comments/news', [KomentarBeritaController::class, 'newsIndex'])->name('dashboard.comments.news');
+            Route::get('/comments/news/{news}/edit', [KomentarBeritaController::class, 'edit'])->name('dashboard.comments.news.edit');
             Route::get('/produk-hukum-comments', [KomentarProdukHukumController::class, 'index'])->name('dashboard.produk-hukum.index-comments');
             Route::patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
             Route::patch('/produk-hukum-comments/{comment}/approve', [KomentarProdukHukumController::class, 'approve'])->name('dashboard.produk-hukum.index-comments.approve');

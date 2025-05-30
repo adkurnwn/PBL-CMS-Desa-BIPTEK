@@ -156,9 +156,26 @@ const handleSidebarCollapse = (collapsed) => {
                 <div v-if="$slots['table-content']" class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] table-container-slot">
                     <slot name="table-content"></slot>
                 </div>
+
+                <div v-if="$slots['edit-comment']" class="flex-1 flex gap-4 h-full overflow-hidden">
+                    <div class="w-2/5 h-full overflow-hidden">
+                        <Scrollbar 
+                            class="h-full" 
+                            :hideScrollbar="false"
+                            :autoHide="false"
+                        >
+                            <slot name="news-content-comment"></slot>
+                        </Scrollbar>
+                    </div>
+                    <div class="w-3/5 h-full overflow-hidden">
+                        <div class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] h-full ">
+                            <slot name="table-content-comment"></slot>
+                        </div>
+                    </div>
+                </div>
                  
                 <Scrollbar 
-                    v-if="!$slots['table-content']"
+                    v-if="!$slots['table-content'] && !$slots['edit-comment']"
                     class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px]" 
                     :hideScrollbar="false"
                     :autoHide="false"
