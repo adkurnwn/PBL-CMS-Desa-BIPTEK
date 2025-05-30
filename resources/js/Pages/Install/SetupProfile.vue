@@ -595,7 +595,7 @@ onMounted(() => {
                                     <TextAreaInput
                                         id="mission"
                                         v-model="form.mission"
-                                        type="numbers"
+                                        type="text"
                                         fieldName="Misi"
                                         placeholder="Masukkan misi desa (gunakan format list dengan nomor 1., 2., dst)"
                                         required

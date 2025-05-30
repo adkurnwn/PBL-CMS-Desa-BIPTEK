@@ -111,14 +111,52 @@ class InstallController extends Controller
                 'DB_DATABASE' => $request->database,
                 'DB_USERNAME' => $request->username,
                 'DB_PASSWORD' => $request->password,
-                'APP_ENV' => 'production',
-                'APP_DEBUG' => 'false',
+                'DB_COLLATION' => 'utf8mb4_unicode_ci', // More compatible collation
+                'APP_ENV' => 'local', // Keep in local during installation
+                'APP_DEBUG' => 'true', // Keep debug enabled during installation
             ]);
 
-            // Run migrations on the newly configured MySQL database
+            // Clear configuration cache to pick up new settings
             Artisan::call('config:clear');
-            Artisan::call('migrate:fresh', ['--force' => true, '--database' => 'mysql']);
-            Artisan::call('db:seed', ['--force' => true]);
+
+            // Set longer timeout for migration
+            ini_set('max_execution_time', 300); // 5 minutes
+
+            try {
+                // Run migrations
+                $migrateOutput = Artisan::call('migrate:fresh', ['--force' => true]);
+
+                // Run core seeders first (roles, permissions)
+                Artisan::call('db:seed', [
+                    '--class' => 'RoleSeeder',
+                    '--force' => true
+                ]);
+
+                Artisan::call('db:seed', [
+                    '--class' => 'PositionSeeder',
+                    '--force' => true
+                ]);
+
+                Artisan::call('db:seed', [
+                    '--class' => 'PermissionSeeder',
+                    '--force' => true
+                ]);
+
+                // Run region seeders with increased memory
+                ini_set('memory_limit', '512M');
+                Artisan::call('db:seed', [
+                    '--class' => 'IndoRegionSeeder',
+                    '--force' => true
+                ]);
+
+                // Run remaining seeders
+                Artisan::call('db:seed', [
+                    '--class' => 'CategorySeeder',
+                    '--force' => true
+                ]);
+            } catch (\Exception $migrationException) {
+                return redirect()->back()->withErrors(['error' => 'Migration error: ' . $migrationException->getMessage()]);
+            }
 
             return redirect()->route('install.admin');
         } catch (\Exception $e) {
@@ -471,9 +509,11 @@ class InstallController extends Controller
      */
     public function finalize()
     {
-        // Force set APP_INSTALLED to true in .env
+        // Force set APP_INSTALLED to true in .env and switch to production mode
         $this->updateEnvFile([
             'APP_INSTALLED' => 'true',
+            'APP_ENV' => 'production',
+            'APP_DEBUG' => 'false',
         ]);
 
         // Clear all caches to ensure changes take effect
