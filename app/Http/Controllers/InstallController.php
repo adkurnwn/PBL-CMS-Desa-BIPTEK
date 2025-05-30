@@ -103,7 +103,7 @@ class InstallController extends Controller
                 return redirect()->back()->withErrors(['connection' => $connection['message']]);
             }
 
-            // Update the .env file with database settings
+            // Update the .env file with database settings AND change session driver to file temporarily
             $this->updateEnvFile([
                 'DB_CONNECTION' => 'mysql',
                 'DB_HOST' => $request->host,
@@ -111,9 +111,10 @@ class InstallController extends Controller
                 'DB_DATABASE' => $request->database,
                 'DB_USERNAME' => $request->username,
                 'DB_PASSWORD' => $request->password,
-                'DB_COLLATION' => 'utf8mb4_unicode_ci', // More compatible collation
-                'APP_ENV' => 'local', // Keep in local during installation
-                'APP_DEBUG' => 'true', // Keep debug enabled during installation
+                'DB_COLLATION' => 'utf8mb4_unicode_ci',
+                'SESSION_DRIVER' => 'file', // Change to file during installation
+                'APP_ENV' => 'local',
+                'APP_DEBUG' => 'true',
             ]);
 
             // Set environment variables for immediate effect
@@ -123,6 +124,7 @@ class InstallController extends Controller
             putenv("DB_DATABASE={$request->database}");
             putenv("DB_USERNAME={$request->username}");
             putenv("DB_PASSWORD={$request->password}");
+            putenv("SESSION_DRIVER=file"); // Set session driver to file
 
             // Update configuration array directly
             config([
@@ -131,14 +133,17 @@ class InstallController extends Controller
                 'database.connections.mysql.database' => $request->database,
                 'database.connections.mysql.username' => $request->username,
                 'database.connections.mysql.password' => $request->password,
+                'session.driver' => 'file', // Change session driver to file
             ]);
 
             // Refresh database connection
             DB::purge('mysql');
             DB::reconnect('mysql');
 
-            // Clear configuration cache to pick up new settings
+            // Clear all caches to ensure changes take effect
             Artisan::call('config:clear');
+            Artisan::call('cache:clear');
+            Artisan::call('route:clear');
 
             // Set longer timeout for migration
             ini_set('max_execution_time', 300); // 5 minutes
@@ -175,6 +180,14 @@ class InstallController extends Controller
                     '--class' => 'CategorySeeder',
                     '--force' => true
                 ]);
+
+                // After migrations are complete, switch back to database session driver
+                $this->updateEnvFile([
+                    'SESSION_DRIVER' => 'database',
+                ]);
+
+                // Update config for immediate effect
+                config(['session.driver' => 'database']);
             } catch (\Exception $migrationException) {
                 return redirect()->back()->withErrors(['error' => 'Migration error: ' . $migrationException->getMessage()]);
             }
@@ -535,6 +548,7 @@ class InstallController extends Controller
             'APP_INSTALLED' => 'true',
             'APP_ENV' => 'production',
             'APP_DEBUG' => 'false',
+            'SESSION_DRIVER' => 'database', // Ensure database session is used in production
         ]);
 
         // Clear all caches to ensure changes take effect
