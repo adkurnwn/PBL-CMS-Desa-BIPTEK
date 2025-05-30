@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
-use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class InstallController extends Controller
 {
@@ -233,93 +234,221 @@ class InstallController extends Controller
      */
     public function storeProfile(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'logo' => 'required|image|max:2048|mimes:jpg,jpeg,png',
-            'provinsi' => 'required|string',
-            'kabupaten' => 'required|string',
-            'kecamatan' => 'required|string',
-            'kelurahan' => 'required|string',
-            'hero_images' => 'required|array',
-            'hero_images.*' => 'image|max:2048|mimes:jpg,jpeg,png',
-            'organization_image' => 'required|image|max:2048|mimes:jpg,jpeg,png',
-            'history' => 'required|string',
-            'vision' => 'required|string',
-            'mission' => 'required|string',
-        ]);
-
         try {
-            // Get village name for profile name
-            $village = \App\Models\Region\Village::find($request->kelurahan);
-            $profileName = $village ? "Desa " . ucwords(strtolower($village->name)) : $request->name;
+            // Log the request data for debugging
+            Log::info('Profile setup submission received', [
+                'has_files' => $request->hasFile('logo'),
+                'fields' => $request->except(['logo', 'organization_image', 'hero_image_1', 'hero_image_2', 'hero_image_3'])
+            ]);
 
-            // Create base profile data
-            $profileData = [
-                'id' => 1,
-                'name' => $profileName,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'provinsi' => $request->provinsi,
-                'kabupaten' => $request->kabupaten,
-                'kecamatan' => $request->kecamatan,
-                'kelurahan' => $request->kelurahan,
-                'lembaga' => json_encode([]),
-                'fasilitas' => json_encode([]),
-                'history' => $request->history,
-                'vision' => $request->vision,
-                'mission' => $request->mission,
-                'primary_color' => '#000000',
-                'secondary_color' => '#000000',
-            ];
+            // Check for hero images - individually
+            $hasHeroImage1 = $request->hasFile('hero_image_1');
+            $hasHeroImage2 = $request->hasFile('hero_image_2');
+            $hasHeroImage3 = $request->hasFile('hero_image_3');
 
-            // Handle logo upload
-            if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('profile-logo', 'public');
-                $profileData['logo'] = $logoPath;
+            Log::info('Hero images check', [
+                'hero_image_1' => $hasHeroImage1 ? 'present' : 'missing',
+                'hero_image_2' => $hasHeroImage2 ? 'present' : 'missing',
+                'hero_image_3' => $hasHeroImage3 ? 'present' : 'missing'
+            ]);
 
-                // Optionally set as favicon (if needed as in ProfileController)
-                // This would be handled in SettingsController
+            // Modify validation to accept either individual hero images or an array
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'name' => 'nullable|string|max:255', // Made optional as we'll derive from village name
+                'email' => 'required|email|max:255',
+                'phone' => 'required|string|max:20',
+                'logo' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+                'provinsi' => 'required|string',
+                'kabupaten' => 'required|string',
+                'kecamatan' => 'required|string',
+                'kelurahan' => 'required|string',
+                'organization_image' => 'required|image|max:2048|mimes:jpg,jpeg,png',
+                'history' => 'required|string',
+                'vision' => 'required|string',
+                'mission' => 'required|string',
+                // Make array optional if individual images are used
+                'hero_images' => 'nullable|array',
+                'hero_images.*' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
+                // Accept individual hero images
+                'hero_image_1' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
+                'hero_image_2' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
+                'hero_image_3' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Profile validation failed', [
+                    'errors' => $validator->errors()->toArray()
+                ]);
+                return redirect()->back()->withErrors($validator)->withInput();
             }
 
-            // Handle organization image
-            if ($request->hasFile('organization_image')) {
-                $orgImagePath = $request->file('organization_image')->store('organization-images', 'public');
-                $profileData['organization_image'] = $orgImagePath;
+            // Validate that at least one hero image is provided
+            if (
+                !$request->hasFile('hero_images') &&
+                !$request->hasFile('hero_image_1') &&
+                !$request->hasFile('hero_image_2') &&
+                !$request->hasFile('hero_image_3')
+            ) {
+
+                Log::error('No hero images provided');
+                return redirect()->back()->withErrors([
+                    'hero_images' => 'Setidaknya satu gambar hero diperlukan.'
+                ])->withInput();
             }
 
-            // Handle hero images
-            $heroImages = [];
-            if ($request->hasFile('hero_images')) {
-                foreach ($request->file('hero_images') as $image) {
-                    $heroImages[] = $image->store('hero-images', 'public');
+            try {
+                // Get village name for profile name
+                $village = \App\Models\Region\Village::find($request->kelurahan);
+                if (!$village) {
+                    Log::error('Village not found', ['kelurahan_id' => $request->kelurahan]);
+                    return redirect()->back()->withErrors([
+                        'kelurahan' => 'Desa/Kelurahan tidak ditemukan. Silakan pilih lagi.'
+                    ])->withInput();
                 }
-            } else {
-                // Check for individual hero image uploads
-                for ($i = 1; $i <= 3; $i++) {
-                    if ($request->hasFile("hero_image_$i")) {
-                        $heroImages[] = $request->file("hero_image_$i")->store('hero-images', 'public');
+
+                $profileName = "Desa " . ucwords(strtolower($village->name));
+                Log::info('Creating profile with name', ['name' => $profileName]);
+
+                // Create base profile data
+                $profileData = [
+                    'id' => 1,
+                    'name' => $profileName,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'provinsi' => $request->provinsi,
+                    'kabupaten' => $request->kabupaten,
+                    'kecamatan' => $request->kecamatan,
+                    'kelurahan' => $request->kelurahan,
+                    'lembaga' => $request->has('lembaga') ? json_encode($request->lembaga) : json_encode([]),
+                    'fasilitas' => $request->has('fasilitas') ? json_encode($request->fasilitas) : json_encode([]),
+                    'history' => $request->history,
+                    'vision' => $request->vision,
+                    'mission' => $request->mission,
+                    'primary_color' => $request->primary_color ?? '#000000',
+                    'secondary_color' => $request->secondary_color ?? '#000000',
+                ];
+
+                // Handle logo upload
+                if ($request->hasFile('logo')) {
+                    try {
+                        $logoPath = $request->file('logo')->store('profile-logo', 'public');
+                        $profileData['logo'] = $logoPath;
+                        Log::info('Logo uploaded', ['path' => $logoPath]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to upload logo', ['error' => $e->getMessage()]);
+                        return redirect()->back()->withErrors([
+                            'logo' => 'Gagal mengunggah logo: ' . $e->getMessage()
+                        ])->withInput();
+                    }
+                } else {
+                    Log::warning('Logo file not provided');
+                    return redirect()->back()->withErrors([
+                        'logo' => 'Logo desa diperlukan'
+                    ])->withInput();
+                }
+
+                // Handle organization image
+                if ($request->hasFile('organization_image')) {
+                    try {
+                        $orgImagePath = $request->file('organization_image')->store('organization-images', 'public');
+                        $profileData['organization_image'] = $orgImagePath;
+                        Log::info('Organization image uploaded', ['path' => $orgImagePath]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to upload organization image', ['error' => $e->getMessage()]);
+                        return redirect()->back()->withErrors([
+                            'organization_image' => 'Gagal mengunggah gambar organisasi: ' . $e->getMessage()
+                        ])->withInput();
                     }
                 }
+
+                // Handle hero images - try array first, then individual files
+                $heroImages = [];
+
+                if ($request->hasFile('hero_images')) {
+                    Log::info('Processing hero_images array');
+                    try {
+                        foreach ($request->file('hero_images') as $index => $image) {
+                            $path = $image->store('hero-images', 'public');
+                            $heroImages[] = $path;
+                            Log::info('Hero image uploaded from array', ['index' => $index, 'path' => $path]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Failed to process hero_images array', ['error' => $e->getMessage()]);
+                        return redirect()->back()->withErrors([
+                            'hero_images' => 'Gagal mengunggah gambar hero: ' . $e->getMessage()
+                        ])->withInput();
+                    }
+                } else {
+                    Log::info('No hero_images array found, trying individual files');
+                    // Check for individual hero image uploads
+                    for ($i = 1; $i <= 3; $i++) {
+                        $field = "hero_image_$i";
+                        if ($request->hasFile($field)) {
+                            try {
+                                $path = $request->file($field)->store('hero-images', 'public');
+                                $heroImages[] = $path;
+                                Log::info('Hero image uploaded', ['field' => $field, 'path' => $path]);
+                            } catch (\Exception $e) {
+                                Log::error("Failed to upload $field", ['error' => $e->getMessage()]);
+                                return redirect()->back()->withErrors([
+                                    $field => "Gagal mengunggah $field: " . $e->getMessage()
+                                ])->withInput();
+                            }
+                        }
+                    }
+                }
+
+                if (empty($heroImages)) {
+                    Log::warning('No hero images were processed');
+                    return redirect()->back()->withErrors([
+                        'hero_images' => 'Minimal satu gambar hero diperlukan'
+                    ])->withInput();
+                }
+
+                $profileData['hero_images'] = json_encode($heroImages);
+
+                // Create the profile
+                try {
+                    $profile = \App\Models\Profile::create($profileData);
+                    Log::info('Profile created successfully', ['profile_id' => $profile->id]);
+
+                    // Create log entry of this action
+                    $logHelper = new \App\HelpersLogActivityHelper();
+                    $logHelper->logActivity('create', 'profile', 'Membuat profil desa ' . $profileName);
+
+                    // Ensure storage link is created
+                    if (!file_exists(public_path('storage'))) {
+                        Artisan::call('storage:link', ['--force' => true]);
+                        Log::info('Storage link created');
+                    }
+
+                    return redirect()->route('install.finish')->with('success', 'Profile desa berhasil dibuat!');
+                } catch (\Exception $e) {
+                    Log::error('Failed to create profile record in database', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    return redirect()->back()->withErrors([
+                        'error' => 'Gagal menyimpan profil ke database: ' . $e->getMessage()
+                    ])->withInput();
+                }
+            } catch (\Exception $e) {
+                Log::error('Error processing profile data', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return redirect()->back()->withErrors([
+                    'error' => 'Terjadi kesalahan saat memproses data profil: ' . $e->getMessage()
+                ])->withInput();
             }
-            $profileData['hero_images'] = json_encode($heroImages);
-
-            // Create the profile
-            $profile = \App\Models\Profile::create($profileData);
-
-            // Create log entry of this action
-            $logHelper = new \App\Helpers\LogActivityHelper();
-            $logHelper->logActivity('create', 'profile', 'Membuat profil desa ' . $profileName);
-
-            // Ensure storage link is created
-            if (!file_exists(public_path('storage'))) {
-                Artisan::call('storage:link', ['--force' => true]);
-            }
-
-            return redirect()->route('install.finish');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to setup profile: ' . $e->getMessage()]);
+            Log::error('Fatal error in storeProfile', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->withErrors([
+                'error' => 'Terjadi kesalahan fatal: ' . $e->getMessage()
+            ])->withInput();
         }
     }
 
