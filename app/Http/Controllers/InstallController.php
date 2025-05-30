@@ -116,6 +116,27 @@ class InstallController extends Controller
                 'APP_DEBUG' => 'true', // Keep debug enabled during installation
             ]);
 
+            // Set environment variables for immediate effect
+            putenv("DB_CONNECTION=mysql");
+            putenv("DB_HOST={$request->host}");
+            putenv("DB_PORT={$request->port}");
+            putenv("DB_DATABASE={$request->database}");
+            putenv("DB_USERNAME={$request->username}");
+            putenv("DB_PASSWORD={$request->password}");
+
+            // Update configuration array directly
+            config([
+                'database.connections.mysql.host' => $request->host,
+                'database.connections.mysql.port' => $request->port,
+                'database.connections.mysql.database' => $request->database,
+                'database.connections.mysql.username' => $request->username,
+                'database.connections.mysql.password' => $request->password,
+            ]);
+
+            // Refresh database connection
+            DB::purge('mysql');
+            DB::reconnect('mysql');
+
             // Clear configuration cache to pick up new settings
             Artisan::call('config:clear');
 
