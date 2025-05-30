@@ -112,7 +112,8 @@ class InstallController extends Controller
                 'DB_USERNAME' => $request->username,
                 'DB_PASSWORD' => $request->password,
                 'DB_COLLATION' => 'utf8mb4_unicode_ci',
-                'SESSION_DRIVER' => 'file', // Change to file during installation
+                'SESSION_DRIVER' => 'file',
+                'CACHE_STORE' => 'file',
                 'APP_ENV' => 'local',
                 'APP_DEBUG' => 'true',
             ]);
@@ -124,7 +125,8 @@ class InstallController extends Controller
             putenv("DB_DATABASE={$request->database}");
             putenv("DB_USERNAME={$request->username}");
             putenv("DB_PASSWORD={$request->password}");
-            putenv("SESSION_DRIVER=file"); // Set session driver to file
+            putenv("SESSION_DRIVER=file");
+            putenv("CACHE_STORE=file");
 
             // Update configuration array directly
             config([
@@ -548,7 +550,8 @@ class InstallController extends Controller
             'APP_INSTALLED' => 'true',
             'APP_ENV' => 'production',
             'APP_DEBUG' => 'false',
-            'SESSION_DRIVER' => 'database', // Ensure database session is used in production
+            'SESSION_DRIVER' => 'database',
+            'CACHE_STORE' => 'database',
         ]);
 
         // Clear all caches to ensure changes take effect
