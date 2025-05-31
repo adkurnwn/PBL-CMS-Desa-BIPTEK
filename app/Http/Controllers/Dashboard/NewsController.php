@@ -34,7 +34,7 @@ class NewsController extends Controller
         $search = $request->input('search');
         $sortField = $request->input('sort', 'created_at');
         $sortDirection = $request->input('direction', 'desc');
-        
+
         // Get filter parameters
         $filters = [];
         if ($request->has('category_id')) {
@@ -52,43 +52,43 @@ class NewsController extends Controller
         if ($request->has('date_filter')) {
             $filters['date_filter'] = $request->input('date_filter');
         }
-        
+
         // Start building the query
         $query = News::with(['category', 'images']); // Include images relation
-        
+
         // Apply search filter if provided
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
-        
+
         // Apply category filter if provided
         if (isset($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
-        
+
         // Apply is_draft filter if provided
         if (isset($filters['is_draft'])) {
             $query->where('is_draft', $filters['is_draft']);
         }
-        
+
         // Apply is_moderate filter if provided
         if (isset($filters['is_moderate'])) {
             $query->where('is_moderate', $filters['is_moderate']);
         }
-        
+
         // Apply date filter if provided
         if (isset($filters['date_filter'])) {
             $dateFilter = $filters['date_filter'];
-            
+
             switch ($dateFilter) {
                 case 'today':
                     // Filter for today
                     $query->whereDate('created_at', now()->toDateString());
                     break;
-                    
+
                 case 'this_week':
                     // Filter for this week
                     $query->whereBetween('created_at', [
@@ -96,30 +96,30 @@ class NewsController extends Controller
                         now()->endOfWeek()->toDateString()
                     ]);
                     break;
-                    
+
                 case 'this_month':
                     // Filter for this month
                     $query->whereMonth('created_at', now()->month)
-                          ->whereYear('created_at', now()->year);
+                        ->whereYear('created_at', now()->year);
                     break;
-                    
+
                 case 'this_year':
                     // Filter for this year
                     $query->whereYear('created_at', now()->year);
                     break;
             }
         }
-        
+
         // Apply sorting - first by draft status (drafts first), then by the user's sort field
         $query->orderBy('is_draft', 'desc') // Put drafts (is_draft=1) first
-              ->orderBy($sortField, $sortDirection);
-        
+            ->orderBy($sortField, $sortDirection);
+
         // Get paginated results - 10 items per page
         $news = $query->paginate(25)->withQueryString();
-        
+
         // Get all categories for filtering
         $categories = Category::where('category_type', 1)->get();
-        
+
         return Inertia::render('Dashboard/News/Index', [
             'news' => $news,
             'search' => $search,
@@ -144,13 +144,13 @@ class NewsController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['category_id'] = $category_id;
-        
-        // Generate a truly unique slug with a timestamp suffix to prevent duplicates
-        $baseSlug = SlugHelper::generateUniqueSlug(News::class, $request->title);
+
+        $slug = SlugHelper::generateUniqueSlug(News::class, $request->title);
+        $data['slug'] = $slug;
 
         // Store content temporarily without processing
         $originalContent = $data['content'];
-        
+
         $news = News::create($data);
 
         // Handle image uploads and get the uploaded image paths
@@ -161,7 +161,7 @@ class NewsController extends Controller
 
         // Process content to replace image placeholders with actual HTML
         $processedContent = $this->processImagePlaceholdersInContent($originalContent, $uploadedImages);
-        
+
         // Update news with processed content
         $news->update(['content' => $processedContent]);
 
@@ -192,7 +192,7 @@ class NewsController extends Controller
 
     public function update(UpdateNewsRequest $request, $slug)
     {
-        
+
         $news = News::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
@@ -251,10 +251,10 @@ class NewsController extends Controller
     {
         // Replace img tags that reference storage images with placeholders
         $pattern = '/<img[^>]*src="[^"]*\/storage\/[^"]*"[^>]*>/';
-        $convertedContent = preg_replace_callback($pattern, function($matches) {
+        $convertedContent = preg_replace_callback($pattern, function ($matches) {
             return '{{EXISTING_IMAGE_PLACEHOLDER}}';
         }, $content);
-        
+
         return $convertedContent;
     }
 
@@ -265,33 +265,33 @@ class NewsController extends Controller
     private function processImagePlaceholdersInContent($content, $uploadedImages)
     {
         $processedContent = $content;
-        
+
         // For create mode: Remove ImageUploader placeholders from content
         // For edit mode: Handle both existing and new placeholders
-        
+
         // First, restore existing image placeholders (these stay in place) - only for edit mode
         $processedContent = str_replace('{{EXISTING_IMAGE_PLACEHOLDER}}', '', $processedContent);
-        
+
         // Remove any ImageUploader placeholders from the main content
         $processedContent = str_replace('{{IMAGEUPLOADER_PLACEHOLDER}}', '', $processedContent);
-        
+
         // Clean up any remaining placeholder patterns
         $processedContent = preg_replace('/\{\{IMAGE_\d+\}\}/', '', $processedContent);
-        
+
         // Clean up any remaining blob URLs and temp image attributes
         $processedContent = preg_replace('/<img[^>]*src="blob:[^"]*"[^>]*>/', '', $processedContent);
         $processedContent = preg_replace('/<img[^>]*data-is-temp-upload="true"[^>]*>/', '', $processedContent);
-        
+
         // Remove data attributes from remaining images
         $processedContent = preg_replace('/\s*data-is-placeholder="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-image-id="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-blob-url="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-temp-image-id="[^"]*"/', '', $processedContent);
         $processedContent = preg_replace('/\s*data-is-temp-upload="[^"]*"/', '', $processedContent);
-        
+
         // Replace preview classes with final classes
         $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="w-full h-auto block my-2"', $processedContent);
-        
+
         // Now append all ImageUploader images at the end
         if (!empty($uploadedImages)) {
             $appendedImages = '';
@@ -302,11 +302,11 @@ class NewsController extends Controller
                     htmlspecialchars($imageData['alt'] ?? '')
                 );
             }
-            
+
             // Add images at the end of content
             $processedContent .= $appendedImages;
         }
-        
+
         return $processedContent;
     }
 
@@ -316,7 +316,7 @@ class NewsController extends Controller
         $search = $request->input('search');
         $sortField = $request->input('sort', 'created_at');
         $sortDirection = $request->input('direction', 'desc');
-        
+
         // Get filter parameters
         $filters = [];
         if ($request->has('category_id')) {
@@ -334,43 +334,43 @@ class NewsController extends Controller
         if ($request->has('date_filter')) {
             $filters['date_filter'] = $request->input('date_filter');
         }
-        
+
         // Start building the query
         $query = News::onlyTrashed()->with(['category', 'images']); // Include images relation
-        
+
         // Apply search filter if provided
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
+                    ->orWhere('content', 'like', "%{$search}%");
             });
         }
-        
+
         // Apply category filter if provided
         if (isset($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
-        
+
         // Apply is_draft filter if provided
         if (isset($filters['is_draft'])) {
             $query->where('is_draft', $filters['is_draft']);
         }
-        
+
         // Apply is_moderate filter if provided
         if (isset($filters['is_moderate'])) {
             $query->where('is_moderate', $filters['is_moderate']);
         }
-        
+
         // Apply date filter if provided
         if (isset($filters['date_filter'])) {
             $dateFilter = $filters['date_filter'];
-            
+
             switch ($dateFilter) {
                 case 'today':
                     // Filter for today
                     $query->whereDate('created_at', now()->toDateString());
                     break;
-                    
+
                 case 'this_week':
                     // Filter for this week
                     $query->whereBetween('created_at', [
@@ -378,30 +378,30 @@ class NewsController extends Controller
                         now()->endOfWeek()->toDateString()
                     ]);
                     break;
-                    
+
                 case 'this_month':
                     // Filter for this month
                     $query->whereMonth('created_at', now()->month)
-                          ->whereYear('created_at', now()->year);
+                        ->whereYear('created_at', now()->year);
                     break;
-                    
+
                 case 'this_year':
                     // Filter for this year
                     $query->whereYear('created_at', now()->year);
                     break;
             }
         }
-        
+
         // Apply sorting - first by draft status (drafts first), then by the user's sort field
         $query->orderBy('is_draft', 'desc') // Put drafts (is_draft=1) first
-              ->orderBy($sortField, $sortDirection);
-    
+            ->orderBy($sortField, $sortDirection);
+
         // Get paginated results - 10 items per page
         $news = $query->paginate(25)->withQueryString();
-        
+
         // Get all categories for filtering
         $categories = Category::where('category_type', 1)->get();
-        
+
         return Inertia::render('Dashboard/News/Archive', [
             'news' => $news,
             'search' => $search,

@@ -71,10 +71,9 @@ defineProps({
                         {{ news.title }}
                     </h2>
                     <p
-                        class="pt-2 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis text-justify"
-                    >
-                        {{ news.content }}
-                    </p>
+                        class="pt-2 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis min-h-16 text-justify"
+                        v-html="news.content"
+                    ></p>
                 </div>
 
                 <!-- Footer Section -->
