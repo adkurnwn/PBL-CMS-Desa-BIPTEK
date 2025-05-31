@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, computed, onMounted, provide } from "vue";
 import ApplicationLogo from "@/Components/DashboardComponent/ApplicationLogo.vue";
 import NavLink from "@/Components/DashboardComponent/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
@@ -17,6 +17,20 @@ const sidebarCollapsed = ref(false);
 // Toast notifications state
 const toasts = ref([]);
 const toastId = ref(0);
+
+// Get primary color from shared data
+const primaryColor = computed(() => {
+    return page.props.profile?.primary_color || '#244031';
+});
+
+// Provide theme colors to all child components
+provide('primaryColor', primaryColor);
+
+const secondaryColor = computed(() => {
+    return page.props.profile?.secondary_color || '#3B614A';
+});
+// Provide secondary color to all child components
+provide('secondaryColor', secondaryColor);
 
 // Get sidebar collapsed state from localStorage on mount
 onMounted(() => {
@@ -89,7 +103,10 @@ const handleSidebarCollapse = (collapsed) => {
 </script>
 
 <template>
-    <div class="flex flex-col h-screen bg-white overflow-hidden">
+    <div 
+        class="flex flex-col h-screen bg-white overflow-hidden"
+        :style="{ '--accent1': primaryColor, '--accent2': secondaryColor, }"
+    >
         <!-- Header -->
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
         

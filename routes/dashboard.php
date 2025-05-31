@@ -154,6 +154,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:manage_settings'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
             Route::post('settings', [SettingsController::class, 'update'])->name('dashboard.settings.update');
+            Route::post('settings/theme', [SettingsController::class, 'updateTheme'])->name('dashboard.settings.update-theme');
         });
     });
 });

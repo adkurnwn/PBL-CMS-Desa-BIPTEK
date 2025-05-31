@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Services\MediaService;
 use App\Http\Requests\Validation\UpdateSettingsRequest;
+use App\Http\Requests\Validation\UpdateThemeRequest;
 use App\Models\Profile;
 
 class SettingsController extends Controller
@@ -61,18 +62,9 @@ class SettingsController extends Controller
         // Get mail drivers
         $mailDrivers = ['smtp', 'sendmail', 'mailgun', 'ses', 'postmark', 'log', 'array'];
 
-        // Theme colors options
-        $colorOptions = [
-            '#244031' => 'Green (Default)',
-            '#1E40AF' => 'Blue',
-            '#9D174D' => 'Pink',
-            '#B45309' => 'Amber',
-            '#831843' => 'Purple',
-            '#1F2937' => 'Gray',
-            '#7F1D1D' => 'Red',
-            '#000000' => 'Black',
-            '#ffffff' => 'White',
-        ];
+        // Theme colors options - get from Profile model enum
+        $colorOptions = Profile::getPrimaryColorOptions();
+        $secondaryColorOptions = Profile::getSecondaryColorOptions();
 
         return Inertia::render('Dashboard/Settings/Edit', [
             'settings' => $settings,
@@ -80,6 +72,7 @@ class SettingsController extends Controller
             'dbConnections' => $dbConnections,
             'mailDrivers' => $mailDrivers,
             'colorOptions' => $colorOptions,
+            'secondaryColorOptions' => $secondaryColorOptions,
         ]);
     }
 
@@ -177,6 +170,40 @@ class SettingsController extends Controller
         $this->logHelper->logActivity('update', 'settings', 'Updated application settings');
 
         return redirect()->back()->with('success', 'Settings updated successfully');
+    }
+
+    public function updateTheme(UpdateThemeRequest $request)
+    {
+        
+        // Update theme colors in the profile
+        if ($request->filled('primary_color') || $request->filled('secondary_color')) {
+            $profile = Profile::first();
+            if (!$profile) {
+                // Create profile if it doesn't exist
+                $profile = new Profile();
+            }
+            
+            $profileData = [];
+
+            if ($request->filled('primary_color')) {
+                $profileData['primary_color'] = $request->primary_color;
+            }
+
+            if ($request->filled('secondary_color')) {
+                $profileData['secondary_color'] = $request->secondary_color;
+            }
+            $result = $profile->updateOrCreate(['id' => $profile->id ?? 1], $profileData);
+        }
+
+        // Handle favicon upload
+        if ($request->hasFile('favicon')) {
+            $this->updateFavicon($request->file('favicon'));
+        }
+
+        // Log the activity
+        $this->logHelper->logActivity('update', 'theme_settings', 'Updated theme settings');
+
+        return redirect()->back()->with('success', 'Theme settings updated successfully');
     }
 
     /**

@@ -10,7 +10,7 @@ import ImageInput from "@/Components/DashboardComponent/ImageInput.vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import SingleLineField from "@/Components/DashboardComponent/SingleLineField.vue";
 import DropdownFieldInput from "@/Components/DashboardComponent/DropdownFieldInput.vue";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
@@ -19,9 +19,10 @@ const props = defineProps({
     dbConnections: Array,
     mailDrivers: Array,
     colorOptions: Object,
+    secondaryColorOptions: Object,
 });
 
-const activeTab = ref("general");
+const activeTab = ref("theme");
 const faviconPreview = ref(null);
 
 // Add reactive states for section locks
@@ -56,8 +57,16 @@ const form = useForm({
     backup_frequency: props.settings.backup_frequency || "daily",
 });
 
+// Add separate form for theme settings
+const themeForm = useForm({
+    primary_color: props.settings.primary_color || "#244031",
+    secondary_color: props.settings.secondary_color || "#3B614A",
+    favicon: null,
+});
+
 const handleFaviconChange = (file) => {
     form.favicon = file;
+    themeForm.favicon = file;
     // Clear any previous preview since ImageInput handles its own preview
     faviconPreview.value = null;
 };
@@ -70,6 +79,33 @@ const submit = () => {
     form.post(route("dashboard.settings.update"), {
         preserveScroll: true,
         forceFormData: true,
+    });
+};
+
+// Add new method for theme-only save
+const submitTheme = () => {
+    // Debug the form data being sent
+    console.log('Theme form data:', {
+        primary_color: themeForm.primary_color,
+        secondary_color: themeForm.secondary_color,
+        favicon: themeForm.favicon
+    });
+    
+    themeForm.post(route("dashboard.settings.update-theme"), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: (page) => {
+            console.log('Theme updated successfully', page);
+            // Update the main form's color values to sync them
+            form.primary_color = themeForm.primary_color;
+            form.secondary_color = themeForm.secondary_color;
+        },
+        onError: (errors) => {
+            console.log('Theme update errors:', errors);
+        },
+        onFinish: () => {
+            console.log('Theme update finished');
+        }
     });
 };
 
@@ -128,7 +164,12 @@ const unlockEmail = () => {
 
 // Update submit method
 const showConfirmationDialog = () => {
-    showConfirmation.value = true;
+    if (activeTab.value === 'theme') {
+        console.log('Submitting theme with color:', themeForm.primary_color);
+        submitTheme();
+    } else {
+        showConfirmation.value = true;
+    }
 };
 
 const confirmSave = () => {
@@ -139,6 +180,21 @@ const confirmSave = () => {
 const cancelSave = () => {
     showConfirmation.value = false;
 };
+
+// Add computed property to map primary colors to secondary colors
+const getSecondaryColorForPrimary = (primaryColor) => {
+    const colorMapping = {
+        '#244031': '#3B614A', // Green (Default) -> Green (Default)
+        '#242540': '#3B4659', // Denim -> Blue Gray
+        '#882828': '#9F4941'  // Maroon -> Red Brown
+    };
+    return colorMapping[primaryColor] || '#3B614A'; // Default to green secondary
+};
+
+// Watch for primary color changes and update secondary color automatically
+watch(() => themeForm.primary_color, (newPrimaryColor) => {
+    themeForm.secondary_color = getSecondaryColorForPrimary(newPrimaryColor);
+});
 </script>
 
 <template>
@@ -170,6 +226,17 @@ const cancelSave = () => {
                             <div class="relative">
                                 <a href="#"
                                     class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
+                                    :class="activeTab === 'theme' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
+                                    @click.prevent="setActiveTab('theme')">
+                                    Tema
+                                    <div v-if="activeTab === 'theme'"
+                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="relative">
+                                <a href="#"
+                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
                                     :class="activeTab === 'general' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
                                     @click.prevent="setActiveTab('general')">
                                     Umum
@@ -196,17 +263,6 @@ const cancelSave = () => {
                                     @click.prevent="setActiveTab('mail')">
                                     Email
                                     <div v-if="activeTab === 'mail'"
-                                        class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="relative">
-                                <a href="#"
-                                    class="px-[8px] sm:px-[9px] md:px-[10px] xl:px-[8px] 2xl:px-[10px] 3xl:px-[11px] 4xl:px-[12px] py-[6px] sm:py-[7px] md:py-[8px] xl:py-[6.5px] 2xl:py-[8px] 3xl:py-[9px] 4xl:py-[10px] inline-block text-[14.5px] sm:text-[16px] md:text-[18px] xl:text-[14.5px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[22px] font-medium transition-colors duration-200"
-                                    :class="activeTab === 'theme' ? 'text-accent1' : 'text-menuText hover:text-accent1/80'"
-                                    @click.prevent="setActiveTab('theme')">
-                                    Tema
-                                    <div v-if="activeTab === 'theme'"
                                         class="absolute bottom-0 left-0 w-full h-[1px] sm:h-[1px] md:h-[1.5px] xl:h-[1.5px] 2xl:h-[1.5px] 3xl:h-[2px] 4xl:h-[2px] bg-accent1">
                                     </div>
                                 </a>
@@ -449,14 +505,14 @@ const cancelSave = () => {
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px]">
                                     <!-- Primary Color -->
                                     <div>
-                                        <InputLabel for="primary_color" value="Warna" />
+                                        <InputLabel for="primary_color" value="Warna Utama" />
                                         <div class="mt-2 flex items-center space-x-3">
                                             <div v-for="(name, color
                                             ) in colorOptions" :key="color" @click="
-                                                    form.primary_color = color
+                                                    themeForm.primary_color = color
                                                     " :class="{
                                                         'ring-2 ring-offset-2 ring-blue-500':
-                                                            form.primary_color ===
+                                                            themeForm.primary_color ===
                                                             color,
                                                     }" class="w-8 h-8 rounded-full cursor-pointer transition-all"
                                                 :style="{
@@ -464,65 +520,66 @@ const cancelSave = () => {
                                                 }" :title="name"></div>
                                         </div>
                                         <p class="mt-1 text-sm text-gray-500">
-                                            Primary theme color for headers and
-                                            main elements
+                                            Warna utama yang akan digunakan di seluruh aplikasi web.
                                         </p>
-                                        <InputError :message="form.errors.primary_color" class="mt-2" />
+                                        <InputError :message="themeForm.errors.primary_color" class="mt-2" />
+                                    </div>
+
+                                    <!-- Secondary Color Display (Read-only) -->
+                                    <div>
+                                        <InputLabel for="secondary_color" value="Warna Sekunder (Otomatis)" />
+                                        <div class="mt-2 flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-full border-2 border-gray-300"
+                                                :style="{
+                                                    backgroundColor: themeForm.secondary_color,
+                                                }" :title="secondaryColorOptions[themeForm.secondary_color] || 'Auto-selected color'"></div>
+                                            <span class="text-sm text-gray-600">
+                                                {{ secondaryColorOptions[themeForm.secondary_color] || 'Auto-selected' }}
+                                            </span>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Warna aksen terpilih secara otomatis berdasarkan warna utama.
+                                        </p>
+                                        <InputError :message="themeForm.errors.secondary_color" class="mt-2" />
                                     </div>
 
                                     <!-- Preview Section -->
                                     <div class="col-span-2">
-                                        <h4 class="font-medium text-gray-700 mb-2">
+                                        <h4 class="font-medium text-selectedText mb-2">
                                             Preview Tema
                                         </h4>
                                         <div class="border rounded-lg p-4 overflow-hidden">
                                             <div class="py-2 px-4 mb-4" :style="{
                                                 backgroundColor:
-                                                    form.primary_color,
+                                                    themeForm.primary_color,
                                                 color: getContrastColor(
-                                                    form.primary_color
+                                                    themeForm.primary_color
                                                 ),
                                             }">
+                                                <h1>
+                                                    Content Management System
+                                                </h1>
                                                 <h5 class="font-bold">
-                                                   Navbar
+                                                   Desa
                                                 </h5>
                                             </div>
                                             <div class="flex space-x-2 mb-4">
-                                                <button class="px-4 py-2 rounded" :style="{
+                                                <PrimaryButton class="cursor-not-allowed" :style="{
                                                     backgroundColor:
-                                                        form.secondary_color,
+                                                        themeForm.secondary_color,
                                                     color: getContrastColor(
-                                                        form.secondary_color
+                                                        themeForm.secondary_color
                                                     ),
-                                                }">
+                                                }" disabled>
                                                     Tombol Utama
-                                                </button>
-                                                <button class="px-4 py-2 rounded border" :style="{
+                                                </PrimaryButton>
+                                                <SecondaryButton class="cursor-not-allowed" :style="{
                                                     borderColor:
-                                                        form.primary_color,
-                                                    color: form.primary_color,
-                                                }">
+                                                        themeForm.primary_color,
+                                                    color: themeForm.primary_color,
+                                                }" disabled>
                                                     Outline Button
-                                                </button>
-                                            </div>
-                                            <div class="flex items-center mb-2">
-                                                <div class="w-4 h-4 rounded-full mr-2" :style="{
-                                                    backgroundColor:
-                                                        form.primary_color,
-                                                }"></div>
-                                                <span :style="{
-                                                    color: form.primary_color,
-                                                }">Text in Primary Color</span>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <div class="w-4 h-4 rounded-full mr-2" :style="{
-                                                    backgroundColor:
-                                                        form.secondary_color,
-                                                }"></div>
-                                                <span :style="{
-                                                    color: form.secondary_color,
-                                                }">Text in Secondary
-                                                    Color</span>
+                                                </SecondaryButton>
                                             </div>
                                         </div>
                                     </div>
@@ -563,8 +620,10 @@ const cancelSave = () => {
 
                             <div class="mt-6 flex justify-end">
                                 <PrimaryButton type="button" @click="showConfirmationDialog"
-                                    :disabled="form.processing">
-                                    Simpan Pengaturan
+                                    :disabled="activeTab === 'theme' ? themeForm.processing : form.processing">
+                                    <span v-if="activeTab === 'theme' && themeForm.processing">Menyimpan Tema...</span>
+                                    <span v-else-if="form.processing">Menyimpan...</span>
+                                    <span v-else>Simpan Pengaturan</span>
                                 </PrimaryButton>
                             </div>
                         </form>
