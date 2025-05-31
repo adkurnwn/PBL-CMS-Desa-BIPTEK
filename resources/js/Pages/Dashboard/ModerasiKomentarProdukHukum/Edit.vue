@@ -228,7 +228,18 @@ const getDocumentFile = () => {
                                 <div>{{ produkHukum.title }}</div>
                                 <div>{{ produkHukum.date }}</div>
                                 <div>{{ produkHukum.description }}</div>
-                                <div>{{ produkHukum.link || 'Tidak tersedia' }}</div>
+                                <div>
+                                    <a 
+                                        v-if="produkHukum.link" 
+                                        :href="produkHukum.link" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        class="text-blue-600 hover:underline"
+                                    >
+                                        {{ produkHukum.link }}
+                                    </a>
+                                    <span v-else>Tidak tersedia</span>
+                                </div>
                             </div>
                         </div>
 
