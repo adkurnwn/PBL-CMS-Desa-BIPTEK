@@ -4,13 +4,19 @@ import { Link } from "@inertiajs/vue3";
 import { ref, onMounted } from "vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import useFilter from "@/Utility/useFilter";
+import { computed } from "vue";
 
 const produkHukum = ref([]);
 const categories = ref([]);
 const error = ref(null);
-const pagination = ref(null);
 const produkHukumApi = useApiFetch();
 const categoriesApi = useApiFetch();
+const pagination = ref(null);
+const totalPages = computed(() => {
+    if (!pagination.value) return [];
+    return Array.from({ length: pagination.value.last_page }, (_, i) => i + 1);
+});
+
 
 const {
     searchQuery,
@@ -136,58 +142,60 @@ onMounted(() => {
                 </div>
 
                 <!-- Documents Grid -->
-                <div
-                    v-else
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                >
+                <div v-else>
                     <div
-                        v-for="dokumen in produkHukum"
+                        v-for="(dokumen, idx) in produkHukum"
                         :key="dokumen.id"
-                        class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                        :href="`/produk-hukum/${dokumen.slug}`"
+                        class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+                        style="text-decoration: none;"
                     >
-                        <div class="p-6">
-                            <!-- Category Badge -->
+                        <!--Nomor Urut-->
+                        <span class="text-accent1 mr-3 text-sm">{{ idx + 1 }}.</span>
+                        <!--Konten-->
+                        <div class="flex-1 min-w-0">
+                            <!-- Kategori Berita -->
                             <span
                                 v-if="dokumen.category"
-                                class="inline-block px-3 py-1 text-sm font-semibold text-blue-600 bg-blue-100 rounded-full mb-4"
+                                class="inline-block px-2 py-0.5 text-xs font-semibold text-white bg-accent1 rounded-full mb-1"
                             >
                                 {{ dokumen.category }}
                             </span>
 
-                            <!-- Title -->
-                            <h2
-                                class="text-xl font-bold text-gray-900 mb-3 line-clamp-2"
+                            <!-- Judul -->
+                            <div
+                                class="text-sm font-medium text-accent1 mb-1 truncate"
                             >
                                 {{ dokumen.title }}
-                            </h2>
-
-                            <!-- Description -->
-                            <p class="text-gray-600 mb-4 line-clamp-3">
-                                {{ dokumen.description }}
-                            </p>
-
-                            <!-- Metadata and Actions -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-500">
-                                    {{ formatDate(dokumen.date) }}
-                                </span>
-                                <div class="flex space-x-2">
-                                    <a
-                                        v-if="dokumen.file"
-                                        :href="`/storage/${dokumen.file}`"
-                                        target="_blank"
-                                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                                    >
-                                        Download
-                                    </a>
-                                    <Link
-                                        :href="`/produk-hukum/${dokumen.slug}`"
-                                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-blue-600 bg-blue-50 hover:bg-blue-100"
-                                    >
-                                        Detail
-                                    </Link>
-                                </div>
                             </div>
+
+                            <!-- Metadata -->
+                            <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1">
+                                <span>
+                                   <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span> 
+                                    Ditetapkan: {{ formatDate(dokumen.date) }}
+                                </span>
+                                <span>
+                                    <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
+                                    Dilihat {{ dokumen.views || 0 }} kali
+                                </span>
+                                <span>
+                                    <span class="material-symbols-outlined align-middle text-sm mr-1">file_save</span>
+                                    Diunduh {{ dokumen.downloads || 0 }} kali
+                                </span>
+                            </div>
+                        </div>
+                        <!--Tombol Download-->
+                        <div class="ml-4">
+                            <a
+                                v-if="dokumen.file"
+                                :href="`/storage/${dokumen.file}`"
+                                target="_blank"
+                                class="inline-flex items-center justify-center w-8 h-8 rounded text-accent1 bg-secondary hover:bg-yellow-500"
+                                tittle="Download"
+                            >
+                                <span class="material-symbols-outlined">download</span>
+                             </a>
                         </div>
                     </div>
 
@@ -202,46 +210,33 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <!-- Pagination (if available from API) -->
+                <!-- Pagination -->
                 <div
                     v-if="pagination && pagination.last_page > 1"
-                    class="mt-8 flex justify-center space-x-2"
+                    class="flex justify-center mt-5 gap-2"
                 >
                     <button
-                        @click="goToPage(1)"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                        :disabled="pagination.current_page === 1"
-                    >
-                        First
-                    </button>
-                    <button
                         @click="goToPage(pagination.current_page - 1)"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                         :disabled="pagination.current_page === 1"
                     >
-                        Prev
+                        &lt;
                     </button>
-                    <span class="px-3 py-1">
-                        Page {{ pagination.current_page }} of
-                        {{ pagination.last_page }}
-                    </span>
+                    <span
+                        v-for="p in totalPages"
+                        :key="p"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
+                        :class="pagination.current_page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                        @click="pagination.current_page = p"
+                    >{{ p }}</span>
                     <button
                         @click="goToPage(pagination.current_page + 1)"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                         :disabled="
                             pagination.current_page === pagination.last_page
                         "
                     >
-                        Next
-                    </button>
-                    <button
-                        @click="goToPage(pagination.last_page)"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                        :disabled="
-                            pagination.current_page === pagination.last_page
-                        "
-                    >
-                        Last
+                        &gt;
                     </button>
                 </div>
             </div>

@@ -24,7 +24,7 @@ onMounted(fetchData());
         >
             <!--Layanan Publik-->
             <article
-                class="flex xl:flex-row flex-col w-full xl:px-20 md:px-16 sm:px-24 px-10 xl:space-x-6 xl:mt-52 sm:mt-40 mt-32 xl:ml-2 justify-center"
+                class="flex xl:flex-row flex-col w-full xl:px-20 md:px-16 sm:px-16 px-10 xl:space-x-6 xl:mt-52 sm:mt-40 mt-32 xl:ml-2 items-center justify-center"
             >
                 <img
                     src="../../../images/LAYANAN_1.png"
@@ -109,7 +109,7 @@ onMounted(fetchData());
             </article>
             <!--Layanan Publik-->
             <article
-                class="w-full xl:px-20 md:px-16 sm:px-16 px-10 flex flex-col bg-type1 font-merriweather xl:mt-10 md:mt-8 sm:mt-8 mt-5 mb-14"
+                class="w-full px-10 sm:px-16 md:px-16 xl:px-20 flex flex-col bg-type1 font-merriweather xl:mt-10 md:mt-8 sm:mt-8 mt-5 mb-14"
             >
                 <h1
                     class="xl:text-3xl sm:text-xl text-md font-semibold text-accent2"

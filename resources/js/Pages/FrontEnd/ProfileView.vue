@@ -42,12 +42,12 @@ const fasilitasList = computed(() =>
                     class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"
                 ></div>
                 <h1
-                    class="text-type1 xl:text-3xl md:text-4xl sm:text-xl xl:text-left text-center font-bold relative z-0 xl:right-36 xl:mt-72 md:mt-96 sm:mt-60"
+                    class="text-type1 xl:text-3xl md:text-4xl text-lg xl:text-left text-center font-bold relative z-0 xl:right-36 sm:right-56 right-0 xl:mt-72 md:mt-96 sm:mt-60 mt-64"
                 >
                     Sejarah Desa
                 </h1>
                 <p
-                    class="text-type1 xl:text-xl md:text-2xl sm:text-md text-justify font-thin relative z-0 xl:right-36 mt-2 xl:max-w-4xl md:max-w-2xl sm:max-w-xl"
+                    class="text-type1 xl:text-xl md:text-2xl sm:text-base text-xs text-justify font-thin relative z-0 xl:right-36 sm:right-0 right-0 mt-2 xl:max-w-4xl md:max-w-2xl sm:max-w-xl max-w-xs"
                 >
                     {{ profile.history }}
                 </p>
@@ -60,9 +60,9 @@ const fasilitasList = computed(() =>
             <article
                 class="flex xl:flex-row flex-col relative items-center justify-center w-full font-merriweather bg-type1"
             >
-                <div class="xl:mt-24 md:mt-24 sm:mt-20 xl:mr-12 sm:mr-0">
+                <div class="xl:mt-24 md:mt-24 sm:mt-20 mt-14 xl:mr-12 sm:mr-0">
                     <!-- Lingkaran Putih -->
-                    <div class="relative oval-container xl:ml-4 sm:ml-5">
+                    <div class="relative oval-container xl:ml-4 sm:ml-4 ml-1">
                         <img
                             :src="`/storage/${profile.kepala_desa_image}`"
                             :alt="`${profile.kepala_desa_name} Profile`"
@@ -71,39 +71,39 @@ const fasilitasList = computed(() =>
                     </div>
                     <!-- Kotak Hijau -->
                     <div
-                        class="bg-accent2 text-white text-center xl:py-4 md:py-4 sm:py-3 py-3 xl:px-12 md:px-12 sm:px-10 px-2 rounded-lg relative z-0 xl:w-fit md:w-96 sm:w-72 w-64 xl:h-20 md:h-20 sm:h-16 h-16 xl:-mt-20 md:-mt-20 sm:-mt-16 -mt-16 xl:ml-0 md:-ml-1 sm:ml-0 ml-3"
+                        class="bg-accent2 text-white text-center xl:py-4 md:py-4 sm:py-3 py-3 xl:px-12 md:px-12 sm:px-10 px-2 rounded-lg relative z-0 xl:w-fit md:w-96 sm:w-72 w-64 xl:h-20 md:h-20 sm:h-16 h-16 xl:-mt-20 md:-mt-20 sm:-mt-16 -mt-16 xl:ml-0 md:-ml-1 sm:ml-0 ml-0"
                     >
                         <p
-                            class="font-bold xl:text-xl md:text-xl sm:text-md text-sm"
+                            class="font-bold xl:text-xl md:text-xl sm:text-base text-sm"
                         >
                             {{ profile.kepala_desa_name }}
                         </p>
                         <p
-                            class="italic xl:text-md md:text-md sm:text-xs text-xs"
+                            class="italic xl:text-base md:text-base sm:text-xs text-xs"
                         >
                             Kepala {{ profile.name }}
                         </p>
                     </div>
                 </div>
-                <div class="text-semiBlack xl:mt-24 md:mt-6 sm:mt-5">
+                <div class="text-semiBlack xl:mt-24 md:mt-6 mt-5">
                     <h1
-                        class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl text-center"
+                        class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl text-lg text-center"
                     >
                         Visi
                     </h1>
                     <p
-                        class="xl:text-xl md:text-lg sm:text-md text-semiBlack text-center italic max-w-3xl xl:mt-1"
+                        class="text-xs sm:text-base md:text-lg xl:text-xl text-semiBlack text-center italic xl:max-w-3xl sm:max-w-xl max-w-xs xl:mt-1"
                     >
                         “{{ profile.vision }}”
                     </p>
                     <h1
-                        class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl xl:mt-5 md:mt-5 sm:mt-3 text-center"
+                        class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl text-lg xl:mt-5 md:mt-5 mt-3 text-center"
                     >
                         Misi
                     </h1>
                     <div class="text-justify xl:mt-1">
                         <ol
-                            class="list-decimal pl-5 xl:max-w-2xl md:max-w-xl sm:max-w-lg space-y-3 text-semiBlack xl:text-xl md:text-lg sm:text-md italic"
+                            class="list-decimal xl:pl-10 sm:pl-16 pl-4 xl:max-w-3xl md:max-w-xl sm:max-w-lg max-w-xs space-y-3 text-semiBlack text-xs sm:text-base md:text-lg xl:text-xl  italic"
                         >
                             <li
                                 v-for="(misi, index) in missionList"
@@ -121,18 +121,18 @@ const fasilitasList = computed(() =>
                 class="flex flex-col items-center justify-center font-merriweather bg-type1"
             >
                 <h1
-                    class="font-bold text-accent2 xl:text-3xl md:text-2xl sm:text-xl xl:-ml-96 xl:mr-96 sm:mr-80 xl:pr-16 xl:mt-20 sm:mt-16"
+                    class="font-bold text-accent2 xl:text-3xl md:text-2xl text-xl xl:-ml-96 xl:mr-96 sm:mr-80 mr-24 xl:pr-16 xl:mt-20 sm:mt-16 mt-14"
                 >
                     Struktur Pemerintahan
                 </h1>
                 <p
-                    class="xl:text-xl md:text-lg sm:text-sm text-semiBlack xl:max-w-7xl sm:max-w-xl text-left xl:mr-56 md:mr-11 xl:ml-2 sm:ml-7 italic"
+                    class="xl:text-xl md:text-lg sm:text-base text-xs text-semiBlack xl:max-w-7xl sm:max-w-xl max-w-xs text-left xl:mr-56 md:mr-11 sm:mr-0 xl:ml-2 sm:ml-7 -ml-1 italic"
                 >
                     Susunan organisasi yang bertanggung jawab dalam mengelola
                     administrasi dan pelayanan publik di desa.
                 </p>
                 <div
-                    class="relative flex flex-wrap xl:flex-row flex-col xl:gap-7 sm:gap-5 p-7 bg-transparant -mt-3 items-center"
+                    class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 p-7 bg-transparant -mt-3 items-center xl:mr-52"
                 >
                     <!-- Card 1 -->
                     <div
@@ -140,11 +140,11 @@ const fasilitasList = computed(() =>
                     >
                         <img
                             :src="`/storage/${profile.organization_image}`"
-                            alt="Gambar 1"
+                            alt="Struktur Organisasi"
                             class="w-full xl:h-72 xl:-mt-2 object-contain"
                         />
                         <p
-                            class="text-accent1 text-lg font-semibold py-2 xl:-mt-1"
+                            class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1"
                         >
                             Struktur Organisasi Pemerintahan Desa
                         </p>
@@ -155,11 +155,11 @@ const fasilitasList = computed(() =>
                     >
                         <img
                             src="../../../images/SO_BPD.png"
-                            alt="Gambar 2"
+                            alt="Struktur Organisasi"
                             class="w-full xl:h-72 xl:-mt-1 object-contain"
                         />
                         <p
-                            class="text-accent1 text-lg font-semibold py-2 xl:-mt-2"
+                            class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-2"
                         >
                             Struktur Organisasi Badan Permusyawaratan Desa
                         </p>
@@ -176,7 +176,7 @@ const fasilitasList = computed(() =>
                     Potensi & Keunggulan Desa
                 </h1>
                 <p
-                    class="xl:text-xl sm:text-md text-semiBlack xl:max-w-7xl sm:max-w-xl xl:ml-0 sm:ml-6 xl:mr-80 sm:mr-0 pr-3 italic"
+                    class="xl:text-xl sm:text-base text-semiBlack xl:max-w-7xl sm:max-w-xl xl:ml-0 sm:ml-6 xl:mr-80 sm:mr-0 pr-3 italic"
                 >
                     Potensi dan aset penting dalam mendorong pertumbuhan desa
                     dan kesejahteraan masyarakat.
@@ -236,7 +236,7 @@ const fasilitasList = computed(() =>
                     Infrastruktur Desa
                 </h1>
                 <p
-                    class="xl:text-xl sm:text-md text-semiBlack max-w-7xl xl:-ml-60 sm:ml-14 xl:mr-2 sm:mr-9 -mb-96 italic"
+                    class="xl:text-xl sm:text-base text-semiBlack max-w-7xl xl:-ml-60 sm:ml-14 xl:mr-2 sm:mr-9 -mb-96 italic"
                 >
                     Informasi tentang sarana dan prasarana yang tersedia di desa
                     yang mendukung kehidupan masyarakat.
@@ -301,7 +301,7 @@ const fasilitasList = computed(() =>
                 >
                     Data Geografi
                 </h1>
-                <div class="flex flex-col w-96 xl:-ml-96 -ml-36 xl:mr-96 mr-2 xl:text-xl text-md">
+                <div class="flex flex-col w-96 xl:-ml-96 -ml-36 xl:mr-96 mr-2 xl:text-xl text-base">
                     <div class="flex w-full">
                         <p class="w-1/3 font-bold text-accent1 -ml-3">
                             Koordinat
@@ -356,7 +356,7 @@ const fasilitasList = computed(() =>
                 >
                     Data Demografi
                 </h1>
-                <p class="xl:text-xl text-md text-accent1 xl:max-w-5xl max-w-xl xl:-ml-36 ml-3 -mt-20 italic">
+                <p class="xl:text-xl text-base text-accent1 xl:max-w-5xl max-w-xl xl:-ml-36 ml-3 -mt-20 italic">
                     Menyajikan informasi mengenai aspek kependudukan yang
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.
@@ -472,7 +472,7 @@ const fasilitasList = computed(() =>
     border-radius: 50% / 50%;
 }
 .container {
-    max-width: 47%;
+    max-width: 100%;
     overflow: hidden;
 }
 @media (max-width: 820px) {
@@ -508,7 +508,7 @@ const fasilitasList = computed(() =>
         height: 320px;
     }
     .container {
-        max-width: 47%;
+        max-width: 100%;
         overflow: hidden;
     }
 }

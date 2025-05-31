@@ -80,6 +80,9 @@ Route::get('/galeri-desa-detail', function () {
     return Inertia::render('FrontEnd/GaleriDetail');
 });
 
+Route::get('/aparat-desa', function () {
+    return Inertia::render('FrontEnd/AparatDesa');
+});
 
 
 require __DIR__ . '/auth.php';
