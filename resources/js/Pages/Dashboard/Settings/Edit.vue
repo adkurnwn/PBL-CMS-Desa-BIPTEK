@@ -527,7 +527,7 @@ watch(() => themeForm.primary_color, (newPrimaryColor) => {
 
                                     <!-- Secondary Color Display (Read-only) -->
                                     <div>
-                                        <InputLabel for="secondary_color" value="Warna Sekunder (Otomatis)" />
+                                        <InputLabel for="secondary_color" value="Warna Aksen (Otomatis)" />
                                         <div class="mt-2 flex items-center space-x-3">
                                             <div class="w-8 h-8 rounded-full border-2 border-gray-300"
                                                 :style="{

@@ -201,9 +201,9 @@ class SettingsController extends Controller
         }
 
         // Log the activity
-        $this->logHelper->logActivity('update', 'theme_settings', 'Updated theme settings');
+        $this->logHelper->logActivity('update', 'theme_settings', 'Memperbarui pengaturan tema');
 
-        return redirect()->back()->with('success', 'Theme settings updated successfully');
+        return redirect()->back()->with('success', 'Pengaturan tema telah diperbarui');
     }
 
     /**

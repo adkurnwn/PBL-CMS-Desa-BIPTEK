@@ -111,7 +111,7 @@ const handleSidebarCollapse = (collapsed) => {
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
         
         <!-- Toast Notifications Container - Positioned for SPA -->
-        <div class="fixed top-[120px] inset-x-0 sm:top-[120px] sm:right-4 sm:inset-x-auto z-50 flex flex-col items-center sm:items-end max-w-full sm:w-[26rem] space-y-2 px-0">
+        <div class="fixed top-[70px] sm:top-[80px] md:top-[90px] lg:top-[100px] xl:top-[107px] 2xl:top-[110px] 3xl:top-[115px] 4xl:top-[120px] right-2 sm:right-3 md:right-3 lg:right-4 xl:right-4 2xl:right-4 3xl:right-4 4xl:right-4 inset-x-auto z-50 flex flex-col items-end max-w-full w-[18rem] sm:w-[20rem] md:w-[22rem] lg:w-[23rem] xl:w-[24rem] 2xl:w-[25rem] 3xl:w-[25.5rem] 4xl:w-[26rem] space-y-1 sm:space-y-1.5 md:space-y-1.5 lg:space-y-2 xl:space-y-2 2xl:space-y-2 3xl:space-y-2 4xl:space-y-2 px-0">
             <ToastNotification
                 v-for="toast in toasts"
                 :key="toast.id"
