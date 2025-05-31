@@ -76,13 +76,13 @@ class KomentarProdukHukumController extends Controller
     public function approve(KomentarProdukHukum $comment)
     {
         $comment->update(['is_approved' => true]);
-        return back()->with('success', 'Comment approved successfully');
+        return back()->with('success', 'Komentar berhasil disetujui');
     }
 
     public function destroy(KomentarProdukHukum $comment)
     {
         $comment->delete();
-        return back()->with('success', 'Comment deleted successfully');
+        return back()->with('success', 'Komentar berhasil dihapus');
     }
 
     public function documentsIndex(Request $request)

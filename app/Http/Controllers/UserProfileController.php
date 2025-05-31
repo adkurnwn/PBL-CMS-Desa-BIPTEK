@@ -51,7 +51,7 @@ class UserProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('success', 'Profile updated successfully');
+        return Redirect::route('profile.edit')->with('success', 'Profil berhasil diperbarui');
     }
 
     /**
@@ -75,7 +75,7 @@ class UserProfileController extends Controller
         
         $user->update(['photo_profile' => $path]);
 
-        return Redirect::route('profile.edit')->with('success', 'Profile image updated successfully');
+        return Redirect::route('profile.edit')->with('success', 'Foto profil berhasil diperbarui');
     }
 
     /**

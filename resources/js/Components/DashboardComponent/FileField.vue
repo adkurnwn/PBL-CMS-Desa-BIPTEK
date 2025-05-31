@@ -4,7 +4,7 @@
 
         <!-- Show current file if exists -->
         <div v-if="currentFile" class="current-file-info">
-            <div class="current-file-label">Current file:</div>
+            <div class="current-file-label">File saat ini:</div>
             <div class="current-file-link">
                 <div
                     v-html="getFileIconSvg(currentFile)"

@@ -169,7 +169,7 @@ class SettingsController extends Controller
         // Log the activity
         $this->logHelper->logActivity('update', 'settings', 'Updated application settings');
 
-        return redirect()->back()->with('success', 'Settings updated successfully');
+        return redirect()->back()->with('success', 'Pengaturan aplikasi web telah diperbarui');
     }
 
     public function updateTheme(UpdateThemeRequest $request)

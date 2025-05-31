@@ -170,7 +170,7 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
-        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Ditambahkan');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil ditambahkan');
     }
 
     public function edit($slug)
@@ -241,7 +241,7 @@ class NewsController extends Controller
         $news->update($data);
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
-        return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diperbarui');
+        return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diperbarui');
     }
 
     /**
@@ -417,7 +417,7 @@ class NewsController extends Controller
         $news = News::withTrashed()->where('slug', $slug)->firstOrFail();
         $news->restore();
         $this->logHelper->logActivity('restore', 'news', 'Memulihkan berita ' . $news->title);
-        return redirect()->route('dashboard.news.archive')->with('success', 'Berita Berhasil Dipulihkan');
+        return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dipulihkan');
     }
 
     public function destroy($slug)
@@ -429,12 +429,12 @@ class NewsController extends Controller
             $news->forceDelete();
 
             $this->logHelper->logActivity('delete', 'news', 'Menghapus berita ' . $news->title);
-            return redirect()->route('dashboard.news.archive')->with('success', 'Berita Berhasil Dihapus');
+            return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dihapus');
         } else {
             $news->delete();
 
             $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
-            return redirect()->route('dashboard.news.index')->with('success', 'Berita Berhasil Diarsipkan');
+            return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diarsipkan');
         }
     }
 }

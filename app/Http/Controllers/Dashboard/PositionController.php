@@ -34,7 +34,7 @@ class PositionController extends Controller
         ]);
 
         $this->logHelper->logActivity('create', 'position', 'Menambahkan posisi ' . $request->name);
-        return redirect()->route('dashboard.users.index')->with('success', 'Posisi Berhasil Ditambahkan');
+        return redirect()->route('dashboard.users.index')->with('success', 'Posisi berhasil ditambahkan');
     }
 
     public function edit(Position $position)
@@ -57,7 +57,7 @@ class PositionController extends Controller
         ]);
 
         $this->logHelper->logActivity('update', 'position', 'Meperbarui posisi ' . $position->name);
-        return redirect()->route('dashboard.users.index')->with('success', 'Posisi Berhasil Diperbarui');
+        return redirect()->route('dashboard.users.index')->with('success', 'Posisi berhasil diperbarui');
     }
 
     public function destroy(Position $position)
@@ -73,7 +73,7 @@ class PositionController extends Controller
         $position->delete();
 
         $this->logHelper->logActivity('delete', 'position', 'Menghapus posisi ' . $position->name);
-        return back()->with('success', 'Posisi Berhasil Dihapus');
+        return back()->with('success', 'Posisi berhasil dihapus');
     }
 
     public function index(Request $request)

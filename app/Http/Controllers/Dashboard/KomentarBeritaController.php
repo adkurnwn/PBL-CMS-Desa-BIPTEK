@@ -76,13 +76,13 @@ class KomentarBeritaController extends Controller
     public function approve(KomentarBerita $comment)
     {
         $comment->update(['is_approved' => true]);
-        return back()->with('success', 'Comment approved successfully');
+        return back()->with('success', 'Komentar berhasil disetujui');
     }
 
     public function destroy(KomentarBerita $comment)
     {
         $comment->delete();
-        return back()->with('success', 'Comment deleted successfully');
+        return back()->with('success', 'Komentar berhasil dihapus');
     }
 
     public function newsIndex(Request $request)
