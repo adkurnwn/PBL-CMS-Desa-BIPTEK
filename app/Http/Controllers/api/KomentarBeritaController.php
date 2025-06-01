@@ -6,14 +6,27 @@ use App\Models\News;
 use App\Models\KomentarBerita;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\StatisticsService;
 
 class KomentarBeritaController extends Controller
 {
-    public function index($slug)
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
     {
+        $this->statisticsService = $statisticsService;
+    }
+
+    public function index($slug, Request $request)
+    {
+        $this->statisticsService->trackFeatureVisit('Komentar Berita', $request);
+
         $news = News::where('slug', $slug)
             ->where('is_draft', false)
             ->firstOrFail();
+
+        // Track viewing comments for the related news
+        $this->statisticsService->trackContentInteraction('news', $news->id, 'comment', $request);
 
         $comments = KomentarBerita::where('id_berita', $news->id)
             ->when($news->is_moderate, function ($query) {
@@ -26,11 +39,16 @@ class KomentarBeritaController extends Controller
         return response()->json($comments);
     }
 
-    public function getReplies($slug, $commentId)
+    public function getReplies($slug, $commentId, Request $request)
     {
+        $this->statisticsService->trackFeatureVisit('Komentar Berita', $request);
+
         $news = News::where('slug', $slug)
             ->where('is_draft', false)
             ->firstOrFail();
+
+        // Track viewing comment replies for the related news
+        $this->statisticsService->trackContentInteraction('news', $news->id, 'comment', $request);
 
         $replies = KomentarBerita::where('id_berita', $news->id)
             ->where(function ($query) use ($commentId) {
@@ -76,6 +94,8 @@ class KomentarBeritaController extends Controller
 
     public function store(Request $request)
     {
+        $this->statisticsService->trackFeatureVisit('Komentar Berita', $request);
+
         $rules = [
             'id_berita' => 'required|string',
             'nama_user' => 'required|string|max:50',
@@ -92,6 +112,9 @@ class KomentarBeritaController extends Controller
         $news = News::where('slug', $request->id_berita)
             ->where('is_draft', false)
             ->firstOrFail();
+
+        // Track comment creation for the related news
+        $this->statisticsService->trackContentInteraction('news', $news->id, 'comment', $request);
 
         $data = $request->all();
         $data['id_berita'] = $news->id;

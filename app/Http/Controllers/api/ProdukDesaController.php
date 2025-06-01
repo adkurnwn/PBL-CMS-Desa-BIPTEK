@@ -8,9 +8,16 @@ use App\Http\Resources\ProdukDesa\ProdukDesaPreview;
 use App\Http\Resources\ProdukDesaResource;
 use App\Models\ProdukDesa;
 use Illuminate\Http\Request;
+use App\Services\StatisticsService;
 
 class ProdukDesaController extends Controller
 {
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -86,7 +93,7 @@ class ProdukDesaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
         try {
             $produkDesa = ProdukDesa::with(['images', 'user:id,name'])
@@ -99,6 +106,7 @@ class ProdukDesaController extends Controller
                     'message' => 'Produk Desa data not found'
                 ], 404);
             }
+            $this->statisticsService->trackContentView('produk_desa', $produkDesa->id, $request);
 
             return response()->json([
                 'success' => true,

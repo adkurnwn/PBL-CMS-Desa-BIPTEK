@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\News\NewsDetail;
 use App\Http\Resources\News\NewsPreview;
+use App\Services\StatisticsService;
 
 class NewsController extends Controller
 {
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -109,7 +117,7 @@ class NewsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
         try {
             $news = News::with(['images', 'category', 'user:id,name'])
@@ -125,6 +133,7 @@ class NewsController extends Controller
             }
 
             $news->increment('views');
+            $this->statisticsService->trackContentView('news', $news->id, $request);
 
             return response()->json([
                 'success' => true,

@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProdukHukum\ProdukHukumDetail;
 use App\Http\Resources\ProdukHukum\ProdukHukumPreview;
+use App\Services\StatisticsService;
 
 class ProdukHukumController extends Controller
 {
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
     public function index(Request $request)
     {
         try {
@@ -69,7 +76,7 @@ class ProdukHukumController extends Controller
         }
     }
 
-    public function show($slug)
+    public function show($slug, Request $request)
     {
         try {
             $produkHukum = ProdukHukum::with(['category', 'user:id,name'])->where('slug', $slug)->firstOrFail();
@@ -81,6 +88,7 @@ class ProdukHukumController extends Controller
                 ], 404);
             }
             $produkHukum->increment('views');
+            $this->statisticsService->trackContentView('produk_hukum', $produkHukum->id, $request);
 
             return response()->json([
                 'success' => true,
