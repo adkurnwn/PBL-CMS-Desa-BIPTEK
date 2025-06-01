@@ -157,7 +157,7 @@ onMounted(() => {
                             <!-- Kategori Berita -->
                             <span
                                 v-if="dokumen.category"
-                                class="inline-block px-2 py-0.5 text-xs font-semibold text-white bg-accent1 rounded-full mb-1"
+                                class="inline-block px-2 py-0.5 text-xs font-semibold text-white bg-accent1 rounded-full"
                             >
                                 {{ dokumen.category }}
                             </span>
