@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, onMounted } from "vue";
+import { ref, watch, computed, onMounted, provide } from "vue";
 import ApplicationLogo from "@/Components/DashboardComponent/ApplicationLogo.vue";
 import NavLink from "@/Components/DashboardComponent/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
@@ -17,6 +17,20 @@ const sidebarCollapsed = ref(false);
 // Toast notifications state
 const toasts = ref([]);
 const toastId = ref(0);
+
+// Get primary color from shared data
+const primaryColor = computed(() => {
+    return page.props.profile?.primary_color || '#244031';
+});
+
+// Provide theme colors to all child components
+provide('primaryColor', primaryColor);
+
+const secondaryColor = computed(() => {
+    return page.props.profile?.secondary_color || '#3B614A';
+});
+// Provide secondary color to all child components
+provide('secondaryColor', secondaryColor);
 
 // Get sidebar collapsed state from localStorage on mount
 onMounted(() => {
@@ -89,12 +103,15 @@ const handleSidebarCollapse = (collapsed) => {
 </script>
 
 <template>
-    <div class="flex flex-col h-screen bg-white overflow-hidden">
+    <div 
+        class="flex flex-col h-screen bg-white overflow-hidden"
+        :style="{ '--accent1': primaryColor, '--accent2': secondaryColor, }"
+    >
         <!-- Header -->
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />
         
         <!-- Toast Notifications Container - Positioned for SPA -->
-        <div class="fixed top-[120px] inset-x-0 sm:top-[120px] sm:right-4 sm:inset-x-auto z-50 flex flex-col items-center sm:items-end max-w-full sm:w-[26rem] space-y-2 px-0">
+        <div class="fixed top-[70px] sm:top-[80px] md:top-[90px] lg:top-[100px] xl:top-[107px] 2xl:top-[110px] 3xl:top-[115px] 4xl:top-[120px] right-2 sm:right-3 md:right-3 lg:right-4 xl:right-4 2xl:right-4 3xl:right-4 4xl:right-4 inset-x-auto z-50 flex flex-col items-end max-w-full w-[18rem] sm:w-[20rem] md:w-[22rem] lg:w-[23rem] xl:w-[24rem] 2xl:w-[25rem] 3xl:w-[25.5rem] 4xl:w-[26rem] space-y-1 sm:space-y-1.5 md:space-y-1.5 lg:space-y-2 xl:space-y-2 2xl:space-y-2 3xl:space-y-2 4xl:space-y-2 px-0">
             <ToastNotification
                 v-for="toast in toasts"
                 :key="toast.id"
@@ -145,16 +162,37 @@ const handleSidebarCollapse = (collapsed) => {
                     <slot name="subtitle-area"></slot>
                 </div>
 
-                <div v-if="$slots['search-area']" class=" pt-[2px] pb-[13px] border-MenuBG shadow-sm border-b sm:pb-[14px] md:pb-[15px] lg:pb-[16px] xl:pb-[16.67px] 2xl:pb-[19px] 3xl:pb-[22px] 4xl:pb-[25px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
+                <div v-if="$slots['search-area']" class=" pt-[2px] pb-[13px] sm:pb-[14px] md:pb-[15px] lg:pb-[16px] xl:pb-[16.67px] 2xl:pb-[19px] 3xl:pb-[22px] 4xl:pb-[25px] pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] flex items-center gap-[6px] sm:gap-[7px] md:gap-[8px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px] justify-end">
                     <slot name="search-area"></slot>
+                </div>
+
+                <div v-if="$slots['border-shadow']" class="border-MenuBG shadow-sm border-b">
+                    <slot name="border-shadow"></slot>
                 </div>
 
                 <div v-if="$slots['table-content']" class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] table-container-slot">
                     <slot name="table-content"></slot>
                 </div>
+
+                <div v-if="$slots['edit-comment']" class="flex-1 flex gap-4 h-full overflow-hidden">
+                    <div class="w-2/5 h-full overflow-hidden">
+                        <Scrollbar 
+                            class="h-full" 
+                            :hideScrollbar="false"
+                            :autoHide="false"
+                        >
+                            <slot name="news-content-comment"></slot>
+                        </Scrollbar>
+                    </div>
+                    <div class="w-3/5 h-full overflow-hidden">
+                        <div class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px] h-full ">
+                            <slot name="table-content-comment"></slot>
+                        </div>
+                    </div>
+                </div>
                  
                 <Scrollbar 
-                    v-if="!$slots['table-content']"
+                    v-if="!$slots['table-content'] && !$slots['edit-comment']"
                     class="flex-1 w-full pr-[15px] sm:pr-[18px] md:pr-[20px] xl:pr-[15px] 2xl:pr-[18px] 3xl:pr-[20px] 4xl:pr-[23px] pl-[4px] sm:pl-[5px] md:pl-[6px] xl:pl-[6px] 2xl:pl-[7px] 3xl:pl-[8px] 4xl:pl-[10px]" 
                     :hideScrollbar="false"
                     :autoHide="false"

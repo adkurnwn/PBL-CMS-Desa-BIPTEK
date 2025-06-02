@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import axios from "axios";
 
 export const formatDate = (date) => {
@@ -7,6 +7,24 @@ export const formatDate = (date) => {
         month: "long",
         day: "numeric",
     });
+};
+
+const setCookie = (name, value, days = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+};
+
+const getCookie = (name) => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === " ") c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0)
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
 };
 
 export default function useComments(type, itemId, isModerated = false) {
@@ -21,12 +39,14 @@ export default function useComments(type, itemId, isModerated = false) {
     // Initialize form data based on the content type
     const commentForm = ref({
         nama_user: "",
+        email_user: "",
         komentar: "",
         captcha: "",
     });
 
     const replyForm = ref({
         nama_user: "",
+        email_user: "",
         komentar: "",
         id_ref_komentar: null,
         captcha: "",
@@ -41,6 +61,62 @@ export default function useComments(type, itemId, isModerated = false) {
         replyForm.value.id_produk_hukum = itemId;
     }
 
+    // Load saved user data from cookies
+    const loadSavedUserData = () => {
+        const savedName = getCookie("comment_user_name");
+        const savedEmail = getCookie("comment_user_email");
+
+        if (savedName) {
+            commentForm.value.nama_user = savedName;
+            replyForm.value.nama_user = savedName;
+        }
+        if (savedEmail) {
+            commentForm.value.email_user = savedEmail;
+            replyForm.value.email_user = savedEmail;
+        }
+    };
+
+    // Watch for changes in name and email fields to save to cookies
+    watch(
+        () => commentForm.value.nama_user,
+        (newName) => {
+            if (newName && newName.trim()) {
+                setCookie("comment_user_name", newName.trim());
+                replyForm.value.nama_user = newName;
+            }
+        }
+    );
+
+    watch(
+        () => commentForm.value.email_user,
+        (newEmail) => {
+            if (newEmail && newEmail.trim()) {
+                setCookie("comment_user_email", newEmail.trim());
+                replyForm.value.email_user = newEmail;
+            }
+        }
+    );
+
+    watch(
+        () => replyForm.value.nama_user,
+        (newName) => {
+            if (newName && newName.trim()) {
+                setCookie("comment_user_name", newName.trim());
+                commentForm.value.nama_user = newName;
+            }
+        }
+    );
+
+    watch(
+        () => replyForm.value.email_user,
+        (newEmail) => {
+            if (newEmail && newEmail.trim()) {
+                setCookie("comment_user_email", newEmail.trim());
+                commentForm.value.email_user = newEmail;
+            }
+        }
+    );
+
     // Helper methods
     const getAvatar = (name) => {
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -48,7 +124,7 @@ export default function useComments(type, itemId, isModerated = false) {
         )}&background=random`;
     };
 
-    const truncateText = (text, length) => {
+    const truncateText = (text, length = 100) => {
         if (!text) return "";
         return text.length > length ? text.substring(0, length) + "..." : text;
     };
@@ -121,13 +197,12 @@ export default function useComments(type, itemId, isModerated = false) {
             }
 
             commentForm.value.komentar = "";
-            commentForm.value.nama_user = "";
             commentForm.value.captcha = "";
             alert(response.data.message);
         } catch (err) {
             console.error("Error submitting comment:", err);
-            await refreshCaptcha("main"); // Refresh on error
-            commentForm.value.captcha = ""; // Clear invalid captcha
+            await refreshCaptcha("main");
+            commentForm.value.captcha = "";
             alert(err.response?.data?.message || "Failed to submit comment");
         } finally {
             submitting.value = false;
@@ -138,7 +213,8 @@ export default function useComments(type, itemId, isModerated = false) {
     const showReplyForm = (commentId) => {
         activeReplyId.value = commentId;
         replyForm.value = {
-            nama_user: "",
+            nama_user: commentForm.value.nama_user, // Use saved name
+            email_user: commentForm.value.email_user, // Use saved email
             komentar: "",
             id_ref_komentar: commentId,
             captcha: "",
@@ -158,7 +234,8 @@ export default function useComments(type, itemId, isModerated = false) {
     const cancelReply = () => {
         activeReplyId.value = null;
         replyForm.value = {
-            nama_user: "",
+            nama_user: commentForm.value.nama_user, // Keep saved name
+            email_user: commentForm.value.email_user, // Keep saved email
             komentar: "",
             id_ref_komentar: null,
             captcha: "",
@@ -269,6 +346,7 @@ export default function useComments(type, itemId, isModerated = false) {
     const initialize = () => {
         fetchComments();
         refreshCaptcha("main");
+        loadSavedUserData(); // Load saved user data on initialization
     };
 
     return {

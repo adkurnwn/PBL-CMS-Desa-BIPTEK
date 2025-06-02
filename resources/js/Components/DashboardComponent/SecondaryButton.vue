@@ -14,7 +14,7 @@
         :class="additionalClasses"
     >
         <!-- Icon slot - only show if icon slot has content -->
-        <span v-if="$slots.icon" class="flex items-center justify-center flex-shrink-0">
+        <span v-if="$slots.icon" class="flex items-center justify-center flex-shrink-0 w-[10.2px] h-[10.2px] sm:w-[11.55px] sm:h-[11.55px] md:w-[12.9px] md:h-[12.9px] lg:w-[13.95px] lg:h-[13.95px] xl:w-[15px] xl:h-[15px] 2xl:w-[17.25px] 2xl:h-[17.25px] 3xl:w-[19.65px] 3xl:h-[19.65px] 4xl:w-[22.5px] 4xl:h-[22.5px]">
             <slot name="icon"></slot>
         </span>
         

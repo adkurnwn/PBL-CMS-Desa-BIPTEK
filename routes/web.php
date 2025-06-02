@@ -3,6 +3,7 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InstallController;
+use App\Services\StatisticsService;
 
 // routes/web.php
 
@@ -24,28 +25,35 @@ Route::fallback(function ($name = null) {
     return app()->make(InstallController::class)->handleProfileNotFound($name);
 });
 
-Route::get('/', function () {
+
+Route::get('/', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Home', request());
     return Inertia::render('FrontEnd/HomeView');
 })->name('home');
 
-Route::get('/profile', function () {
+Route::get('/profile', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Profil Desa', request());
     return Inertia::render('FrontEnd/ProfileView');
 })->name('profil-desa');
 
-Route::get('/informasi', function () {
+Route::get('/informasi', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Informasi & Berita', request());
     return Inertia::render('FrontEnd/InformasiView');
 })->name('informasi');
 
-Route::get('/layanan', function () {
+Route::get('/layanan', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Layanan Publik', request());
     return Inertia::render('FrontEnd/LayananView');
 })->name('layanan');
 
 Route::prefix('berita')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Berita', request());
         return Inertia::render('FrontEnd/BeritaList');
     })->name('berita');
 
-    Route::get('/{slug}', function ($slug) {
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Berita', request());
         return Inertia::render('FrontEnd/BeritaDetail', [
             'slug' => $slug
         ]);
@@ -53,28 +61,32 @@ Route::prefix('berita')->group(function () {
 });
 
 Route::prefix('produk-hukum')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Produk Hukum', request());
         return Inertia::render('FrontEnd/ProdukHukumList');
     })->name('produk-hukum');
 
-    Route::get('/{slug}', function ($slug) {
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Produk Hukum', request());
         return Inertia::render('FrontEnd/ProdukHukumDetail', [
             'slug' => $slug
         ]);
     })->name('produk-hukum.show');
 });
 
-Route::get('/event-test', function () {
+Route::get('/event-test', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Agenda', request());
     return Inertia::render('FrontEnd/EventListTest');
 })->name('event-test');
 
-
-Route::prefix('laporan-dana-desa')->group(function () {
-    Route::get('/', function () {
+Route::prefix('dana-desa')->group(function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Dana Desa', request());
         return Inertia::render('FrontEnd/LaporanDana');
     })->name('dana-desa');
 
-    Route::get('/{slug}', function ($slug) {
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Dana Desa', request());
         return Inertia::render('FrontEnd/LaporanDanaDetail', [
             'slug' => $slug
         ]);
@@ -82,25 +94,32 @@ Route::prefix('laporan-dana-desa')->group(function () {
 });
 
 Route::prefix('produk-unggulan')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Produk Unggulan', request());
         return Inertia::render('FrontEnd/ProdukUnggulan');
     });
 
-    Route::get('/{slug}', function ($slug) {
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Produk Unggulan', request());
         return Inertia::render('FrontEnd/ProdukUnggulanDetail', [
             'slug' => $slug
         ]);
     })->name('produk-desa.detail');
 });
 
-Route::get('/galeri-desa', function () {
+Route::get('/galeri-desa', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Galeri', request());
     return Inertia::render('FrontEnd/GaleriList');
 });
 
-Route::get('/galeri-desa-detail', function () {
+Route::get('/galeri-desa-detail', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Galeri', request());
     return Inertia::render('FrontEnd/GaleriDetail');
 });
 
+Route::get('/aparat-desa', function () {
+    return Inertia::render('FrontEnd/AparatDesa');
+});
 
 
 require __DIR__ . '/auth.php';

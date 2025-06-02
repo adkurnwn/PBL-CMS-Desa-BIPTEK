@@ -50,7 +50,7 @@ class RecoveryController extends Controller
             $this->logHelper->logActivity('create', 'backup', 'Created new database backup');
 
             return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Backup created successfully (previous backups were automatically deleted)');
+                ->with('success', 'Cadangan berhasil dibuat (cadangan sebelumnya telah dihapus secara otomatis)');
         } catch (\Exception $e) {
             return redirect()->route('dashboard.recovery.index')
                 ->with('error', 'Failed to create backup: ' . $e->getMessage());
@@ -149,7 +149,7 @@ class RecoveryController extends Controller
             $this->cleanupTempFiles($extractPath);
 
             return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Backup restored successfully');
+                ->with('success', 'Cadangan berhasil dipulihkan');
         } catch (\Exception $e) {
             return redirect()->route('dashboard.recovery.index')
                 ->with('error', 'Failed to restore backup: ' . $e->getMessage());
@@ -168,7 +168,7 @@ class RecoveryController extends Controller
             if (file_exists($backupPath) && unlink($backupPath)) {
                 $this->logHelper->logActivity('delete', 'backup', 'Deleted backup file: ' . $fileName);
                 return redirect()->route('dashboard.recovery.index')
-                    ->with('success', 'Backup deleted successfully');
+                    ->with('success', 'Cadangan berhasil dihapus');
             }
 
             return redirect()->route('dashboard.recovery.index')

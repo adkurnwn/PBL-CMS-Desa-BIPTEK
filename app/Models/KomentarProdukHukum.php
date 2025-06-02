@@ -14,7 +14,8 @@ class KomentarProdukHukum extends Model
         'id_ref_komentar',
         'nama_user',
         'is_approved',
-        'komentar'
+        'komentar',
+        'email_user',
     ];
 
     // Relationship with ProdukHukum
