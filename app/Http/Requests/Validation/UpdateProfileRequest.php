@@ -37,8 +37,6 @@ class UpdateProfileRequest extends FormRequest
             'vision' => 'required|string',
             'mission' => 'required|string',
             'organization_image' => 'nullable|image|max:10000|mimes:jpg,png,jpeg',
-            'primary_color' => 'required|in:#000000,#ffffff',
-            'secondary_color' => 'required|in:#000000,#ffffff',
             'hero_images.*' => 'sometimes|image|max:10000|mimes:jpg,png,jpeg',
             'hero_image_1' => 'nullable|image|max:10000|mimes:jpg,png,jpeg',
             'hero_image_2' => 'nullable|image|max:10000|mimes:jpg,png,jpeg',
