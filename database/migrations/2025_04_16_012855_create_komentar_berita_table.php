@@ -24,6 +24,7 @@ return new class extends Migration
                 ->on('komentar_berita')
                 ->onDelete('cascade');
             $table->string('nama_user', 50);
+            $table->string('email_user', 50);
             $table->boolean('is_approved')->default(false);
             $table->text('komentar');
             $table->timestamps();

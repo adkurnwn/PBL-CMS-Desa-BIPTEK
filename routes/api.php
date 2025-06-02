@@ -15,6 +15,8 @@ use App\Http\Controllers\api\ProdukDesaController;
 use App\Http\Controllers\api\ProdukHukumController;
 use App\Http\Controllers\api\KomentarBeritaController;
 use App\Http\Controllers\api\KomentarProdukHukumController;
+use App\Http\Controllers\api\StatisticsController;
+use App\Services\StatisticsService;
 
 Route::get('provinces', [RegionController::class, 'getProvinces']);
 Route::get('regencies/{province_id}', [RegionController::class, 'getRegencies']);
@@ -92,3 +94,7 @@ Route::prefix('demografi')->group(function () {
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index']);
 });
+
+
+Route::post('statistics/content-view', [StatisticsController::class, 'trackContentView']);
+Route::post('statistics/feature-visit', [StatisticsController::class, 'trackFeatureVisit']);

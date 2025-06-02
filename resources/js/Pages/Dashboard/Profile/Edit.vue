@@ -286,7 +286,10 @@ const newFasilitas = ref("");
 const newLembaga = ref("");
 
 // Add methods to add and remove items
-const addFasilitas = () => {
+const addFasilitas = (event) => {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
     if (newFasilitas.value.trim()) {
         // Create a new array by spreading the existing items and adding the new one
         // This is important to ensure reactivity
@@ -300,7 +303,10 @@ const removeFasilitas = (index) => {
     form.fasilitas = form.fasilitas.filter((_, i) => i !== index);
 };
 
-const addLembaga = () => {
+const addLembaga = (event) => {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
     if (newLembaga.value.trim()) {
         // Create a new array by spreading the existing items and adding the new one
         form.lembaga = [...form.lembaga, newLembaga.value];
@@ -403,7 +409,7 @@ const removeLembaga = (index) => {
                                         <div class="">
                                             <SingleLineField id="fasilitas" v-model="newFasilitas" type="add"
                                                 fieldName="Fasilitas" placeholder="Masukkan fasilitas desa"
-                                                custom-width="100%" @click.prevent="addFasilitas" />
+                                                custom-width="100%" @click="addFasilitas" />
                                         </div>
                                     </div>
 
@@ -445,7 +451,7 @@ const removeLembaga = (index) => {
                                         <div class="">
                                             <SingleLineField id="lembaga" v-model="newLembaga" type="add"
                                                 fieldName="Lembaga" placeholder="Masukkan nama lembaga desa"
-                                                custom-width="100%" @click.prevent="addLembaga" />
+                                                custom-width="100%" @click="addLembaga" />
                                         </div>
                                     </div>
 

@@ -23,11 +23,16 @@ class ProdukHukum extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class);
     }
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(KomentarProdukHukum::class, 'id_produk_hukum');
     }
 }

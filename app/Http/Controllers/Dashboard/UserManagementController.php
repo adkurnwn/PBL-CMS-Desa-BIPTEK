@@ -158,7 +158,7 @@ class UserManagementController extends Controller
         }
 
         $this->logHelper->logActivity('update', 'user', 'Memperbarui pengguna ' . $user->name);
-        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil Diperbarui');
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna berhasil diperbarui');
     }
 
     public function destroy(User $user)
@@ -171,6 +171,6 @@ class UserManagementController extends Controller
         $statusMessage = $newStatus ? 'Diaktifkan' : 'Dinonaktifkan';
         $logStatus = $newStatus ? 'restore' : 'delete';
         $this->logHelper->logActivity($logStatus, 'user', $logMessage . 'pengguna ' . $user->name);
-        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna Berhasil ' . $statusMessage);
+        return redirect()->route('dashboard.users.index')->with('success', 'Pengguna berhasil ' . $statusMessage);
     }
 }

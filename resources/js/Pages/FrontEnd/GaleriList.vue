@@ -152,23 +152,23 @@ const totalPages = 2;
             <!-- Pagination -->
             <div class="flex justify-center mt-5 gap-2">
                 <button
-                    class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                     :disabled="page === 1"
                     @click="page--"
                 >&lt;</button>
                 <button
                     v-for="p in totalPages"
                     :key="p"
-                    class="w-7 h-7 rounded-full flex items-center justify-center text-xs"
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
                     :class="page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
                     @click="page = p"
                 >{{ p }}</button>
                 <button
-                    class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                     :disabled="page === totalPages"
                     @click="page++"
                 >&gt;</button>
-                </div>
+            </div>
             </article>
             <!--Galeri Terkni-->
             <article class="w-full px-20 flex flex-col pb-8 lg:pb-24 bg-type1 font-merriweather space-y-5">

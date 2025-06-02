@@ -77,7 +77,7 @@ class RoleManagementController extends Controller
         ]);
 
         $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses role ' . $role->name);
-        return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
+        return redirect()->back()->with('success', 'Hak Akses Role berhasil diperbarui');
     }
 
     public function batchUpdate(Request $request)
@@ -97,6 +97,6 @@ class RoleManagementController extends Controller
         }
 
         $this->logHelper->logActivity('update', 'role', 'Memperbarui hak akses beberapa role sekaligus');
-        return redirect()->back()->with('success', 'Hak akses role berhasil diperbarui');
+        return redirect()->back()->with('success', 'Hak Akses Role berhasil diperbarui');
     }
 }

@@ -104,7 +104,7 @@ const emptyStateMessage = "No backups available. Create your first backup to get
             <PrimaryButton @click="createBackup">Cadangkan Sekarang</PrimaryButton>
         </template>
 
-        <div class="bg-greenLabel p-4 mb-6 rounded-lg">
+        <div class="bg-selectedBG p-4 mb-6 rounded-lg">
             <h4
                 class="text-[18px] sm:text-[18px] md:text-[18px] xl:text-[20px] 2xl:text-[23px] 3xl:text-[27px] 4xl:text-[31px] font-semibold leading-tight text-accent2 mb-2">
                 Terkait Pencadangan dan Pemulihan Data

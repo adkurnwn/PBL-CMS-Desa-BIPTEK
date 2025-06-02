@@ -51,6 +51,16 @@
                 d="M440-320h80v-166l64 62 56-56-160-160-160 160 56 56 64-62v166ZM280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z" />
         </svg>
 
+        <!-- accept icon - updated -->
+        <svg v-else-if="type === 'accept'" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <mask id="mask0_1679_3120" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="22" height="22">
+                <rect x="0.5625" y="0.5" width="21" height="21" fill="#D9D9D9"/>
+            </mask>
+            <g mask="url(#mask0_1679_3120)">
+                <path d="M8.91914 16.2504L3.93164 11.2629L5.17852 10.016L8.91914 13.7566L16.9473 5.72852L18.1941 6.97539L8.91914 16.2504Z" fill="#4C7660"/>
+            </g>
+        </svg>
+
         <!-- view Icon -->
         <svg v-else-if="type === 'view'" xmlns="http://www.w3.org/2000/svg" width="22" height="21" viewBox="0 0 22 21"
             fill="none">
@@ -72,7 +82,7 @@ defineProps({
     type: {
         type: String,
         required: true,
-        validator: (value) => ['edit', 'delete', 'archive', 'restore', 'view'].includes(value)
+        validator: (value) => ['edit', 'delete', 'archive', 'restore', 'view', 'accept'].includes(value)
     }
 });
 </script>

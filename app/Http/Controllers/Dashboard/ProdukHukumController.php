@@ -116,7 +116,7 @@ class ProdukHukumController extends Controller
         ProdukHukum::create($data);
 
         $this->logHelper->logActivity('create', 'produk_hukum', 'Menambahkan produk hukum ' . $request->title);
-        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum Berhasil Ditambahkan');
+        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil ditambahkan');
     }
 
     public function edit($slug)
@@ -170,6 +170,6 @@ class ProdukHukumController extends Controller
         $produkHukum->update($data);
 
         $this->logHelper->logActivity('update', 'produk_hukum', 'Memperbarui produk hukum ' . $produkHukum->title);
-        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum Berhasil Diperbarui');
+        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil diperbarui');
     }
 }

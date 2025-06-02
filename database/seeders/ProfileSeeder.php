@@ -57,8 +57,8 @@ class ProfileSeeder extends Seeder
 3. Meningkatkan kualitas sumber daya manusia melalui pendidikan dan pelatihan
 4. Membangun infrastruktur desa yang berkualitas dan ramah lingkungan
 5. Memperkuat nilai-nilai sosial, budaya, dan kearifan lokal dalam kehidupan masyarakat",
-            'primary_color' => '#000000',
-            'secondary_color' => '#000000',
+            'primary_color' => '#244031',
+            'secondary_color' => '#3B614A',
         ]);
     }
 }

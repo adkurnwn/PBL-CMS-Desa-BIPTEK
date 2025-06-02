@@ -7,6 +7,8 @@ import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
 import Search from "@/Components/DashboardComponent/Search.vue";
 
 const props = defineProps({
+    stats: Object,
+    filters: Object,
     logs: Object,
     currentPage: {
         type: Number,
@@ -35,6 +37,42 @@ const hasPermission = (permission) => {
     }
     // Check if user has the specific permission
     return auth.value.user?.permissions?.includes(permission);
+};
+
+// Computed properties for easy access to stats
+const visitors = computed(() => props.stats?.visitors || {});
+const contentStats = computed(() => props.stats?.content || {});
+const featureStats = computed(() => props.stats?.features || []);
+
+// Content period filter (frontend only now)
+const contentPeriod = ref('month');
+
+// Get filtered content stats based on selected period
+const filteredContentStats = computed(() => {
+    return contentStats.value?.all_periods?.[contentPeriod.value] || [];
+});
+
+// Helper function to format numbers
+const formatNumber = (num) => {
+    return new Intl.NumberFormat('id-ID').format(num || 0);
+};
+
+// Handle content period change (no server request needed)
+const handleContentPeriodChange = () => {
+    // No need to make server request, just update the reactive variable
+    // The computed property will automatically update the display
+};
+
+// Get period label for display
+const getPeriodLabel = (period) => {
+    const labels = {
+        'day': 'Hari Ini',
+        'week': 'Minggu Ini', 
+        'month': 'Bulan Ini',
+        'year': 'Tahun Ini',
+        'all': 'Sepanjang Waktu'
+    };
+    return labels[period] || 'Bulan Ini';
 };
 
 </script>
@@ -66,63 +104,124 @@ const hasPermission = (permission) => {
             ]" />
         </template>
 
-
-
-
         <div class="h-full">
             <div class="overflow-hidden bg-white shadow-sm h-full overflow-y-auto">
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
+                <!-- Visitors Overview -->
+                <div class="p-6 border-b">
+                    <h2 class="text-lg font-semibold text-gray-900">Pengunjung Unik</h2>
+                    <p class="mt-2 text-sm text-gray-600">Statistik pengunjung unik berdasarkan periode waktu.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-blue-800">Hari Ini</h3>
+                            <p class="text-2xl font-bold text-blue-900">{{ formatNumber(visitors.today) }}</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-green-800">Minggu Ini</h3>
+                            <p class="text-2xl font-bold text-green-900">{{ formatNumber(visitors.week) }}</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-yellow-800">Bulan Ini</h3>
+                            <p class="text-2xl font-bold text-yellow-900">{{ formatNumber(visitors.month) }}</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-purple-800">Tahun Ini</h3>
+                            <p class="text-2xl font-bold text-purple-900">{{ formatNumber(visitors.year) }}</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- Repeat blocks from the original file -->
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
+
+                <!-- Content Views by Category -->
+                <div class="p-6 border-b">
+                    <h2 class="text-lg font-semibold text-gray-900">Tampilan Konten Berdasarkan Kategori</h2>
+                    <p class="mt-2 text-sm text-gray-600">Statistik tampilan konten untuk setiap kategori.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div class="bg-indigo-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-indigo-800">Berita</h3>
+                            <p class="text-xl font-bold text-indigo-900">{{ formatNumber(contentStats.news?.length || 0) }} konten</p>
+                            <p class="text-sm text-indigo-600">Total views: {{ formatNumber(contentStats.news?.reduce((sum, item) => sum + (item.views || 0), 0) || 0) }}</p>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-red-800">Produk Hukum</h3>
+                            <p class="text-xl font-bold text-red-900">{{ formatNumber(contentStats.produk_hukum?.length || 0) }} konten</p>
+                            <p class="text-sm text-red-600">Total views: {{ formatNumber(contentStats.produk_hukum?.reduce((sum, item) => sum + (item.views || 0), 0) || 0) }}</p>
+                        </div>
+                        <div class="bg-teal-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-teal-800">Dana Desa</h3>
+                            <p class="text-xl font-bold text-teal-900">{{ formatNumber(contentStats.dana_desa?.length || 0) }} konten</p>
+                            <p class="text-sm text-teal-600">Total views: {{ formatNumber(contentStats.dana_desa?.reduce((sum, item) => sum + (item.views || 0), 0) || 0) }}</p>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-orange-800">Produk Desa</h3>
+                            <p class="text-xl font-bold text-orange-900">{{ formatNumber(contentStats.produk_desa?.length || 0) }} konten</p>
+                            <p class="text-sm text-orange-600">Total views: {{ formatNumber(contentStats.produk_desa?.reduce((sum, item) => sum + (item.views || 0), 0) || 0) }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
+
+                <!-- Popular Content -->
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900">Konten Terpopuler</h2>
+                            <p class="mt-2 text-sm text-gray-600">Konten dengan skor popularitas tertinggi (Views × 1 + Comments × 3) - {{ getPeriodLabel(contentPeriod) }}.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="content-period" class="text-sm font-medium text-gray-700">Periode:</label>
+                            <select
+                                id="content-period"
+                                v-model="contentPeriod"
+                                @change="handleContentPeriodChange"
+                                class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            >
+                                <option value="day">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month">Bulan Ini</option>
+                                <option value="year">Tahun Ini</option>
+                                <option value="all">Sepanjang Waktu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div v-if="filteredContentStats && filteredContentStats.length > 0" class="space-y-3">
+                            <div v-for="(content, index) in filteredContentStats.slice(0, 5)" :key="index" 
+                                 class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ content.title }}</p>
+                                    <p class="text-sm text-gray-600">Kategori: {{ content.category }}</p>
+                                    <div class="flex gap-4 mt-1">
+                                        <span class="text-xs text-blue-600">{{ formatNumber(content.views) }} views</span>
+                                        <span v-if="content.comments > 0" class="text-xs text-green-600">{{ formatNumber(content.comments) }} comments</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-gray-900">{{ formatNumber(content.weighted_score) }}</p>
+                                    <p class="text-sm text-gray-600">skor</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="text-center py-8 text-gray-500">
+                            Tidak ada data konten yang tersedia untuk periode {{ getPeriodLabel(contentPeriod).toLowerCase() }}
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Feature Usage -->
                 <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
-                </div>
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold text-gray-900">Statistik Aktivitas</h2>
-                    <p class="mt-2 text-sm text-gray-600">Berikut adalah statistik aktivitas terbaru.</p>
+                    <h2 class="text-lg font-semibold text-gray-900">Penggunaan Fitur</h2>
+                    <p class="mt-2 text-sm text-gray-600">Statistik penggunaan fitur-fitur pada website.</p>
+                    <div class="mt-4">
+                        <div v-if="featureStats && featureStats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div v-for="(feature, index) in featureStats" :key="index" 
+                                 class="bg-gray-50 p-4 rounded-lg">
+                                <h3 class="font-medium text-gray-900">{{ feature.feature_name }}</h3>
+                                <p class="text-2xl font-bold text-gray-900 mt-2">{{ formatNumber(feature.visits) }}</p>
+                                <p class="text-sm text-gray-600">kunjungan</p>
+                            </div>
+                        </div>
+                        <div v-else class="text-center py-8 text-gray-500">
+                            Tidak ada data penggunaan fitur yang tersedia
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

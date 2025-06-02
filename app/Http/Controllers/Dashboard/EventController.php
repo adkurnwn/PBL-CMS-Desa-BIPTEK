@@ -102,7 +102,7 @@ class EventController extends Controller
         Event::create($data);
 
         $this->logHelper->logActivity('create', 'event', 'Menambahkan event ' . $request->title);
-        return redirect()->route('dashboard.events.index')->with('success', 'Event Berhasil Ditambahkan');
+        return redirect()->route('dashboard.events.index')->with('success', 'Agenda Berhasil Ditambahkan');
     }
 
     public function edit($slug)
@@ -144,6 +144,6 @@ class EventController extends Controller
         $event->update($data);
 
         $this->logHelper->logActivity('update', 'event', 'Memperbarui event ' . $request->title);
-        return redirect()->route('dashboard.events.index')->with('success', 'Event Berhasil Diperbarui');
+        return redirect()->route('dashboard.events.index')->with('success', 'Agenda Berhasil Diperbarui');
     }
 }
