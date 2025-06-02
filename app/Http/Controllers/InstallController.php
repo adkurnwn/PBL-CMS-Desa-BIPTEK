@@ -110,7 +110,7 @@ class InstallController extends Controller
                 'DB_PORT' => $request->port,
                 'DB_DATABASE' => $request->database,
                 'DB_USERNAME' => $request->username,
-                'DB_PASSWORD' => "$request->password",
+                'DB_PASSWORD' => '"' . $request->password . '"',
                 'DB_COLLATION' => 'utf8mb4_unicode_ci',
                 'SESSION_DRIVER' => 'file',
                 'CACHE_STORE' => 'file',
@@ -124,7 +124,7 @@ class InstallController extends Controller
             putenv("DB_PORT={$request->port}");
             putenv("DB_DATABASE={$request->database}");
             putenv("DB_USERNAME={$request->username}");
-            putenv("DB_PASSWORD=\"{$request->password}\"");
+            putenv("DB_PASSWORD={$request->password}");
             putenv("SESSION_DRIVER=file");
             putenv("CACHE_STORE=file");
 
