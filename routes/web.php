@@ -43,9 +43,9 @@ Route::prefix('produk-hukum')->group(function () {
     })->name('produk-hukum.show');
 });
 
-Route::get('/event-test', function () {
-    return Inertia::render('FrontEnd/EventListTest');
-})->name('event-test');
+Route::get('/event', function () {
+    return Inertia::render('FrontEnd/EventList');
+})->name('event');
 
 
 Route::prefix('laporan-dana-desa')->group(function () {
