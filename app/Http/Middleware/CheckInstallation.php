@@ -19,10 +19,7 @@ class CheckInstallation
     public function handle(Request $request, Closure $next): Response
     {
         // Check if the application is installed by testing if specific tables exist
-        $installed = env('APP_INSTALLED', false) === true &&
-            Schema::hasTable('users') &&
-
-            \App\Models\Profile::count() > 0;  // Add this check
+        $installed = env('APP_INSTALLED', false) === true;
 
         // Installation routes that should be accessible even if partially installed
         $installationRoutes = ['install/setup-profile', 'install/store-profile', 'install/finish'];
@@ -36,10 +33,6 @@ class CheckInstallation
 
         // If accessing non-install routes but not installed, redirect to install
         if (!$isInstallationRoute && !$isExemptRoute && !$request->is('assets*') && !$installed) {
-            // Check if we need to go to setup profile
-            if (Schema::hasTable('users') && \App\Models\Profile::count() == 0) {
-                return redirect()->route('install.setupProfile');
-            }
             return redirect()->route('install.index');
         }
 
