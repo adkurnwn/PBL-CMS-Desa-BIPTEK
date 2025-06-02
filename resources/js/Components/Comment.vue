@@ -46,7 +46,6 @@ const {
     cancelReply,
     submitReply,
     loadReplies,
-    refreshCaptcha,
     getAllDeeperReplies: getAllDeeperRepliesSorted,
     initialize,
 } = useComments(contentType.value, props.slug, props.data?.is_moderate);
