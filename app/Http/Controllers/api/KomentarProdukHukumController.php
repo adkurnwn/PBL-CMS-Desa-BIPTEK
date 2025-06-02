@@ -19,12 +19,8 @@ class KomentarProdukHukumController extends Controller
 
     public function index($slug, Request $request)
     {
-        $this->statisticsService->trackFeatureVisit('Komentar Produk Hukum', $request);
 
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
-
-        // Track viewing comments for the related produk hukum
-        $this->statisticsService->trackContentInteraction('produk_hukum', $produkHukum->id, 'comment', $request);
 
         $comments = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->when($produkHukum->is_moderate, function ($query) {
@@ -39,12 +35,7 @@ class KomentarProdukHukumController extends Controller
 
     public function getReplies($slug, $commentId, Request $request)
     {
-        $this->statisticsService->trackFeatureVisit('Komentar Produk Hukum', $request);
-
         $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
-
-        // Track viewing comment replies for the related produk hukum
-        $this->statisticsService->trackContentInteraction('produk_hukum', $produkHukum->id, 'comment', $request);
 
         $replies = KomentarProdukHukum::where('id_produk_hukum', $produkHukum->id)
             ->whereNotNull('id_ref_komentar')

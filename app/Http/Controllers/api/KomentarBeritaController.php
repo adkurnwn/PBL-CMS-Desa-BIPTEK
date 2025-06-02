@@ -17,16 +17,12 @@ class KomentarBeritaController extends Controller
         $this->statisticsService = $statisticsService;
     }
 
-    public function index($slug, Request $request)
+    public function index($slug)
     {
-        $this->statisticsService->trackFeatureVisit('Komentar Berita', $request);
 
         $news = News::where('slug', $slug)
             ->where('is_draft', false)
             ->firstOrFail();
-
-        // Track viewing comments for the related news
-        $this->statisticsService->trackContentInteraction('news', $news->id, 'comment', $request);
 
         $comments = KomentarBerita::where('id_berita', $news->id)
             ->when($news->is_moderate, function ($query) {
@@ -39,16 +35,12 @@ class KomentarBeritaController extends Controller
         return response()->json($comments);
     }
 
-    public function getReplies($slug, $commentId, Request $request)
+    public function getReplies($slug, $commentId)
     {
-        $this->statisticsService->trackFeatureVisit('Komentar Berita', $request);
 
         $news = News::where('slug', $slug)
             ->where('is_draft', false)
             ->firstOrFail();
-
-        // Track viewing comment replies for the related news
-        $this->statisticsService->trackContentInteraction('news', $news->id, 'comment', $request);
 
         $replies = KomentarBerita::where('id_berita', $news->id)
             ->where(function ($query) use ($commentId) {
