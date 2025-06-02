@@ -2,7 +2,8 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, } from "vue";
+import useFilter from "@/Utility/useFilter";
 import axios from "axios";
 
 const news = ref([]);

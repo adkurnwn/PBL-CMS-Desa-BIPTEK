@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full md:w-1/3">
+  <div class="relative w-full ">
       <div class="flip-card" :class="{ 'is-flipped': isFlipped }">
           <div class="flip-card-inner">
               <!-- Front of card -->
