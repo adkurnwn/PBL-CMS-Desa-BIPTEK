@@ -46,6 +46,7 @@ const {
     cancelReply,
     submitReply,
     loadReplies,
+    refreshCaptcha,
     getAllDeeperReplies: getAllDeeperRepliesSorted,
     initialize,
 } = useComments(contentType.value, props.slug, props.data?.is_moderate);
@@ -148,7 +149,7 @@ onMounted(() => {
                     />
                     <button
                         type="button"
-                        @click="() => refreshCaptcha('main')"
+                        @click="refreshCaptcha('main')"
                         class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                     >
                         Refresh Captcha
@@ -304,7 +305,7 @@ onMounted(() => {
                                     />
                                     <button
                                         type="button"
-                                        @click="() => refreshCaptcha('reply')"
+                                        @click="refreshCaptcha('reply')"
                                         class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                                     >
                                         Refresh Captcha
@@ -496,10 +497,7 @@ onMounted(() => {
                                                 <button
                                                     type="button"
                                                     @click="
-                                                        () =>
-                                                            refreshCaptcha(
-                                                                'reply'
-                                                            )
+                                                        refreshCaptcha('reply')
                                                     "
                                                     class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                                                 >
@@ -724,10 +722,9 @@ onMounted(() => {
                                                         <button
                                                             type="button"
                                                             @click="
-                                                                () =>
-                                                                    refreshCaptcha(
-                                                                        'reply'
-                                                                    )
+                                                                refreshCaptcha(
+                                                                    'reply'
+                                                                )
                                                             "
                                                             class="text-xs lg:text-base text-blue-600 hover:text-blue-800"
                                                         >

@@ -67,7 +67,7 @@ class ProdukDesaController extends Controller
         try {
             $produkDesa = ProdukDesa::with(['images', 'user:id,name'])
                 ->orderBy('created_at', 'desc')
-                ->take(3)
+                ->take(4)
                 ->get();
 
             if ($produkDesa->isEmpty()) {
