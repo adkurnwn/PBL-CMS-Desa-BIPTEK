@@ -57,7 +57,7 @@ onUnmounted(() => {
             />
             <div class="flex flex-col">
                 <h1
-                    class="text-white font-bold text-base sm:text-2xl lg:text-xl"
+                    class="text-white font-bold text-base sm:text-2xl lg:text-xl" 
                 >
                     {{ layout.name }}
                 </h1>

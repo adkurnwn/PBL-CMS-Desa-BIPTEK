@@ -17,6 +17,7 @@ class ProfileDetail extends JsonResource
     {
         return [
             'name' => $this->name,
+            'kode_pos' => $this->kode_pos,
             'hero_image' => json_decode($this->hero_images)[1],
             'history' => $this->history,
             'vision' => $this->vision,
