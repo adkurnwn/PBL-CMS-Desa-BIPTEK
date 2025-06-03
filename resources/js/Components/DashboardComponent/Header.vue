@@ -37,14 +37,14 @@ const dropdownStyles = {
         <div class="flex justify-between items-center py-[12px] md:py-[15px] px-3 sm:px-4 md:px-[19px] w-full">
             <!-- Left Side -->
             <div class="flex items-center">
-                
+
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <ApplicationLogo 
-                        :logo="page.props.profile?.logo" 
+                    <ApplicationLogo
+                        :logo="page.props.profile?.logo"
                         class="h-[35px] sm:h-[40px] md:h-[45px] xl:h-[50px] 2xl:h-[55px] 3xl:h-[60px] 4xl:h-[76px] w-auto fill-current text-white"
                     />
-                    
+
                     <!-- Display CMS title and village name -->
                     <div class="ml-[6px] sm:ml-[8px] md:ml-[10px] flex flex-col w-[180px] sm:w-[220px] md:w-[260px] xl:w-[310px] h-auto justify-center">
                         <div class="text-[16px] sm:text-[18px] md:text-[20px] xl:text-[14.67px] 2xl:text-[16.5px] 3xl:text-[17.6px] 4xl:text-[22px] font-normal">
@@ -58,8 +58,8 @@ const dropdownStyles = {
 
             <!-- Right Side - User Profile Dropdown -->
             <div class="flex items-center">
-                <Dropdown 
-                    align="right" 
+                <Dropdown
+                    align="right"
                     width="auto"
                     contentClasses="bg-white w-auto sm:w-[180px] md:w-[200px] xl:w-[214.67px] 2xl:w-[250px] 3xl:w-[280px] 4xl:w-[322px]"
                 >
@@ -68,18 +68,18 @@ const dropdownStyles = {
                             <div class="flex items-center w-full">
                                 <!-- User Avatar - Show profile picture if available, otherwise show initials -->
                                 <div class="relative sm:mr-[6px] md:mr-[8px] xl:mr-[8px] 2xl:mr-[9px] 3xl:mr-[9px] 4xl:mr-[10px]">
-                                    <div v-if="$page.props.auth.user.photo_profile" 
+                                    <div v-if="$page.props.auth.user.photo_profile"
                                         class="h-[25px] sm:h-[27px] md:h-[29px] xl:h-[30px] 2xl:h-[34px] 3xl:h-[38px] 4xl:h-[45px] w-[25px] sm:w-[27px] md:w-[29px] xl:w-[30px] 2xl:w-[34px] 3xl:w-[38px] 4xl:w-[45px] rounded-full overflow-hidden border-2 border-white">
                                         <img :src="'/storage/' + $page.props.auth.user.photo_profile"
-                                            :alt="$page.props.auth.user.name" 
+                                            :alt="$page.props.auth.user.name"
                                             class="h-full w-full object-cover object-top" />
                                     </div>
-                                    <div v-else 
+                                    <div v-else
                                         class="h-[25px] sm:h-[27px] md:h-[29px] xl:h-[30px] 2xl:h-[34px] 3xl:h-[38px] 4xl:h-[45px] w-[25px] sm:w-[27px] md:w-[29px] xl:w-[30px] 2xl:w-[34px] 3xl:w-[38px] 4xl:w-[45px] rounded-full bg-white text-accent1 flex items-center justify-center border-2 border-white font-medium">
                                         {{ $page.props.auth.user.name.charAt(0).toUpperCase() }}
                                     </div>
                                 </div>
-                                
+
                                 <!-- User info - Hidden on small screens -->
                                 <div class="hidden sm:flex flex-col items-start flex-1 overflow-hidden">
                                     <div class="truncate max-w-[180px] md:max-w-[200px] xl:max-w-[220px] text-[14px] md:text-[16px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[17px] 4xl:text-[18px]">{{ $page.props.auth.user.name }}</div>
@@ -96,13 +96,13 @@ const dropdownStyles = {
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Dropdown indicator - Hidden on small screens -->
-                                <svg class="hidden sm:block flex-shrink-0 fill-current h-3 md:h-3.5 xl:h-3 2xl:h-3.5 3xl:h-3.5 4xl:h-4 w-3 md:w-3.5 xl:w-3 2xl:w-3.5 3xl:w-3.5 4xl:w-4 ml-1 md:ml-1.5 xl:ml-1 2xl:ml-1.5 3xl:ml-1.5 4xl:ml-2" 
-                                    xmlns="http://www.w3.org/2000/svg" 
+                                <svg class="hidden sm:block flex-shrink-0 fill-current h-3 md:h-3.5 xl:h-3 2xl:h-3.5 3xl:h-3.5 4xl:h-4 w-3 md:w-3.5 xl:w-3 2xl:w-3.5 3xl:w-3.5 4xl:w-4 ml-1 md:ml-1.5 xl:ml-1 2xl:ml-1.5 3xl:ml-1.5 4xl:ml-2"
+                                    xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" 
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z" 
+                                    <path fill-rule="evenodd"
+                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
                                         clip-rule="evenodd" />
                                 </svg>
                             </div>
@@ -125,10 +125,10 @@ const dropdownStyles = {
                                 </span>
                             </div>
                         </div>
-                        
+
                         <!-- Profile Link -->
-                        <DropdownLink 
-                            :href="route('profile.edit')" 
+                        <DropdownLink
+                            :href="route('profile.edit')"
                             :active="route().current('profile.edit')"
                         >
                             <div class="flex items-center">
@@ -138,12 +138,12 @@ const dropdownStyles = {
                                 <span class="text-[14px] xl:text-[14px] 2xl:text-[15px] 3xl:text-[15px] 4xl:text-[16px]">Profile</span>
                             </div>
                         </DropdownLink>
-                        
+
                         <!-- Logout Link -->
-                        <DropdownLink 
-                            :href="route('logout')" 
-                            method="post" 
-                            as="button" 
+                        <DropdownLink
+                            :href="route('logout')"
+                            method="post"
+                            as="button"
                             class="w-full text-left"
                             danger
                         >

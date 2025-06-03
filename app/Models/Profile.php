@@ -23,6 +23,7 @@ class Profile extends Model
         'kabupaten',
         'kecamatan',
         'kelurahan',
+        'kode_pos',
         'hero_images',
         'organization_image',
         'lembaga',
@@ -58,15 +59,15 @@ class Profile extends Model
     {
         $type = DB::select("SHOW COLUMNS FROM profiles WHERE Field = 'primary_color'")[0]->Type;
         preg_match('/^enum\((.+)\)$/', $type, $matches);
-        
+
         if (!isset($matches[1])) {
             return [];
         }
-        
+
         $enumValues = [];
         foreach (explode(',', $matches[1]) as $value) {
             $value = trim($value, "'\"");
-            switch($value) {
+            switch ($value) {
                 case '#244031':
                     $enumValues[$value] = 'Green Forest';
                     break;
@@ -80,7 +81,7 @@ class Profile extends Model
                     $enumValues[$value] = 'Color ' . $value;
             }
         }
-        
+
         return $enumValues;
     }
 
@@ -91,15 +92,15 @@ class Profile extends Model
     {
         $type = DB::select("SHOW COLUMNS FROM profiles WHERE Field = 'secondary_color'")[0]->Type;
         preg_match('/^enum\((.+)\)$/', $type, $matches);
-        
+
         if (!isset($matches[1])) {
             return [];
         }
-        
+
         $enumValues = [];
         foreach (explode(',', $matches[1]) as $value) {
             $value = trim($value, "'\"");
-            switch($value) {
+            switch ($value) {
                 case '#3B614A':
                     $enumValues[$value] = 'Aksen Green Forest';
                     break;
@@ -113,7 +114,7 @@ class Profile extends Model
                     $enumValues[$value] = 'Color ' . $value;
             }
         }
-        
+
         return $enumValues;
     }
 }

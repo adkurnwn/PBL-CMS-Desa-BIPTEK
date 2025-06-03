@@ -12,25 +12,25 @@ const props = defineProps({
     },
     initialZoom: {
         type: Number,
-        default: 13, // Higher default zoom level
+        default: 15,
     },
+    locationData: Object,
+    kelurahan: String,
+    kodePos: String,
 });
 
-// Process location name to improve search results
-const processedLocationName = computed(() => {
-    if (!props.locationName) return "INDONESIA";
-
-    // 1. Remove "Desa" prefix (case insensitive)
-    // 2. Ensure spaces are properly encoded and handled
-    // 3. Add "Indonesia" suffix to improve geolocation context
-    let processed = props.locationName.replace(/desa\s*/i, "").trim();
-
-    // Add Indonesia as context to improve search results
-    if (!processed.toLowerCase().includes("indonesia")) {
-        processed += ", Indonesia";
+const locationName = computed(() => {
+    if (!props.locationName || props.locationName === "INDONESIA") {
+        return null;
     }
 
-    return processed;
+    // Clean up the location name string
+    return props.locationName
+        .replace(/Desa\s+/gi, "")
+        .replace(/Kabupaten\s+/gi, "")
+        .replace(/Kecamatan\s+/gi, "")
+        .replace(/Kota\s+/gi, "")
+        .trim();
 });
 
 // Fix Leaflet icon issue
@@ -50,147 +50,168 @@ L.Icon.Default.mergeOptions({
 const mapCenter = ref(null);
 const regionPolygon = ref([]);
 const map = ref(null);
-const zoom = ref(5); // Default zoom (will be changed when location is found)
-const center = ref([-2.5489, 118.0149]); // Default center of Indonesia
+const zoom = ref(5);
+const center = ref([-2.5489, 118.0149]);
 
-// Add satellite layer options
 const satelliteLayerUrl =
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
 const satelliteLayerAttribution =
     "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community";
 
-const searchLocation = async () => {
+const searchWithQuery = async (query, includePolygon = true) => {
     try {
-        const searchQuery = processedLocationName.value;
-        console.log("Searching for location:", searchQuery);
+        const params = {
+            q: query,
+            format: "json",
+            countrycodes: "id",
+            limit: 5, // Get more results to choose from
+        };
+
+        if (includePolygon) {
+            params.polygon_geojson = 1;
+        }
 
         const response = await axios.get(
             `https://nominatim.openstreetmap.org/search`,
-            {
-                params: {
-                    q: searchQuery,
-                    format: "json",
-                    polygon_geojson: 1,
-                    countrycodes: "id",
-                    limit: 1, // Limit to one result for better accuracy
-                },
-            }
+            { params }
         );
 
         if (response.data.length > 0) {
-            const place = response.data[0];
-            mapCenter.value = [parseFloat(place.lat), parseFloat(place.lon)];
+            // Sort results by importance/class to get the best match
+            const sortedResults = response.data.sort((a, b) => {
+                const aImportance = parseFloat(a.importance || 0);
+                const bImportance = parseFloat(b.importance || 0);
+                return bImportance - aImportance;
+            });
 
-            // Update center to the found location
-            center.value = mapCenter.value;
-
-            // Set zoom level for better view of the area
-            zoom.value = props.initialZoom;
-
-            if (place.geojson) {
-                if (place.geojson.type === "Polygon") {
-                    regionPolygon.value = place.geojson.coordinates[0].map(
-                        (coord) => [coord[1], coord[0]]
-                    );
-                } else if (place.geojson.type === "MultiPolygon") {
-                    regionPolygon.value = place.geojson.coordinates[0][0].map(
-                        (coord) => [coord[1], coord[0]]
-                    );
-                }
-
-                // Ensure map is available before attempting to fit bounds
-                if (map.value && regionPolygon.value.length > 0) {
-                    // Use setTimeout to ensure map is fully initialized
-                    setTimeout(() => {
-                        // Fit bounds with padding
-                        map.value.fitBounds(regionPolygon.value, {
-                            padding: [50, 50],
-                            maxZoom: 15,
-                        });
-                    }, 100);
-                }
-            } else {
-                // If no polygon data, at least center and zoom to the marker
-                if (map.value) {
-                    setTimeout(() => {
-                        map.value.setView(mapCenter.value, props.initialZoom);
-                    }, 100);
-                }
-            }
-        } else {
-            console.warn(`No location found for: ${searchQuery}`);
-
-            // Try a more generalized search by removing spaces
-            const fallbackQuery = searchQuery.replace(/\s+/g, "");
-            console.log("Trying fallback search:", fallbackQuery);
-
-            const fallbackResponse = await axios.get(
-                `https://nominatim.openstreetmap.org/search`,
-                {
-                    params: {
-                        q: fallbackQuery,
-                        format: "json",
-                        polygon_geojson: 1,
-                        countrycodes: "id",
-                        limit: 1,
-                    },
-                }
-            );
-
-            if (fallbackResponse.data.length > 0) {
-                const place = fallbackResponse.data[0];
-                mapCenter.value = [
-                    parseFloat(place.lat),
-                    parseFloat(place.lon),
-                ];
-                center.value = mapCenter.value;
-                zoom.value = props.initialZoom;
-
-                // Process polygon or point data similar to above
-                if (place.geojson) {
-                    // Same polygon processing as above
-                    if (place.geojson.type === "Polygon") {
-                        regionPolygon.value = place.geojson.coordinates[0].map(
-                            (coord) => [coord[1], coord[0]]
-                        );
-                    } else if (place.geojson.type === "MultiPolygon") {
-                        regionPolygon.value =
-                            place.geojson.coordinates[0][0].map((coord) => [
-                                coord[1],
-                                coord[0],
-                            ]);
-                    }
-
-                    if (map.value && regionPolygon.value.length > 0) {
-                        setTimeout(() => {
-                            map.value.fitBounds(regionPolygon.value, {
-                                padding: [50, 50],
-                                maxZoom: 15,
-                            });
-                        }, 100);
-                    }
-                } else if (map.value) {
-                    setTimeout(() => {
-                        map.value.setView(mapCenter.value, props.initialZoom);
-                    }, 100);
-                }
-            } else {
-                console.error(
-                    "Both search queries failed for:",
-                    props.locationName
-                );
-            }
+            return sortedResults[0];
         }
+
+        return null;
     } catch (error) {
-        console.error("Error fetching location:", error);
+        console.error("Search error for query:", query, error);
+        return null;
     }
 };
 
-// Watch for changes in locationName
+const processLocationResult = (place) => {
+    if (!place) return false;
+
+    mapCenter.value = [parseFloat(place.lat), parseFloat(place.lon)];
+    center.value = mapCenter.value;
+    zoom.value = props.initialZoom;
+
+    if (place.geojson) {
+        try {
+            if (place.geojson.type === "Polygon") {
+                regionPolygon.value = place.geojson.coordinates[0].map(
+                    (coord) => [coord[1], coord[0]]
+                );
+            } else if (place.geojson.type === "MultiPolygon") {
+                regionPolygon.value = place.geojson.coordinates[0][0].map(
+                    (coord) => [coord[1], coord[0]]
+                );
+            }
+
+            if (map.value && regionPolygon.value.length > 0) {
+                setTimeout(() => {
+                    map.value.fitBounds(regionPolygon.value, {
+                        padding: [50, 50],
+                        maxZoom: 15,
+                    });
+                }, 100);
+            }
+        } catch (error) {
+            console.error("Error processing polygon data:", error);
+            // Fall back to just showing the marker
+            if (map.value) {
+                setTimeout(() => {
+                    map.value.setView(mapCenter.value, props.initialZoom);
+                }, 100);
+            }
+        }
+    } else {
+        // No polygon data, just center on the marker
+        if (map.value) {
+            setTimeout(() => {
+                map.value.setView(mapCenter.value, props.initialZoom);
+            }, 100);
+        }
+    }
+
+    return true;
+};
+
+const searchLocation = async () => {
+    try {
+        const searchQueries = createSearchQueries();
+
+        // Try each query in order of specificity
+        for (const query of searchQueries) {
+            // First try with polygon data
+            let result = await searchWithQuery(query, true);
+
+            if (result) {
+                if (processLocationResult(result)) {
+                    return;
+                }
+            }
+
+            // If no polygon result, try without polygon for faster response
+            result = await searchWithQuery(query, false);
+
+            if (result) {
+                if (processLocationResult(result)) {
+                    return;
+                }
+            }
+
+            // Add a small delay between requests to be respectful to the API
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        console.warn(
+            "No location found for any search queries:",
+            searchQueries
+        );
+
+        // Final fallback - try a very general search
+        const fallbackQuery = "Indonesia";
+        const fallbackResult = await searchWithQuery(fallbackQuery, false);
+        if (fallbackResult) {
+            processLocationResult(fallbackResult);
+        }
+    } catch (error) {
+        console.error("Error in location search:", error);
+    }
+};
+
+// Create search queries for better location finding
+const createSearchQueries = () => {
+    const queries = [];
+
+    // First priority: Most specific location using all available props
+    if (locationName.value) {
+        queries.push(locationName.value);
+    }
+
+    // Second priority: Fallback to kelurahan + kodePos if available
+    if (props.kelurahan && props.kodePos) {
+        const cleanedKelurahan = props.kelurahan
+            .replace(/^Desa\s+/i, "")
+            .trim();
+        queries.push(`${cleanedKelurahan}, ${props.kodePos}`);
+    }
+
+    // Remove duplicates and empty queries
+    return [...new Set(queries.filter((q) => q && q.trim() !== ""))];
+};
+
+// Watch for changes in location props
 watch(
-    processedLocationName,
-    (newValue) => {
-        if (newValue && map.value && newValue !== "INDONESIA") {
+    [() => props.locationName, () => props.kelurahan],
+    () => {
+        if (map.value) {
             searchLocation();
         }
     },
@@ -200,11 +221,8 @@ watch(
 const onMapReady = (mapObject) => {
     map.value = mapObject;
 
-    // Only search if we have a location name
-    if (
-        processedLocationName.value &&
-        processedLocationName.value !== "INDONESIA"
-    ) {
+    // Only search if we have location data
+    if (props.locationName && props.locationName !== "INDONESIA") {
         searchLocation();
     }
 };
