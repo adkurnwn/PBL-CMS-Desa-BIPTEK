@@ -38,9 +38,28 @@ class PermissionSeeder extends Seeder
         }
 
         // Get roles
-        $admin = Role::where('name', 'admin')->first();
+        $admin = Role::where('name', 'Admin')->first();
+        $kepalaDesa = Role::where('name', 'Kepala Desa')->first();
+        $aparatDesa = Role::where('name', 'Aparat Desa')->first();
 
         // Give admin all permissions by default
         $admin->givePermissionTo(Permission::all());
+        $kepalaDesa->givePermissionTo([
+            'manage_dashboard',
+            'manage_demografi',
+            'manage_statistics',
+            'manage_feedbacks',
+        ]);
+        $aparatDesa->givePermissionTo([
+            'manage_dashboard',
+            'manage_news',
+            'manage_galleries',
+            'manage_events',
+            'manage_produk-hukum',
+            'manage_dana-desa',
+            'manage_produk-desa',
+            'manage_feedbacks',
+            'manage_comments',
+        ]);
     }
 }
