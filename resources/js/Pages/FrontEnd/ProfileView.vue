@@ -138,10 +138,17 @@ const fasilitasList = computed(() =>
                     <div
                         class="container bg-white rounded-xl shadow-lg text-center"
                     >
+                        <!--
                         <img
                             :src="`/storage/${profile.organization_image}`"
                             alt="Struktur Organisasi"
-                            class="w-full xl:h-72 xl:-mt-2 object-contain"
+                            class="w-full xl:h-72 xl:mt-1 object-contain"
+                        />
+                        -->
+                        <img
+                            src="../../../images/SO_PEMERINTAHAN_DESA.png"
+                            alt="Struktur Organisasi"
+                            class="w-full xl:h-72 object-contain"
                         />
                         <p
                             class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1"
@@ -149,21 +156,24 @@ const fasilitasList = computed(() =>
                             Struktur Organisasi Pemerintahan Desa
                         </p>
                     </div>
-                    <!-- Card 2 -->
-                    <div
-                        class="container bg-white rounded-xl shadow-lg text-center"
+                </div>
+                <div>
+                    <p
+                        class="flex items-center ml-60 xl:ml-96 xl:-mr-96 xl:-mt-4 pl-44 text-secondary text-lg"
                     >
-                        <img
-                            src="../../../images/SO_BPD.png"
-                            alt="Struktur Organisasi"
-                            class="w-full xl:h-72 xl:-mt-1 object-contain"
-                        />
-                        <p
-                            class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-2"
+                        Selengkapnya
+                        <svg
+                            class="mt-0 w-6 h-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#DEA521"
                         >
-                            Struktur Organisasi Badan Permusyawaratan Desa
-                        </p>
-                    </div>
+                            <path
+                                d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
+                            />
+                        </svg>
+                    </p>
                 </div>
             </div>
             <!-- Potensi & Keunggulan -->
@@ -389,7 +399,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -409,7 +419,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -429,7 +439,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -450,7 +460,7 @@ const fasilitasList = computed(() =>
                     <svg
                         class="mt-0 w-6 h-6"
                         xmlns="http://www.w3.org/2000/svg"
-                        viewBox="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
+                        viewBox="0 -960 960 960"
                         width="24px"
                         fill="#DEA521"
                     >
