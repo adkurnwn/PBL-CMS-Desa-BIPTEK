@@ -28,6 +28,7 @@ class UpdateProfileRequest extends FormRequest
             'kabupaten' => 'required|string|max:50',
             'kecamatan' => 'required|string|max:50',
             'kelurahan' => 'required|string|max:50',
+            'kode_pos' => 'required|string|max:10',
             'logo' => 'nullable|image|max:10000|mimes:png',
             'lembaga' => 'nullable|array',
             'lembaga.*' => 'required|string|max:255',

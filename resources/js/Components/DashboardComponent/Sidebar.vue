@@ -11,49 +11,59 @@ import Collapse from "@/Components/DashboardComponent/Collapse.vue";
 const sidebarCollapsed = ref(false);
 
 // Define emits
-const emit = defineEmits(['collapse']);
+const emit = defineEmits(["collapse"]);
 
 // Load the sidebar state when the component is mounted
 onMounted(() => {
-    const storedState = localStorage.getItem('sidebarCollapsed');
+    const storedState = localStorage.getItem("sidebarCollapsed");
     if (storedState !== null) {
-        sidebarCollapsed.value = storedState === 'true';
+        sidebarCollapsed.value = storedState === "true";
     }
     // Provide the initial value and emit it to parent
-    provide('sidebarCollapsed', sidebarCollapsed.value);
-    emit('collapse', sidebarCollapsed.value);
+    provide("sidebarCollapsed", sidebarCollapsed.value);
+    emit("collapse", sidebarCollapsed.value);
 });
 
 // Toggle sidebar collapsed state and persist it
 const toggleSidebar = () => {
     sidebarCollapsed.value = !sidebarCollapsed.value;
     // Store the state in localStorage
-    localStorage.setItem('sidebarCollapsed', sidebarCollapsed.value);
+    localStorage.setItem("sidebarCollapsed", sidebarCollapsed.value);
     // Update the provided value
-    provide('sidebarCollapsed', sidebarCollapsed.value);
+    provide("sidebarCollapsed", sidebarCollapsed.value);
     // Emit the new state to parent
-    emit('collapse', sidebarCollapsed.value);
+    emit("collapse", sidebarCollapsed.value);
 };
 
 // Watch for changes to collapsed state and emit them
 watch(sidebarCollapsed, (newValue) => {
-    emit('collapse', newValue);
+    emit("collapse", newValue);
 });
 
 // Provide the collapsed state to child components
-provide('sidebarCollapsed', sidebarCollapsed.value);
+provide("sidebarCollapsed", sidebarCollapsed.value);
 
 // Get the current URL path from Inertia's page object
 const page = usePage();
 const currentUrl = computed(() => page.url);
 
-console.log('Current URL:', currentUrl.value);
+console.log("Current URL:", currentUrl.value);
+
+// Get village name directly from Inertia shared data
+const villageName = computed(() => {
+    // Access the same way as done in Login.vue
+    return page.props.profile?.name || "Desa";
+});
 
 // Get user permissions from Inertia shared data
 const auth = computed(() => page.props.auth);
 const hasPermission = (permission) => {
     // Always show for admin users
-    if (auth.value.user?.roles?.some(role => role.name.toLowerCase() === 'admin')) {
+    if (
+        auth.value.user?.roles?.some(
+            (role) => role.name.toLowerCase() === "admin"
+        )
+    ) {
         return true;
     }
     // Check if user has the specific permission
@@ -89,57 +99,72 @@ const documentCommentIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none"
 // Define active state for each menu item based on URL segments
 const isDashboardActive = computed(() => {
     const path = currentUrl.value;
-    return path === '/' || 
-           path === '/dashboard' || 
-           path === '/dashboard/aktivitas-terbaru' ||
-           path === '/dashboard/statistik' ||
-           /^\/dashboard\/\d+(\?.*)?$/.test(path) ||
-           /^\/dashboard\?.*$/.test(path);
+    return (
+        path === "/" ||
+        path === "/dashboard" ||
+        path === "/dashboard/aktivitas-terbaru" ||
+        path === "/dashboard/statistik" ||
+        /^\/dashboard\/\d+(\?.*)?$/.test(path) ||
+        /^\/dashboard\?.*$/.test(path)
+    );
 });
 
-const isUsersActive = computed(() => urlIncludes('/dashboard/users') || urlIncludes('/dashboard/positions'));
-const isRolesActive = computed(() => urlIncludes('/dashboard/roles'));
-const isProfilesActive = computed(() => urlIncludes('/dashboard/profiles'));
-const isDemografiActive = computed(() => urlIncludes('/dashboard/demografi'));
-const isNewsActive = computed(() => urlIncludes('/dashboard/news'));
-const isGalleriesActive = computed(() => urlIncludes('/dashboard/galleries'));
-const isEventsActive = computed(() => urlIncludes('/dashboard/events'));
-const isProdukDesaActive = computed(() => urlIncludes('/dashboard/produk-desa'));
+const isUsersActive = computed(
+    () => urlIncludes("/dashboard/users") || urlIncludes("/dashboard/positions")
+);
+const isRolesActive = computed(() => urlIncludes("/dashboard/roles"));
+const isProfilesActive = computed(() => urlIncludes("/dashboard/profiles"));
+const isDemografiActive = computed(() => urlIncludes("/dashboard/demografi"));
+const isNewsActive = computed(() => urlIncludes("/dashboard/news"));
+const isGalleriesActive = computed(() => urlIncludes("/dashboard/galleries"));
+const isEventsActive = computed(() => urlIncludes("/dashboard/events"));
+const isProdukDesaActive = computed(() =>
+    urlIncludes("/dashboard/produk-desa")
+);
 const isProdukHukumActive = computed(() => {
-    return urlIncludes('/dashboard/produk-hukum') && 
-           !urlIncludes('/dashboard/produk-hukum-comments');
+    return (
+        urlIncludes("/dashboard/produk-hukum") &&
+        !urlIncludes("/dashboard/produk-hukum-comments")
+    );
 });
-const isDanaDesaActive = computed(() => urlIncludes('/dashboard/dana-desa'));
-const isCommentsActive = computed(() => urlIncludes('/dashboard/comments'));
-const isProdukHukumCommentsActive = computed(() => urlIncludes('/dashboard/produk-hukum-comments'));
-const isFeedbacksActive = computed(() => urlIncludes('/dashboard/feedbacks'));
-const isRecoveryActive = computed(() => urlIncludes('/dashboard/recovery'));
-const isSettingsActive = computed(() => urlIncludes('/dashboard/settings'));
+const isDanaDesaActive = computed(() => urlIncludes("/dashboard/dana-desa"));
+const isCommentsActive = computed(() => urlIncludes("/dashboard/comments"));
+const isProdukHukumCommentsActive = computed(() =>
+    urlIncludes("/dashboard/produk-hukum-comments")
+);
+const isFeedbacksActive = computed(() => urlIncludes("/dashboard/feedbacks"));
+const isRecoveryActive = computed(() => urlIncludes("/dashboard/recovery"));
+const isSettingsActive = computed(() => urlIncludes("/dashboard/settings"));
 
 // Compute active states for sections
-const isUserSectionActive = computed(() => 
-    isUsersActive.value || isRolesActive.value);
+const isUserSectionActive = computed(
+    () => isUsersActive.value || isRolesActive.value
+);
 
-const isInfoSectionActive = computed(() => 
-    isProfilesActive.value || isDemografiActive.value);
+const isInfoSectionActive = computed(
+    () => isProfilesActive.value || isDemografiActive.value
+);
 
-const isContentSectionActive = computed(() => 
-    isNewsActive.value || 
-    isGalleriesActive.value || 
-    isEventsActive.value || 
-    isProdukDesaActive.value);
+const isContentSectionActive = computed(
+    () =>
+        isNewsActive.value ||
+        isGalleriesActive.value ||
+        isEventsActive.value ||
+        isProdukDesaActive.value
+);
 
-const isRegulationSectionActive = computed(() => 
-    isProdukHukumActive.value || 
-    isDanaDesaActive.value);
+const isRegulationSectionActive = computed(
+    () => isProdukHukumActive.value || isDanaDesaActive.value
+);
 
-const isInteractionSectionActive = computed(() => 
-    isCommentsActive.value || 
-    isProdukHukumCommentsActive.value || 
-    isFeedbacksActive.value);
+const isInteractionSectionActive = computed(
+    () =>
+        isCommentsActive.value ||
+        isProdukHukumCommentsActive.value ||
+        isFeedbacksActive.value
+);
 
-const isConfigSectionActive = computed(() => 
-    isRecoveryActive.value);
+const isConfigSectionActive = computed(() => isRecoveryActive.value);
 
 // Import provide for passing index to menu boxes
 // Menu item index counter for staggered animations
@@ -152,7 +177,7 @@ const resetMenuIndex = () => {
 };
 
 const getNextMenuIndex = () => {
-    provide('menuBoxIndex', menuItemIndex);
+    provide("menuBoxIndex", menuItemIndex);
     menuItemIndex++;
     return null;
 };
@@ -162,7 +187,7 @@ const commentModeratorExpanded = ref(true);
 
 // Toggle function for comment moderation submenu
 const toggleCommentModerator = () => {
-  commentModeratorExpanded.value = !commentModeratorExpanded.value;
+    commentModeratorExpanded.value = !commentModeratorExpanded.value;
 };
 </script>
 
@@ -170,37 +195,37 @@ const toggleCommentModerator = () => {
     <!-- Sidebar container with relative positioning -->
     <div class="flex">
         <!-- Main sidebar with dynamic width based on collapsed state -->
-        <div 
+        <div
             class="h-full bg-white text-white fixed left-0 top-[60px] sm:top-[65px] md:top-[70px] xl:top-[73px] 2xl:top-[82px] 3xl:top-[88px] 4xl:top-[110px] overflow-hidden sidebar"
             :class="[
-                sidebarCollapsed 
-                    ? 'w-[80px]' 
-                    : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px]'
+                sidebarCollapsed
+                    ? 'w-[80px]'
+                    : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px]',
             ]"
-            :style="{ 
-                transition: 'width 300ms ease-in-out'
+            :style="{
+                transition: 'width 300ms ease-in-out',
             }"
         >
             <!-- Fixed Dashboard Menu at the top with 50px padding -->
-            <div 
+            <div
                 class="fixed bg-white pt-[30px] sm:pt-[35px] md:pt-[40px] xl:pt-[35px] 2xl:pt-[40px] 3xl:pt-[45px] 4xl:pt-[50px] pb-[10px] sm:pb-[12px] md:pb-[13px] xl:pb-[10px] 2xl:pb-[12px] 3xl:pb-[13px] 4xl:pb-[15px] z-10"
                 :class="[
-                    sidebarCollapsed 
-                        ? 'w-[60px] pl-[20px] sm:pl-[20px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]' 
-                        : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] sm:pl-[20px] pr-[12px]'
+                    sidebarCollapsed
+                        ? 'w-[60px] pl-[20px] sm:pl-[20px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]'
+                        : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] sm:pl-[20px] pr-[12px]',
                 ]"
-                :style="{ 
-                    transition: 'width 300ms ease-in-out'
+                :style="{
+                    transition: 'width 300ms ease-in-out',
                 }"
             >
                 <!-- Dashboard menu stays fixed at left -->
-                <div 
+                <div
                     class="transition-all duration-300"
                     :class="sidebarCollapsed ? '' : ''"
                     v-if="hasPermission('manage_home')"
                 >
-                    <MenuBox 
-                        :href="route('dashboard')" 
+                    <MenuBox
+                        :href="route('dashboard')"
                         :active="isDashboardActive"
                         :icon="dashboardIcon"
                         :collapsed="sidebarCollapsed"
@@ -210,37 +235,46 @@ const toggleCommentModerator = () => {
                     {{ resetMenuIndex() }}
                 </div>
             </div>
-            
+
             <!-- Scrollable content with padding to account for the fixed Dashboard -->
-            <Scrollbar 
+            <Scrollbar
                 :hideScrollbar="true"
                 :autoHide="true"
                 class="pt-[75px] sm:pt-[85px] md:pt-[95px] xl:pt-[85px] 2xl:pt-[95px] 3xl:pt-[105px] 4xl:pt-[113px] sidebar-scrollbar"
             >
-                <div class="pb-[100px] pl-[20px] sm:pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px] sm:pt-[0px]" :class="sidebarCollapsed ? 'pr-3 sm:pr-5' : 'pr-0'">
-                    <div class="space-y-[10px] sm:space-y-[11px] md:space-y-[12px] xl:space-y-[13px] 2xl:space-y-[15px] 3xl:space-y-[18px] 4xl:space-y-[20px]" :class="sidebarCollapsed ? '' : 'pr-[12px]'">
+                <div
+                    class="pb-[100px] pl-[20px] sm:pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px] sm:pt-[0px]"
+                    :class="sidebarCollapsed ? 'pr-3 sm:pr-5' : 'pr-0'"
+                >
+                    <div
+                        class="space-y-[10px] sm:space-y-[11px] md:space-y-[12px] xl:space-y-[13px] 2xl:space-y-[15px] 3xl:space-y-[18px] 4xl:space-y-[20px]"
+                        :class="sidebarCollapsed ? '' : 'pr-[12px]'"
+                    >
                         <!-- User Management Section - Only show if user has user or role permissions -->
-                        <MenuSection 
-                            v-if="hasPermission('manage_users') || hasPermission('manage_roles')"
-                            title="Manajemen Pengguna" 
-                            :active="isUserSectionActive" 
+                        <MenuSection
+                            v-if="
+                                hasPermission('manage_users') ||
+                                hasPermission('manage_roles')
+                            "
+                            title="Manajemen Pengguna"
+                            :active="isUserSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_users')"
-                                :href="route('dashboard.users.index')" 
-                                :active="isUsersActive" 
-                                :icon="userIcon" 
+                                :href="route('dashboard.users.index')"
+                                :active="isUsersActive"
+                                :icon="userIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Pengguna
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_roles')"
-                                :href="route('dashboard.roles.index')" 
-                                :active="isRolesActive" 
-                                :icon="roleIcon" 
+                                :href="route('dashboard.roles.index')"
+                                :active="isRolesActive"
+                                :icon="roleIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Hak Akses
@@ -249,27 +283,35 @@ const toggleCommentModerator = () => {
                         </MenuSection>
 
                         <!-- Information Section - Only show if user has profile or demografi permissions -->
-                        <MenuSection 
-                            v-if="hasPermission('manage_profiles') || hasPermission('manage_demografi')"
-                            title="Informasi Desa" 
-                            :active="isInfoSectionActive" 
+                        <MenuSection
+                            v-if="
+                                hasPermission('manage_profiles') ||
+                                hasPermission('manage_demografi')
+                            "
+                            title="Informasi Desa"
+                            :active="isInfoSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_profiles')"
-                                :href="route('dashboard.profiles.index')" 
-                                :active="isProfilesActive" 
-                                :icon="profileIcon" 
+                                :href="
+                                    route(
+                                        'dashboard.profiles.edit',
+                                        villageName
+                                    )
+                                "
+                                :active="isProfilesActive"
+                                :icon="profileIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Profil Desa
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_demografi')"
-                                :href="route('dashboard.demografi.index')" 
-                                :active="isDemografiActive" 
-                                :icon="demografiIcon" 
+                                :href="route('dashboard.demografi.index')"
+                                :active="isDemografiActive"
+                                :icon="demografiIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Demografi
@@ -278,48 +320,52 @@ const toggleCommentModerator = () => {
                         </MenuSection>
 
                         <!-- Content Section - Only show if user has relevant permissions -->
-                        <MenuSection 
-                            v-if="hasPermission('manage_news') || hasPermission('manage_galleries') || 
-                                 hasPermission('manage_events') || hasPermission('manage_produk-desa')"
-                            title="Konten & Publikasi" 
-                            :active="isContentSectionActive" 
+                        <MenuSection
+                            v-if="
+                                hasPermission('manage_news') ||
+                                hasPermission('manage_galleries') ||
+                                hasPermission('manage_events') ||
+                                hasPermission('manage_produk-desa')
+                            "
+                            title="Konten & Publikasi"
+                            :active="isContentSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_news')"
-                                :href="route('dashboard.news.index')" 
-                                :active="isNewsActive" 
-                                :icon="newsIcon" 
+                                :href="route('dashboard.news.index')"
+                                :active="isNewsActive"
+                                :icon="newsIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Berita
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_galleries')"
-                                :href="route('dashboard.galleries.index')" 
-                                :active="isGalleriesActive" 
-                                :icon="galleryIcon" 
+                                :href="route('dashboard.galleries.index')"
+                                :active="isGalleriesActive"
+                                :icon="galleryIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Galeri
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_events')"
-                                :href="route('dashboard.events.index')" 
-                                :active="isEventsActive" 
-                                :icon="eventIcon" 
+                                :href="route('dashboard.events.index')"
+                                :active="isEventsActive"
+                                :icon="eventIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 Agenda
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_produk-desa')"
-                                :href="route('dashboard.produk-desa.index')" 
-                                :active="isProdukDesaActive" 
-                                :icon="produkDesaIcon" 
+                                :href="route('dashboard.produk-desa.index')"
+                                :active="isProdukDesaActive"
+                                :icon="produkDesaIcon"
                                 :collapsed="sidebarCollapsed"
                             >
                                 UMKM/Produk Unggulan
@@ -328,15 +374,18 @@ const toggleCommentModerator = () => {
                         </MenuSection>
 
                         <!-- Regulation Section - Only show if user has relevant permissions -->
-                        <MenuSection 
-                            v-if="hasPermission('manage_produk-hukum') || hasPermission('manage_dana-desa')"
-                            title="Regulasi Desa" 
-                            :active="isRegulationSectionActive" 
+                        <MenuSection
+                            v-if="
+                                hasPermission('manage_produk-hukum') ||
+                                hasPermission('manage_dana-desa')
+                            "
+                            title="Regulasi Desa"
+                            :active="isRegulationSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_produk-hukum')"
-                                :href="route('dashboard.produk-hukum.index')" 
+                                :href="route('dashboard.produk-hukum.index')"
                                 :active="isProdukHukumActive"
                                 :icon="produkHukumIcon"
                                 :collapsed="sidebarCollapsed"
@@ -344,10 +393,10 @@ const toggleCommentModerator = () => {
                                 Produk Hukum
                             </MenuBox>
                             {{ getNextMenuIndex() }}
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_dana-desa')"
-                                :href="route('dashboard.dana-desa.index')" 
-                                :active="isDanaDesaActive" 
+                                :href="route('dashboard.dana-desa.index')"
+                                :active="isDanaDesaActive"
                                 :icon="danaDesaIcon"
                                 :collapsed="sidebarCollapsed"
                             >
@@ -357,107 +406,149 @@ const toggleCommentModerator = () => {
                         </MenuSection>
 
                         <!-- Interaction Section - Only show if user has comments or feedback permissions -->
-                        <MenuSection 
-                            v-if="hasPermission('manage_comments') || hasPermission('manage_feedbacks')"
-                            title="Interaksi Pengguna" 
-                            :active="isInteractionSectionActive" 
+                        <MenuSection
+                            v-if="
+                                hasPermission('manage_comments') ||
+                                hasPermission('manage_feedbacks')
+                            "
+                            title="Interaksi Pengguna"
+                            :active="isInteractionSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
                             <!-- Comments section with permission check -->
                             <div v-if="hasPermission('manage_comments')">
                                 <!-- In non-collapsed state, show the dropdown menu -->
-                                <div v-if="!sidebarCollapsed" class="moderation-container">
+                                <div
+                                    v-if="!sidebarCollapsed"
+                                    class="moderation-container"
+                                >
                                     <!-- Custom comment moderation box -->
-                                    <div class="moderation-container ">
-                                        <div 
+                                    <div class="moderation-container">
+                                        <div
                                             class="w-full mb-[15px] rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] overflow-hidden bg-menuBG"
                                         >
                                             <!-- Header - highlight if any of the submenu items are active -->
-                                            <button 
+                                            <button
                                                 @click="toggleCommentModerator"
                                                 class="w-full flex items-center justify-between h-[32px] sm:h-[32px] md:h-[32px] xl:h-[32px] 2xl:h-[40px] 3xl:h-[44px] 4xl:h-[48px] transition-colors duration-200"
-                                                :class="{ 
-                                                    'text-selectedText font-medium': isCommentsActive || isProdukHukumCommentsActive,
-                                                    'text-menuText hover:text-selectedText': !isCommentsActive && !isProdukHukumCommentsActive 
+                                                :class="{
+                                                    'text-selectedText font-medium':
+                                                        isCommentsActive ||
+                                                        isProdukHukumCommentsActive,
+                                                    'text-menuText hover:text-selectedText':
+                                                        !isCommentsActive &&
+                                                        !isProdukHukumCommentsActive,
                                                 }"
                                             >
                                                 <div class="flex items-center">
-                                                    <svg 
+                                                    <svg
                                                         class="h-[12px] w-[12px] sm:h-[13px] sm:w-[13px] md:h-[14px] md:w-[14px] xl:h-[16px] xl:w-[16px] 2xl:h-[18px] 2xl:w-[18px] 3xl:h-[21px] 3xl:w-[21px] 4xl:h-[24px] 4xl:w-[24px] ml-[8px] sm:ml-[9px] md:ml-[10px] xl:ml-[8px] 2xl:ml-[10px] 3xl:ml-[11px] 4xl:ml-[12px] mr-[8px] sm:mr-[8px] md:mr-[9px] xl:mr-[8px] 2xl:mr-[9px] 3xl:mr-[9px] 4xl:mr-[10px]'"
-                                                        fill="none" 
-                                                        viewBox="0 0 24 24" 
-                                                        stroke="currentColor" 
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
                                                         v-html="commentIcon"
                                                     ></svg>
-                                                    <span class="text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">Moderasi Komentar</span>
+                                                    <span
+                                                        class="text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                                        >Moderasi Komentar</span
+                                                    >
                                                 </div>
                                                 <svg
                                                     class="h-[12px] w-[12px] sm:h-[13px] sm:w-[13px] md:h-[14px] md:w-[14px] xl:h-[16px] xl:w-[16px] 2xl:h-[18px] 2xl:w-[18px] 3xl:h-[21px] 3xl:w-[21px] 4xl:h-[24px] 4xl:w-[24px] mr-[8px] sm:mr-[9px] md:mr-[10px] xl:mr-[8px] 2xl:mr-[10px] 3xl:mr-[11px] 4xl:mr-[12px] transform transition-transform duration-200"
-                                                    :class="{ 'rotate-180': commentModeratorExpanded }"
+                                                    :class="{
+                                                        'rotate-180':
+                                                            commentModeratorExpanded,
+                                                    }"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 24 24"
                                                     fill="currentColor"
                                                 >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
-                                                    clip-rule="evenodd"
-                                                />
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 0 010-1.414z"
+                                                        clip-rule="evenodd"
+                                                    />
                                                 </svg>
                                             </button>
-                                            
+
                                             <!-- Submenu content with transition -->
-                                            <div 
-                                                v-show="commentModeratorExpanded"
-                                                class="transition-all duration-300 ease-out overflow-hidden "
+                                            <div
+                                                v-show="
+                                                    commentModeratorExpanded
+                                                "
+                                                class="transition-all duration-300 ease-out overflow-hidden"
                                             >
-                                                <div class="submenu-wrapper rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] overflow-hidden">
+                                                <div
+                                                    class="submenu-wrapper rounded-[6px] sm:rounded-[6px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] overflow-hidden"
+                                                >
                                                     <!-- Berita submenu with proper MenuBox styling -->
                                                     <Link
-                                                        :href="route('dashboard.comments')"
+                                                        :href="
+                                                            route(
+                                                                'dashboard.comments'
+                                                            )
+                                                        "
                                                         class="submenu-box w-full flex items-center rounded-[4px] sm:rounded-[5px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] h-[32px] sm:h-[32px] md:h-[32px] xl:h-[32px] 2xl:h-[40px] 3xl:h-[44px] 4xl:h-[48px] transition-all duration-200"
-                                                        :class="{ 
-                                                            'bg-selectedBG text-selectedText border border-selectedText': isCommentsActive,
-                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isCommentsActive
+                                                        :class="{
+                                                            'bg-selectedBG text-selectedText border border-selectedText':
+                                                                isCommentsActive,
+                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText':
+                                                                !isCommentsActive,
                                                         }"
                                                     >
-                                                        <svg 
+                                                        <svg
                                                             class="h-[12px] w-[12px] sm:h-[13px] sm:w-[13px] md:h-[14px] md:w-[14px] xl:h-[16px] xl:w-[16px] 2xl:h-[18px] 2xl:w-[18px] 3xl:h-[21px] 3xl:w-[21px] 4xl:h-[24px] 4xl:w-[24px] ml-[8px] sm:ml-[9px] md:ml-[10px] xl:ml-[24px] 2xl:ml-[26px] 3xl:ml-[28px] 4xl:ml-[30px] mr-[8px] sm:mr-[8px] md:mr-[9px] xl:mr-[8px] 2xl:mr-[9px] 3xl:mr-[9px] 4xl:mr-[10px]"
-                                                            fill="none" 
-                                                            viewBox="0 0 24 24" 
-                                                            stroke="currentColor" 
-                                                            v-html="newsCommentIcon"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                            v-html="
+                                                                newsCommentIcon
+                                                            "
                                                         ></svg>
-                                                        <span class="truncate overflow-hidden max-w-[280px] text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">Berita</span>
+                                                        <span
+                                                            class="truncate overflow-hidden max-w-[280px] text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                                            >Berita</span
+                                                        >
                                                     </Link>
-                                                    
+
                                                     <!-- Produk Hukum submenu - Make sure this gets highlighted correctly -->
-                                                    <Link 
-                                                        :href="route('dashboard.produk-hukum.index-comments')"
+                                                    <Link
+                                                        :href="
+                                                            route(
+                                                                'dashboard.produk-hukum.index-comments'
+                                                            )
+                                                        "
                                                         class="submenu-box w-full flex items-center rounded-[4px] sm:rounded-[5px] md:rounded-[6px] xl:rounded-[6px] 2xl:rounded-[7px] 3xl:rounded-[8px] 4xl:rounded-[10px] h-[32px] sm:h-[32px] md:h-[32px] xl:h-[32px] 2xl:h-[40px] 3xl:h-[44px] 4xl:h-[48px] transition-all duration-200"
-                                                        :class="{ 
-                                                            'bg-selectedBG text-selectedText border border-selectedText': isProdukHukumCommentsActive,
-                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText': !isProdukHukumCommentsActive
+                                                        :class="{
+                                                            'bg-selectedBG text-selectedText border border-selectedText':
+                                                                isProdukHukumCommentsActive,
+                                                            'bg-menuBG text-menuText hover:bg-selectedBG hover:text-selectedText':
+                                                                !isProdukHukumCommentsActive,
                                                         }"
                                                     >
-                                                        <svg 
+                                                        <svg
                                                             class="h-[12px] w-[12px] sm:h-[13px] sm:w-[13px] md:h-[14px] md:w-[14px] xl:h-[16px] xl:w-[16px] 2xl:h-[18px] 2xl:w-[18px] 3xl:h-[21px] 3xl:w-[21px] 4xl:h-[24px] 4xl:w-[24px] ml-[8px] sm:ml-[9px] md:ml-[10px] xl:ml-[24px] 2xl:ml-[26px] 3xl:ml-[28px] 4xl:ml-[30px] mr-[8px] sm:mr-[8px] md:mr-[9px] xl:mr-[8px] 2xl:mr-[9px] 3xl:mr-[9px] 4xl:mr-[10px]"
-                                                            fill="none" 
-                                                            viewBox="0 0 24 24" 
-                                                            stroke="currentColor" 
-                                                            v-html="documentCommentIcon"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                            v-html="
+                                                                documentCommentIcon
+                                                            "
                                                         ></svg>
-                                                        <span class="truncate overflow-hidden max-w-[280px] text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">Produk Hukum</span>
+                                                        <span
+                                                            class="truncate overflow-hidden max-w-[280px] text-[12px] sm:text-[12px] md:text-[12px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                                            >Produk Hukum</span
+                                                        >
                                                     </Link>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- In collapsed state, show individual comment menu items -->
                                 <template v-if="sidebarCollapsed">
-                                    <MenuBox 
+                                    <MenuBox
                                         :href="route('dashboard.comments')"
                                         :active="isCommentsActive"
                                         :icon="newsCommentIcon"
@@ -466,8 +557,12 @@ const toggleCommentModerator = () => {
                                         Berita
                                     </MenuBox>
                                     {{ getNextMenuIndex() }}
-                                    <MenuBox 
-                                        :href="route('dashboard.produk-hukum.index-comments')"
+                                    <MenuBox
+                                        :href="
+                                            route(
+                                                'dashboard.produk-hukum.index-comments'
+                                            )
+                                        "
                                         :active="isProdukHukumCommentsActive"
                                         :icon="documentCommentIcon"
                                         :collapsed="sidebarCollapsed"
@@ -479,10 +574,10 @@ const toggleCommentModerator = () => {
                             </div>
 
                             <!-- Normal MenuBox for Feedback with permission check -->
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_feedbacks')"
-                                :href="route('dashboard.feedbacks.index')" 
-                                :active="isFeedbacksActive" 
+                                :href="route('dashboard.feedbacks.index')"
+                                :active="isFeedbacksActive"
                                 :icon="feedbackIcon"
                                 :collapsed="sidebarCollapsed"
                             >
@@ -492,16 +587,16 @@ const toggleCommentModerator = () => {
                         </MenuSection>
 
                         <!-- System & Configuration Section -->
-                        <MenuSection 
+                        <MenuSection
                             v-if="hasPermission('manage_recovery')"
-                            title="Sistem & Konfigurasi" 
-                            :active="isConfigSectionActive" 
+                            title="Sistem & Konfigurasi"
+                            :active="isConfigSectionActive"
                             :collapsed="sidebarCollapsed"
                         >
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_recovery')"
-                                :href="route('dashboard.recovery.index')" 
-                                :active="isRecoveryActive" 
+                                :href="route('dashboard.recovery.index')"
+                                :active="isRecoveryActive"
                                 :icon="recoveryIcon"
                                 :collapsed="sidebarCollapsed"
                             >
@@ -509,10 +604,10 @@ const toggleCommentModerator = () => {
                             </MenuBox>
                             {{ getNextMenuIndex() }}
 
-                            <MenuBox 
+                            <MenuBox
                                 v-if="hasPermission('manage_settings')"
-                                :href="route('dashboard.settings.edit')" 
-                                :active="isSettingsActive" 
+                                :href="route('dashboard.settings.edit')"
+                                :active="isSettingsActive"
                                 :icon="settingsIcon"
                                 :collapsed="sidebarCollapsed"
                             >
@@ -524,17 +619,17 @@ const toggleCommentModerator = () => {
                 </div>
             </Scrollbar>
         </div>
-        
+
         <!-- Collapse button positioned outside the sidebar -->
-        <div 
+        <div
             class="fixed z-20 top-[90px] sm:top-[100px] md:top-[110px] xl:top-[108px] 2xl:top-[122px] 3xl:top-[133px] 4xl:top-[160px]"
             :class="[
-                sidebarCollapsed 
-                    ? 'left-[64px] xl:left-[64px] 2xl:left-[72px] 3xl:left-[76px] 4xl:left-[80px]' 
-                    : 'left-[230px] sm:left-[250px] md:left-[266px] xl:left-[266px] 2xl:left-[300px] 3xl:left-[350px] 4xl:left-[400px]'
+                sidebarCollapsed
+                    ? 'left-[64px] xl:left-[64px] 2xl:left-[72px] 3xl:left-[76px] 4xl:left-[80px]'
+                    : 'left-[230px] sm:left-[250px] md:left-[266px] xl:left-[266px] 2xl:left-[300px] 3xl:left-[350px] 4xl:left-[400px]',
             ]"
-            :style="{ 
-                transition: 'left 300ms ease-in-out'
+            :style="{
+                transition: 'left 300ms ease-in-out',
             }"
         >
             <Collapse :collapsed="sidebarCollapsed" @click="toggleSidebar" />
@@ -593,7 +688,8 @@ const toggleCommentModerator = () => {
 }
 
 /* Remove transform origin and custom transition delays that were causing issues */
-.sidebar, .sidebar > div {
+.sidebar,
+.sidebar > div {
     will-change: width, left;
 }
 

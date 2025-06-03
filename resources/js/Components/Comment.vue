@@ -63,7 +63,34 @@ const timeAgo = (date) => {
     if (diff < 31104000) return `${Math.floor(diff / 2592000)} bulan lalu`;
     return `${Math.floor(diff / 31104000)} tahun lalu`;
 };
+const fullUrl = computed(() => {
+    // Adjust the base URL as needed for your deployment
+    return `${window.location.origin}/berita/${props.data.slug || props.slug}`;
+});
+const generateShareId = () => {
+    // Simple random string, you can use a better generator if needed
+    return Math.random().toString(36).substring(2, 10);
+};
 
+const shareId = ref(generateShareId());
+
+const mobileShareUrl = computed(() => {
+    return `${window.location.origin}/berita/${props.data.slug || props.slug}?utm_source=Mobile&utm_medium=copy-to-clipboard&shareID=${shareId.value}`;
+});
+
+const copyToClipboard = async () => {
+    if (!navigator.clipboard) {
+        alert('Fitur salin link tidak didukung di browser ini.');
+        return;
+    }
+    try {
+        await navigator.clipboard.writeText(mobileShareUrl.value);
+        alert('Link berhasil disalin!');
+    } catch (e) {
+        alert('Gagal menyalin link');
+        console.error('Gagal menyalin link:', e);
+    }
+};
 onMounted(() => {
     initialize();
 });
@@ -79,19 +106,54 @@ onMounted(() => {
                 Bagikan Artikel Ini
             </h2>
             <div class="ml-1 my-2 lg:my-4 flex items-center">
-                <i
-                    class="bi bi-instagram md:text-xl relative mr-4 text-accent2"
-                ></i>
-                <i
-                    class="bi bi-twitter-x md:text-xl relative mr-4 text-accent2"
-                ></i>
-                <i
-                    class="bi bi-facebook md:text-xl relative mr-4 text-accent2"
-                ></i>
-                <i
-                    class="bi bi-whatsapp md:text-xl relative mr-4 text-accent2"
-                ></i>
-            </div>
+            <!-- Instagram (Instagram does not support direct sharing, so just link to Instagram home or your profile) -->
+            <!-- <a
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noopener"
+                class="mr-4"
+                title="Bagikan ke Instagram"
+            >
+                <i class="bi bi-instagram md:text-xl relative text-accent2"></i>
+            </a> -->
+            <!-- X (Twitter) -->
+            <a
+                :href="`https://x.com/intent/post?text=${encodeURIComponent(props.data.title || '')}&url=${encodeURIComponent(fullUrl)}`"
+                target="_blank"
+                rel="noopener"
+                class="mr-4"
+                title="Bagikan ke X"
+            >
+                <i class="bi bi-twitter-x md:text-xl relative text-accent2"></i>
+            </a>
+            <!-- Facebook -->
+            <a
+                :href="`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`"
+                target="_blank"
+                rel="noopener"
+                class="mr-4"
+                title="Bagikan ke Facebook"
+            >
+                <i class="bi bi-facebook md:text-xl relative text-accent2"></i>
+            </a>
+            <!-- WhatsApp -->
+            <a
+                :href="`https://wa.me/?text=${encodeURIComponent(props.data.title || '')}%20${encodeURIComponent(fullUrl)}`"
+                target="_blank"
+                rel="noopener"
+                class="mr-4"
+                title="Bagikan ke WhatsApp"
+            >
+                <i class="bi bi-whatsapp md:text-xl relative text-accent2"></i>
+            </a>
+            <button
+                @click="copyToClipboard"
+                class="mr-4 flex items-center text-accent2"
+                title="Salin Link"
+            >
+                <i class="bi bi-clipboard md:text-xl relative"></i>
+            </button>
+        </div>
         </div>
         <div class="flex flex-col border-gray-300 mt-2 lg:mt-0 mb-2 lg:mb-6">
             <h2

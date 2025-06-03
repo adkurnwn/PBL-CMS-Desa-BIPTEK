@@ -5,6 +5,7 @@ import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import useApiFetch from '@/Utility/useApiFetch';
+import { Link } from '@inertiajs/vue3';
 
 const events = ref([]);
 const news = ref([]);
@@ -131,6 +132,9 @@ onMounted(() => {
             <EventCard v-for="event in events.slice(0, 3)" :key="event.id" :event="event" />
           </template>
         </div>
+        <Link href="/event" class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
+          Selengkapnya &gt;&gt;
+        </Link>
       </article>
 
       <!-- Galeri Desa -->

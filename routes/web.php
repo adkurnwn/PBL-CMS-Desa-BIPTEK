@@ -53,10 +53,10 @@ Route::prefix('produk-hukum')->group(function () {
     })->name('produk-hukum.show');
 });
 
-Route::get('/event-test', function (StatisticsService $statisticsService) {
+Route::get('/event', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Agenda', request());
-    return Inertia::render('FrontEnd/EventListTest');
-})->name('event-test');
+    return Inertia::render('FrontEnd/EventList');
+})->name('event');
 
 Route::prefix('dana-desa')->group(function () {
     Route::get('/', function (StatisticsService $statisticsService) {
