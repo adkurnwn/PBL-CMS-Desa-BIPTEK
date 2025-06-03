@@ -190,7 +190,7 @@ const triggerFileInput = () => {
 </script>
 
 <template>
-    <div class="flex flex-col items-start justify-start gap-[5.3px] sm:gap-[6px] md:gap-[6.7px] lg:gap-[7.3px] xl:gap-[8px] 2xl:gap-[9.3px] 3xl:gap-[10.7px] 4xl:gap-[12px] text-left text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] border-none">
+    <div class="p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px] flex flex-col items-start justify-start gap-[5.3px] sm:gap-[6px] md:gap-[6.7px] lg:gap-[7.3px] xl:gap-[8px] 2xl:gap-[9.3px] 3xl:gap-[10.7px] 4xl:gap-[12px] text-left text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] border-none">
         <div class="self-stretch overflow-hidden flex flex-col items-start justify-start gap-0">
             <div class="self-stretch text-selectedText text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] mb-[4.4px] sm:mb-[5px] md:mb-[5.6px] lg:mb-[6.1px] xl:mb-[6.67px] 2xl:mb-[7.7px] 3xl:mb-[8.9px] 4xl:mb-[10px]">{{ label }}</div>
             <input

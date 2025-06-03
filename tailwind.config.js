@@ -13,14 +13,14 @@ export default {
     theme: {
         extend: {
             colors: {
-                'accent1': '#244031', 
-                'accent2': '#3B614A',
+                'accent1': 'var(--accent1, #244031)',
+                'accent2': 'var(--accent2, #3B614A)',
                 'type1': '#F6F5F1',
                 'type2': '#40483D',
                 'secondary': '#DEA521',
                 'semiBlack':"#1E1E1E",
-                'selectedBG': '#DBE4DF',
-                'selectedText': '#4C7660',
+                'selectedBG': 'color-mix(in srgb, white 82%, var(--accent2))',
+                'selectedText': 'var(--accent2, #4C7660)',
                 'menuBG': '#F7F7F9',
                 'menuText': '#868080',
                 'dangerBG': '#F6C4CE',

@@ -7,9 +7,16 @@ use App\Http\Resources\DanaDesa\DanaDesaDetail;
 use App\Http\Resources\DanaDesa\DanaDesaPreview;
 use App\Models\DanaDesa;
 use Illuminate\Http\Request;
+use App\Services\StatisticsService;
 
 class DanaDesaController extends Controller
 {
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -67,7 +74,7 @@ class DanaDesaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
         try {
             $danaDesa = DanaDesa::where('slug', $slug)->first();
@@ -78,6 +85,7 @@ class DanaDesaController extends Controller
                     'message' => 'Dana Desa not found'
                 ], 404);
             }
+            $this->statisticsService->trackContentView('dana_desa', $danaDesa->id, $request);
 
             return response()->json([
                 'success' => true,

@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col w-full text-left text-[#111827] font-sans gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
+        class="flex flex-col w-full text-left text-[#111827]">
         <!-- Avatar and Name Row -->
         <div
             class="flex flex-row items-center justify-start gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
@@ -9,7 +9,7 @@
                 <img :src="avatarUrl" :alt="name" class="w-full h-full object-cover" @error="handleImageError" />
             </div>
             <div
-                class="flex-1 relative font-medium text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">
+                class="flex-1 relative font-medium text-[9px] sm:text-[10px] md:text-[11px] lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[15px] 4xl:text-[18px]">
                 {{ name }}</div>
         </div>
 
@@ -20,9 +20,9 @@
                 
             </div>
             <div
-                class="rounded-r-sm w-full sm:rounded-r-sm md:rounded-r lg:rounded-r-md xl:rounded-r-lg 2xl:rounded-r-xl 3xl:rounded-r-2xl 4xl:rounded-r-md bg-gray-200 bg-opacity-50 border-l border-[#6f7684] overflow-hidden flex flex-col items-start justify-center p-[2.6px] sm:p-[3px] md:p-[3.4px] lg:p-[3.6px] xl:p-[4px] 2xl:p-[4.6px] 3xl:p-[5.4px] 4xl:p-[6px] text-[6px] sm:text-[7px] md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[13px] 4xl:text-[15px]">
+                class="rounded-r-sm w-full sm:rounded-r-sm md:rounded-r lg:rounded-r-md xl:rounded-r-lg 2xl:rounded-r-xl 3xl:rounded-r-2xl 4xl:rounded-r-md bg-gray-200 bg-opacity-50 border-l border-[#6f7684] overflow-hidden flex flex-col items-start justify-center p-[2.6px] sm:p-[3px] md:p-[3.4px] lg:p-[3.6px] xl:p-[4px] 2xl:p-[4.6px] 3xl:p-[5.4px] 4xl:p-[6px] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[15px] 4xl:text-[17px]">
                 <div class="self-stretch relative font-medium">{{ title }}</div>
-                <i class="self-stretch relative font-light">{{ description }}</i>
+                <i class="self-stretch relative font-light line-clamp-3 overflow-hidden">{{ description }}</i>
             </div>
         </div>
     </div>

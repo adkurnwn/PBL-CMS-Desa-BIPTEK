@@ -118,7 +118,11 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
 
         Route::middleware(['permission:manage_comments'])->group(function () {
             Route::get('/comments', [KomentarBeritaController::class, 'index'])->name('dashboard.comments');
+            Route::get('/comments/news', [KomentarBeritaController::class, 'newsIndex'])->name('dashboard.comments.news');
+            Route::get('/comments/news/{news}/edit', [KomentarBeritaController::class, 'edit'])->name('dashboard.comments.news.edit');
             Route::get('/produk-hukum-comments', [KomentarProdukHukumController::class, 'index'])->name('dashboard.produk-hukum.index-comments');
+            Route::get('/produk-hukum-comments/documents', [KomentarProdukHukumController::class, 'documentsIndex'])->name('dashboard.produk-hukum.index-documents');
+            Route::get('/produk-hukum-comments/{produkHukum}/edit', [KomentarProdukHukumController::class, 'edit'])->name('dashboard.produk-hukum.index-comments.edit');
             Route::patch('/comments/{comment}/approve', [KomentarBeritaController::class, 'approve'])->name('dashboard.comments.approve');
             Route::patch('/produk-hukum-comments/{comment}/approve', [KomentarProdukHukumController::class, 'approve'])->name('dashboard.produk-hukum.index-comments.approve');
             Route::delete('/comments/{comment}', [KomentarBeritaController::class, 'destroy'])->name('dashboard.comments.destroy');
@@ -150,6 +154,7 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:manage_settings'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
             Route::post('settings', [SettingsController::class, 'update'])->name('dashboard.settings.update');
+            Route::post('settings/theme', [SettingsController::class, 'updateTheme'])->name('dashboard.settings.update-theme');
         });
     });
 });

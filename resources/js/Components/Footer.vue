@@ -12,7 +12,7 @@ const props = defineProps({
     >
         <div class="grid mt-4 md:mt-10 xl:ml-28 ml-4">
             <img
-                :src="`storage/${layout.logo}`"
+                :src="`/storage/${layout.logo}`"
                 :alt="'Logo ' + layout.name"
                 class="w-16 h-17 mb-2"
             />

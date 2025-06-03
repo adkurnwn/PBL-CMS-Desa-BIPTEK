@@ -1,15 +1,132 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm, router } from "@inertiajs/vue3";
+import { ref, computed, watch } from "vue";
+import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import Search from "@/Components/DashboardComponent/Search.vue";
+import DropdownFilter from "@/Components/DashboardComponent/DropdownFilter.vue";
+import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
+import Tabel from "@/Components/DashboardComponent/Tabel.vue";
+import Labels from "@/Components/DashboardComponent/Labels.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import DangerButton from "@/Components/DangerButton.vue";
-import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
+import Comments from "@/Components/DashboardComponent/Comments.vue";
+import IconAksi from "@/Components/DashboardComponent/IconAksi.vue";
 
 const props = defineProps({
-    comments: Object, // Will contain paginated comments data
+    comments: Object,
+    flash: Object,
+    search: {
+        type: String,
+        default: ''
+    },
+    filters: {
+        type: Object,
+        default: () => ({})
+    },
+    sort: {
+        type: String,
+        default: 'created_at'
+    },
+    direction: {
+        type: String,
+        default: 'desc'
+    },
+    pendingCommentsCount: {
+        type: Number,
+        default: 0
+    }
+});
+
+// Extract pagination info from the comments object
+const pagination = computed(() => {
+    if (!props.comments) return null;
+
+    return {
+        currentPage: props.comments.current_page,
+        lastPage: props.comments.last_page,
+        perPage: props.comments.per_page,
+        total: props.comments.total,
+    };
+});
+
+// Extract the comment data from the paginated response
+const commentItems = computed(() => {
+    return props.comments?.data || [];
 });
 
 const form = useForm({});
+
+// Update searchQuery to use the prop
+const searchQuery = ref(props.search || '');
+
+// Add filter state - exclude is_approved from filters since it's handled by tabs
+const filterState = ref((() => {
+    const filters = { ...props.filters };
+    // Remove both is_approved and news_id from filters since they're handled separately
+    delete filters.is_approved;
+    delete filters.news_id;
+    return filters;
+})());
+
+// Add activeTab state - fix initialization
+const activeTab = ref((() => {
+    if (props.filters?.is_approved === 'pending') return 'pending';
+    if (props.filters?.is_approved === 'approved') return 'approved';
+    return 'all';
+})());
+
+// Add sort state
+const sortField = ref(props.sort || 'created_at');
+const sortDirection = ref(props.direction || 'desc');
+
+// Table headers for comment data
+const tableHeaders = [
+    {
+        label: 'Komentar Pengguna',
+        field: 'komentar',
+        sortable: true,
+        nowrap: false,
+        width: '60%',
+        multiline: true
+    },
+    {
+        label: 'Waktu',
+        field: 'created_at',
+        sortable: true,
+        width: '15%'
+    },
+    {
+        label: 'Status',
+        field: 'is_approved',
+        sortable: false,
+        filterable: true,
+        filterOptions: [
+            { id: 'pending', name: 'Menunggu' },
+            { id: 'approved', name: 'Disetujui' }
+        ],
+        width: '15%'
+    },
+    {
+        label: 'Aksi',
+        field: 'actions',
+        sortable: false,
+        width: '15%'
+    }
+];
+
+// Update filterFields to include is_approved for the dropdown
+const filterFields = computed(() => [
+    {
+        id: 'is_approved',
+        name: 'Status Persetujuan',
+        type: 'select',
+        options: [
+            { id: 'pending', name: 'Menunggu' },
+            { id: 'approved', name: 'Disetujui' }
+        ]
+    }
+]);
 
 const approveComment = (commentId) => {
     if (confirm("Are you sure you want to approve this comment?")) {
@@ -27,6 +144,156 @@ const deleteComment = (commentId) => {
     }
 };
 
+// Handle tab changes
+const handleTabChange = (tab) => {
+    activeTab.value = tab;
+    
+    const params = {
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Set is_approved filter based on tab
+    if (tab === 'pending') {
+        params.is_approved = 'pending';
+    } else if (tab === 'approved') {
+        params.is_approved = 'approved';
+    }
+    // For 'all' tab, don't add is_approved filter
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+// Add search handling function
+const handleSearch = () => {
+    const params = {
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Add current tab's is_approved filter if not 'all'
+    if (activeTab.value === 'pending') {
+        params.is_approved = 'pending';
+    } else if (activeTab.value === 'approved') {
+        params.is_approved = 'approved';
+    }
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+// Add filter change handling function
+const handleFilterChange = (filters) => {
+    filterState.value = filters;
+    
+    const params = {
+        ...filters,
+        sort: sortField.value,
+        direction: sortDirection.value
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Add current tab's is_approved filter if not 'all'
+    if (activeTab.value === 'pending') {
+        params.is_approved = 'pending';
+    } else if (activeTab.value === 'approved') {
+        params.is_approved = 'approved';
+    }
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+// Add sort handling function
+const handleSort = (field) => {
+    // Toggle direction if same field, otherwise use 'asc'
+    const newDirection = (sortField.value === field && sortDirection.value === 'asc') ? 'desc' : 'asc';
+    
+    sortField.value = field;
+    sortDirection.value = newDirection;
+    
+    const params = {
+        ...filterState.value,
+        sort: field,
+        direction: newDirection
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Add current tab's is_approved filter if not 'all'
+    if (activeTab.value === 'pending') {
+        params.is_approved = 'pending';
+    } else if (activeTab.value === 'approved') {
+        params.is_approved = 'approved';
+    }
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+// Add pagination handling function
+const handlePageChanged = (page) => {
+    const params = {
+        ...filterState.value,
+        sort: sortField.value,
+        direction: sortDirection.value,
+        page: page
+    };
+    
+    if (searchQuery.value) {
+        params.search = searchQuery.value;
+    }
+    
+    // Add current tab's is_approved filter if not 'all'
+    if (activeTab.value === 'pending') {
+        params.is_approved = 'pending';
+    } else if (activeTab.value === 'approved') {
+        params.is_approved = 'approved';
+    }
+    
+    router.get(route('dashboard.comments'), params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+// Watch for search query changes to handle real-time search
+watch(searchQuery, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+        // Debounce search to avoid too many requests
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            handleSearch();
+        }, 300);
+    }
+});
+
+let searchTimeout;
+
 const formatDate = (date) => {
     return new Date(date).toLocaleString("id-ID", {
         year: "numeric",
@@ -36,10 +303,31 @@ const formatDate = (date) => {
         minute: "2-digit",
     });
 };
+
+// Watch for external filter changes
+watch(() => props.filters, (newValue) => {
+    const filtersWithoutApproval = { ...newValue };
+    // Remove both is_approved and news_id since they're handled separately
+    delete filtersWithoutApproval.is_approved;
+    delete filtersWithoutApproval.news_id;
+    
+    if (JSON.stringify(filtersWithoutApproval) !== JSON.stringify(filterState.value)) {
+        filterState.value = { ...filtersWithoutApproval };
+    }
+    
+    // Update active tab based on is_approved filter
+    if (newValue.is_approved === 'pending') {
+        activeTab.value = 'pending';
+    } else if (newValue.is_approved === 'approved') {
+        activeTab.value = 'approved';
+    } else {
+        activeTab.value = 'all';
+    }
+}, { deep: true });
+
 </script>
 
 <template>
-
     <Head title="Comment Moderation" />
 
     <AuthenticatedLayout>
@@ -57,103 +345,98 @@ const formatDate = (date) => {
                                 fill="#4C7660" />
                         </g>
                     </svg>
-
                 </template>
             </HeadingMenu>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm  ">
-                    <div class="p-6">
-                        <!-- Comments List -->
-                        <div class="space-y-6">
-                            <div v-for="comment in comments.data" :key="comment.id"
-                                class="bg-gray-50 p-6 rounded-lg shadow">
-                                <!-- Comment Header -->
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 class="font-semibold text-lg">
-                                            {{ comment.nama_user }}
-                                        </h3>
-                                        <p class="text-sm text-gray-500">
-                                            on post:
-                                            {{
-                                                comment.news?.title ||
-                                                "Deleted Post"
-                                            }}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ formatDate(comment.created_at) }}
-                                        </p>
-                                    </div>
-                                    <div class="space-x-2">
-                                        <PrimaryButton v-if="!comment.is_approved" @click="approveComment(comment.id)"
-                                            class="mb-2">
-                                            Approve
-                                        </PrimaryButton>
-                                        <DangerButton @click="deleteComment(comment.id)">
-                                            Delete
-                                        </DangerButton>
-                                    </div>
-                                </div>
+        <template #tab-devider>
+            <TabDevider :tabs="[
+                {
+                    name: 'Semua Komentar',
+                    href: '#',
+                    active: activeTab === 'all',
+                    onClick: () => handleTabChange('all')
+                },
+                {
+                    name: 'Menunggu Moderasi',
+                    href: '#',
+                    active: activeTab === 'pending',
+                    onClick: () => handleTabChange('pending'),
+                    badge: pendingCommentsCount
+                },
+                {
+                    name: 'Daftar Berita',
+                    href: route('dashboard.comments.news'),
+                    active: false
+                }
+            ]" />
+        </template>
 
-                                <!-- Comment Content -->
-                                <div class="prose max-w-none">
-                                    <p class="text-gray-700">
-                                        {{ comment.komentar }}
-                                    </p>
-                                </div>
+        <template #search-area>
+            <Search 
+                v-model="searchQuery" 
+                placeholder="Cari komentar..." 
+                @search="handleSearch" 
+            />
+            <DropdownFilter 
+                placeholder="Filter..." 
+                :filter-fields="filterFields" 
+                v-model:filters="filterState"
+                @filter-changed="handleFilterChange" 
+                width="250px" 
+                dropdownTitle="Filter berdasarkan"
+                activeFiltersTitle="Filter yang aktif" 
+                :close-on-select="false" 
+            />
+        </template>
 
-                                <!-- Parent Comment Reference -->
-                                <div v-if="comment.parent" class="mt-4 pl-4 border-l-4 border-gray-200">
-                                    <p class="text-sm text-gray-500">
-                                        In reply to:
-                                    </p>
-                                    <p class="text-gray-600">
-                                        {{ comment.parent.komentar }}
-                                    </p>
-                                </div>
+        <template #table-content>
+            <div class="h-full">
+                <div class="overflow-hidden bg-white shadow-sm h-full">
+                    <Tabel :headers="tableHeaders" :items="commentItems" :pagination="true"
+                        :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
+                        :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
+                        :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
+                        :white-background="true" empty-state-message="No comments found"
+                        @filter-changed="handleFilterChange" @sort="handleSort" @page-changed="handlePageChanged">
 
-                                <!-- Status Badge -->
-                                <div class="mt-4">
-                                    <span class="px-2 py-1 text-xs rounded-full" :class="comment.is_approved
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-yellow-100 text-yellow-800'
-                                        ">
-                                        {{
-                                            comment.is_approved
-                                                ? "Approved"
-                                                : "Pending"
-                                        }}
-                                    </span>
-                                </div>
+                        <template #['item.Komentar_Pengguna']="{ item }">
+                            <Comments 
+                                :user-name="item.nama_user"
+                                :email-user="item.email_user"
+                                :comment="item.komentar"
+                                :parent-comment="item.parent?.komentar || null"
+                                :parent-comment-username="item.parent?.nama_user || null"
+                                :news-title="item.news?.title || null"
+                            />
+                        </template>
+
+                        <template #['item.Waktu']="{ item }">
+                            <div class="flex flex-col">
+                                <span class="text-[#404DBD] text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px] font-normal">
+                                    {{ formatDate(item.created_at) }}
+                                </span>
                             </div>
+                        </template>
 
-                            <!-- Empty State -->
-                            <div v-if="comments.data.length === 0" class="text-center py-12 text-gray-500">
-                                No comments to moderate
+                        <template #['item.Status']="{ item }">
+                            <Labels :type="item.is_approved ? 'ditanggapi' : 'menunggu'"
+                                :text="item.is_approved ? 'Disetujui' : 'Menunggu'" />
+                        </template>
+
+                        <template #['item.Aksi']="{ item }">
+                            <div class="flex gap-2">
+                                <button @click="deleteComment(item.id)" class="hover:opacity-75 transition-opacity">
+                                    <IconAksi type="delete" />
+                                </button>
+                                <button v-if="!item.is_approved" @click="approveComment(item.id)" class="hover:opacity-75 transition-opacity">
+                                    <IconAksi type="accept" />
+                                </button>
                             </div>
-                        </div>
-
-                        <!-- Pagination -->
-                        <div v-if="comments.last_page > 1" class="mt-6">
-                            <nav class="flex items-center justify-between">
-                                <div class="flex justify-between flex-1 sm:hidden">
-                                    <Link v-if="comments.prev_page_url" :href="comments.prev_page_url"
-                                        class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                                    Previous
-                                    </Link>
-                                    <Link v-if="comments.next_page_url" :href="comments.next_page_url"
-                                        class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                                    Next
-                                    </Link>
-                                </div>
-                            </nav>
-                        </div>
-                    </div>
+                        </template>
+                    </Tabel>
                 </div>
             </div>
-        </div>
+        </template>
     </AuthenticatedLayout>
 </template>
