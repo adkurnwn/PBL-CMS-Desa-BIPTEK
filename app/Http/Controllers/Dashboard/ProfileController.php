@@ -8,7 +8,6 @@ use App\Models\Region\Village;
 use App\Services\MediaService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\UpdateProfileRequest;
 
 class ProfileController extends Controller
@@ -60,6 +59,7 @@ class ProfileController extends Controller
 
         $profileData['lembaga'] = json_encode($request->lembaga);
         $profileData['fasilitas'] = json_encode($request->fasilitas);
+        $profileData['kode_pos'] = $request->kode_pos;
 
         if ($request->hasFile('logo')) {
             if ($profile->logo) $this->mediaService->delete($profile->logo);
@@ -93,6 +93,6 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
-        return redirect()->route('dashboard')->with('success', 'Profil berhasil diperbarui');
+        return redirect()->route('dashboard.profiles.edit', [$profile->name])->with('success', 'Profil berhasil diperbarui');
     }
 }
