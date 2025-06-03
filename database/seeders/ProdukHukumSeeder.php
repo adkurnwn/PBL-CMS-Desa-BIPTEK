@@ -39,52 +39,7 @@ class ProdukHukumSeeder extends Seeder
                 'title' => 'Peraturan Desa No. 3 Tahun 2023 tentang BUMDes',
                 'description' => 'Peraturan Desa mengenai pembentukan dan pengelolaan Badan Usaha Milik Desa',
                 'date' => '2023-03-10',
-            ],
-            [
-                'title' => 'Peraturan Bupati No. 15 Tahun 2023 tentang Pembinaan Desa',
-                'description' => 'Peraturan Bupati tentang pedoman pembinaan dan pengawasan penyelenggaraan pemerintahan desa',
-                'date' => '2023-04-05',
-            ],
-            [
-                'title' => 'SK Kepala Desa No. 12 Tahun 2023 tentang Pengangkatan Perangkat Desa',
-                'description' => 'Surat Keputusan tentang pengangkatan perangkat desa untuk mengisi jabatan kosong',
-                'date' => '2023-05-12',
-            ],
-            [
-                'title' => 'Peraturan Desa No. 4 Tahun 2023 tentang Pelaksanaan Pembangunan Desa',
-                'description' => 'Peraturan mengenai mekanisme dan tata cara pelaksanaan pembangunan di wilayah desa',
-                'date' => '2023-06-18',
-            ],
-            [
-                'title' => 'Peraturan Bupati No. 22 Tahun 2023 tentang Dana Desa',
-                'description' => 'Peraturan Bupati tentang tata cara pengalokasian, penyaluran, dan penggunaan dana desa',
-                'date' => '2023-07-02',
-            ],
-            [
-                'title' => 'Peraturan Gubernur No. 45 Tahun 2023 tentang Pelestarian Lingkungan',
-                'description' => 'Peraturan Gubernur mengenai upaya pelestarian lingkungan hidup di wilayah pedesaan',
-                'date' => '2023-07-25',
-            ],
-            [
-                'title' => 'Peraturan Desa No. 5 Tahun 2023 tentang Pembentukan RT/RW',
-                'description' => 'Peraturan mengenai pembentukan, pembagian wilayah, dan pengelolaan RT/RW',
-                'date' => '2023-08-14',
-            ],
-            [
-                'title' => 'Peraturan Desa No. 6 Tahun 2023 tentang Pengelolaan Aset Desa',
-                'description' => 'Peraturan tentang tata kelola, inventarisasi, dan pemanfaatan aset desa',
-                'date' => '2023-09-22',
-            ],
-            [
-                'title' => 'Peraturan Bupati No. 30 Tahun 2023 tentang Administrasi Desa',
-                'description' => 'Peraturan mengenai tata cara administrasi pemerintahan desa yang efektif dan efisien',
-                'date' => '2023-10-09',
-            ],
-            [
-                'title' => 'Peraturan Desa No. 7 Tahun 2023 tentang Penanggulangan Bencana',
-                'description' => 'Peraturan mengenai penanggulangan bencana dan tanggap darurat di wilayah desa',
-                'date' => '2023-11-17',
-            ],
+            ]
         ];
 
         foreach ($produkHukumData as $index => $data) {

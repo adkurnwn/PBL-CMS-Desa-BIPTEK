@@ -18,18 +18,9 @@ class NewsSeeder extends Seeder
             'Pemerintah Desa Mengadakan Pelatihan',
             'Kegiatan Sosialisasi Program Desa',
             'Pembangunan Jalan Desa Selesai Tepat Waktu',
-            'Pemerintah Desa Mengadakan Rapat Umum',
-            'Pemerintah Desa Mengadakan Pelatihan Keterampilan',
-            'Kegiatan Gotong Royong Masyarakat Desa',
-            'Pemerintah Desa Mengadakan Lomba Kebersihan',
-            'Peresmian Posyandu Baru di Desa',
-            'Program Bantuan Pangan untuk Warga Desa',
-            'Desa Meraih Penghargaan Desa Terbaik Tingkat Kabupaten',
-            'Peluncuran Program Digitalisasi Administrasi Desa',
-            'Perayaan Hari Kemerdekaan di Desa'
         ];
 
-        $images = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        $images = [1, 2, 3];
 
         $x = 0;
 
