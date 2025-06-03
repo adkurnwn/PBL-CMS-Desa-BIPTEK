@@ -28,8 +28,8 @@ return new class extends Migration
             $table->text('history');
             $table->text('vision');
             $table->text('mission');
-            $table->enum('primary_color', ['#244031', '#242540', '#882828']);
-            $table->enum('secondary_color', ['#3B614A', '#3B4659', '#9F4941']);
+            $table->enum('primary_color', ['#244031', '#242540', '#882828'])->default('#244031');
+            $table->enum('secondary_color', ['#3B614A', '#3B4659', '#9F4941'])->default('#3B614A');
             $table->timestamps();
         });
     }
