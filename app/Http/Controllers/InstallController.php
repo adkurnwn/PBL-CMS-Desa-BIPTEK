@@ -349,8 +349,6 @@ class InstallController extends Controller
                 'history' => $request->history,
                 'vision' => $request->vision,
                 'mission' => $request->mission,
-                'primary_color' => '#000000',
-                'secondary_color' => '#000000',
             ];
 
             // Handle logo upload
