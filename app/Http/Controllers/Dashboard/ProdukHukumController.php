@@ -172,4 +172,20 @@ class ProdukHukumController extends Controller
         $this->logHelper->logActivity('update', 'produk_hukum', 'Memperbarui produk hukum ' . $produkHukum->title);
         return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil diperbarui');
     }
+
+    public function destroy($slug)
+    {
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
+        
+        // Delete the associated file if it exists
+        if ($produkHukum->file) {
+            $this->mediaService->delete($produkHukum->file);
+        }
+        
+        $title = $produkHukum->title;
+        $produkHukum->delete();
+        
+        $this->logHelper->logActivity('delete', 'produk_hukum', 'Menghapus produk hukum ' . $title);
+        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil dihapus');
+    }
 }

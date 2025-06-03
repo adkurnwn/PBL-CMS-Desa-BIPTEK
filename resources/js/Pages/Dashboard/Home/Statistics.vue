@@ -5,6 +5,8 @@ import { ref, onMounted, computed, watch } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
 import TabDevider from "@/Components/DashboardComponent/TabDevider.vue";
 import Search from "@/Components/DashboardComponent/Search.vue";
+import LineChart from "@/Components/DashboardComponent/Charts/LineChart.vue";
+import DoughnutChart from "@/Components/DashboardComponent/Charts/DoughnutChart.vue";
 
 const props = defineProps({
     stats: Object,
@@ -75,6 +77,30 @@ const getPeriodLabel = (period) => {
     return labels[period] || 'Bulan Ini';
 };
 
+// Visitor chart period filter
+const visitorPeriod = ref('weekly'); // Changed from 'daily' to 'weekly'
+
+// Get filtered visitor chart data based on selected period
+const visitorChartData = computed(() => {
+    const timeSeriesData = props.stats?.visitors?.time_series;
+    if (!timeSeriesData || !timeSeriesData[visitorPeriod.value]) {
+        return { labels: [], values: [] };
+    }
+    return timeSeriesData[visitorPeriod.value];
+});
+
+// Get visitor chart title
+const visitorChartTitle = computed(() => {
+    const titles = {
+        'daily': 'Pengunjung Unik per 4 Jam (Hari Ini)',
+        'weekly': 'Pengunjung Unik Harian (Minggu Ini)',
+        'monthly': 'Pengunjung Unik Mingguan (Bulan Ini)',
+        'yearly': 'Pengunjung Unik Bulanan (Tahun Ini)',
+        'all': 'Pengunjung Unik Tahunan (Sepanjang Waktu)'
+    };
+    return titles[visitorPeriod.value] || 'Pengunjung Unik';
+});
+
 </script>
 
 <template>
@@ -106,11 +132,38 @@ const getPeriodLabel = (period) => {
 
         <div class="h-full">
             <div class="overflow-hidden bg-white shadow-sm h-full overflow-y-auto">
-                <!-- Visitors Overview -->
+                <!-- Visitors Chart -->
                 <div class="p-6 border-b">
-                    <h2 class="text-lg font-semibold text-gray-900">Pengunjung Unik</h2>
-                    <p class="mt-2 text-sm text-gray-600">Statistik pengunjung unik berdasarkan periode waktu.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900">Statistik Pengunjung Unik</h2>
+                            <p class="mt-2 text-sm text-gray-600">Grafik pengunjung unik berdasarkan periode waktu yang dipilih.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label for="visitor-period" class="text-sm font-medium text-gray-700">Periode:</label>
+                            <select
+                                id="visitor-period"
+                                v-model="visitorPeriod"
+                                class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                            >
+                                <option value="daily">Harian (4 Jam)</option>
+                                <option value="weekly">Mingguan (Hari)</option>
+                                <option value="monthly">Bulanan (Minggu)</option>
+                                <option value="yearly">Tahunan (Bulan)</option>
+                                <option value="all">Sepanjang Waktu (Tahun)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <LineChart 
+                            :data="visitorChartData"
+                            :title="visitorChartTitle"
+                            color="#3B614A"
+                        />
+                    </div>
+                    
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
                         <div class="bg-blue-50 p-4 rounded-lg">
                             <h3 class="text-sm font-medium text-blue-800">Hari Ini</h3>
                             <p class="text-2xl font-bold text-blue-900">{{ formatNumber(visitors.today) }}</p>
@@ -210,12 +263,13 @@ const getPeriodLabel = (period) => {
                     <h2 class="text-lg font-semibold text-gray-900">Penggunaan Fitur</h2>
                     <p class="mt-2 text-sm text-gray-600">Statistik penggunaan fitur-fitur pada website.</p>
                     <div class="mt-4">
-                        <div v-if="featureStats && featureStats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="(feature, index) in featureStats" :key="index" 
-                                 class="bg-gray-50 p-4 rounded-lg">
-                                <h3 class="font-medium text-gray-900">{{ feature.feature_name }}</h3>
-                                <p class="text-2xl font-bold text-gray-900 mt-2">{{ formatNumber(feature.visits) }}</p>
-                                <p class="text-sm text-gray-600">kunjungan</p>
+                        <div v-if="featureStats && featureStats.length > 0" class="flex flex-col lg:flex-row gap-6">
+                            <!-- Chart Section -->
+                            <div class="flex-1">
+                                <DoughnutChart 
+                                    :data="featureStats"
+                                    title="Penggunaan Fitur"
+                                />
                             </div>
                         </div>
                         <div v-else class="text-center py-8 text-gray-500">

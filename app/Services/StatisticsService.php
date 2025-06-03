@@ -344,6 +344,193 @@ class StatisticsService
         return $enrichedStats->values();
     }
 
+    public function getVisitorTimeSeriesData($period = 'daily')
+    {
+        $labels = [];
+        $values = [];
+        $now = Carbon::now();
+
+        // Indonesian day names mapping
+        $dayNames = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa', 
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu'
+        ];
+
+        // Indonesian month names mapping
+        $monthNames = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember'
+        ];
+
+        switch ($period) {
+            case 'daily':
+                // Show hours from 00:00 to current hour with 4-hour steps
+                $currentHour = $now->hour;
+                // Include the current 4-hour block if we're past the start of it
+                $maxHour = $currentHour + 4 - ($currentHour % 4);
+                
+                for ($i = 0; $i < $maxHour; $i += 4) {
+                    $hourStart = Carbon::today()->addHours($i);
+                    $hourEnd = Carbon::today()->addHours($i + 4);
+                    $labels[] = $hourStart->format('H:i') . '-' . $hourEnd->format('H:i');
+                    
+                    // For the current time block, only count up to now
+                    $endTime = $hourEnd;
+                    if ($hourEnd->gt($now)) {
+                        $endTime = $now;
+                    }
+                    
+                    $count = Statistic::whereDate('date', Carbon::today())
+                        ->where(function($query) use ($hourStart, $endTime) {
+                            $query->whereTime('time', '>=', $hourStart->format('H:i:s'))
+                                  ->whereTime('time', '<=', $endTime->format('H:i:s'));
+                        })
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'weekly':
+                // Show days from Monday to current day of the week
+                $startOfWeek = $now->clone()->startOfWeek();
+                $currentDayOfWeek = $now->dayOfWeek; // 0 = Sunday, 1 = Monday, etc.
+                
+                // Convert to Monday = 0, Sunday = 6
+                $currentDay = $currentDayOfWeek === 0 ? 6 : $currentDayOfWeek - 1;
+                
+                for ($i = 0; $i <= $currentDay; $i++) {
+                    $date = $startOfWeek->clone()->addDays($i);
+                    $dayName = $dayNames[$date->format('l')];
+                    $monthName = $monthNames[$date->format('F')];
+                    $labels[] = $dayName . ', ' . $date->format('j') . ' ' . $monthName;
+                    
+                    $count = Statistic::whereDate('date', $date)
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'monthly':
+                // Show weeks from start of month to current week
+                $startOfMonth = $now->clone()->startOfMonth();
+                $endOfMonth = $now->clone()->endOfMonth();
+                $currentWeekStart = $startOfMonth->clone()->startOfWeek();
+                $currentWeekOfMonth = $now->clone()->startOfWeek();
+                $weekNumber = 1;
+                
+                while ($currentWeekStart->lte($currentWeekOfMonth)) {
+                    $weekEnd = $currentWeekStart->clone()->endOfWeek();
+                    
+                    // Adjust for month boundaries
+                    $actualStart = $currentWeekStart->lt($startOfMonth) ? $startOfMonth : $currentWeekStart;
+                    $actualEnd = $weekEnd->gt($endOfMonth) ? $endOfMonth : $weekEnd;
+                    
+                    // For current week, only go up to today
+                    if ($currentWeekStart->eq($currentWeekOfMonth)) {
+                        $actualEnd = $now->lt($actualEnd) ? $now : $actualEnd;
+                    }
+                    
+                    $startMonth = $monthNames[$actualStart->format('F')];
+                    $endMonth = $monthNames[$actualEnd->format('F')];
+                    
+                    if ($actualStart->format('F') === $actualEnd->format('F')) {
+                        $labels[] = 'Minggu ' . $weekNumber . ' (' . $actualStart->format('j') . '-' . $actualEnd->format('j') . ' ' . $startMonth . ')';
+                    } else {
+                        $labels[] = 'Minggu ' . $weekNumber . ' (' . $actualStart->format('j') . ' ' . $startMonth . ' - ' . $actualEnd->format('j') . ' ' . $endMonth . ')';
+                    }
+                    
+                    $count = Statistic::whereBetween('date', [$actualStart, $actualEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                    
+                    $currentWeekStart->addWeek();
+                    $weekNumber++;
+                }
+                break;
+                
+            case 'yearly':
+                // Show months from January to current month of current year
+                $startOfYear = $now->clone()->startOfYear();
+                $currentMonth = $now->month;
+                
+                for ($i = 0; $i < $currentMonth; $i++) {
+                    $monthStart = $startOfYear->clone()->addMonths($i);
+                    $monthEnd = $monthStart->clone()->endOfMonth();
+                    
+                    // For current month, only go up to today
+                    if ($i === $currentMonth - 1) {
+                        $monthEnd = $now->lt($monthEnd) ? $now : $monthEnd;
+                    }
+                    
+                    $monthName = $monthNames[$monthStart->format('F')];
+                    $labels[] = $monthName . ' ' . $monthStart->format('Y');
+                    
+                    $count = Statistic::whereBetween('date', [$monthStart, $monthEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'all':
+                // Show years from first record to current year
+                $firstRecord = Statistic::orderBy('date', 'asc')->first();
+                $startYear = $firstRecord ? Carbon::parse($firstRecord->date)->year : $now->year;
+                $currentYear = $now->year;
+                
+                for ($year = $startYear; $year <= $currentYear; $year++) {
+                    $yearStart = Carbon::createFromDate($year, 1, 1)->startOfYear();
+                    $yearEnd = Carbon::createFromDate($year, 12, 31)->endOfYear();
+                    
+                    // For current year, only go up to today
+                    if ($year === $currentYear) {
+                        $yearEnd = $now->lt($yearEnd) ? $now : $yearEnd;
+                    }
+                    
+                    $labels[] = (string) $year;
+                    
+                    $count = Statistic::whereBetween('date', [$yearStart, $yearEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values
+        ];
+    }
+
     private function applyPeriodFilter($query, $period)
     {
         switch ($period) {
