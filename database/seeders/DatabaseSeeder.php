@@ -24,6 +24,17 @@ class DatabaseSeeder extends Seeder
                 IndoRegionSeeder::class,
                 CategorySeeder::class,
             ],
+            'installation' => [
+                RoleSeeder::class,
+                PositionSeeder::class,
+                PermissionSeeder::class,
+                IndoRegionSeeder::class,
+                CategorySeeder::class,
+                GallerySeeder::class,
+                NewsSeeder::class,
+                DanaDesaSeeder::class,
+                ProdukHukumSeeder::class,
+            ],
             'default' => [
                 RoleSeeder::class,
                 PositionSeeder::class,

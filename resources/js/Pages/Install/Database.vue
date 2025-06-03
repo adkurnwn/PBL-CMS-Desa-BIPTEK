@@ -7,11 +7,12 @@ const props = defineProps({
 });
 
 const form = useForm({
-    host: props.currentConfig?.host || "127.0.0.1",
-    port: props.currentConfig?.port || "3306",
-    database: props.currentConfig?.database || "",
-    username: props.currentConfig?.username || "",
-    password: props.currentConfig?.password || "",
+    host: props.currentConfig.host,
+    port: props.currentConfig.port,
+    database: props.currentConfig.database,
+    username: props.currentConfig.username,
+    password: props.currentConfig.password,
+    run_seeders: true, // Default to true
 });
 
 const loading = ref(false);
@@ -273,6 +274,26 @@ const submit = () => {
                                     class="mt-2 text-sm text-red-600"
                                 >
                                     {{ form.errors.password }}
+                                </p>
+                            </div>
+
+                            <!-- Run Seeders -->
+                            <div class="mb-4">
+                                <label class="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        v-model="form.run_seeders"
+                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-600">
+                                        Jalankan seeders data contoh (Disarankan
+                                        untuk instalasi baru)
+                                    </span>
+                                </label>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Ini akan mengisi database Anda dengan
+                                    wilayah, kategori, dan data penting lainnya
+                                    sebagai contoh.
                                 </p>
                             </div>
                         </div>

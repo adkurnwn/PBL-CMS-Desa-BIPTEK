@@ -31,7 +31,7 @@ const form = useForm({
     kabupaten: "",
     kecamatan: "",
     kelurahan: "",
-    // Change this to individual hero images to match validation
+    kode_pos: "",
     hero_image_1: null,
     hero_image_2: null,
     hero_image_3: null,
@@ -365,6 +365,21 @@ onMounted(() => {
                                     />
                                     <InputError
                                         :message="form.errors.kelurahan"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="kode_pos"
+                                        v-model="form.kode_pos"
+                                        type="text"
+                                        fieldName="Kode Pos"
+                                        required
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors.kode_pos"
                                         class="mt-2"
                                     />
                                 </div>

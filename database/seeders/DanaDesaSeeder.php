@@ -18,15 +18,6 @@ class DanaDesaSeeder extends Seeder
             'Laporan Dana Desa Tahun 2024',
             'Anggaran Dana Desa Triwulan I 2024',
             'Realisasi Dana Desa Tahun 2023',
-            'Anggaran Pembangunan Infrastruktur Desa 2024',
-            'Laporan Keuangan Dana Desa 2023',
-            'Penggunaan Dana Desa untuk Program Kesehatan',
-            'Alokasi Dana Desa untuk UMKM',
-            'Anggaran Dana Desa untuk Pendidikan',
-            'Laporan Pertanggungjawaban Dana Desa 2023',
-            'Rencana Anggaran Biaya Pembangunan Jalan Desa',
-            'Dana Desa untuk Penanggulangan Bencana',
-            'Transparansi Penggunaan Dana Desa 2023',
         ];
 
         // Create directory if it doesn't exist

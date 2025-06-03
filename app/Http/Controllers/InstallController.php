@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Inertia\Inertia;
+use App\Models\Profile;
 use Illuminate\Http\Request;
+use App\Models\Region\Village;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
-use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class InstallController extends Controller
 {
@@ -87,6 +89,7 @@ class InstallController extends Controller
             'database' => 'required|string',
             'username' => 'required|string',
             'password' => 'nullable|string',
+            'run_seeders' => 'boolean', // Add this validation
         ]);
 
         try {
@@ -108,8 +111,8 @@ class InstallController extends Controller
                 'DB_CONNECTION' => 'mysql',
                 'DB_HOST' => $request->host,
                 'DB_PORT' => $request->port,
-                'DB_DATABASE' => $request->database,
-                'DB_USERNAME' => $request->username,
+                'DB_DATABASE' => '"' . $request->database . '"',
+                'DB_USERNAME' => '"' . $request->username . '"',
                 'DB_PASSWORD' => '"' . $request->password . '"',
                 'DB_COLLATION' => 'utf8mb4_unicode_ci',
                 'SESSION_DRIVER' => 'file',
@@ -118,15 +121,10 @@ class InstallController extends Controller
                 'APP_DEBUG' => 'true',
             ]);
 
-            // Set environment variables for immediate effect
-            putenv("DB_CONNECTION=mysql");
-            putenv("DB_HOST={$request->host}");
-            putenv("DB_PORT={$request->port}");
-            putenv("DB_DATABASE={$request->database}");
-            putenv("DB_USERNAME={$request->username}");
-            putenv("DB_PASSWORD={$request->password}");
-            putenv("SESSION_DRIVER=file");
-            putenv("CACHE_STORE=file");
+            // Generate application key if it doesn't exist
+            if (empty(env('APP_KEY'))) {
+                Artisan::call('key:generate', ['--force' => true]);
+            }
 
             // Update configuration array directly
             config([
@@ -135,7 +133,8 @@ class InstallController extends Controller
                 'database.connections.mysql.database' => $request->database,
                 'database.connections.mysql.username' => $request->username,
                 'database.connections.mysql.password' => $request->password,
-                'session.driver' => 'file', // Change session driver to file
+                'session.driver' => 'file',
+                'cache.default' => 'file',
             ]);
 
             // Refresh database connection
@@ -154,34 +153,15 @@ class InstallController extends Controller
                 // Run migrations
                 $migrateOutput = Artisan::call('migrate:fresh', ['--force' => true]);
 
-                // Run core seeders first (roles, permissions)
-                Artisan::call('db:seed', [
-                    '--class' => 'RoleSeeder',
-                    '--force' => true
-                ]);
+                // Only run seeders if user opted for it
+                if ($request->input('run_seeders', true)) { // Default to true for backward compatibility
+                    // Run region seeders with increased memory
+                    ini_set('memory_limit', '512M');
 
-                Artisan::call('db:seed', [
-                    '--class' => 'PositionSeeder',
-                    '--force' => true
-                ]);
-
-                Artisan::call('db:seed', [
-                    '--class' => 'PermissionSeeder',
-                    '--force' => true
-                ]);
-
-                // Run region seeders with increased memory
-                ini_set('memory_limit', '512M');
-                Artisan::call('db:seed', [
-                    '--class' => 'IndoRegionSeeder',
-                    '--force' => true
-                ]);
-
-                // Run remaining seeders
-                Artisan::call('db:seed', [
-                    '--class' => 'CategorySeeder',
-                    '--force' => true
-                ]);
+                    // Set environment for seeding
+                    config(['app.env' => 'installation']);
+                    Artisan::call('db:seed', ['--force' => true]);
+                }
 
                 // After migrations are complete, switch back to database session driver
                 $this->updateEnvFile([
@@ -211,7 +191,7 @@ class InstallController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'password' => 'required|string|min:8|confirmed',
-            'photo_profile' => 'nullable|image|max:2048|mimes:jpg,jpeg,png',
+            'photo_profile' => 'required|image|max:10000|mimes:jpg,jpeg,png',
         ]);
 
         try {
@@ -226,30 +206,6 @@ class InstallController extends Controller
             // Handle profile photo upload
             if ($request->hasFile('photo_profile')) {
                 $userData['photo_profile'] = $request->file('photo_profile')->store('profile-photos', 'public');
-            } else {
-                // Use a default profile image when none is provided
-                $userData['photo_profile'] = 'profile-photos/default-admin.png';
-
-                // Check if the default image exists in storage, if not, copy it from assets
-                $defaultImagePath = public_path('storage/profile-photos/default-admin.png');
-                $defaultImageDir = dirname($defaultImagePath);
-
-                if (!file_exists($defaultImagePath)) {
-                    // Create directory if it doesn't exist
-                    if (!file_exists($defaultImageDir)) {
-                        mkdir($defaultImageDir, 0755, true);
-                    }
-
-                    // Copy default image from assets (you may need to adjust this path)
-                    $sourceImage = public_path('assets/images/default-admin.png');
-
-                    // If source exists, copy it; otherwise use a placeholder
-                    if (file_exists($sourceImage)) {
-                        copy($sourceImage, $defaultImagePath);
-                    } else {
-                        $this->generateDefaultAvatar($request->name, $defaultImagePath);
-                    }
-                }
             }
 
             $user = User::create($userData);
@@ -287,28 +243,21 @@ class InstallController extends Controller
     public function finish()
     {
         // Check if profile exists
-        if (\App\Models\Profile::count() === 0) {
+        if (Profile::count() === 0) {
             return redirect()->route('install.setupProfile')
                 ->with('warning', 'Please complete your village profile setup before finishing installation.');
         }
 
-        // Don't mark as installed yet - we'll do that when they click "Ke Halaman Login"
         // Keep the storage:link and cache commands
         Artisan::call('storage:link', ['--force' => true]);
 
         return Inertia::render('Install/Finish');
     }
 
-    /**
-     * Setup Profile Desa and handle not found errors
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function storeProfile(Request $request)
     {
         $request->validate([
-            'name' => 'nullable|string|max:255', // Make optional since we generate from village
+            'name' => 'nullable|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'logo' => 'required|image|max:10000|mimes:jpg,jpeg,png',
@@ -316,7 +265,7 @@ class InstallController extends Controller
             'kabupaten' => 'required|string',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
-            // Change validation to match frontend
+            'kode_pos' => 'required|string|max:10',
             'hero_image_1' => 'required|image|max:10000|mimes:jpg,jpeg,png',
             'hero_image_2' => 'required|image|max:10000|mimes:jpg,jpeg,png',
             'hero_image_3' => 'required|image|max:10000|mimes:jpg,jpeg,png',
@@ -324,13 +273,13 @@ class InstallController extends Controller
             'history' => 'required|string',
             'vision' => 'required|string',
             'mission' => 'required|string',
-            'lembaga' => 'nullable|array', // Change to array to match frontend
-            'fasilitas' => 'nullable|array', // Change to array to match frontend
+            'lembaga' => 'nullable|array',
+            'fasilitas' => 'nullable|array',
         ]);
 
         try {
             // Get village name for profile name
-            $village = \App\Models\Region\Village::find($request->kelurahan);
+            $village = Village::find($request->kelurahan);
             $profileName = $village ? "Desa " . ucwords(strtolower($village->name)) : 'Desa Default';
 
             // Create base profile data
@@ -343,7 +292,7 @@ class InstallController extends Controller
                 'kabupaten' => $request->kabupaten,
                 'kecamatan' => $request->kecamatan,
                 'kelurahan' => $request->kelurahan,
-                // Handle array data from frontend - encode to JSON like ProfileController
+                'kode_pos' => $request->kode_pos,
                 'lembaga' => json_encode($request->lembaga ?? []),
                 'fasilitas' => json_encode($request->fasilitas ?? []),
                 'history' => $request->history,
@@ -373,7 +322,7 @@ class InstallController extends Controller
             $profileData['hero_images'] = json_encode($heroImages);
 
             // Create the profile
-            $profile = \App\Models\Profile::create($profileData);
+            Profile::create($profileData);
 
             // Create log entry of this action
             $logHelper = new \App\Helpers\LogActivityHelper();
@@ -394,7 +343,7 @@ class InstallController extends Controller
     {
         // Check if the system has been installed but profile doesn't exist
         if (env('APP_INSTALLED') === 'true') {
-            if (\App\Models\Profile::count() === 0) {
+            if (Profile::count() === 0) {
                 // Redirect to profile setup if no profile exists
                 return redirect()->route('install.setupProfile')
                     ->with('warning', 'Please complete your village profile setup first.');
@@ -488,47 +437,6 @@ class InstallController extends Controller
             ['key' => 'site_description', 'value' => 'Website Resmi Desa', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'maintenance_mode', 'value' => '0', 'created_at' => now(), 'updated_at' => now()],
         ]);
-    }
-
-    /**
-     * Generate a simple default avatar image with the user's initials
-     *
-     * @param string $name
-     * @param string $outputPath
-     * @return void
-     */
-    private function generateDefaultAvatar($name, $outputPath)
-    {
-        // Get initials from name (up to 2 characters)
-        $initials = strtoupper(mb_substr($name, 0, 1));
-        if (strpos($name, ' ') !== false) {
-            $nameParts = explode(' ', $name);
-            $initials = strtoupper(mb_substr($nameParts[0], 0, 1) . mb_substr(end($nameParts), 0, 1));
-        }
-
-        // Create image
-        $image = imagecreatetruecolor(200, 200);
-
-        // Define colors
-        $bgColor = imagecolorallocate($image, 36, 64, 49); // Your accent color #244031
-        $textColor = imagecolorallocate($image, 255, 255, 255);
-
-        // Fill background
-        imagefill($image, 0, 0, $bgColor);
-
-        // Add text
-        $font = 5; // Built-in font size (1-5)
-        $textWidth = imagefontwidth($font) * strlen($initials);
-        $textHeight = imagefontheight($font);
-
-        $centerX = (200 - $textWidth) / 2;
-        $centerY = (200 - $textHeight) / 2;
-
-        imagestring($image, $font, $centerX, $centerY, $initials, $textColor);
-
-        // Save as PNG
-        imagepng($image, $outputPath);
-        imagedestroy($image);
     }
 
     /**
