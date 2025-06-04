@@ -153,6 +153,8 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');
             Route::post('settings', [SettingsController::class, 'update'])->name('dashboard.settings.update');
             Route::post('settings/theme', [SettingsController::class, 'updateTheme'])->name('dashboard.settings.update-theme');
+            Route::post('settings/test-connection', [SettingsController::class, 'testConnection'])
+                ->name('dashboard.settings.test-connection');
         });
     });
 });
