@@ -159,7 +159,15 @@ class InstallController extends Controller
                 // Only run IndoRegionSeeder as it's required and doesn't depend on users
                 ini_set('memory_limit', '512M');
                 Artisan::call('db:seed', [
-                    '--class' => 'Database\\Seeders\\IndoRegionSeeder',
+                    '--class' => 'IndoRegionSeeder',
+                    '--force' => true
+                ]);
+                Artisan::call('db:seed', [
+                    '--class' => 'RoleSeeder',
+                    '--force' => true
+                ]);
+                Artisan::call('db:seed', [
+                    '--class' => 'PermissionSeeder',
                     '--force' => true
                 ]);
 
