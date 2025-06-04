@@ -121,6 +121,7 @@ const fasilitasList = computed(() =>
                 class="flex flex-col items-center justify-center font-merriweather bg-type1"
             >
                 <h1
+                    id="struktur-pemerintahan"
                     class="font-bold text-accent2 xl:text-3xl md:text-2xl text-xl xl:-ml-96 xl:mr-96 sm:mr-80 mr-24 xl:pr-16 xl:mt-20 sm:mt-16 mt-14"
                 >
                     Struktur Pemerintahan

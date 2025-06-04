@@ -158,21 +158,24 @@ onBeforeUnmount(() => {
                     <input
                         v-model="form.nama"
                         type="text"
-                        placeholder="Nama Pengirim"
+                        placeholder="*Nama Pengirim"
                         class="border p-2 rounded text-sm"
+                        required="true"
                     />
                     <input
                         v-model="form.email"
                         type="email"
-                        placeholder="Email"
+                        placeholder="*Email"
                         class="flex border p-2 rounded text-sm"
+                        required="true"
                     />
                     <div class="flex flex-col md:flex-row gap-2">
                         <input
                             v-model="form.judul"
                             type="text"
-                            placeholder="Judul"
+                            placeholder="*Judul"
                             class="border p-2 rounded text-sm"
+                            required="true"
                         />
                         <select
                             v-model="form.kategori"
@@ -193,9 +196,10 @@ onBeforeUnmount(() => {
 
                     <textarea
                         v-model="form.isi"
-                        placeholder="Isi Pengaduan"
+                        placeholder="*Isi Pengaduan"
                         rows="3"
                         class="border p-2 rounded text-sm resize-none"
+                        required="true"
                     ></textarea>
                     <div class="relative w-full">
                         <div class="flex items-center gap-3 flex-wrap">
@@ -215,7 +219,7 @@ onBeforeUnmount(() => {
                                         d="M440-200h80v-167l64 64 56-57-160-160-160 160 57 56 63-63v167ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0-33-23.5-56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"
                                     />
                                 </svg>
-                                <span>Pilih File</span>
+                                <span>Pilih File (Opsional)</span>
                             </label>
 
                             <!-- Input File -->
