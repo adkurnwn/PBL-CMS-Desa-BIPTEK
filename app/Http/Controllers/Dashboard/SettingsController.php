@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use Exception;
 use Inertia\Inertia;
+use App\Models\Profile;
 use Illuminate\Http\Request;
+use App\Services\MediaService;
 use App\Helpers\LogActivityHelper;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use App\Services\MediaService;
-use App\Http\Requests\Validation\UpdateSettingsRequest;
 use App\Http\Requests\Validation\UpdateThemeRequest;
-use App\Models\Profile;
+use App\Http\Requests\Validation\UpdateSettingsRequest;
 
 class SettingsController extends Controller
 {
@@ -81,30 +86,72 @@ class SettingsController extends Controller
         $envFilePath = base_path('.env');
         $envContent = File::get($envFilePath);
 
-        // Update .env variables
+        // Check if database settings are being changed
+        $dbSettingsChanged = $this->isDatabaseSettingsChanged($request);
+
+        if ($dbSettingsChanged) {
+            try {
+                // Step 1: Change session and cache drivers to file before DB changes
+                $originalSessionDriver = env('SESSION_DRIVER');
+                $originalCacheStore = env('CACHE_STORE');
+
+                $envContent = $this->switchToFileDrivers($envContent);
+                File::put($envFilePath, $envContent);
+
+                // Clear config cache to apply file drivers immediately
+                Artisan::call('config:clear');
+
+                // Step 2: Create backup of current database
+                $this->createDatabaseBackup();
+
+                // Step 3: Test new database connection
+                $this->testDatabaseConnection($request);
+
+                // Step 4: Update database settings in .env
+                $envContent = File::get($envFilePath); // Re-read after file driver changes
+                $envContent = $this->updateDatabaseSettings($envContent, $request);
+                File::put($envFilePath, $envContent);
+
+                // Step 5: Clear config cache to reload new DB settings
+                Artisan::call('config:clear');
+
+                config([
+                    'database.connections.mysql.host' => env('DB_HOST'),
+                    'database.connections.mysql.port' => env('DB_PORT'),
+                    'database.connections.mysql.database' => env('DB_DATABASE'),
+                    'database.connections.mysql.username' => env('DB_USERNAME'),
+                    'database.connections.mysql.password' => env('DB_PASSWORD'),
+                ]);
+                // Step 6: Run migrations on new database
+                $this->runMigrationsOnNewDatabase();
+
+                // Step 7: Switch session and cache drivers back to database
+                $envContent = File::get($envFilePath); // Re-read after DB changes
+                $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver, $originalCacheStore);
+                File::put($envFilePath, $envContent);
+
+                // Final config clear to apply database drivers
+                Artisan::call('config:clear');
+            } catch (Exception $e) {
+                // If anything fails, restore original drivers and return error
+                try {
+                    $envContent = File::get($envFilePath);
+                    $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver ?? 'database', $originalCacheStore ?? 'database');
+                    File::put($envFilePath, $envContent);
+                    Artisan::call('config:clear');
+                } catch (Exception $restoreException) {
+                    // Log the restore failure but still show the original error
+                    $this->logHelper->logActivity('error', 'settings_restore', 'Failed to restore original drivers: ' . $restoreException->getMessage());
+                }
+
+                return redirect()->back()->with('error', 'Database change failed: ' . $e->getMessage());
+            }
+        }
+
+        // Update other .env variables (non-database)
         $envContent = $this->updateEnvVariable($envContent, 'APP_NAME', $request->app_name);
         $envContent = $this->updateEnvVariable($envContent, 'APP_TIMEZONE', $request->app_timezone);
         $envContent = $this->updateEnvVariable($envContent, 'APP_URL', $request->app_url);
-
-        // Database settings
-        if ($request->filled('db_connection')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_CONNECTION', $request->db_connection);
-        }
-        if ($request->filled('db_host')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_HOST', $request->db_host);
-        }
-        if ($request->filled('db_port')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_PORT', $request->db_port);
-        }
-        if ($request->filled('db_database')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_DATABASE', $request->db_database);
-        }
-        if ($request->filled('db_username')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_USERNAME', $request->db_username);
-        }
-        if ($request->filled('db_password')) {
-            $envContent = $this->updateEnvVariable($envContent, 'DB_PASSWORD', $request->db_password);
-        }
 
         // Mail settings
         if ($request->filled('mail_mailer')) {
@@ -140,8 +187,10 @@ class SettingsController extends Controller
             $envContent = $this->updateEnvVariable($envContent, 'BACKUP_FREQUENCY', $request->backup_frequency);
         }
 
-        // Write content back to .env file
-        File::put($envFilePath, $envContent);
+        // Write content back to .env file (if not already done for database changes)
+        if (!$dbSettingsChanged) {
+            File::put($envFilePath, $envContent);
+        }
 
         // Handle favicon upload
         if ($request->hasFile('favicon')) {
@@ -169,12 +218,16 @@ class SettingsController extends Controller
         // Log the activity
         $this->logHelper->logActivity('update', 'settings', 'Updated application settings');
 
-        return redirect()->back()->with('success', 'Pengaturan aplikasi web telah diperbarui');
+        $message = $dbSettingsChanged ?
+            'Pengaturan aplikasi web telah diperbarui dan database telah dimigrasikan' :
+            'Pengaturan aplikasi web telah diperbarui';
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function updateTheme(UpdateThemeRequest $request)
     {
-        
+
         // Update theme colors in the profile
         if ($request->filled('primary_color') || $request->filled('secondary_color')) {
             $profile = Profile::first();
@@ -182,7 +235,7 @@ class SettingsController extends Controller
                 // Create profile if it doesn't exist
                 $profile = new Profile();
             }
-            
+
             $profileData = [];
 
             if ($request->filled('primary_color')) {
@@ -242,5 +295,152 @@ class SettingsController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Check if any database settings are being changed
+     */
+    protected function isDatabaseSettingsChanged($request)
+    {
+        $dbFields = ['db_connection', 'db_host', 'db_port', 'db_database', 'db_username', 'db_password'];
+
+        foreach ($dbFields as $field) {
+            if ($request->filled($field) && $request->$field !== env(strtoupper($field))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Create backup of current database
+     */
+    protected function createDatabaseBackup()
+    {
+        try {
+            // Use RecoveryController's backup system instead
+            $recoveryController = new \App\Http\Controllers\Dashboard\RecoveryController();
+            $recoveryController->create();
+
+            $this->logHelper->logActivity('create', 'database_backup', 'Database backup created before changing settings');
+        } catch (Exception $e) {
+            throw new Exception('Failed to create database backup: ' . $e->getMessage());
+        }
+    }
+
+    public function testConnection(Request $request)
+    {
+        try {
+            $this->testDatabaseConnection($request);
+            return response()->json(['success' => true, 'message' => 'Database connection successful']);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    protected function testDatabaseConnection($request)
+    {
+        try {
+            // Create temporary database configuration
+            $config = [
+                'driver' => $request->db_connection ?: env('DB_CONNECTION'),
+                'host' => $request->db_host ?: env('DB_HOST'),
+                'port' => $request->db_port ?: env('DB_PORT'),
+                'database' => $request->db_database ?: env('DB_DATABASE'),
+                'username' => $request->db_username ?: env('DB_USERNAME'),
+                'password' => $request->db_password ?: env('DB_PASSWORD'),
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => true,
+                'engine' => null,
+            ];
+
+            // Set temporary database configuration
+            Config::set('database.connections.test_connection', $config);
+
+            // Test the connection
+            $pdo = DB::connection('test_connection')->getPdo();
+
+            if (!$pdo) {
+                throw new Exception('Could not establish database connection');
+            }
+
+            // Test if we can run a simple query
+            DB::connection('test_connection')->select('SELECT 1');
+
+            // Log successful connection test
+            $this->logHelper->logActivity('test', 'database_connection', 'Database connection test successful');
+        } catch (Exception $e) {
+            throw new Exception('Database connection test failed: ' . $e->getMessage());
+        }
+    }
+
+    protected function updateDatabaseSettings($envContent, $request)
+    {
+        if ($request->filled('db_connection')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_CONNECTION', $request->db_connection);
+        }
+        if ($request->filled('db_host')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_HOST', $request->db_host);
+        }
+        if ($request->filled('db_port')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_PORT', $request->db_port);
+        }
+        if ($request->filled('db_database')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_DATABASE', $request->db_database);
+        }
+        if ($request->filled('db_username')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_USERNAME', $request->db_username);
+        }
+        if ($request->filled('db_password')) {
+            $envContent = $this->updateEnvVariable($envContent, 'DB_PASSWORD', $request->db_password);
+        }
+
+        return $envContent;
+    }
+
+    protected function switchToFileDrivers($envContent)
+    {
+        $envContent = $this->updateEnvVariable($envContent, 'SESSION_DRIVER', 'file');
+        $envContent = $this->updateEnvVariable($envContent, 'CACHE_STORE', 'file');
+
+        $this->logHelper->logActivity('update', 'drivers', 'Switched to file-based session and cache drivers');
+
+        return $envContent;
+    }
+
+    protected function switchBackToDatabaseDrivers($envContent, $originalSessionDriver, $originalCacheStore)
+    {
+        $envContent = $this->updateEnvVariable($envContent, 'SESSION_DRIVER', $originalSessionDriver ?: 'database');
+        $envContent = $this->updateEnvVariable($envContent, 'CACHE_STORE', $originalCacheStore ?: 'database');
+
+        $this->logHelper->logActivity('update', 'drivers', 'Switched back to database-based session and cache drivers');
+
+        return $envContent;
+    }
+
+    protected function runMigrationsOnNewDatabase()
+    {
+        try {
+            DB::purge('mysql');
+            DB::reconnect('mysql');
+            $databaseName = DB::connection()->getDatabaseName();
+            Log::info("Connected to database: " . $databaseName);
+
+            // Run migrations (this will create sessions and cache tables if needed)
+            Artisan::call('migrate', ['--force' => true]);
+            Log::info(Artisan::output());
+
+
+            // Check if migrations ran successfully
+            $output = Artisan::output();
+
+            // Log migration completion
+            $this->logHelper->logActivity('run', 'database_migration', 'Database migrations completed on new database');
+        } catch (Exception $e) {
+            throw new Exception('Migration failed: ' . $e->getMessage());
+        }
     }
 }
