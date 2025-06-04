@@ -7,6 +7,7 @@ import { parseFasilitas, parseMisi } from "@/Utility/useParser";
 
 const profile = ref({});
 const demografi = ref({});
+const coordinates = ref({ lat: null, lon: null, display_name: null });
 
 const fetchData = async () => {
     const profileApi = useApiCache("profileData", "/api/profile/profile");
@@ -26,6 +27,9 @@ const missionList = computed(() => parseMisi(profile.value.mission || ""));
 const fasilitasList = computed(() =>
     parseFasilitas(profile.value.fasilitas || "")
 );
+const handleCoordinatesUpdate = (coords) => {
+    coordinates.value = coords;
+};
 </script>
 <!-- Profileview.vue -->
 <template>
@@ -130,7 +134,7 @@ const fasilitasList = computed(() =>
                     class="xl:text-xl md:text-lg sm:text-base text-xs text-semiBlack xl:max-w-7xl sm:max-w-xl max-w-xs text-left xl:mr-56 md:mr-11 sm:mr-0 xl:ml-2 sm:ml-7 -ml-1 italic"
                 >
                     Susunan organisasi yang bertanggung jawab dalam mengelola
-                    administrasi dan pelayanan publik di desa.
+                    administrasi dan pelayanan publik di {{ layout.name }}.
                 </p>
                 <div
                     class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 p-7 bg-transparant -mt-3 items-center xl:mr-52"
@@ -139,22 +143,15 @@ const fasilitasList = computed(() =>
                     <div
                         class="container bg-white rounded-xl shadow-lg text-center"
                     >
-                        <!--
                         <img
                             :src="`/storage/${profile.organization_image}`"
-                            alt="Struktur Organisasi"
-                            class="w-full xl:h-72 xl:mt-1 object-contain"
-                        />
-                        -->
-                        <img
-                            src="../../../images/SO_PEMERINTAHAN_DESA.png"
                             alt="Struktur Organisasi"
                             class="w-full xl:h-72 object-contain"
                         />
                         <p
                             class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1"
                         >
-                            Struktur Organisasi Pemerintahan Desa
+                            Struktur Organisasi Pemerintahan {{ layout.name }}
                         </p>
                     </div>
                 </div>
@@ -320,7 +317,7 @@ const fasilitasList = computed(() =>
                             Koordinat
                         </p>
                         <p class="w-1/2 text-accent2 -ml-4">
-                            : -4.498, 119.600
+                            : {{ coordinates.lat && coordinates.lon ? `${coordinates.lat}, ${coordinates.lon}` : '-4.498, 119.600' }}
                         </p>
                     </div>
                     <div class="flex w-full">
@@ -347,6 +344,7 @@ const fasilitasList = computed(() =>
                         "
                         :provinsi="profile?.name"
                         :kode-pos="profile.kode_pos"
+                        @coordinates-found="handleCoordinatesUpdate"
                     />
                 </div>
                 <div
@@ -368,8 +366,7 @@ const fasilitasList = computed(() =>
                     class="xl:mt-32 mt-16 xl:-ml-80 ml-12 xl:pr-4 text-accent1 xl:text-xl text-sm"
                 >
                     <p class="font-bold -ml-16">
-                        GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru,
-                        Sulawesi Selatan 90761
+                        {{ coordinates.display_name || 'GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru, Sulawesi Selatan 90761' }}
                     </p>
                 </div>
             </div>
