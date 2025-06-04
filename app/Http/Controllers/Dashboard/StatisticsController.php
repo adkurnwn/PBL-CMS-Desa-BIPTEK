@@ -44,6 +44,9 @@ class StatisticsController extends Controller
         $danaDesaStats = $this->statisticsService->getContentStatsWithTitles('dana_desa', 'month');
         $produkDesaStats = $this->statisticsService->getContentStatsWithTitles('produk_desa', 'month');
         
+        // Get content views by category for chart (last 6 months)
+        $contentViewsByCategory = $this->statisticsService->getContentViewsByCategory(6);
+        
         // Get feature stats
         $featureStats = $this->statisticsService->getFeatureStats($period);
         
@@ -84,6 +87,7 @@ class StatisticsController extends Controller
                     'dana_desa' => $danaDesaStats,
                     'produk_desa' => $produkDesaStats,
                     'all_periods' => $allContentStatsAllPeriods,
+                    'views_by_category' => $contentViewsByCategory,
                 ],
                 'features' => $featureStats,
                 'time_series' => [

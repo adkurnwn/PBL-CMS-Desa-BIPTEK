@@ -409,15 +409,9 @@ class StatisticsService
                 break;
                 
             case 'weekly':
-                // Show days from Monday to current day of the week
-                $startOfWeek = $now->clone()->startOfWeek();
-                $currentDayOfWeek = $now->dayOfWeek; // 0 = Sunday, 1 = Monday, etc.
-                
-                // Convert to Monday = 0, Sunday = 6
-                $currentDay = $currentDayOfWeek === 0 ? 6 : $currentDayOfWeek - 1;
-                
-                for ($i = 0; $i <= $currentDay; $i++) {
-                    $date = $startOfWeek->clone()->addDays($i);
+                // Show last 7 days ending with today
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = $now->clone()->subDays($i);
                     $dayName = $dayNames[$date->format('l')];
                     $monthName = $monthNames[$date->format('F')];
                     $labels[] = $dayName . ', ' . $date->format('j') . ' ' . $monthName;
@@ -432,43 +426,31 @@ class StatisticsService
                 break;
                 
             case 'monthly':
-                // Show weeks from start of month to current week
-                $startOfMonth = $now->clone()->startOfMonth();
-                $endOfMonth = $now->clone()->endOfMonth();
-                $currentWeekStart = $startOfMonth->clone()->startOfWeek();
-                $currentWeekOfMonth = $now->clone()->startOfWeek();
-                $weekNumber = 1;
-                
-                while ($currentWeekStart->lte($currentWeekOfMonth)) {
-                    $weekEnd = $currentWeekStart->clone()->endOfWeek();
-                    
-                    // Adjust for month boundaries
-                    $actualStart = $currentWeekStart->lt($startOfMonth) ? $startOfMonth : $currentWeekStart;
-                    $actualEnd = $weekEnd->gt($endOfMonth) ? $endOfMonth : $weekEnd;
+                // Show last 4 weeks ending with current week
+                for ($i = 3; $i >= 0; $i--) {
+                    $weekStart = $now->clone()->subWeeks($i)->startOfWeek();
+                    $weekEnd = $now->clone()->subWeeks($i)->endOfWeek();
                     
                     // For current week, only go up to today
-                    if ($currentWeekStart->eq($currentWeekOfMonth)) {
-                        $actualEnd = $now->lt($actualEnd) ? $now : $actualEnd;
+                    if ($i === 0) {
+                        $weekEnd = $now->lt($weekEnd) ? $now : $weekEnd;
                     }
                     
-                    $startMonth = $monthNames[$actualStart->format('F')];
-                    $endMonth = $monthNames[$actualEnd->format('F')];
+                    $startMonth = $monthNames[$weekStart->format('F')];
+                    $endMonth = $monthNames[$weekEnd->format('F')];
                     
-                    if ($actualStart->format('F') === $actualEnd->format('F')) {
-                        $labels[] = 'Minggu ' . $weekNumber . ' (' . $actualStart->format('j') . '-' . $actualEnd->format('j') . ' ' . $startMonth . ')';
+                    if ($weekStart->format('F') === $weekEnd->format('F')) {
+                        $labels[] = $weekStart->format('j') . '-' . $weekEnd->format('j') . ' ' . $startMonth;
                     } else {
-                        $labels[] = 'Minggu ' . $weekNumber . ' (' . $actualStart->format('j') . ' ' . $startMonth . ' - ' . $actualEnd->format('j') . ' ' . $endMonth . ')';
+                        $labels[] = $weekStart->format('j') . ' ' . $startMonth . ' - ' . $weekEnd->format('j') . ' ' . $endMonth;
                     }
                     
-                    $count = Statistic::whereBetween('date', [$actualStart, $actualEnd])
+                    $count = Statistic::whereBetween('date', [$weekStart, $weekEnd])
                         ->whereNotNull('session_id')
                         ->distinct('session_id')
                         ->count();
                     
                     $values[] = $count;
-                    
-                    $currentWeekStart->addWeek();
-                    $weekNumber++;
                 }
                 break;
                 
@@ -529,6 +511,82 @@ class StatisticsService
             'labels' => $labels,
             'values' => $values
         ];
+    }
+
+    public function getContentViewsByCategory($months = 6)
+    {
+        $now = Carbon::now();
+        $categories = ['news', 'produk_hukum', 'dana_desa', 'produk_desa'];
+        $labels = [];
+        $datasets = [];
+
+        // Indonesian month names mapping
+        $monthNames = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember'
+        ];
+
+        // Generate labels for the last X months
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $monthDate = $now->clone()->subMonths($i);
+            $monthName = $monthNames[$monthDate->format('F')];
+            $labels[] = $monthName . ' ' . $monthDate->format('Y');
+        }
+
+        // Initialize datasets for each category
+        foreach ($categories as $category) {
+            $data = [];
+            
+            for ($i = $months - 1; $i >= 0; $i--) {
+                $monthStart = $now->clone()->subMonths($i)->startOfMonth();
+                $monthEnd = $now->clone()->subMonths($i)->endOfMonth();
+                
+                // For current month, only count up to today
+                if ($i === 0) {
+                    $monthEnd = $now->lt($monthEnd) ? $now : $monthEnd;
+                }
+                
+                $count = Statistic::where('type', 'content_view')
+                    ->where('category', $category)
+                    ->whereBetween('date', [$monthStart, $monthEnd])
+                    ->count();
+                
+                $data[] = $count;
+            }
+            
+            $datasets[] = [
+                'label' => $this->getCategoryDisplayName($category),
+                'category' => $category,
+                'data' => $data
+            ];
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => $datasets
+        ];
+    }
+
+    private function getCategoryDisplayName($category)
+    {
+        $names = [
+            'news' => 'Berita',
+            'produk_hukum' => 'Produk Hukum',
+            'dana_desa' => 'Dana Desa',
+            'produk_desa' => 'Produk Desa'
+        ];
+        
+        return $names[$category] ?? ucfirst($category);
     }
 
     private function applyPeriodFilter($query, $period)

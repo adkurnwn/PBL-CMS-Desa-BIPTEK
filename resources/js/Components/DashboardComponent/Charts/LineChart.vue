@@ -44,6 +44,10 @@ const props = defineProps({
   color: {
     type: String,
     default: '#3B614A'
+  },
+  multiDataset: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -65,33 +69,63 @@ const createChart = () => {
 
   const ctx = chartCanvas.value.getContext('2d');
 
+  let datasets = [];
+  
+  if (props.multiDataset && props.data.datasets) {
+    // Multi-dataset configuration
+    const colors = [
+      '#3B4659', // Blue for Berita
+      '#9F4941', // Red for Produk Hukum  
+      '#3B614A', // Green for Dana Desa
+      '#F59E0B'  // Orange for Produk Desa
+    ];
+    
+    datasets = props.data.datasets.map((dataset, index) => ({
+      label: dataset.label,
+      data: dataset.data,
+      borderColor: colors[index] || props.color,
+      backgroundColor: (colors[index] || props.color) + '20',
+      fill: false,
+      tension: 0.4,
+      pointBackgroundColor: colors[index] || props.color,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }));
+  } else {
+    // Single dataset configuration
+    datasets = [{
+      label: props.title,
+      data: props.data.values || [],
+      borderColor: props.color,
+      backgroundColor: props.color + '20',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: props.color,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6
+    }];
+  }
+
   chartInstance = new ChartJS(ctx, {
     type: 'line',
     data: {
       labels: props.data.labels || [],
-      datasets: [{
-        label: props.title,
-        data: props.data.values || [],
-        borderColor: props.color,
-        backgroundColor: props.color + '20',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: props.color,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6
-      }]
+      datasets: datasets
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         title: {
-          display: false // Hide title since we show it above the chart
+          display: false
         },
         legend: {
-          display: false
+          display: props.multiDataset,
+          position: 'top'
         },
         tooltip: {
           mode: 'index',
@@ -110,7 +144,7 @@ const createChart = () => {
           display: true,
           title: {
             display: true,
-            text: 'Pengunjung'
+            text: props.multiDataset ? 'Jumlah Views' : 'Pengunjung'
           },
           beginAtZero: true,
           ticks: {
