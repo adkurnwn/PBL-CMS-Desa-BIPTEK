@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Region\Village;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -89,7 +90,7 @@ class InstallController extends Controller
             'database' => 'required|string',
             'username' => 'required|string',
             'password' => 'nullable|string',
-            'run_seeders' => 'boolean', // Add this validation
+            'run_seeders' => 'boolean',
         ]);
 
         try {
@@ -106,7 +107,7 @@ class InstallController extends Controller
                 return redirect()->back()->withErrors(['connection' => $connection['message']]);
             }
 
-            // Update the .env file with database settings AND change session driver to file temporarily
+            // Update the .env file with database settings
             $this->updateEnvFile([
                 'DB_CONNECTION' => 'mysql',
                 'DB_HOST' => $request->host,
@@ -119,6 +120,8 @@ class InstallController extends Controller
                 'CACHE_STORE' => 'file',
                 'APP_ENV' => 'local',
                 'APP_DEBUG' => 'true',
+                // Store seeder preference for later use
+                'RUN_SEEDERS' => $request->input('run_seeders', true) ? 'true' : 'false',
             ]);
 
             // Generate application key if it doesn't exist
@@ -150,21 +153,15 @@ class InstallController extends Controller
             ini_set('max_execution_time', 300); // 5 minutes
 
             try {
-                // Run migrations
+                // Run migrations only
                 $migrateOutput = Artisan::call('migrate:fresh', ['--force' => true]);
 
-                // Always run IndoRegionSeeder as it's required for the system to function
+                // Only run IndoRegionSeeder as it's required and doesn't depend on users
                 ini_set('memory_limit', '512M');
                 Artisan::call('db:seed', [
                     '--class' => 'Database\\Seeders\\IndoRegionSeeder',
                     '--force' => true
                 ]);
-
-                // Only run other seeders if user opted for it
-                if ($request->input('run_seeders', true)) { // Default to true for backward compatibility
-                    // Run remaining seeders with increased memory
-                    Artisan::call('db:seed', ['--force' => true]);
-                }
 
                 // After migrations are complete, switch back to database session driver
                 $this->updateEnvFile([
@@ -224,12 +221,30 @@ class InstallController extends Controller
             // Assign admin role to the user
             $user->assignRole('Admin');
 
+            // Now run the remaining seeders that require user relationships
+            if (env('RUN_SEEDERS', 'true') === 'true') {
+                try {
+                    ini_set('memory_limit', '512M');
+                    ini_set('max_execution_time', 300);
+
+                    // Run all remaining seeders (excluding IndoRegionSeeder which was already run)
+                    Artisan::call('db:seed', [
+                        '--force' => true,
+                        '--class' => 'DatabaseSeeder' // This will run all seeders except those already run
+                    ]);
+                } catch (\Exception $seederException) {
+                    // Log the error but don't fail the installation
+                    Log::warning('Some seeders failed to run: ' . $seederException->getMessage());
+                }
+            }
+
             // Create default settings if needed
             $this->createDefaultSettings();
 
-            // Remove the APP_INSTALLED setting from here, just set APP_DEBUG to false
+            // Clean up the RUN_SEEDERS env variable and set APP_DEBUG to false
             $this->updateEnvFile([
                 'APP_DEBUG' => 'false',
+                'RUN_SEEDERS' => null, // Remove this temporary variable
             ]);
 
             return redirect()->route('install.setupProfile');

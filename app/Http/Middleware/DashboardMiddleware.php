@@ -14,7 +14,7 @@ class DashboardMiddleware
             return redirect()->route('login');
         }
 
-        if (!$request->user()->hasRole('admin')) {
+        if (!$request->user()->hasRole('Admin')) {
             abort(403, 'Unauthorized action.');
         }
 
