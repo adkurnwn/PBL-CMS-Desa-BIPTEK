@@ -121,7 +121,7 @@ class InstallController extends Controller
                 'APP_ENV' => 'local',
                 'APP_DEBUG' => 'true',
                 // Store seeder preference for later use
-                'RUN_SEEDERS' => $request->input('run_seeders', true) ? 'true' : 'false',
+                'RUN_SEEDERS' => $request->input('run_seeders', true) ? true : false,
             ]);
 
             // Generate application key if it doesn't exist
@@ -230,7 +230,7 @@ class InstallController extends Controller
             $user->assignRole('Admin');
 
             // Now run the remaining seeders that require user relationships
-            if (env('RUN_SEEDERS', 'true') === 'true') {
+            if (env('RUN_SEEDERS', true) === true) {
                 try {
                     ini_set('memory_limit', '512M');
                     ini_set('max_execution_time', 300);
