@@ -153,13 +153,16 @@ class InstallController extends Controller
                 // Run migrations
                 $migrateOutput = Artisan::call('migrate:fresh', ['--force' => true]);
 
-                // Only run seeders if user opted for it
-                if ($request->input('run_seeders', true)) { // Default to true for backward compatibility
-                    // Run region seeders with increased memory
-                    ini_set('memory_limit', '512M');
+                // Always run IndoRegionSeeder as it's required for the system to function
+                ini_set('memory_limit', '512M');
+                Artisan::call('db:seed', [
+                    '--class' => 'Database\\Seeders\\IndoRegionSeeder',
+                    '--force' => true
+                ]);
 
-                    // Set environment for seeding
-                    config(['app.env' => 'installation']);
+                // Only run other seeders if user opted for it
+                if ($request->input('run_seeders', true)) { // Default to true for backward compatibility
+                    // Run remaining seeders with increased memory
                     Artisan::call('db:seed', ['--force' => true]);
                 }
 

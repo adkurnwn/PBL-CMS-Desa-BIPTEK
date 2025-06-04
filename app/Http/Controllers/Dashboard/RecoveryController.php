@@ -179,7 +179,7 @@ class RecoveryController extends Controller
         }
     }
 
-    private function getBackups()
+    public function getBackups()
     {
         $backups = [];
 

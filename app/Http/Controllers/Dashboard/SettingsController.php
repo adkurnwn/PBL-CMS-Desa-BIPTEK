@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\UpdateThemeRequest;
@@ -101,6 +102,10 @@ class SettingsController extends Controller
                 // Clear config cache to apply file drivers immediately
                 Artisan::call('config:clear');
 
+                // Update runtime config immediately (like InstallController)
+                Config::set('session.driver', 'file');
+                Config::set('cache.default', 'file');
+
                 // Step 2: Create backup of current database
                 $this->createDatabaseBackup();
 
@@ -108,40 +113,48 @@ class SettingsController extends Controller
                 $this->testDatabaseConnection($request);
 
                 // Step 4: Update database settings in .env
-                $envContent = File::get($envFilePath); // Re-read after file driver changes
+                $envContent = File::get($envFilePath);
                 $envContent = $this->updateDatabaseSettings($envContent, $request);
                 File::put($envFilePath, $envContent);
 
-                // Step 5: Clear config cache to reload new DB settings
-                Artisan::call('config:clear');
+                // Step 5: Update runtime database configuration (like InstallController)
+                Config::set('database.connections.mysql.host', $request->db_host);
+                Config::set('database.connections.mysql.port', $request->db_port);
+                Config::set('database.connections.mysql.database', $request->db_database);
+                Config::set('database.connections.mysql.username', $request->db_username);
+                Config::set('database.connections.mysql.password', $request->db_password);
 
-                config([
-                    'database.connections.mysql.host' => env('DB_HOST'),
-                    'database.connections.mysql.port' => env('DB_PORT'),
-                    'database.connections.mysql.database' => env('DB_DATABASE'),
-                    'database.connections.mysql.username' => env('DB_USERNAME'),
-                    'database.connections.mysql.password' => env('DB_PASSWORD'),
-                ]);
+                // Refresh database connection (like InstallController)
+                DB::purge('mysql');
+                DB::reconnect('mysql');
+
                 // Step 6: Run migrations on new database
                 $this->runMigrationsOnNewDatabase();
 
                 // Step 7: Switch session and cache drivers back to database
-                $envContent = File::get($envFilePath); // Re-read after DB changes
+                $envContent = File::get($envFilePath);
                 $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver, $originalCacheStore);
                 File::put($envFilePath, $envContent);
 
-                // Final config clear to apply database drivers
+                // Final config updates (like InstallController)
+                Config::set('session.driver', $originalSessionDriver ?: 'database');
+                Config::set('cache.default', $originalCacheStore ?: 'database');
                 Artisan::call('config:clear');
             } catch (Exception $e) {
-                // If anything fails, restore original drivers and return error
+                // Enhanced error handling with proper restoration
+                Log::error("Database change failed: " . $e->getMessage());
+
                 try {
                     $envContent = File::get($envFilePath);
                     $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver ?? 'database', $originalCacheStore ?? 'database');
                     File::put($envFilePath, $envContent);
+
+                    // Restore runtime config
+                    Config::set('session.driver', $originalSessionDriver ?? 'database');
+                    Config::set('cache.default', $originalCacheStore ?? 'database');
                     Artisan::call('config:clear');
                 } catch (Exception $restoreException) {
-                    // Log the restore failure but still show the original error
-                    $this->logHelper->logActivity('error', 'settings_restore', 'Failed to restore original drivers: ' . $restoreException->getMessage());
+                    Log::error('Failed to restore original drivers: ' . $restoreException->getMessage());
                 }
 
                 return redirect()->back()->with('error', 'Database change failed: ' . $e->getMessage());
@@ -403,8 +416,13 @@ class SettingsController extends Controller
 
     protected function switchToFileDrivers($envContent)
     {
+        // Update .env variables
         $envContent = $this->updateEnvVariable($envContent, 'SESSION_DRIVER', 'file');
         $envContent = $this->updateEnvVariable($envContent, 'CACHE_STORE', 'file');
+
+        // Force immediate runtime configuration changes (like InstallController)
+        Config::set('session.driver', 'file');
+        Config::set('cache.default', 'file');
 
         $this->logHelper->logActivity('update', 'drivers', 'Switched to file-based session and cache drivers');
 
@@ -424,23 +442,269 @@ class SettingsController extends Controller
     protected function runMigrationsOnNewDatabase()
     {
         try {
+            // Temporarily store the original logHelper to disable logging during migration
+            $originalLogHelper = $this->logHelper;
+
+            // Create a null logger that doesn't actually log to database
+            $this->logHelper = new class {
+                public function logActivity($action, $module, $description)
+                {
+                    // Log to file instead of database during migration
+                    Log::info("Activity (not logged to DB): {$action} - {$module} - {$description}");
+                }
+            };
+
+            // Clear all caches first (like InstallController does)
+            Artisan::call('config:clear');
+            Artisan::call('cache:clear');
+            Artisan::call('route:clear');
+
+            // Purge and reconnect to database
             DB::purge('mysql');
             DB::reconnect('mysql');
+
+            // Verify connection to new database
             $databaseName = DB::connection()->getDatabaseName();
             Log::info("Connected to database: " . $databaseName);
 
-            // Run migrations (this will create sessions and cache tables if needed)
-            Artisan::call('migrate', ['--force' => true]);
-            Log::info(Artisan::output());
+            // Set longer timeout for migration (like InstallController)
+            ini_set('max_execution_time', 300); // 5 minutes
+            ini_set('memory_limit', '512M'); // Increase memory limit
 
+            // Use migrate:fresh to ensure clean migration (like InstallController)
+            // This will drop all tables and recreate them
+            $migrateOutput = Artisan::call('migrate:fresh', ['--force' => true]);
 
-            // Check if migrations ran successfully
+            // Check if migrate command was successful
+            if ($migrateOutput !== 0) {
+                throw new Exception('Migration command failed with exit code: ' . $migrateOutput);
+            }
+
+            // Get migration output for debugging
             $output = Artisan::output();
+            Log::info("Migration output: " . $output);
 
-            // Log migration completion
-            $this->logHelper->logActivity('run', 'database_migration', 'Database migrations completed on new database');
+            // Verify critical tables exist after migration (but don't seed them)
+            $this->verifyMigrationTables();
+
+            // Now restore data from backup using RecoveryController
+            $this->restoreDataFromBackup();
+
+            // Restore the original logHelper after data is restored
+            $this->logHelper = $originalLogHelper;
+
+            // Now safe to log because users table has data
+            $this->logHelper->logActivity('run', 'database_migration', 'Database migration and data restoration completed successfully');
         } catch (Exception $e) {
+            // Restore original logHelper in case of error
+            if (isset($originalLogHelper)) {
+                $this->logHelper = $originalLogHelper;
+            }
+
+            Log::error("Migration failed: " . $e->getMessage());
             throw new Exception('Migration failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Verify that critical tables exist after migration (structure only)
+     */
+    protected function verifyMigrationTables()
+    {
+        $criticalTables = [
+            'users',
+            'sessions',
+            'cache',
+            'migrations',
+            'roles',
+            'permissions',
+            'positions',
+            'profiles',
+            'news',
+            'galleries',
+            'categories'
+        ];
+
+        $missingTables = [];
+
+        foreach ($criticalTables as $table) {
+            if (!Schema::hasTable($table)) {
+                $missingTables[] = $table;
+            }
+        }
+
+        if (!empty($missingTables)) {
+            throw new Exception('Critical tables missing after migration: ' . implode(', ', $missingTables));
+        }
+
+        Log::info('All critical table structures verified successfully');
+    }
+
+    /**
+     * Restore database from SQL dump file
+     */
+    protected function restoreDatabaseFromSql($sqlFile)
+    {
+        try {
+            // Increase limits for large database restoration
+            ini_set('max_execution_time', 600); // 10 minutes
+            ini_set('memory_limit', '1G'); // 1GB memory
+
+            $dbConnection = config('database.default');
+            $dbConfig = config('database.connections.' . $dbConnection);
+
+            // Disable foreign key checks and other optimizations
+            $optimizations = [
+                'SET FOREIGN_KEY_CHECKS=0;',
+                'SET UNIQUE_CHECKS=0;',
+                'SET AUTOCOMMIT=0;',
+                'SET SQL_LOG_BIN=0;'
+            ];
+
+            foreach ($optimizations as $sql) {
+                DB::statement($sql);
+            }
+
+            Log::info("Starting database restoration from: " . $sqlFile);
+
+            // Use MySQL command line for better performance
+            $passwordFlag = !empty($dbConfig['password'])
+                ? "-p" . escapeshellarg($dbConfig['password'])
+                : "";
+
+            $command = sprintf(
+                'mysql -h%s -u%s %s --single-transaction --routines --triggers %s < %s 2>&1',
+                escapeshellarg($dbConfig['host']),
+                escapeshellarg($dbConfig['username']),
+                $passwordFlag,
+                escapeshellarg($dbConfig['database']),
+                escapeshellarg($sqlFile)
+            );
+
+            Log::info("Executing command: " . str_replace($dbConfig['password'] ?? '', '***', $command));
+
+            $output = [];
+            $returnVar = 0;
+
+            // Execute with longer timeout
+            $timeStart = microtime(true);
+            exec($command, $output, $returnVar);
+            $timeEnd = microtime(true);
+
+            $executionTime = round($timeEnd - $timeStart, 2);
+            Log::info("Database restoration completed in {$executionTime} seconds");
+
+            if ($returnVar !== 0) {
+                $errorOutput = implode("\n", $output);
+                Log::error("Database import failed with return code {$returnVar}: " . $errorOutput);
+                throw new Exception('Database import failed: ' . $errorOutput);
+            }
+
+            // Re-enable foreign key checks
+            $cleanup = [
+                'SET FOREIGN_KEY_CHECKS=1;',
+                'SET UNIQUE_CHECKS=1;',
+                'SET AUTOCOMMIT=1;',
+                'COMMIT;'
+            ];
+
+            foreach ($cleanup as $sql) {
+                DB::statement($sql);
+            }
+
+            Log::info("Database restored successfully from: " . $sqlFile);
+        } catch (Exception $e) {
+            Log::error("SQL restoration failed: " . $e->getMessage());
+            throw new Exception('SQL restoration failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cleanup temporary files (copied from RecoveryController)
+     */
+    protected function cleanupTempFiles($path)
+    {
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $files = array_diff(scandir($path), ['.', '..']);
+
+        foreach ($files as $file) {
+            $filePath = $path . '/' . $file;
+
+            if (is_dir($filePath)) {
+                $this->cleanupTempFiles($filePath);
+            } else {
+                try {
+                    if (!unlink($filePath)) {
+                        Log::warning("Failed to unlink file: $filePath");
+                    }
+                } catch (\Throwable $e) {
+                    Log::error("Exception while deleting $filePath: " . $e->getMessage());
+                }
+            }
+        }
+
+        try {
+            if (!rmdir($path)) {
+                Log::warning("Failed to remove directory: $path");
+            }
+        } catch (\Throwable $e) {
+            Log::error("Exception while removing directory $path: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restore data from the most recent backup after migration
+     */
+    protected function restoreDataFromBackup()
+    {
+        try {
+            Log::info("Starting data restoration process...");
+
+            // Get the most recent backup
+            $recoveryController = new \App\Http\Controllers\Dashboard\RecoveryController();
+            $backups = $recoveryController->getBackups();
+
+            if (empty($backups)) {
+                Log::warning('No backups found to restore data from');
+                return;
+            }
+
+            // Get the most recent backup (first in the sorted array)
+            $latestBackup = $backups[0];
+            $backupFileName = $latestBackup['path'];
+
+            Log::info("Restoring data from backup: " . $backupFileName);
+
+            // Use RecoveryController's restore method directly
+            try {
+                // Call the restore method from RecoveryController
+                $recoveryController->restore($backupFileName);
+
+                Log::info("Data restoration completed successfully using RecoveryController");
+            } catch (Exception $e) {
+                // If RecoveryController restore fails, log the error
+                Log::error("RecoveryController restore failed: " . $e->getMessage());
+                throw new Exception('Failed to restore backup using RecoveryController: ' . $e->getMessage());
+            }
+        } catch (Exception $e) {
+            Log::error("Data restoration failed: " . $e->getMessage());
+            throw new Exception('Data restoration failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Format bytes to human readable format
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
