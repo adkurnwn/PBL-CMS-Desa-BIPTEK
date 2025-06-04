@@ -5,6 +5,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import { formatDate } from "@/Utility/useComment";
+import NotFound from "@/Components/NotFound.vue";
 
 const props = defineProps({
     slug: {
@@ -58,7 +59,11 @@ onMounted(() => {
 
 <template>
     <UserLayout>
-        <div class="min-h-screen bg-type1">
+        <div v-if="error">
+            <NotFound />
+        </div>
+        
+        <div v-else-if="!error" class="min-h-screen bg-type1">
             <div
                 class="max-w-screen-2xl w-full px-4 lg:px-20 mx-auto py-0 pt-32 pb-6 lg:pt-36"
             >
@@ -232,7 +237,7 @@ onMounted(() => {
                             class="flex flex-col w-full lg:w-1/3 px-1 lg:px-4 my-3 lg:my-0 font-merriweather"
                         >
                             <div
-                                class="flex bg-accent1 shadow-md rounded-sm p-3 space-x-2"
+                                class="flex bg-accent1 shadow-md rounded-lg rounded-b-none p-3 space-x-2"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
