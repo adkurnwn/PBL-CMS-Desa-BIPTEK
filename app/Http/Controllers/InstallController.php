@@ -230,7 +230,7 @@ class InstallController extends Controller
             $user->assignRole('Admin');
 
             // Now run the remaining seeders that require user relationships
-            if (env('RUN_SEEDERS', true) === true) {
+            if (filter_var(env('RUN_SEEDERS', true), FILTER_VALIDATE_BOOLEAN)) {
                 try {
                     ini_set('memory_limit', '512M');
                     ini_set('max_execution_time', 300);
