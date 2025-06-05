@@ -28,6 +28,9 @@ class FeedbackController extends Controller
             'email' => 'required|email|max:50',
             'bukti' => 'nullable|array|max:3', // Add array validation with max:3
             'bukti.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:1024',
+            'captcha' => 'required|captcha_api:' . $request->code . ',default'
+        ], [
+            'captcha.captcha_api' => 'Kode captcha tidak valid'
         ]);
 
         $data = [
