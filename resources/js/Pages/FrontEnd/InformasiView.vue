@@ -125,7 +125,7 @@ onMounted(fetchData);
                     </div>
                     <template v-else>
                         <EventCard
-                            v-for="eventItem in events"
+                            v-for="eventItem in events.slice(0, 3)"
                             :key="eventItem.id"
                             :isHome="true"
                             :event="eventItem"

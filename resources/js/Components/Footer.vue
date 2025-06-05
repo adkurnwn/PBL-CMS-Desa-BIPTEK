@@ -1,10 +1,17 @@
 <script setup>
+import { computed } from 'vue';
+import { parseMediaSosial } from '@/Utility/useParser';
+
 const props = defineProps({
     layout: {
         type: Object,
         default: () => ({}),
     },
 });
+
+const socialMedia = computed(() => 
+    parseMediaSosial(props.layout.media_sosial || '')
+);
 </script>
 <template>
     <div
@@ -25,7 +32,7 @@ const props = defineProps({
                         Pemerintah {{ layout.name }}
                     </h1>
                     <p
-                        class="text-white text-sm md:text-base max-w-[200px] leading-relaxed"
+                        class="text-white text-sm md:text-base leading-relaxed"
                     >
                         {{ layout.name }}, Kecamatan {{ layout.kecamatan }},
                         {{ layout.kabupaten }}, Provinsi {{ layout.provinsi }}.
@@ -42,10 +49,42 @@ const props = defineProps({
                 </h1>
                 <div class="space-y-3">
                     <div class="flex justify-center md:justify-start space-x-4 mb-4">
-                        <i class="bi bi-instagram text-xl hover:text-yellow-600 cursor-pointer"></i>
-                        <i class="bi bi-twitter-x text-xl hover:text-yellow-600 cursor-pointer"></i>
-                        <i class="bi bi-facebook text-xl hover:text-yellow-600 cursor-pointer"></i>
-                        <i class="bi bi-youtube text-xl hover:text-yellow-600 cursor-pointer"></i>
+                        <a 
+                            v-if="socialMedia.instagram.url" 
+                            :href="socialMedia.instagram.url" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="text-xl hover:text-yellow-600 cursor-pointer transition-colors duration-200"
+                        >
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a 
+                            v-if="socialMedia.x.url" 
+                            :href="socialMedia.x.url" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="text-xl hover:text-yellow-600 cursor-pointer transition-colors duration-200"
+                        >
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a 
+                            v-if="socialMedia.facebook.url" 
+                            :href="socialMedia.facebook.url" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="text-xl hover:text-yellow-600 cursor-pointer transition-colors duration-200"
+                        >
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a 
+                            v-if="socialMedia.youtube.url" 
+                            :href="socialMedia.youtube.url" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="text-xl hover:text-yellow-600 cursor-pointer transition-colors duration-200"
+                        >
+                            <i class="bi bi-youtube"></i>
+                        </a>
                     </div>
                     <p class="text-white text-sm md:text-base">
                         <i class="bi bi-telephone text-sm mr-2"></i>{{ layout.phone }}

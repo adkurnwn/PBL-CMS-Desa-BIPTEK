@@ -212,7 +212,7 @@ onMounted(() => {
                 >
                     <button
                         @click="goToPage(pagination.current_page - 1)"
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 disabled:opacity-50 text-type1 text-xs"
                         :disabled="pagination.current_page === 1"
                     >
                         &lt;
@@ -226,7 +226,7 @@ onMounted(() => {
                     >{{ p }}</span>
                     <button
                         @click="goToPage(pagination.current_page + 1)"
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 disabled:opacity-50 text-type1 text-xs"
                         :disabled="
                             pagination.current_page === pagination.last_page
                         "

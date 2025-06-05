@@ -28,6 +28,9 @@ class Profile extends Model
         'organization_image',
         'lembaga',
         'fasilitas',
+        'tipe_pemerintahan',
+        'media_sosial',
+        'batas_desa',
         'primary_color',
         'secondary_color'
     ];

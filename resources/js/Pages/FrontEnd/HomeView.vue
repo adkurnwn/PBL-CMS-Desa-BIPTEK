@@ -6,11 +6,13 @@ import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import useApiFetch from '@/Utility/useApiFetch';
 import { Link } from '@inertiajs/vue3';
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
 
 const events = ref([]);
 const news = ref([]);
 const gallery = ref({});
 const produkDesa = ref([]);
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 const fetchData = async () => {
   const eventApi = useApiFetch();
@@ -49,7 +51,12 @@ onMounted(() => {
 <template>
   <UserLayout v-slot="{ layout }">
     <header class="relative flex flex-col items-center justify-center w-full h-screen bg-red-100">
-      <img :src="`/storage/${layout.hero_image}`" alt="Hero Image" class="absolute z-0 w-full h-screen object-cover" />
+      <img 
+        :src="getImageSrc(`/storage/${layout.hero_image}`)" 
+        alt="Hero Image" 
+        class="absolute z-0 w-full h-screen object-cover"
+        @error="handleImageError" 
+      />
       <div class="absolute bg-black z-0 w-full h-screen opacity-60">
 
       </div>
@@ -154,20 +161,20 @@ onMounted(() => {
             class="flex flex-col w-full justify-between space-y-4">
             <!-- First row - 2 images -->
             <div class="flex flex-row w-full justify-between space-x-2">
-              <img v-if="gallery.images[0]" :src="`/storage/${gallery.images[0].path}`" :alt="gallery.images[0].alt"
-                class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2" />
-              <img v-if="gallery.images[1]" :src="`/storage/${gallery.images[1].path}`" :alt="gallery.images[1].alt"
-                class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover" />
+              <img v-if="gallery.images[0]" :src="getImageSrc(`/storage/${gallery.images[0].path}`)" :alt="gallery.images[0].alt"
+                class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2" @error="handleImageError"/>
+              <img v-if="gallery.images[1]" :src="getImageSrc(`/storage/${gallery.images[1].path}`)" :alt="gallery.images[1].alt"
+                class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"  @error="handleImageError"/>
             </div>
 
             <!-- Second row - 3 images -->
             <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
-              <img v-if="gallery.images[2]" :src="`/storage/${gallery.images[2].path}`" :alt="gallery.images[2].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2" />
-              <img v-if="gallery.images[3]" :src="`/storage/${gallery.images[3].path}`" :alt="gallery.images[3].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2" />
-              <img v-if="gallery.images[4]" :src="`/storage/${gallery.images[4].path}`" :alt="gallery.images[4].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover" />
+              <img v-if="gallery.images[2]" :src="getImageSrc(`/storage/${gallery.images[2].path}`)" :alt="gallery.images[2].alt"
+                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"  @error="handleImageError"/>
+              <img v-if="gallery.images[3]" :src="getImageSrc(`/storage/${gallery.images[3].path}`)" :alt="gallery.images[3].alt"
+                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"  @error="handleImageError"/>
+              <img v-if="gallery.images[4]" :src="getImageSrc(`/storage/${gallery.images[4].path}`)" :alt="gallery.images[4].alt"
+                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"  @error="handleImageError"/>
             </div>
           </div>
 
