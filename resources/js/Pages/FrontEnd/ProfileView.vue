@@ -59,7 +59,7 @@ const handleCoordinatesUpdate = (coords) => {
 
             </article>
         </header>
-        <main class="flex flex-col font-merriweather px-[6.56%] space-y-10 xl:mt-24 md:mt-6 mt-5 xl:mb-24 md:mb-6 mb-5">
+        <main class="max-w-screen-4xl mx-auto w-full px-[6.56%] font-merriweather space-y-10 xl:mt-24 md:mt-6 mt-5 xl:mb-24 md:mb-6 mb-5">
             <!-- Visi & Misi -->
             <article
                 class="flex xl:flex-row flex-col relative justify-center w-full font-merriweather bg-type1 lg:space-x-20">
@@ -219,9 +219,9 @@ const handleCoordinatesUpdate = (coords) => {
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.
                 </p>
-                <div class="flex flex-wrap gap-5 mt-3 justify-center">
+                <div class="flex flex-wrap lg:grid lg:grid-cols-4 gap-5 mt-3">
                     <!-- Grid 1 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="48px" fill="#DEA521">
                             <path
@@ -233,7 +233,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Penduduk</p>
                     </div>
                     <!-- Grid 2 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path
@@ -245,7 +245,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Kepala Keluarga</p>
                     </div>
                     <!-- Grid 3 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path
@@ -257,7 +257,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Penduduk Laki-Laki</p>
                     </div>
                     <!-- Grid 4 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path

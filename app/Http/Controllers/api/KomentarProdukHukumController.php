@@ -87,7 +87,7 @@ class KomentarProdukHukumController extends Controller
         ];
 
         $request->validate($rules, [
-            'captcha.captcha_api' => 'Invalid captcha code'
+            'captcha.captcha_api' => 'Kode captcha tidak valid',
         ]);
 
         $produkhukum = ProdukHukum::where('slug', $request->id_produk_hukum)->firstOrFail();
