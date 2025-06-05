@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LPolygon } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 // Define emits
-const emit = defineEmits(['coordinates-found']);
+const emit = defineEmits(["coordinates-found"]);
 
 const locationName = computed(() => {
     if (!props.locationName || props.locationName === "INDONESIA") {
@@ -105,10 +105,10 @@ const processLocationResult = (place) => {
     zoom.value = props.initialZoom;
 
     // Emit coordinates and display_name to parent component
-    emit('coordinates-found', {
+    emit("coordinates-found", {
         lat: place.lat,
         lon: place.lon,
-        display_name: place.display_name
+        display_name: place.display_name,
     });
 
     if (place.geojson) {
