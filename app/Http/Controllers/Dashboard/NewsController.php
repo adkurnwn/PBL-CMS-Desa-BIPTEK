@@ -260,7 +260,7 @@ class NewsController extends Controller
 
     /**
      * Process image placeholders in content and replace with HTML img tags
-     * Modified to append ImageUploader images at the end
+     * Modified to exclude the first image from content and append remaining images at the end
      */
     private function processImagePlaceholdersInContent($content, $uploadedImages)
     {
@@ -292,10 +292,12 @@ class NewsController extends Controller
         // Replace preview classes with final classes
         $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="w-full h-auto block my-2"', $processedContent);
 
-        // Now append all ImageUploader images at the end
-        if (!empty($uploadedImages)) {
+        // Now append images starting from index 1 (skip the first image) at the end
+        if (!empty($uploadedImages) && count($uploadedImages) > 1) {
             $appendedImages = '';
-            foreach ($uploadedImages as $imageData) {
+            // Skip the first image (index 0) and append the rest
+            for ($i = 1; $i < count($uploadedImages); $i++) {
+                $imageData = $uploadedImages[$i];
                 $appendedImages .= sprintf(
                     '<img src="%s" alt="%s" class="w-full h-auto block my-2" />',
                     asset('storage/' . $imageData['path']),

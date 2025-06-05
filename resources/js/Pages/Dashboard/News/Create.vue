@@ -90,7 +90,8 @@ const processContentForSubmission = (content) => {
     let processedContent = content
 
     // Replace blob URLs and images with data-is-placeholder="true" with indexed placeholders
-    let imageIndex = 0
+    // Start from index 1 to skip the first image
+    let imageIndex = 1
 
     // First, replace images with data-is-placeholder attribute
     const imgWithPlaceholderRegex = /<img[^>]*data-is-placeholder="true"[^>]*>/g
