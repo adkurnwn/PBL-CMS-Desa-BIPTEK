@@ -94,7 +94,8 @@ const tableHeaders = [
         sortable: false,
         nowrap: true,
         width: '14%',  // Changed from '250px' to percentage
-        transform: 'capitalize'
+        transform: 'capitalize',
+        truncate: true,
     },
     {
         label: 'Deskripsi',
@@ -293,7 +294,7 @@ onMounted(() => {
                                     :text="item.action" />
                             </template>
                             <template #item.Modul="{ item }">
-                                <div class="italic">
+                                <div class="italic truncate">
                                     {{ (item.module).toUpperCase() }}
                                 </div>
                             </template>
