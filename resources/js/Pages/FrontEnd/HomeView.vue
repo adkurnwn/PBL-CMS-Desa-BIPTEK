@@ -51,18 +51,18 @@ onMounted(() => {
 <template>
   <UserLayout v-slot="{ layout }">
     <header class="relative flex flex-col items-center justify-center w-full h-screen bg-red-100">
-      <img 
-        :src="getImageSrc(`/storage/${layout.hero_image}`)" 
-        alt="Hero Image" 
-        class="absolute z-0 w-full h-screen object-cover"
-        @error="handleImageError" 
-      />
+      <img :src="getImageSrc(`/storage/${layout.hero_image}`)" alt="Hero Image"
+        class="absolute z-0 w-full h-screen object-cover" @error="handleImageError" />
       <div class="absolute bg-black z-0 w-full h-screen opacity-60">
 
       </div>
       <div class="absolute z-10 font-merriweather text-type1 mt-4 px-6 md:px-0">
-        <h1 class=" justify-center items-center text-center text-4xl md:text-5xl 3xl:text-6xl 4xl:text-7xl font-semibold">Selamat Datang</h1>
-        <h2 class=" justify-center items-center text-center text-md md:text-xl 3xl:text-2xl 4xl:text-3xl  font-thin mt-1 md:mt-4 3xl:mt-6">Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
+        <h1
+          class=" justify-center items-center text-center text-4xl md:text-5xl 3xl:text-6xl 4xl:text-7xl font-semibold">
+          Selamat Datang</h1>
+        <h2
+          class=" justify-center items-center text-center text-md md:text-xl 3xl:text-2xl 4xl:text-3xl  font-thin mt-1 md:mt-4 3xl:mt-6">
+          Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
       </div>
     </header>
     <main class="max-w-screen-2xl mx-auto w-full">
@@ -88,7 +88,8 @@ onMounted(() => {
 
         <!-- Image Section -->
         <figure class="w-48 h-48 my-12 lg:w-80 lg:h-80 flex items-center justify-center rounded-full">
-          <img src="../../../images/profile.jpg" alt="Desa Pao Pao" class=" h-full object-cover rounded-full" />
+          <img :src="getImageSrc(`/storage/${layout.circle_image}`)" alt="Hero Image"
+            class=" h-full object-cover rounded-full" @error="handleImageError"/>
         </figure>
       </article>
 
@@ -115,7 +116,7 @@ onMounted(() => {
             Selengkapnya >>
           </a>
 
-      </article>
+        </article>
 
 
         <!-- Event Terdekat-->
@@ -161,28 +162,35 @@ onMounted(() => {
             class="flex flex-col w-full justify-between space-y-4">
             <!-- First row - 2 images -->
             <div class="flex flex-row w-full justify-between space-x-2">
-              <img v-if="gallery.images[0]" :src="getImageSrc(`/storage/${gallery.images[0].path}`)" :alt="gallery.images[0].alt"
-                class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2" @error="handleImageError"/>
-              <img v-if="gallery.images[1]" :src="getImageSrc(`/storage/${gallery.images[1].path}`)" :alt="gallery.images[1].alt"
-                class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"  @error="handleImageError"/>
+              <img v-if="gallery.images[0]" :src="getImageSrc(`/storage/${gallery.images[0].path}`)"
+                :alt="gallery.images[0].alt" class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
+                @error="handleImageError" />
+              <img v-if="gallery.images[1]" :src="getImageSrc(`/storage/${gallery.images[1].path}`)"
+                :alt="gallery.images[1].alt" class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
+                @error="handleImageError" />
             </div>
 
             <!-- Second row - 3 images -->
             <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
-              <img v-if="gallery.images[2]" :src="getImageSrc(`/storage/${gallery.images[2].path}`)" :alt="gallery.images[2].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"  @error="handleImageError"/>
-              <img v-if="gallery.images[3]" :src="getImageSrc(`/storage/${gallery.images[3].path}`)" :alt="gallery.images[3].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"  @error="handleImageError"/>
-              <img v-if="gallery.images[4]" :src="getImageSrc(`/storage/${gallery.images[4].path}`)" :alt="gallery.images[4].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"  @error="handleImageError"/>
+              <img v-if="gallery.images[2]" :src="getImageSrc(`/storage/${gallery.images[2].path}`)"
+                :alt="gallery.images[2].alt"
+                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
+                @error="handleImageError" />
+              <img v-if="gallery.images[3]" :src="getImageSrc(`/storage/${gallery.images[3].path}`)"
+                :alt="gallery.images[3].alt"
+                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
+                @error="handleImageError" />
+              <img v-if="gallery.images[4]" :src="getImageSrc(`/storage/${gallery.images[4].path}`)"
+                :alt="gallery.images[4].alt" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
+                @error="handleImageError" />
             </div>
           </div>
 
-        <!-- No images fallback -->
-        <div v-else class="text-center py-8 text-gray-500">
-          Belum ada gambar dalam galeri
-        </div>
-      </article>
+          <!-- No images fallback -->
+          <div v-else class="text-center py-8 text-gray-500">
+            Belum ada gambar dalam galeri
+          </div>
+        </article>
 
 
         <!-- Produk Unggulan-->
