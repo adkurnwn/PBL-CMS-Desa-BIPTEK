@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UserLayout from '@/Layouts/UserLayout.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const selectedDate = ref('');
 const laporanDana = ref([
@@ -29,6 +29,17 @@ const laporanDana = ref([
     file: '',
   },
 ]);
+const pagination = ref({
+  current_page: 1,
+  last_page: 2,
+});
+
+const totalPages = computed(() => pagination.value.last_page);
+
+function goToPage(page: number) {
+  if (page < 1 || page > pagination.value.last_page) return;
+  pagination.value.current_page = page;
+}
 
 function lihatDetail(id) {
   // Ganti dengan navigasi ke detail jika ada
@@ -39,28 +50,28 @@ function lihatDetail(id) {
 <template>
   <UserLayout>
     <div class="min-h-screen bg-type1">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 xl:px-8 py-40 font-merriweather">
-        <div class="flex flex-col items-center justify-center mb-12">
-          <h1 class="text-2xl font-bold text-accent1">Laporan Dana Desa</h1>
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 xl:px-8 py-40 font-merriweather">
+        <div class="flex flex-col items-center justify-center sm:mb-10 xl:mb-12">
+          <h1 class="sm:text-xl xl:text-2xl font-bold text-accent1">Laporan Dana Desa</h1>
         </div>
-        <div class="flex items-center justify-between mt-4 mb-8">
-          <h1 class="text-xl text-accent2 flex items-center">
-            <span class="material-symbols-outlined mr-2 text-[1.3em] align-middle">description</span>
+        <div class="flex sm:flex-col xl:flex-row xl:items-center justify-between mt-4 mb-8">
+          <h1 class="sm:text-md xl:text-xl text-accent2 flex">
+            <span class="material-symbols-outlined mr-2 sm:text-base xl:text-xl align-middle">description</span>
             Laporan Dana Desa
           </h1>
            <!-- Filter Bar -->
-          <div class="flex flex-wrap gap-2 text-sm">
+          <div class="flex flex-wrap gap-2 text-sm sm:mt-2 xl:mt-0 sm:justify-center xl:justify-end">
             <!-- Nomor Peraturan -->
             <div class="relative">
               <input
                 type="text"
                 placeholder="Cari laporan dana desa..."
-                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-80"
+                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 sm:w-96 xl:w-80"
               />
               <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
             </div>
               <!-- Tahun Penetapan -->
-              <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 w-40">
+              <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 sm:w-52 xl:w-40">
                 <option>Tahun</option>
               </select>
           </div>
@@ -116,6 +127,33 @@ function lihatDetail(id) {
           <div v-if="laporanDana.length === 0" class="col-span-full text-center py-12">
             <p class="text-gray-500 text-lg">Belum ada laporan dana yang tersedia.</p>
           </div>
+        </div>
+        <!-- Pagination -->
+        <div
+          v-if="pagination && pagination.last_page > 1"
+          class="flex justify-center mt-5 gap-2"
+        >
+          <button
+            @click="goToPage(pagination.current_page - 1)"
+            class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs disabled:opacity-50"
+            :disabled="pagination.current_page === 1"
+          >
+            &lt;
+          </button>
+          <span
+            v-for="p in totalPages"
+            :key="p"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-xs cursor-pointer"
+            :class="pagination.current_page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+            @click="goToPage(p)"
+          >{{ p }}</span>
+          <button
+            @click="goToPage(pagination.current_page + 1)"
+            class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs disabled:opacity-50"
+            :disabled="pagination.current_page === pagination.last_page"
+          >
+            &gt;
+          </button>
         </div>
       </div>
     </div>
