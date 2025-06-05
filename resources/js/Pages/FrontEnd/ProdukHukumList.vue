@@ -150,39 +150,34 @@ onMounted(() => {
                         class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
                         style="text-decoration: none;"
                     >
-                        <!--Nomor Urut-->
-                        <span class="text-accent1 mr-3 text-sm">{{ idx + 1 }}.</span>
-                        <!--Konten-->
-                        <div class="flex-1 min-w-0">
-                            <!-- Kategori Berita -->
-                            <span
-                                v-if="dokumen.category"
-                                class="inline-block px-2 py-0.5 text-xs font-semibold text-white bg-accent1 rounded-full"
-                            >
-                                {{ dokumen.category }}
-                            </span>
-
-                            <!-- Judul -->
-                            <div
-                                class="text-sm font-medium text-accent1 mb-1 truncate"
-                            >
-                                {{ dokumen.title }}
+                        <div class="flex-1 min-w-0 flex flex-col mt-2">
+                            <!-- Nomor & Judul -->
+                            <span class="text-accent1 mr-3 text-sm flex-shrink-0">{{ idx + 1 }}. <span class="ml-5">{{ dokumen.title }}</span></span>
+                            <!-- Kategori -->
+                            <div class="ml-8">
+                                <span
+                                    v-if="dokumen.category"
+                                    class="inline-block px-2 py-0.5 text-xs font-semibold text-white bg-accent1 rounded-full whitespace-nowrap mx-auto"
+                                >
+                                    {{ dokumen.category }}
+                                </span>
                             </div>
-
-                            <!-- Metadata -->
-                            <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1">
-                                <span>
-                                   <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span> 
-                                    Ditetapkan: {{ formatDate(dokumen.date) }}
-                                </span>
-                                <span>
-                                    <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
-                                    Dilihat {{ dokumen.views || 0 }} kali
-                                </span>
-                                <span>
-                                    <span class="material-symbols-outlined align-middle text-sm mr-1">file_save</span>
-                                    Diunduh {{ dokumen.downloads || 0 }} kali
-                                </span>
+                            <div class="flex items-center gap-2 ml-8 mt-1 mb-2">
+                                <!-- Metadata -->
+                                <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1">
+                                    <span>
+                                        <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span>
+                                        Ditetapkan: {{ formatDate(dokumen.date) }}
+                                    </span>
+                                    <span>
+                                        <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
+                                        Dilihat {{ dokumen.views || 0 }} kali
+                                    </span>
+                                    <span>
+                                        <span class="material-symbols-outlined align-middle text-sm mr-1">file_save</span>
+                                        Diunduh {{ dokumen.downloads || 0 }} kali
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <!--Tombol Download-->

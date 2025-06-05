@@ -25,3 +25,6 @@ switch ($frequency) {
     default:
         $backupCommand->dailyAt('00:00');
 }
+
+
+Schedule::command('app:send-event-reminders')->everyMinute();

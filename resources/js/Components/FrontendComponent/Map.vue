@@ -19,6 +19,9 @@ const props = defineProps({
     kodePos: String,
 });
 
+// Define emits
+const emit = defineEmits(['coordinates-found']);
+
 const locationName = computed(() => {
     if (!props.locationName || props.locationName === "INDONESIA") {
         return null;
@@ -100,6 +103,13 @@ const processLocationResult = (place) => {
     mapCenter.value = [parseFloat(place.lat), parseFloat(place.lon)];
     center.value = mapCenter.value;
     zoom.value = props.initialZoom;
+
+    // Emit coordinates and display_name to parent component
+    emit('coordinates-found', {
+        lat: place.lat,
+        lon: place.lon,
+        display_name: place.display_name
+    });
 
     if (place.geojson) {
         try {

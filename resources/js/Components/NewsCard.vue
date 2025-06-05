@@ -1,7 +1,8 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
+import { computed } from "vue";
 
-defineProps({
+const props = defineProps({
     isHome: {
         type: Boolean,
         default: false,
@@ -23,6 +24,22 @@ defineProps({
         type: String,
         required: true, // Ensure the href is passed
     },
+});
+
+const processedContent = computed(() => {
+    if (!props.news.content) return "";
+
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = props.news.content;
+
+    // Remove images, videos, audio, iframes, and other media elements
+    const mediaElements = tempDiv.querySelectorAll(
+        "img, video, audio, iframe, embed, object, source, track"
+    );
+    mediaElements.forEach((element) => element.remove());
+
+    return tempDiv.innerHTML;
 });
 </script>
 
@@ -71,8 +88,8 @@ defineProps({
                         {{ news.title }}
                     </h2>
                     <p
-                        class="pt-2 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis min-h-16 text-justify"
-                        v-html="news.content"
+                        class="pt-2 text-sm font-thin text-type2 line-clamp-3 overflow-hidden text-ellipsis min-h-16 text-justify content-no-media"
+                        v-html="processedContent"
                     ></p>
                 </div>
 
@@ -103,7 +120,7 @@ defineProps({
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 height="24px"
-                                viewBox="0 -960 960 960"
+                                viewBox="http://www.w3.org/2000/svg"
                                 width="24px"
                                 fill="currentColor"
                                 class="text-semiBlack"
@@ -129,5 +146,15 @@ defineProps({
     overflow: hidden;
     text-overflow: ellipsis;
     min-height: 3rem; /* Adjust this value based on your font size and line height */
+}
+
+/* Hide any remaining media elements as fallback */
+.content-no-media img,
+.content-no-media video,
+.content-no-media audio,
+.content-no-media iframe,
+.content-no-media embed,
+.content-no-media object {
+    display: none !important;
 }
 </style>

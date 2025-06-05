@@ -8,7 +8,7 @@
                       <div class="flex flex-col">
                           <h2 class="text-2xl md:text-3xl font-semibold text-secondary">{{ formattedDate }}</h2>
                           <h2 class="text-2xl md:text-3xl font-semibold text-secondary">{{ year }}</h2>
-                          <h3 class="text-lg md:text-xl font-semibold text-white line-clamp-2 h-14 items-center justify-center mt-4 mb-2">{{ event.title }}</h3>
+                          <h3 class="text-lg md:text-xl font-semibold text-white line-clamp-2 items-center justify-center mt-4 mb-2">{{ event.title }}</h3>
                       </div>
                       <div class="flex flex-col justify-between">
                           <div class="flex flex-col text-lg space-y-1">
@@ -27,7 +27,7 @@
                           </div>
                       </div>
                       <div class="lg:absolute md:bottom-0 md:right-0 flex flex-row space-x-4 md:p-3 px-4 hover:scale-105 transition-transform">
-                          <button @click="flipCard" class="bg-accent1 text-white text-sm mx-auto px-8 py-2 mt-4 rounded-lg">
+                          <button @click="flipCard" class="bg-accent1 text-white text-sm mx-auto px-2 py-2 mt-4 rounded-md">
                               Atur Pengingat
                           </button>
                       </div>
@@ -78,7 +78,7 @@
                                   <button 
                                       type="button"
                                       @click="flipCard"
-                                      class="bg-type2 text-white text-sm px-8 py-2 rounded-lg"
+                                      class="bg-secondary text-white text-sm px-8 py-2 rounded-lg"
                                   >
                                       Batalkan
                                   </button>
