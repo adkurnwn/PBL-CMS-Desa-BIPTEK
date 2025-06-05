@@ -61,8 +61,10 @@ const albums = ref([
   },
 ]);
 
-const page = ref(1);
+const pageAlbumDesa = ref(1);
 const totalPages = 2;
+const pageGaleriTerkini = ref(1);
+const totalPagesGaleriTerkini = 2;
 </script>
 
 <template>
@@ -153,24 +155,24 @@ const totalPages = 2;
             <div class="flex justify-center mt-5 gap-2">
                 <button
                     class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                    :disabled="page === 1"
-                    @click="page--"
+                    :disabled="pageAlbumDesa === 1"
+                    @click="pageAlbumDesa--"
                 >&lt;</button>
                 <button
                     v-for="p in totalPages"
                     :key="p"
                     class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                    :class="page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
-                    @click="page = p"
+                    :class="pageAlbumDesa === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                    @click="pageAlbumDesa = p"
                 >{{ p }}</button>
                 <button
                     class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                    :disabled="page === totalPages"
-                    @click="page++"
+                    :disabled="pageAlbumDesa === totalPages"
+                    @click="pageAlbumDesa++"
                 >&gt;</button>
             </div>
             </article>
-            <!--Galeri Terkni-->
+            <!--Galeri Terkini-->
             <article class="w-full px-20 flex flex-col pb-8 lg:pb-24 bg-type1 font-merriweather space-y-5">
               <h1 class="text-xl font-bold text-gray-800">
                 Galeri Terkini
@@ -203,6 +205,26 @@ const totalPages = 2;
                         alt="Gambar 5"
                         class="w-full sm:w-1/3 h-[200px] lg:w-96 rounded-xl object-cover"
                     />
+                </div>
+                <!-- Pagination -->
+                <div class="flex justify-center mt-5 gap-2">
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="pageGaleriTerkini === 1"
+                        @click="pageGaleriTerkini--"
+                    >&lt;</button>
+                    <button
+                        v-for="p in totalPagesGaleriTerkini"
+                        :key="p"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
+                        :class="pageGaleriTerkini === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                        @click="pageGaleriTerkini = p"
+                    >{{ p }}</button>
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="pageGaleriTerkini === totalPagesGaleriTerkini"
+                        @click="pageGaleriTerkini++"
+                    >&gt;</button>
                 </div>
             </article>
         </main>

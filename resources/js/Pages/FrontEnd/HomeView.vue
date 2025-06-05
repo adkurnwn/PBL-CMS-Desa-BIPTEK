@@ -54,21 +54,20 @@ onMounted(() => {
 
       </div>
       <div class="absolute z-10 font-merriweather text-type1 mt-4 px-6 md:px-0">
-        <h1 class=" justify-center items-center text-center text-4xl md:text-6xl font-semibold">Selamat Datang</h1>
-        <h2 class=" justify-center items-center text-center text-md md:text-[24px] font-thin mt-1 md:mt-4">Sumber
-          informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
+        <h1 class=" justify-center items-center text-center text-4xl md:text-5xl 3xl:text-6xl 4xl:text-7xl font-semibold">Selamat Datang</h1>
+        <h2 class=" justify-center items-center text-center text-md md:text-xl 3xl:text-2xl 4xl:text-3xl  font-thin mt-1 md:mt-4 3xl:mt-6">Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
       </div>
     </header>
-    <main class="w-full">
+    <main class="max-w-screen-2xl mx-auto w-full">
       <!-- Bagian Selamat Datang -->
       <article
         class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 px-[13.91%] py-10 pt-4 md:pt-16 lg:pt-40">
         <!-- Text Section -->
         <section class="flex flex-col  w-2/3 space-y-3 md:mx-8">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2 text-center lg:text-left">
+          <h1 class="text-xl 3xl:md:text-3xl xl:text-xl font-semibold text-accent2 text-center lg:text-left">
             Selamat datang di website resmi Pemerintah {{ layout.name }}!
           </h1>
-          <div class="space-y-3 md:text-xl text-semiBlack text-justify font-thin">
+          <div class="space-y-3 3xl:md:text-xl  text-semiBlack text-justify font-thin">
             <p>
               Kami berkomitmen untuk menghadirkan layanan yang transparan, informatif, dan bermanfaat bagi seluruh
               masyarakat serta para pengunjung yang ingin mengenal desa kami lebih dekat.
@@ -82,7 +81,7 @@ onMounted(() => {
 
         <!-- Image Section -->
         <figure class="w-48 h-48 my-12 lg:w-80 lg:h-80 flex items-center justify-center rounded-full">
-          <img :src="`/storage/${layout.circle_image}`" :alt="`${layout.name}`" class=" h-full object-cover rounded-full" />
+          <img src="../../../images/profile.jpg" alt="Desa Pao Pao" class=" h-full object-cover rounded-full" />
         </figure>
       </article>
 
@@ -109,7 +108,7 @@ onMounted(() => {
             Selengkapnya >>
           </a>
 
-        </article>
+      </article>
 
 
         <!-- Event Terdekat-->
@@ -172,11 +171,11 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- No images fallback -->
-          <div v-else class="text-center py-8 text-gray-500">
-            Belum ada gambar dalam galeri
-          </div>
-        </article>
+        <!-- No images fallback -->
+        <div v-else class="text-center py-8 text-gray-500">
+          Belum ada gambar dalam galeri
+        </div>
+      </article>
 
 
         <!-- Produk Unggulan-->

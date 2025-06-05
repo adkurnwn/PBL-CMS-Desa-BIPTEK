@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject } from "vue";
 import useComments from "@/Utility/useComment";
 
 const props = defineProps({
@@ -20,7 +20,7 @@ const props = defineProps({
         default: false,
     },
 });
-
+const showToast = inject("showToast");
 // Determine content type from commentApiBase
 const contentType = computed(() => {
     return props.commentApiBase.includes("produk-hukum")
@@ -148,7 +148,7 @@ onMounted(() => {
             </a>
             <button
                 @click="copyToClipboard"
-                class="mr-4 flex items-center text-accent2"
+                class="flex items-center text-accent2"
                 title="Salin Link"
             >
                 <i class="bi bi-clipboard md:text-xl relative"></i>

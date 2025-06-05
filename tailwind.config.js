@@ -51,9 +51,9 @@ export default {
                 'sm': '640px',
                 md: '800px', // Mengubah md dari 768px menjadi 800px
                 lg: '1025px', // Mengubah lg dari 1024px menjadi 1025px
-                xl: '1280px',
-                '2xl': '1440px',
-                '3xl': '1536px',
+                xl: '1280px', // UKURAN FHD 150%
+                '2xl': '1440px', //
+                '3xl': '1536px', //// UKURAN FHD 125%
                 '4xl': '1920px', // Your default design width
             },
             maxWidth: {
