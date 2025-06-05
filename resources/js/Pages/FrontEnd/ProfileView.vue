@@ -317,7 +317,12 @@ const handleCoordinatesUpdate = (coords) => {
                             Koordinat
                         </p>
                         <p class="w-1/2 text-accent2 -ml-4">
-                            : {{ coordinates.lat && coordinates.lon ? `${coordinates.lat}, ${coordinates.lon}` : '-4.498, 119.600' }}
+                            :
+                            {{
+                                coordinates.lat && coordinates.lon
+                                    ? `${coordinates.lat}, ${coordinates.lon}`
+                                    : "-4.498, 119.600"
+                            }}
                         </p>
                     </div>
                     <div class="flex w-full">
@@ -342,7 +347,7 @@ const handleCoordinatesUpdate = (coords) => {
                                 .filter(Boolean)
                                 .join(' ')
                         "
-                        :provinsi="profile?.name"
+                        :kelurahan="profile?.name"
                         :kode-pos="profile.kode_pos"
                         @coordinates-found="handleCoordinatesUpdate"
                     />
@@ -366,7 +371,10 @@ const handleCoordinatesUpdate = (coords) => {
                     class="xl:mt-32 mt-16 xl:-ml-80 ml-12 xl:pr-4 text-accent1 xl:text-xl text-sm"
                 >
                     <p class="font-bold -ml-16">
-                        {{ coordinates.display_name || 'GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru, Sulawesi Selatan 90761' }}
+                        {{
+                            coordinates.display_name ||
+                            "GJ22+QCF, Pao-Pao, Kec. Tanete Rilau, Kabupaten Barru, Sulawesi Selatan 90761"
+                        }}
                     </p>
                 </div>
             </div>
