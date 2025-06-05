@@ -4,10 +4,12 @@ import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
 import { useApiCache } from "@/Utility/useApiCache";
 import { parseFasilitas, parseMisi, parseBatas } from "@/Utility/useParser";
+import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
 
 const profile = ref({});
 const demografi = ref({});
 const coordinates = ref({ lat: null, lon: null, display_name: null });
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 const fetchData = async () => {
     const profileApi = useApiCache("profileData", "/api/profile/profile");
@@ -27,7 +29,7 @@ const missionList = computed(() => parseMisi(profile.value.mission || ""));
 const fasilitasList = computed(() =>
     parseFasilitas(profile.value.fasilitas || "")
 );
-const batasList = computed(() => 
+const batasList = computed(() =>
     parseBatas(profile.value.batas_desa || "")
 );
 
@@ -41,8 +43,8 @@ const handleCoordinatesUpdate = (coords) => {
         <header class="flex items-center justify-center font-merriweather">
             <!--Sejarah Desa-->
             <article class="h-screen font-merriweather">
-                <img :src="`/storage/${profile.hero_image}`" alt="Logo"
-                    class="absolute z-0 left-0 w-full h-screen object-cover" />
+                <img :src="getImageSrc(`/storage/${profile.hero_image}`)" alt="Logo"
+                    class="absolute z-0 left-0 w-full h-screen object-cover" @error="handleImageError" />
                 <div class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"></div>
                 <div
                     class="flex flex-col justify-center items-center h-full px-[6.56%] pb-[6.56%] sm:justify-end sm:items-start sm:pl-[6.56%] sm:pr-[25%] sm:pb-[6.56%] sm:px-0">
@@ -64,12 +66,14 @@ const handleCoordinatesUpdate = (coords) => {
                 <div class="justify-start items-center flex flex-col">
                     <div class="xl:w-80 md:w-80 sm:w-72">
                         <!-- Lingkaran Putih -->
-                        <div class="relative oval-container xl:py-5 md:py-7 sm:py-4 py-4">
-                            <img :src="`/storage/${profile.kepala_desa_image}`"
-                                :alt="`${profile.kepala_desa_name} Profile`" class="" />
+                        <div class="relative overflow-hidden rounded-full aspect-[514/620] w-full">
+                            <img :src="getImageSrc(`/storage/${profile.kepala_desa_image}`)"
+                                :alt="`${profile.kepala_desa_name} Profile`" class="w-full h-full object-cover"
+                                @error="handleImageError" />
                         </div>
+
                         <!-- Kotak Hijau -->
-                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-14">
+                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-16">
                             <p class="font-bold xl:text-xl md:text-xl sm:text-base text-sm">
                                 {{ profile.kepala_desa_name }}
                             </p>
@@ -114,8 +118,8 @@ const handleCoordinatesUpdate = (coords) => {
                     class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 p-7 bg-transparant -mt-3 items-center justify-center">
                     <!-- Card 1 -->
                     <div class=" bg-white rounded-xl shadow-lg text-center">
-                        <img :src="`/storage/${profile.organization_image}`" alt="Struktur Organisasi"
-                            class="w-full xl:h-72 object-contain" />
+                        <img :src="getImageSrc(`/storage/${profile.organization_image}`)" alt="Struktur Organisasi"
+                            class="w-full xl:h-72 object-contain" @error="handleImageError" />
                         <p class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1">
                             Struktur Organisasi Pemerintahan {{ layout.name }}
                         </p>
@@ -175,13 +179,13 @@ const handleCoordinatesUpdate = (coords) => {
                     <!-- Pass location data to Map component if available -->
                     <div class="w-[58.06%] mt-2 z-0">
                         <Map :location-name="[
-                                layout?.provinsi,
-                                layout?.kabupaten,
-                                layout?.kecamatan,
-                                layout?.name,
-                            ]
-                                .filter(Boolean)
-                                .join(' ')
+                            layout?.provinsi,
+                            layout?.kabupaten,
+                            layout?.kecamatan,
+                            layout?.name,
+                        ]
+                            .filter(Boolean)
+                            .join(' ')
                             " :kelurahan="profile?.name" :kode-pos="profile.kode_pos"
                             @coordinates-found="handleCoordinatesUpdate" />
                     </div>

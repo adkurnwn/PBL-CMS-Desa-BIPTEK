@@ -1,6 +1,7 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
 
 const props = defineProps({
     isHome: {
@@ -25,6 +26,8 @@ const props = defineProps({
         required: true, // Ensure the href is passed
     },
 });
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 const processedContent = computed(() => {
     if (!props.news.content) return "";
@@ -51,13 +54,10 @@ const processedContent = computed(() => {
         >
             <div class="flex max-w-full w-full h-full rounded-full">
                 <img
-                    :src="
-                        news.thumbnail
-                            ? `/storage/${news.thumbnail}`
-                            : '/storage/default-image.jpg'
-                    "
+                    :src="getImageSrc(`/storage/${news.thumbnail}`)"
                     :alt="news.alt || 'Default Image'"
                     class="w-full h-60 lg:h-80 object-cover p-4 rounded-3xl overflow-hidden"
+                    @error="handleImageError"
                 />
             </div>
             <div class="flex flex-col px-2 w-full justify-center h-full">

@@ -1,5 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 defineProps({
     produkDesa: {
@@ -19,13 +22,10 @@ defineProps({
         >
             <div class="px-3 mt-5">
                 <img
-                    :src="
-                        produkDesa?.thumbnail
-                            ? `/storage/${produkDesa.thumbnail}`
-                            : '/default-image.jpg'
-                    "
+                    :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
                     :alt="produkDesa?.alt || 'Default Image'"
                     class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
+                    @error="handleImageError"
                 />
             </div>
             <div class="px-4">

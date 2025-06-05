@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
 
 defineProps({
     layout: {
@@ -8,6 +9,7 @@ defineProps({
     },
 });
 
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 const isScrolled = ref(false);
 const isMenuOpen = ref(false);
 const currentPath = ref(window.location.pathname);
@@ -51,9 +53,10 @@ onUnmounted(() => {
     >
         <div class="flex items-center space-x-4 xl:space-x-6 4xl:space-x-8">
             <img
-                :src="`/storage/${layout.logo}`"
+                :src="getImageSrc(`/storage/${layout.logo}`)"
                 :alt="'Logo ' + layout.name"
                 class="w-10 h-12 2xl:w-12 2xl:h-16  4xl:w-20 4xl:h-24 " 
+                @error="handleImageError"
             />
             <div class="flex flex-col">
                 <h1
