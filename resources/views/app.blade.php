@@ -4,7 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta property="og:title" :content="berita.title" />
+    <meta property="og:description" :content="berita.excerpt || berita.title" />
+    <meta property="og:url" :content="`${window.location.origin}/berita/${berita.slug}`" />
+    <meta property="og:type" content="article" />
+    <meta property="og:image" :content="berita.images && berita.images.length > 0 ? `/storage/${berita.images[0].path}` : '/default-og-image.jpg'" />
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Favicon -->
@@ -16,6 +20,7 @@
 
     <!-- Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
 
     <!-- Scripts -->
     @routes

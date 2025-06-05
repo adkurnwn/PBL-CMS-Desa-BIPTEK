@@ -49,19 +49,19 @@ onUnmounted(() => {
             isScrolled || !isHomePage ? 'bg-accent1' : 'bg-transparent',
         ]"
     >
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4 xl:space-x-6 4xl:space-x-8">
             <img
                 :src="`/storage/${layout.logo}`"
                 :alt="'Logo ' + layout.name"
-                class="w-10 h-12 md:w-12 md:h-16"
+                class="w-10 h-12 2xl:w-12 2xl:h-16  4xl:w-20 4xl:h-24 " 
             />
             <div class="flex flex-col">
                 <h1
-                    class="text-white font-bold text-base sm:text-2xl lg:text-xl"
+                    class="text-white font-bold text-base sm:text-2xl xl:md:text-xl 4xl:text-3xl"
                 >
                     {{ layout.name }}
                 </h1>
-                <p class="text-white text-[12px] sm:text-base lg:text-sm">
+                <p class="text-white text-[12px] sm:text-base md:text-xs 3xl:text-sm 4xl:text-lg 4xl:mt-1">
                     {{ layout.kabupaten }}
                 </p>
             </div>
@@ -78,7 +78,7 @@ onUnmounted(() => {
         <!-- Navigation Links -->
         <ul
             :class="[
-                'md:flex text-sm sm:text-xl lg:text-base lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt-6 lg:mt-2.5 lg:mr-6',
+                'md:flex text-sm sm:text-xl xl:text-sm 3xl:text-base 4xl:text-xl lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt-6 lg:mt-2.5 lg:mr-6',
                 isMenuOpen
                     ? 'block'
                     : 'max-h-0 opacity-0 scale-y-0 sm:max-h-full sm:opacity-100 lg:scale-y-100',
