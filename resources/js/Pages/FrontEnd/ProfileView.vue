@@ -29,7 +29,7 @@ const fasilitasList = computed(() =>
 </script>
 <!-- Profileview.vue -->
 <template>
-    <UserLayout>
+    <UserLayout v-slot="{ layout }">
         <header class="flex items-center justify-center font-merriweather">
             <!--Sejarah Desa-->
             <article class="h-screen font-merriweather">
@@ -103,7 +103,7 @@ const fasilitasList = computed(() =>
                     </h1>
                     <div class="text-justify xl:mt-1">
                         <ol
-                            class="list-decimal xl:pl-10 sm:pl-16 pl-4 xl:max-w-3xl md:max-w-xl sm:max-w-lg max-w-xs space-y-3 text-semiBlack text-xs sm:text-base md:text-lg xl:text-xl  italic"
+                            class="list-decimal xl:pl-10 sm:pl-16 pl-4 xl:max-w-3xl md:max-w-xl sm:max-w-lg max-w-xs space-y-3 text-semiBlack text-xs sm:text-base md:text-lg xl:text-xl italic"
                         >
                             <li
                                 v-for="(misi, index) in missionList"
@@ -121,6 +121,7 @@ const fasilitasList = computed(() =>
                 class="flex flex-col items-center justify-center font-merriweather bg-type1"
             >
                 <h1
+                    id="struktur-pemerintahan"
                     class="font-bold text-accent2 xl:text-3xl md:text-2xl text-xl xl:-ml-96 xl:mr-96 sm:mr-80 mr-24 xl:pr-16 xl:mt-20 sm:mt-16 mt-14"
                 >
                     Struktur Pemerintahan
@@ -138,10 +139,17 @@ const fasilitasList = computed(() =>
                     <div
                         class="container bg-white rounded-xl shadow-lg text-center"
                     >
+                        <!--
                         <img
                             :src="`/storage/${profile.organization_image}`"
                             alt="Struktur Organisasi"
-                            class="w-full xl:h-72 xl:-mt-2 object-contain"
+                            class="w-full xl:h-72 xl:mt-1 object-contain"
+                        />
+                        -->
+                        <img
+                            src="../../../images/SO_PEMERINTAHAN_DESA.png"
+                            alt="Struktur Organisasi"
+                            class="w-full xl:h-72 object-contain"
                         />
                         <p
                             class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1"
@@ -149,21 +157,24 @@ const fasilitasList = computed(() =>
                             Struktur Organisasi Pemerintahan Desa
                         </p>
                     </div>
-                    <!-- Card 2 -->
-                    <div
-                        class="container bg-white rounded-xl shadow-lg text-center"
+                </div>
+                <div>
+                    <p
+                        class="flex items-center ml-60 xl:ml-96 xl:-mr-96 xl:-mt-4 pl-44 text-secondary text-lg"
                     >
-                        <img
-                            src="../../../images/SO_BPD.png"
-                            alt="Struktur Organisasi"
-                            class="w-full xl:h-72 xl:-mt-1 object-contain"
-                        />
-                        <p
-                            class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-2"
+                        Selengkapnya
+                        <svg
+                            class="mt-0 w-6 h-6"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#DEA521"
                         >
-                            Struktur Organisasi Badan Permusyawaratan Desa
-                        </p>
-                    </div>
+                            <path
+                                d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
+                            />
+                        </svg>
+                    </p>
                 </div>
             </div>
             <!-- Potensi & Keunggulan -->
@@ -301,7 +312,9 @@ const fasilitasList = computed(() =>
                 >
                     Data Geografi
                 </h1>
-                <div class="flex flex-col w-96 xl:-ml-96 -ml-36 xl:mr-96 mr-2 xl:text-xl text-base">
+                <div
+                    class="flex flex-col w-96 xl:-ml-96 -ml-36 xl:mr-96 mr-2 xl:text-xl text-base"
+                >
                     <div class="flex w-full">
                         <p class="w-1/3 font-bold text-accent1 -ml-3">
                             Koordinat
@@ -321,7 +334,20 @@ const fasilitasList = computed(() =>
                 <div
                     class="xl:w-[700px] w-[400px] xl:-ml-24 xl:mr-96 mr-40 mt-2 z-0"
                 >
-                    <Map :location-name="profile.name" />
+                    <Map
+                        :location-name="
+                            [
+                                layout?.provinsi,
+                                layout?.kabupaten,
+                                layout?.kecamatan,
+                                layout?.name,
+                            ]
+                                .filter(Boolean)
+                                .join(' ')
+                        "
+                        :provinsi="profile?.name"
+                        :kode-pos="profile.kode_pos"
+                    />
                 </div>
                 <div
                     class="xl:ml-80 sm:ml-96 xl:-mr-80 -mr-10 xl:-mt-[455px] -mt-[305px] text-accent1 xl:text-xl text-sm"
@@ -356,12 +382,16 @@ const fasilitasList = computed(() =>
                 >
                     Data Demografi
                 </h1>
-                <p class="xl:text-xl text-base text-accent1 xl:max-w-5xl max-w-xl xl:-ml-36 ml-3 -mt-20 italic">
+                <p
+                    class="xl:text-xl text-base text-accent1 xl:max-w-5xl max-w-xl xl:-ml-36 ml-3 -mt-20 italic"
+                >
                     Menyajikan informasi mengenai aspek kependudukan yang
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.
                 </p>
-                <div class="flex flex-wrap gap-5 xl:mr-20 mr-9 mt-3 justify-center">
+                <div
+                    class="flex flex-wrap gap-5 xl:mr-20 mr-9 mt-3 justify-center"
+                >
                     <!-- Grid 1 -->
                     <div
                         class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center"
@@ -369,7 +399,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -389,7 +419,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -409,7 +439,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -429,7 +459,7 @@ const fasilitasList = computed(() =>
                         <svg
                             class="ml-44 h-16 -mt-3"
                             xmlns="http://www.w3.org/2000/svg"
-                            viewBox="http://www.w3.org/2000/svg"
+                            viewBox="0 -960 960 960"
                             width="48px"
                             fill="#DEA521"
                         >
@@ -450,7 +480,7 @@ const fasilitasList = computed(() =>
                     <svg
                         class="mt-0 w-6 h-6"
                         xmlns="http://www.w3.org/2000/svg"
-                        viewBox="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"
+                        viewBox="0 -960 960 960"
                         width="24px"
                         fill="#DEA521"
                     >

@@ -82,7 +82,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:manage_produk-hukum'])->group(function () {
             Route::resource('produk-hukum', ProdukHukumController::class, [
                 'as' => 'dashboard',
-                'except' => ['destroy'],
                 'parameters' => ['produk-hukum' => 'slug']
             ]);
         });
@@ -148,8 +147,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::get('/user-profile', [UserProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/user-profile', [UserProfileController::class, 'update'])->name('profile.update');
         Route::post('/user-profile/image', [UserProfileController::class, 'updateImage'])->name('profile.update-image');
-        Route::get('/user-profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/user-profile', [ProfileController::class, 'update'])->name('profile.update');
 
         Route::middleware(['permission:manage_settings'])->group(function () {
             Route::get('settings', [SettingsController::class, 'edit'])->name('dashboard.settings.edit');

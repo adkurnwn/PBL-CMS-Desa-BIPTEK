@@ -67,9 +67,6 @@ class ProdukDesaController extends Controller
         // Paginate results
         $produkDesa = $query->paginate($perPage)->withQueryString();
 
-        // Log activity
-        $this->logHelper->logActivity('view', 'produk_desa', 'Melihat daftar produk desa');
-
         return Inertia::render('Dashboard/ProdukDesa/Index', [
             'produkDesa' => $produkDesa,
             'search' => $search,

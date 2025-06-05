@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use Inertia\Inertia;
 use App\Models\ActivityLog;
+use App\Models\Statistic;
 use App\Services\StatisticsService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -43,6 +44,9 @@ class StatisticsController extends Controller
         $danaDesaStats = $this->statisticsService->getContentStatsWithTitles('dana_desa', 'month');
         $produkDesaStats = $this->statisticsService->getContentStatsWithTitles('produk_desa', 'month');
         
+        // Get content views by category for chart (last 6 months)
+        $contentViewsByCategory = $this->statisticsService->getContentViewsByCategory(6);
+        
         // Get feature stats
         $featureStats = $this->statisticsService->getFeatureStats($period);
         
@@ -55,6 +59,13 @@ class StatisticsController extends Controller
         $weeklyVisits = $this->statisticsService->getTimeSeriesData('feature_visit', 'weekly', 84);
         $monthlyVisits = $this->statisticsService->getTimeSeriesData('feature_visit', 'monthly', 365);
 
+        // Get visitor time series data for all periods using the StatisticsService
+        $dailyVisitorData = $this->statisticsService->getVisitorTimeSeriesData('daily');
+        $weeklyVisitorData = $this->statisticsService->getVisitorTimeSeriesData('weekly');
+        $monthlyVisitorData = $this->statisticsService->getVisitorTimeSeriesData('monthly');
+        $yearlyVisitorData = $this->statisticsService->getVisitorTimeSeriesData('yearly');
+        $allTimeVisitorData = $this->statisticsService->getVisitorTimeSeriesData('all');
+
         return Inertia::render('Dashboard/Home/Statistics', [
             'stats' => [
                 'visitors' => [
@@ -62,6 +73,13 @@ class StatisticsController extends Controller
                     'week' => $weekVisitors,
                     'month' => $monthVisitors,
                     'year' => $yearVisitors,
+                    'time_series' => [
+                        'daily' => $dailyVisitorData,
+                        'weekly' => $weeklyVisitorData,
+                        'monthly' => $monthlyVisitorData,
+                        'yearly' => $yearlyVisitorData,
+                        'all' => $allTimeVisitorData,
+                    ],
                 ],
                 'content' => [
                     'news' => $newsStats,
@@ -69,6 +87,7 @@ class StatisticsController extends Controller
                     'dana_desa' => $danaDesaStats,
                     'produk_desa' => $produkDesaStats,
                     'all_periods' => $allContentStatsAllPeriods,
+                    'views_by_category' => $contentViewsByCategory,
                 ],
                 'features' => $featureStats,
                 'time_series' => [

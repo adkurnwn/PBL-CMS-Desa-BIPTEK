@@ -344,6 +344,251 @@ class StatisticsService
         return $enrichedStats->values();
     }
 
+    public function getVisitorTimeSeriesData($period = 'daily')
+    {
+        $labels = [];
+        $values = [];
+        $now = Carbon::now();
+
+        // Indonesian day names mapping
+        $dayNames = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa', 
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu'
+        ];
+
+        // Indonesian month names mapping
+        $monthNames = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember'
+        ];
+
+        switch ($period) {
+            case 'daily':
+                // Show hours from 00:00 to current hour with 4-hour steps
+                $currentHour = $now->hour;
+                // Include the current 4-hour block if we're past the start of it
+                $maxHour = $currentHour + 4 - ($currentHour % 4);
+                
+                for ($i = 0; $i < $maxHour; $i += 4) {
+                    $hourStart = Carbon::today()->addHours($i);
+                    $hourEnd = Carbon::today()->addHours($i + 4);
+                    $labels[] = $hourStart->format('H:i') . '-' . $hourEnd->format('H:i');
+                    
+                    // For the current time block, only count up to now
+                    $endTime = $hourEnd;
+                    if ($hourEnd->gt($now)) {
+                        $endTime = $now;
+                    }
+                    
+                    $count = Statistic::whereDate('date', Carbon::today())
+                        ->where(function($query) use ($hourStart, $endTime) {
+                            $query->whereTime('time', '>=', $hourStart->format('H:i:s'))
+                                  ->whereTime('time', '<=', $endTime->format('H:i:s'));
+                        })
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'weekly':
+                // Show last 7 days ending with today
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = $now->clone()->subDays($i);
+                    $dayName = $dayNames[$date->format('l')];
+                    $monthName = $monthNames[$date->format('F')];
+                    $labels[] = $dayName . ', ' . $date->format('j') . ' ' . $monthName;
+                    
+                    $count = Statistic::whereDate('date', $date)
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'monthly':
+                // Show last 4 weeks ending with current week
+                for ($i = 3; $i >= 0; $i--) {
+                    $weekStart = $now->clone()->subWeeks($i)->startOfWeek();
+                    $weekEnd = $now->clone()->subWeeks($i)->endOfWeek();
+                    
+                    // For current week, only go up to today
+                    if ($i === 0) {
+                        $weekEnd = $now->lt($weekEnd) ? $now : $weekEnd;
+                    }
+                    
+                    $startMonth = $monthNames[$weekStart->format('F')];
+                    $endMonth = $monthNames[$weekEnd->format('F')];
+                    
+                    if ($weekStart->format('F') === $weekEnd->format('F')) {
+                        $labels[] = $weekStart->format('j') . '-' . $weekEnd->format('j') . ' ' . $startMonth;
+                    } else {
+                        $labels[] = $weekStart->format('j') . ' ' . $startMonth . ' - ' . $weekEnd->format('j') . ' ' . $endMonth;
+                    }
+                    
+                    $count = Statistic::whereBetween('date', [$weekStart, $weekEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'yearly':
+                // Show months from January to current month of current year
+                $startOfYear = $now->clone()->startOfYear();
+                $currentMonth = $now->month;
+                
+                for ($i = 0; $i < $currentMonth; $i++) {
+                    $monthStart = $startOfYear->clone()->addMonths($i);
+                    $monthEnd = $monthStart->clone()->endOfMonth();
+                    
+                    // For current month, only go up to today
+                    if ($i === $currentMonth - 1) {
+                        $monthEnd = $now->lt($monthEnd) ? $now : $monthEnd;
+                    }
+                    
+                    $monthName = $monthNames[$monthStart->format('F')];
+                    $labels[] = $monthName . ' ' . $monthStart->format('Y');
+                    
+                    $count = Statistic::whereBetween('date', [$monthStart, $monthEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+                
+            case 'all':
+                // Show years from first record to current year
+                $firstRecord = Statistic::orderBy('date', 'asc')->first();
+                $startYear = $firstRecord ? Carbon::parse($firstRecord->date)->year : $now->year;
+                $currentYear = $now->year;
+                
+                for ($year = $startYear; $year <= $currentYear; $year++) {
+                    $yearStart = Carbon::createFromDate($year, 1, 1)->startOfYear();
+                    $yearEnd = Carbon::createFromDate($year, 12, 31)->endOfYear();
+                    
+                    // For current year, only go up to today
+                    if ($year === $currentYear) {
+                        $yearEnd = $now->lt($yearEnd) ? $now : $yearEnd;
+                    }
+                    
+                    $labels[] = (string) $year;
+                    
+                    $count = Statistic::whereBetween('date', [$yearStart, $yearEnd])
+                        ->whereNotNull('session_id')
+                        ->distinct('session_id')
+                        ->count();
+                    
+                    $values[] = $count;
+                }
+                break;
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values
+        ];
+    }
+
+    public function getContentViewsByCategory($months = 6)
+    {
+        $now = Carbon::now();
+        $categories = ['news', 'produk_hukum', 'dana_desa', 'produk_desa'];
+        $labels = [];
+        $datasets = [];
+
+        // Indonesian month names mapping
+        $monthNames = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember'
+        ];
+
+        // Generate labels for the last X months
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $monthDate = $now->clone()->subMonths($i);
+            $monthName = $monthNames[$monthDate->format('F')];
+            $labels[] = $monthName . ' ' . $monthDate->format('Y');
+        }
+
+        // Initialize datasets for each category
+        foreach ($categories as $category) {
+            $data = [];
+            
+            for ($i = $months - 1; $i >= 0; $i--) {
+                $monthStart = $now->clone()->subMonths($i)->startOfMonth();
+                $monthEnd = $now->clone()->subMonths($i)->endOfMonth();
+                
+                // For current month, only count up to today
+                if ($i === 0) {
+                    $monthEnd = $now->lt($monthEnd) ? $now : $monthEnd;
+                }
+                
+                $count = Statistic::where('type', 'content_view')
+                    ->where('category', $category)
+                    ->whereBetween('date', [$monthStart, $monthEnd])
+                    ->count();
+                
+                $data[] = $count;
+            }
+            
+            $datasets[] = [
+                'label' => $this->getCategoryDisplayName($category),
+                'category' => $category,
+                'data' => $data
+            ];
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => $datasets
+        ];
+    }
+
+    private function getCategoryDisplayName($category)
+    {
+        $names = [
+            'news' => 'Berita',
+            'produk_hukum' => 'Produk Hukum',
+            'dana_desa' => 'Dana Desa',
+            'produk_desa' => 'Produk Desa'
+        ];
+        
+        return $names[$category] ?? ucfirst($category);
+    }
+
     private function applyPeriodFilter($query, $period)
     {
         switch ($period) {

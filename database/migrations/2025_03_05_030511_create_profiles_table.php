@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('kabupaten', 50);
             $table->string('kecamatan', 50);
             $table->string('kelurahan', 50);
+            $table->string('kode_pos', 10);
             $table->json('hero_images');
             $table->string('organization_image', 255);
             $table->json('lembaga')->nullable();
@@ -28,8 +29,8 @@ return new class extends Migration
             $table->text('history');
             $table->text('vision');
             $table->text('mission');
-            $table->enum('primary_color', ['#244031', '#242540', '#882828']);
-            $table->enum('secondary_color', ['#3B614A', '#3B4659', '#9F4941']);
+            $table->enum('primary_color', ['#244031', '#242540', '#882828'])->default('#244031');
+            $table->enum('secondary_color', ['#3B614A', '#3B4659', '#9F4941'])->default('#3B614A');
             $table->timestamps();
         });
     }
