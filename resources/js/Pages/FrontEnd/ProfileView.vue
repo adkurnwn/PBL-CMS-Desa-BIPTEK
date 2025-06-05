@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
 import { useApiCache } from "@/Utility/useApiCache";
-import { parseFasilitas, parseMisi } from "@/Utility/useParser";
+import { parseFasilitas, parseMisi, parseBatas } from "@/Utility/useParser";
 
 const profile = ref({});
 const demografi = ref({});
@@ -27,6 +27,10 @@ const missionList = computed(() => parseMisi(profile.value.mission || ""));
 const fasilitasList = computed(() =>
     parseFasilitas(profile.value.fasilitas || "")
 );
+const batasList = computed(() => 
+    parseBatas(profile.value.batas_desa || "")
+);
+
 const handleCoordinatesUpdate = (coords) => {
     coordinates.value = coords;
 };
@@ -185,13 +189,13 @@ const handleCoordinatesUpdate = (coords) => {
                         <h1 class="font-bold">Batas Desa</h1>
                         <div class="xl:max-w-96 max-w-40">
                             <p class="font-bold xl:mt-3 mt-2">Utara</p>
-                            <span>Kelurahan Lalolang & Desa Tellumpanua</span>
+                            <span>{{ batasList.utara }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Barat</p>
-                            <span>Selat Makassar</span>
+                            <span>{{ batasList.barat }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Timur</p>
-                            <span>Kecamatan Ternate Riaja</span>
+                            <span>{{ batasList.timur }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Selatan</p>
-                            <span>Desa Corawali</span>
+                            <span>{{ batasList.selatan }}</span>
                         </div>
                     </div>
                 </div>

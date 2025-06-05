@@ -27,6 +27,7 @@ class ProfileLayout extends JsonResource
             'email' => $this->email,
             'hero_image' => json_decode($this->hero_images)[0],
             'circle_image' => json_decode($this->hero_images)[2],
+            'media_sosial' => $this->media_sosial,
             'produk_hukum' => ProdukHukum::exists(),
             'dana_desa' => DanaDesa::exists(),
             'demografi' => Demografi::exists(),

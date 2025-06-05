@@ -30,6 +30,7 @@ const locationName = computed(() => {
     // Clean up the location name string
     return props.locationName
         .replace(/Desa\s+/gi, "")
+        .replace(/Kelurahan\s+/gi, "")
         .replace(/Kabupaten\s+/gi, "")
         .replace(/Kecamatan\s+/gi, "")
         .replace(/Kota\s+/gi, "")
@@ -209,6 +210,7 @@ const createSearchQueries = () => {
     if (props.kelurahan && props.kodePos) {
         const cleanedKelurahan = props.kelurahan
             .replace(/^Desa\s+/i, "")
+            .replace(/^Kelurahan\s+/i, "")
             .trim();
         queries.push(`${cleanedKelurahan}, ${props.kodePos}`);
     }
