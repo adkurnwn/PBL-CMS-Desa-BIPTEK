@@ -186,7 +186,7 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
           </h2>
-          <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2 w-max-full">
+          <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-4 -m-2 w-max-full">
             <div v-if="eventsLoading" class="text-center w-full col-span-2">
               <p>Memuat produk unggulan...</p>
             </div>
@@ -210,10 +210,9 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Pusat layanan dan informasi resmi dari Pemerintah Desa untuk masyarakat.</p>
           </h2>
-          <div class="flex flex-col sm:flex-row lg:flex-row space-y-2 sm:space-y-0 justify-between py-4 ">
-
+          <div class="flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row space-y-2 sm:space-y-0 justify-between py-4 sm:gap-4  ">
             <a v-if="layout.produk_hukum" href="/produk-hukum"
-              class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+              class="flex w-full sm:w-full lg:w-1/3 space-x-6 px-3 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <div>
@@ -233,7 +232,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a v-if="layout.dana_desa" href="/dana-desa" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a v-if="layout.dana_desa" href="/dana-desa" class="flex w-full sm:w-full lg:w-1/3 space-x-6 px-3 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -249,7 +248,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/#" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a href="/#" class="flex w-full sm:w-full lg:w-1/3 space-x-6 px-3 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -265,7 +264,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/profile#struktur-pemerintahan" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a href="/profile#struktur-pemerintahan" class="flex w-full sm:w-full lg:w-1/3 space-x-6 px-3 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
