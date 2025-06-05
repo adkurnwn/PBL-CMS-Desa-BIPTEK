@@ -25,7 +25,7 @@ const props = defineProps({
                         Pemerintah {{ layout.name }}
                     </h1>
                     <p
-                        class="text-white text-sm md:text-base max-w-[200px] leading-relaxed"
+                        class="text-white text-sm md:text-base leading-relaxed"
                     >
                         {{ layout.name }}, Kecamatan {{ layout.kecamatan }},
                         {{ layout.kabupaten }}, Provinsi {{ layout.provinsi }}.
