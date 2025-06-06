@@ -4,6 +4,7 @@ import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
 import useApiFetch from "@/Utility/useApiFetch";
+import { Link } from "@inertiajs/vue3";
 
 const gallery = ref({});
 const events = ref([]);
@@ -41,7 +42,7 @@ onMounted(fetchData);
         >
             <!-- Galeri Desa -->
             <article
-                class="w-full px-8 flex flex-col pt-32 pb-8 lg:pb-24 bg-type1 font-merriweather"
+                class="w-full px-8 flex flex-col pt-32 4xl:pt-44 pb-8 xl:pb-16 bg-type1 font-merriweather"
             >
                 <div
                     v-if="galleryLoading"
@@ -101,7 +102,7 @@ onMounted(fetchData);
         <main class="max-w-7xl mx-auto w-full">
             <!-- Event Terdekat-->
             <article
-                class="w-full px-8 sm:px-14 lg:px-8 flex flex-col py-6 md:py-10 bg-type1 font-merriweather"
+                class="w-full px-8 sm:px-10 lg:px-8 flex flex-col py-6  bg-type1 font-merriweather"
             >
                 <h1 class="text-xl md:text-3xl font-semibold text-accent2">
                     Event Terdekat
@@ -112,7 +113,7 @@ onMounted(fetchData);
                     </p>
                 </h2>
                 <div
-                    class="flex flex-col md:flex-row justify-center md:space-x-4 m-4 space-y-2 md:space-y-0"
+                    class="flex flex-col sm:flex-row justify-center  min-h-full md:space-y-0 gap-3"
                 >
                     <div v-if="eventLoading" class="text-center w-full">
                         <p>Memuat events...</p>
@@ -132,19 +133,22 @@ onMounted(fetchData);
                         />
                     </template>
                 </div>
+                <Link href="/event" class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 xl:my-8ml-2 text-right justify-end">
+                    Selengkapnya &gt;&gt;
+                </Link>
             </article>
 
             <!-- Berita Terbaru-->
             <article
-                class="w-full px-8 sm:px-14 lg:px-8 flex flex-col py-6 md:py-10 bg-type1 font-merriweather"
+                class="w-full px-8 sm:px-10 lg:px-8 flex flex-col xl:py-4 mb-10 bg-type1 font-merriweather"
             >
                 <h1
-                    class="text-xl md:text-3xl font-semibold text-accent2 my-3 ml-2"
+                    class="text-xl md:text-3xl font-semibold text-accent2 mb-3 ml-2"
                 >
                     Berita Terbaru
                 </h1>
                 <div
-                    class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center space-y-1 md:space-y-0"
+                    class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center gap-4 xl:gap-2"
                 >
                     <div v-if="newsLoading" class="text-center w-full">
                         <p>Memuat berita...</p>

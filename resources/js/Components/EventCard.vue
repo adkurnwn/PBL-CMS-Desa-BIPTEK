@@ -1,13 +1,13 @@
 <template>
-  <div class="relative w-full ">
+  <div class="relative w-full min-h-full">
       <div class="flip-card" :class="{ 'is-flipped': isFlipped }">
           <div class="flip-card-inner">
               <!-- Front of card -->
-              <div class="flip-card-front bg-accent2 rounded-lg shadow-2xl">
+              <div class="flip-card-front bg-accent2 rounded-lg shadow-2xl ">
                   <div class="px-7 xl:px-9 py-7">
                       <div class="flex flex-col sm:flex-row xl:flex-col  ">
-                          <h2 class="text-2xl sm:text-xl xl:text-3xl font-semibold text-secondary">{{ formattedDate }}</h2>
-                          <h2 class="text-2xl sm:text-xl xl:text-3xl font-semibold text-secondary sm-0 sm:ml-1 xl:ml-0">{{ year }}</h2>
+                          <h2 class="text-2xl sm:text-lg xl:text-3xl font-semibold text-secondary">{{ formattedDate }}</h2>
+                          <h2 class="text-2xl sm:text-lg xl:text-3xl font-semibold text-secondary sm-0 sm:ml-1 xl:ml-0">{{ year }}</h2>
                           
                       </div>
                       <div class="flex flex-col justify-between">
@@ -181,18 +181,24 @@ const toggleDescription = () => {
 <style scoped>
 .flip-card {
   perspective: 1000px;
+  min-height: 270px; /* Set a reasonable min-height for mobile */
   height: 100%;
-  min-height: 250px;
+  display: flex;
+  flex-direction: column;
 }
 
 .flip-card-inner {
   position: relative;
   width: 100%;
+  min-height: 270px; /* Match the min-height of .flip-card */
   height: 100%;
   text-align: left;
   transition: transform 0.6s;
   transform-style: preserve-3d;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .flip-card.is-flipped .flip-card-inner {
   transform: rotateY(180deg);
@@ -202,10 +208,15 @@ const toggleDescription = () => {
 .flip-card-back {
   position: absolute;
   width: 100%;
+  min-height: 270px; /* Ensure both sides have the same min-height */
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   border-radius: 0.5rem;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .flip-card-back {
