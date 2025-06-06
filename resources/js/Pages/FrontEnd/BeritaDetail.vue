@@ -127,7 +127,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="20px"
-                                            viewBox="http://www.w3.org/2000/svg"
+                                            viewBox="0 -960 960 960"
                                             width="20px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -144,7 +144,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="24px"
-                                            viewBox="http://www.w3.org/2000/svg"
+                                            viewBox="0 -960 960 960"
                                             width="24px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -161,7 +161,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="24px"
-                                            viewBox="http://www.w3.org/2000/svg"
+                                            viewBox="0 -960 960 960"
                                             width="24px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -249,7 +249,7 @@ onMounted(() => {
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     height="24px"
-                                    viewBox="http://www.w3.org/2000/svg"
+                                    viewBox="0 -960 960 960"
                                     width="24px"
                                     fill="currentColor"
                                     class="text-type1"
