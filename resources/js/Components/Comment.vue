@@ -233,7 +233,7 @@ onMounted(() => {
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="18px"
-                    viewBox="http://www.w3.org/2000/svg"
+                    viewBox="0 -960 960 960"
                     width="16px"
                     fill="#FFFFFF"
                     class="-mt-0.5 lg:w-6 lg:h-6"
@@ -394,7 +394,7 @@ onMounted(() => {
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         height="18px"
-                                        viewBox="http://www.w3.org/2000/svg"
+                                        viewBox="0 -960 960 960"
                                         width="16px"
                                         fill="#FFFFFF"
                                         class="-mt-0.5 lg:w-6 lg:h-6"
@@ -587,7 +587,7 @@ onMounted(() => {
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     height="18px"
-                                                    viewBox="http://www.w3.org/2000/svg"
+                                                    viewBox="0 -960 960 960"
                                                     width="16px"
                                                     fill="#FFFFFF"
                                                     class="-mt-0.5 lg:w-6 lg:h-6"
@@ -816,7 +816,7 @@ onMounted(() => {
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             height="18px"
-                                                            viewBox="http://www.w3.org/2000/svg"
+                                                            viewBox="0 -960 960 960"
                                                             width="16px"
                                                             fill="#FFFFFF"
                                                             class="-mt-0.5 lg:w-6 lg:h-6"
