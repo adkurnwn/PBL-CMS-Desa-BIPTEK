@@ -23,6 +23,7 @@ class ProfileDetail extends JsonResource
             'vision' => $this->vision,
             'mission' => $this->mission,
             'fasilitas' => $this->fasilitas,
+            'batas_desa' => $this->batas_desa,
             'lembaga' => $this->lembaga,
             'organization_image' => $this->organization_image,
             'kepala_desa_name' => User::whereHas('roles', function ($query) {

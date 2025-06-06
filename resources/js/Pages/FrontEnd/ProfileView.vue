@@ -3,11 +3,14 @@ import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
 import { useApiCache } from "@/Utility/useApiCache";
-import { parseFasilitas, parseMisi } from "@/Utility/useParser";
+import { parseFasilitas, parseMisi, parseBatas } from "@/Utility/useParser";
+import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
+import { Head } from "@inertiajs/vue3";
 
 const profile = ref({});
 const demografi = ref({});
 const coordinates = ref({ lat: null, lon: null, display_name: null });
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 const fetchData = async () => {
     const profileApi = useApiCache("profileData", "/api/profile/profile");
@@ -27,18 +30,23 @@ const missionList = computed(() => parseMisi(profile.value.mission || ""));
 const fasilitasList = computed(() =>
     parseFasilitas(profile.value.fasilitas || "")
 );
+const batasList = computed(() =>
+    parseBatas(profile.value.batas_desa || "")
+);
+
 const handleCoordinatesUpdate = (coords) => {
     coordinates.value = coords;
 };
 </script>
 <!-- Profileview.vue -->
 <template>
+    <Head title="Profil Desa" />
     <UserLayout v-slot="{ layout }">
         <header class="flex items-center justify-center font-merriweather">
             <!--Sejarah Desa-->
             <article class="h-screen font-merriweather">
-                <img :src="`/storage/${profile.hero_image}`" alt="Logo"
-                    class="absolute z-0 left-0 w-full h-screen object-cover" />
+                <img :src="getImageSrc(`/storage/${profile.hero_image}`)" alt="Logo"
+                    class="absolute z-0 left-0 w-full h-screen object-cover" @error="handleImageError" />
                 <div class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"></div>
                 <div
                     class="flex flex-col justify-center items-center h-full px-[6.56%] pb-[6.56%] sm:justify-end sm:items-start sm:pl-[6.56%] sm:pr-[25%] sm:pb-[6.56%] sm:px-0">
@@ -53,19 +61,21 @@ const handleCoordinatesUpdate = (coords) => {
 
             </article>
         </header>
-        <main class="flex flex-col font-merriweather px-[6.56%] space-y-10 xl:mt-24 md:mt-6 mt-5 xl:mb-24 md:mb-6 mb-5">
+        <main class="max-w-screen-4xl mx-auto w-full px-[6.56%] font-merriweather space-y-10 xl:mt-24 md:mt-6 mt-5 xl:mb-24 md:mb-6 mb-5">
             <!-- Visi & Misi -->
             <article
                 class="flex xl:flex-row flex-col relative justify-center w-full font-merriweather bg-type1 lg:space-x-20">
                 <div class="justify-start items-center flex flex-col">
                     <div class="xl:w-80 md:w-80 sm:w-72">
                         <!-- Lingkaran Putih -->
-                        <div class="relative oval-container xl:py-5 md:py-7 sm:py-4 py-4">
-                            <img :src="`/storage/${profile.kepala_desa_image}`"
-                                :alt="`${profile.kepala_desa_name} Profile`" class="" />
+                        <div class="relative overflow-hidden rounded-full aspect-[514/620] w-full">
+                            <img :src="getImageSrc(`/storage/${profile.kepala_desa_image}`)"
+                                :alt="`${profile.kepala_desa_name} Profile`" class="w-full h-full object-cover"
+                                @error="handleImageError" />
                         </div>
+
                         <!-- Kotak Hijau -->
-                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-14">
+                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-16">
                             <p class="font-bold xl:text-xl md:text-xl sm:text-base text-sm">
                                 {{ profile.kepala_desa_name }}
                             </p>
@@ -110,8 +120,8 @@ const handleCoordinatesUpdate = (coords) => {
                     class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 p-7 bg-transparant -mt-3 items-center justify-center">
                     <!-- Card 1 -->
                     <div class=" bg-white rounded-xl shadow-lg text-center">
-                        <img :src="`/storage/${profile.organization_image}`" alt="Struktur Organisasi"
-                            class="w-full xl:h-72 object-contain" />
+                        <img :src="getImageSrc(`/storage/${profile.organization_image}`)" alt="Struktur Organisasi"
+                            class="w-full xl:h-72 object-contain" @error="handleImageError" />
                         <p class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1">
                             Struktur Organisasi Pemerintahan {{ layout.name }}
                         </p>
@@ -178,20 +188,20 @@ const handleCoordinatesUpdate = (coords) => {
                         ]
                             .filter(Boolean)
                             .join(' ')
-                            " :provinsi="profile?.name" :kode-pos="profile.kode_pos"
+                            " :kelurahan="profile?.name" :kode-pos="profile.kode_pos"
                             @coordinates-found="handleCoordinatesUpdate" />
                     </div>
                     <div class="text-accent1 xl:text-xl text-sm">
                         <h1 class="font-bold">Batas Desa</h1>
                         <div class="xl:max-w-96 max-w-40">
                             <p class="font-bold xl:mt-3 mt-2">Utara</p>
-                            <span>Kelurahan Lalolang & Desa Tellumpanua</span>
+                            <span>{{ batasList.utara }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Barat</p>
-                            <span>Selat Makassar</span>
+                            <span>{{ batasList.barat }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Timur</p>
-                            <span>Kecamatan Ternate Riaja</span>
+                            <span>{{ batasList.timur }}</span>
                             <p class="font-bold xl:mt-3 mt-2">Selatan</p>
-                            <span>Desa Corawali</span>
+                            <span>{{ batasList.selatan }}</span>
                         </div>
                     </div>
                 </div>
@@ -211,11 +221,11 @@ const handleCoordinatesUpdate = (coords) => {
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.
                 </p>
-                <div class="flex flex-wrap gap-5 mt-3 justify-center">
+                <div class="flex flex-wrap lg:grid lg:grid-cols-4 gap-5 mt-3">
                     <!-- Grid 1 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
-                        <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                            fill="#DEA521">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
+                        <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" height="48px"
+                            viewBox="0 -960 960 960" width="48px" fill="#DEA521">
                             <path
                                 d="M40-160v-160q0-34 23.5-57t56.5-23h131q20 0 38 10t29 27q29 39 71.5 61t90.5 22q49 0 91.5-22t70.5-61q13-17 30.5-27t36.5-10h131q34 0 57 23t23 57v160H640v-91q-35 25-75.5 38T480-200q-43 0-84-13.5T320-252v92H40Zm440-160q-38 0-72-17.5T351-386q-17-25-42.5-39.5T253-440q22-37 93-58.5T480-520q63 0 134 21.5t93 58.5q-29 0-55 14.5T609-386q-22 32-56 49t-73 17ZM160-440q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T280-560q0 50-34.5 85T160-440Zm640 0q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T920-560q0 50-34.5 85T800-440ZM480-560q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-680q0 50-34.5 85T480-560Z" />
                         </svg>
@@ -225,7 +235,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Penduduk</p>
                     </div>
                     <!-- Grid 2 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path
@@ -237,7 +247,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Kepala Keluarga</p>
                     </div>
                     <!-- Grid 3 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path
@@ -249,7 +259,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <p class="text-lg text-left ml-3">Penduduk Laki-Laki</p>
                     </div>
                     <!-- Grid 4 -->
-                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-64 h-40 text-center">
+                    <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center">
                         <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
                             width="48px" fill="#DEA521">
                             <path

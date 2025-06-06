@@ -77,6 +77,14 @@ const form = useForm({
     history: props.profile.history,
     vision: props.profile.vision,
     mission: props.profile.mission,
+    tipe_pemerintahan: props.profile.tipe_pemerintahan,
+    media_sosial: parseJson(props.profile.media_sosial).length === 4 
+        ? parseJson(props.profile.media_sosial) 
+        : ['', '', '', ''], // [instagram, x, facebook, youtube]
+    batas_desa: parseJson(props.profile.batas_desa).length === 4 
+        ? parseJson(props.profile.batas_desa) 
+        : ['', '', '', ''], // [batas_utara, batas_timur, batas_selatan, batas_barat]
+    website: props.profile.website,
     primary_color: props.profile.primary_color,
     secondary_color: props.profile.secondary_color,
     _method: "PUT",
@@ -402,6 +410,24 @@ const removeLembaga = (index) => {
                                     />
                                 </div>
 
+                                <div>
+                                    <DropdownFieldInput
+                                        id="tipe_pemerintahan"
+                                        v-model="form.tipe_pemerintahan"
+                                        fieldName="Tipe Pemerintahan"
+                                        placeholder="Pilih Tipe Pemerintahan"
+                                        :options="[
+                                            { value: 'desa', label: 'Desa' },
+                                            {
+                                                value: 'kelurahan',
+                                                label: 'Kelurahan',
+                                            },
+                                        ]"
+                                        required
+                                        custom-width="100%"
+                                    />
+                                </div>
+
                                 <!-- Region Fields -->
                                 <div>
                                     <DropdownFieldInput
@@ -491,8 +517,8 @@ const removeLembaga = (index) => {
                                     <DropdownFieldInput
                                         id="kelurahan"
                                         v-model="form.kelurahan"
-                                        fieldName="Kelurahan"
-                                        placeholder="Pilih Kelurahan"
+                                        fieldName="Desa/Kelurahan"
+                                        placeholder="Pilih Desa/Kelurahan"
                                         :options="
                                             villages.map((v) => ({
                                                 value: v.id,
@@ -693,6 +719,65 @@ const removeLembaga = (index) => {
                                         class="mt-2"
                                     />
                                 </div>
+                                <div>
+                                    <SingleLineField
+                                        id="batas_utara"
+                                        v-model="form.batas_desa[0]"
+                                        type="text"
+                                        fieldName="Batas Utara"
+                                        placeholder="Contoh: Sungai, Gunung, Jalan, Desa lain"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['batas_desa.0']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="batas_timur"
+                                        v-model="form.batas_desa[1]"
+                                        type="text"
+                                        fieldName="Batas Timur"
+                                        placeholder="Contoh: Sungai, Gunung, Jalan, Desa lain"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['batas_desa.1']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="batas_selatan"
+                                        v-model="form.batas_desa[2]"
+                                        type="text"
+                                        fieldName="Batas Selatan"
+                                        placeholder="Contoh: Sungai, Gunung, Jalan, Desa lain"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['batas_desa.2']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="batas_barat"
+                                        v-model="form.batas_desa[3]"
+                                        type="text"
+                                        fieldName="Batas Barat"
+                                        placeholder="Contoh: Sungai, Gunung, Jalan, Desa lain"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['batas_desa.3']"
+                                        class="mt-2"
+                                    />
+                                </div>
                             </div>
 
                             <div class="flex flex-col gap-y-[15px]">
@@ -768,6 +853,66 @@ const removeLembaga = (index) => {
                                     />
                                     <InputError
                                         :message="form.errors.vision"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="instagram"
+                                        v-model="form.media_sosial[0]"
+                                        type="text"
+                                        fieldName="Akun Instagram"
+                                        placeholder="@username"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['media_sosial.0']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="x_twitter"
+                                        v-model="form.media_sosial[1]"
+                                        type="text"
+                                        fieldName="Akun X (Twitter)"
+                                        placeholder="@username"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['media_sosial.1']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="facebook"
+                                        v-model="form.media_sosial[2]"
+                                        type="text"
+                                        fieldName="Akun Facebook"
+                                        placeholder="@username"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['media_sosial.2']"
+                                        class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <SingleLineField
+                                        id="youtube"
+                                        v-model="form.media_sosial[3]"
+                                        type="text"
+                                        fieldName="Akun YouTube"
+                                        placeholder="@username"
+                                        custom-width="100%"
+                                    />
+                                    <InputError
+                                        :message="form.errors['media_sosial.3']"
                                         class="mt-2"
                                     />
                                 </div>

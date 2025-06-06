@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LPolygon } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 // Define emits
-const emit = defineEmits(['coordinates-found']);
+const emit = defineEmits(["coordinates-found"]);
 
 const locationName = computed(() => {
     if (!props.locationName || props.locationName === "INDONESIA") {
@@ -30,6 +30,7 @@ const locationName = computed(() => {
     // Clean up the location name string
     return props.locationName
         .replace(/Desa\s+/gi, "")
+        .replace(/Kelurahan\s+/gi, "")
         .replace(/Kabupaten\s+/gi, "")
         .replace(/Kecamatan\s+/gi, "")
         .replace(/Kota\s+/gi, "")
@@ -105,10 +106,10 @@ const processLocationResult = (place) => {
     zoom.value = props.initialZoom;
 
     // Emit coordinates and display_name to parent component
-    emit('coordinates-found', {
+    emit("coordinates-found", {
         lat: place.lat,
         lon: place.lon,
-        display_name: place.display_name
+        display_name: place.display_name,
     });
 
     if (place.geojson) {
@@ -209,6 +210,7 @@ const createSearchQueries = () => {
     if (props.kelurahan && props.kodePos) {
         const cleanedKelurahan = props.kelurahan
             .replace(/^Desa\s+/i, "")
+            .replace(/^Kelurahan\s+/i, "")
             .trim();
         queries.push(`${cleanedKelurahan}, ${props.kodePos}`);
     }

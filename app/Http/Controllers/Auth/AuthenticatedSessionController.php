@@ -28,6 +28,8 @@ class AuthenticatedSessionController extends Controller
         $profileDesa = Profile::latest()->first();
         $profile['logo'] = $profileDesa->logo ?? null;
         $profile['name'] = $profileDesa->name ?? null;
+        $profile['primary_color'] = $profileDesa->primary_color ?? null;
+        $profile['secondary_color'] = $profileDesa->secondary_color ?? null;
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),

@@ -29,6 +29,9 @@ return new class extends Migration
             $table->text('history');
             $table->text('vision');
             $table->text('mission');
+            $table->enum('tipe_pemerintahan', ['desa', 'kelurahan'])->default('desa');
+            $table->json('media_sosial')->nullable();
+            $table->json('batas_desa')->nullable();
             $table->enum('primary_color', ['#244031', '#242540', '#882828'])->default('#244031');
             $table->enum('secondary_color', ['#3B614A', '#3B4659', '#9F4941'])->default('#3B614A');
             $table->timestamps();

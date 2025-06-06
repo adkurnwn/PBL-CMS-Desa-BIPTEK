@@ -52,7 +52,7 @@ provide("layout", layout);
         </div>
         <main class="bg-type1 min-h-screen">
             <!-- Navbar -->
-            <div class="fixed top-0 left-0 w-full z-50">
+            <div class="fixed top-0 left-0 w-full z-40">
                 <Navbar :layout="layout" />
             </div>
             <!-- Page Content -->
