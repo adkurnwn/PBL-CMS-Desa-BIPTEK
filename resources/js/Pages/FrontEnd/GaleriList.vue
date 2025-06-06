@@ -62,7 +62,7 @@ const albums = ref([
 ]);
 
 const pageAlbumDesa = ref(1);
-const totalPages = 2;
+const totalPagesAlbumDesa = 2;
 const pageGaleriTerkini = ref(1);
 const totalPagesGaleriTerkini = 2;
 </script>
@@ -71,7 +71,7 @@ const totalPagesGaleriTerkini = 2;
     <UserLayout>
         <!--Menu Bar-->
         <main class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather">
-            <article class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather py-60 -mt-20">
+            <article class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather py-60 -mt-20 space-y-5">
                 <!-- Judul -->
                 <h1 class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2">Galeri Desa</h1> 
                 <!-- Search Bar -->
@@ -80,8 +80,7 @@ const totalPagesGaleriTerkini = 2;
                     type="text"
                     v-model="searchQuery"
                     placeholder="Cari Kegiatan atau Album..."
-                    style="width: 800px;"
-                    class="items-center max-w-xl mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-ligh" 
+                    class="max-w-xl px-3 py-1 sm:py-2 xl:py-2 mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic text-accent1 text-xxs sm:text-base w-60 sm:w-96 xl:w-[600px]" 
                     />
                     <!-- Button Ikon Search -->
                     <button
@@ -91,7 +90,7 @@ const totalPagesGaleriTerkini = 2;
                     </button>
                 </div>
                 <!-- Kategori Galeri -->
-                <div class="flex relative items-center space-x-7 overflow-x-auto text-lg text-accent1">
+                <div class="flex relative items-center space-x-7 overflow-x-auto text-lg text-accent2">
                     <button class="hover:underline font-medium">Semua</button>
                     <button class="hover:underline">Populer</button>
                     <button class="hover:underline">Wisata</button>
@@ -105,14 +104,14 @@ const totalPagesGaleriTerkini = 2;
                     height="24px" 
                     viewBox="0 -960 960 960" 
                     width="24px" 
-                    fill="#244031">
+                    fill="#3B614A">
                     <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/></svg>
                     </button>
                 </div>
             </article> 
             <article  class="relative flex-grow items-center self-start ml-20 -mt-56">
                 <!--Berita Terkini-->
-                <h1 class="text-xl font-bold text-gray-800">
+                <h1 class="text-xl font-bold text-accent1">
                     Album Desa
                 </h1>
             </article> 
@@ -154,27 +153,27 @@ const totalPagesGaleriTerkini = 2;
             <!-- Pagination -->
             <div class="flex justify-center mt-5 gap-2">
                 <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent2 text-type1 text-xs"
                     :disabled="pageAlbumDesa === 1"
                     @click="pageAlbumDesa--"
                 >&lt;</button>
                 <button
-                    v-for="p in totalPages"
+                    v-for="p in totalPagesAlbumDesa"
                     :key="p"
                     class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                    :class="pageAlbumDesa === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                    :class="pageAlbumDesa === p ? 'bg-accent2 text-type1' : 'border text-accent2 bg-type1'"
                     @click="pageAlbumDesa = p"
                 >{{ p }}</button>
                 <button
-                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                    :disabled="pageAlbumDesa === totalPages"
+                    class="w-8 h-8 rounded-full flex items-center justify-center bg-accent2 text-type1 text-xs"
+                    :disabled="pageAlbumDesa === totalPagesAlbumDesa"
                     @click="pageAlbumDesa++"
                 >&gt;</button>
             </div>
             </article>
             <!--Galeri Terkini-->
             <article class="w-full px-20 flex flex-col pb-8 lg:pb-24 bg-type1 font-merriweather space-y-5">
-              <h1 class="text-xl font-bold text-gray-800">
+              <h1 class="text-xl font-bold text-accent1">
                 Galeri Terkini
               </h1>
                 <div class="flex flex-row w-full h-full justify-between space-x-5">
@@ -209,7 +208,7 @@ const totalPagesGaleriTerkini = 2;
                 <!-- Pagination -->
                 <div class="flex justify-center mt-5 gap-2">
                     <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent2 text-type1 text-xs"
                         :disabled="pageGaleriTerkini === 1"
                         @click="pageGaleriTerkini--"
                     >&lt;</button>
@@ -217,11 +216,11 @@ const totalPagesGaleriTerkini = 2;
                         v-for="p in totalPagesGaleriTerkini"
                         :key="p"
                         class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                        :class="pageGaleriTerkini === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                        :class="pageGaleriTerkini === p ? 'bg-accent2 text-type1' : 'border text-accent2 bg-type1'"
                         @click="pageGaleriTerkini = p"
                     >{{ p }}</button>
                     <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent2 text-type1 text-xs"
                         :disabled="pageGaleriTerkini === totalPagesGaleriTerkini"
                         @click="pageGaleriTerkini++"
                     >&gt;</button>
