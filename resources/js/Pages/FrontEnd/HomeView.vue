@@ -65,10 +65,10 @@ onMounted(() => {
           Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
       </div>
     </header>
-    <main class="max-w-screen-2xl mx-auto w-full">
+    <main class="max-w-screen-3xl mx-auto w-full ">
       <!-- Bagian Selamat Datang -->
       <article
-        class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 px-[13.91%] py-10 pt-4 md:pt-16 lg:pt-40">
+        class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 sm:px-[13.91%] py-10 pt-4 md:pt-16 lg:pt-40">
         <!-- Text Section -->
         <section class="flex flex-col  w-2/3 space-y-3 md:mx-8">
           <h1 class="text-xl 3xl:md:text-3xl xl:text-xl font-semibold text-accent2 text-center lg:text-left">
@@ -97,7 +97,7 @@ onMounted(() => {
       <div class="px-[6.56%]">
         <!-- Berita Terbaru-->
         <article class="w-full flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 ml-2">
+          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 md:ml-2">
             Berita Terbaru
           </h1>
 
@@ -112,7 +112,7 @@ onMounted(() => {
               :isHome="true" :news="newsItem" />
 
           </div>
-          <a href="/berita" class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
+          <a href="/berita" class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 ml-2 text-right justify-end">
             Selengkapnya >>
           </a>
 
@@ -127,7 +127,7 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
             <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
           </h2>
-          <div class="flex flex-col md:flex-row justify-center lg:space-x-4 space-y-2 md:space-y-0">
+          <div class="flex flex-col sm:flex-row justify-center lg:space-x-4 space-y-2 sm:space-y-0 gap-2 xl:gap-0">
             <div v-if="eventsLoading" class="text-center w-full">
               <p>Loading events...</p>
             </div>
@@ -138,7 +138,7 @@ onMounted(() => {
               <EventCard v-for="event in events.slice(0, 3)" :key="event.id" :event="event" />
             </template>
           </div>
-          <Link href="/event" class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
+          <Link href="/event" class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 xl:my-8ml-2 text-right justify-end">
           Selengkapnya &gt;&gt;
           </Link>
         </article>
@@ -201,7 +201,7 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
           </h2>
-          <div class="grid grid-cols-2 lg:flex lg:flex-row justify-center lg:space-x-8 -m-2 w-max-full">
+          <div class="grid grid-cols-2 sm:flex sm:flex-row md:grid md:grid-cols-2 xl:flex xl:flex-row justify-center lg:space-x-4 -m-2 w-max-full">
             <div v-if="eventsLoading" class="text-center w-full col-span-2">
               <p>Memuat produk unggulan...</p>
             </div>
@@ -211,24 +211,23 @@ onMounted(() => {
             <ProductCard v-else v-for="produkDesa in produkDesa" :key="produkDesa.id" :produkDesa="produkDesa" />
           </div>
           <a href="produk-unggulan"
-            class="text-lg md:text-xl font-semibold text-secondary my-6 ml-2 text-right justify-end">
+            class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 xl:my-8 ml-2 text-right justify-end">
             Selengkapnya >>
           </a>
         </article>
 
 
         <!-- Layanan Publik-->
-        <article class="w-full flex flex-col py-6 lg:py-10 md:pb-16 bg-type1 font-merriweather">
+        <article class="w-full flex flex-col py-6 4xl:py-0 4xl:mb-8 bg-type1 font-merriweather">
           <h1 class="text-xl md:text-3xl font-semibold text-accent2">
             Layanan Publik
           </h1>
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Pusat layanan dan informasi resmi dari Pemerintah Desa untuk masyarakat.</p>
           </h2>
-          <div class="flex flex-col sm:flex-row lg:flex-row space-y-2 sm:space-y-0 justify-between py-4 ">
-
+          <div class="flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row space-y-2 sm:space-y-0 justify-between py-4 sm:gap-4  ">
             <a v-if="layout.produk_hukum" href="/produk-hukum"
-              class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+              class="flex w-full sm:w-full lg:w-1/3 space-x-6  sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <div>
@@ -248,7 +247,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a v-if="layout.dana_desa" href="/dana-desa" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a v-if="layout.dana_desa" href="/dana-desa" class="flex w-full sm:w-full lg:w-1/3 space-x-6  sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -264,7 +263,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/#" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a href="/#" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
@@ -280,7 +279,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/profile#struktur-pemerintahan" class="flex w-full sm:w-3/4 lg:w-1/3 space-x-6 px-3 sm:mx-0">
+            <a href="/profile#struktur-pemerintahan" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"

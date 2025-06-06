@@ -81,7 +81,7 @@ onUnmounted(() => {
         <!-- Navigation Links -->
         <ul
             :class="[
-                'md:flex text-sm sm:text-xl xl:text-sm 3xl:text-base 4xl:text-xl lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt-6 lg:mt-2.5 lg:mr-6',
+                'md:flex text-sm sm:text-xl md:text-sm 3xl:text-base 4xl:text-xl lg:space-x-8 text-white font-semibold transition-all duration-300 sm:mt-3 md:mt-6 lg:mt-2.5 lg:mr-6',
                 isMenuOpen
                     ? 'block'
                     : 'max-h-0 opacity-0 scale-y-0 sm:max-h-full sm:opacity-100 lg:scale-y-100',

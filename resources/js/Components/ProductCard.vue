@@ -16,7 +16,7 @@ defineProps({
 });
 </script>
 <template>
-    <div class="w-full max-w-sm p-1">
+    <div class="w-full max-w-lg p-1">
         <div
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300"
         >
@@ -24,7 +24,7 @@ defineProps({
                 <img
                     :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
                     :alt="produkDesa?.alt"
-                    class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
+                    class="w-full h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
                     @error="handleImageError"
                 />
             </div>
