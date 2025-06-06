@@ -24,7 +24,7 @@
         <div v-else-if="events.length === 0" class="flex justify-center">
         <p>No upcoming events</p>
         </div>
-        <div v-else class="md:flex flex-wrap lg:grid grid-cols-3 justify-center gap-4 mt-4 space-y-4 lg:space-y-0">
+        <div v-else class="flex flex-wrap sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center gap-4 mt-4 space-y-4 sm:space-y-0">
           <EventCard 
             v-for="event in events" 
             :key="event.id"

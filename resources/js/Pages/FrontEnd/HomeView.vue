@@ -127,7 +127,7 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
             <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
           </h2>
-          <div class="flex flex-col sm:flex-row justify-center lg:space-x-4 space-y-2 sm:space-y-0 gap-2 xl:gap-0">
+          <div class="flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row justify-center lg:space-x-4 space-y-2 sm:space-y-0 gap-2 xl:gap-0">
             <div v-if="eventsLoading" class="text-center w-full">
               <p>Loading events...</p>
             </div>

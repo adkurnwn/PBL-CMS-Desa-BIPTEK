@@ -113,7 +113,7 @@ onMounted(fetchData);
                     </p>
                 </h2>
                 <div
-                    class="flex flex-col sm:flex-row justify-center  min-h-full md:space-y-0 gap-3"
+                    class="flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row justify-center  min-h-full md:space-y-0 gap-3"
                 >
                     <div v-if="eventLoading" class="text-center w-full">
                         <p>Memuat events...</p>

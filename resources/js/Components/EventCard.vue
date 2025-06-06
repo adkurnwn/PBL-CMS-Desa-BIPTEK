@@ -16,14 +16,14 @@
               <h3 class="text-xl font-semibold text-white line-clamp-2 items-center justify-center sm:mt-2 xl:mt-4 h-14"
                 :class="{ 'text-gray-300': isPastEvent }">{{ event.title }}</h3>
               <div class="flex flex-col text-lg space-y-1">
-                <div class="flex flex-row space-x-2">
+                <div class="flex flex-row space-x-2 sm:mt-5 xl:mt-0">
                   <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960"
                     width="18px" fill="currentColor" class="text-secondary md:h-[24px] md:w-[24px]"
                     :class="{ 'text-gray-400': isPastEvent }">
                     <path
                       d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" />
                   </svg>
-                  <h2 class="text-xs sm:text-sm line-clamp-1 text-type1 font-extralight mt-0.5"
+                  <h2 class="text-xs sm:text-sm line-clamp-1 text-type1 font-extralight mt-0.5 "
                     :class="{ 'text-gray-500': isPastEvent }">{{ event.location }}</h2>
                 </div>
                 <div class="flex flex-row space-x-2">
@@ -198,7 +198,7 @@ const toggleDescription = () => {
 <style scoped>
 .flip-card {
   perspective: 1000px;
-  min-height: 270px; /* Set a reasonable min-height for mobile */
+  min-height: 200px; /* Set a reasonable min-height for mobile */
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -207,7 +207,7 @@ const toggleDescription = () => {
 .flip-card-inner {
   position: relative;
   width: 100%;
-  min-height: 270px; /* Match the min-height of .flip-card */
+  min-height: 200px; /* Match the min-height of .flip-card */
   height: 100%;
   text-align: left;
   transition: transform 0.6s;
@@ -224,7 +224,7 @@ const toggleDescription = () => {
 .flip-card-front {
   position: absolute;
   width: 100%;
-  min-height: 270px; /* Ensure both sides have the same min-height */
+
   height: 100%;
   min-height: 250px;
   -webkit-backface-visibility: hidden;
