@@ -76,24 +76,24 @@ onMounted(() => {
 
 <template>
     <UserLayout>
-        <div class="min-h-screen bg-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-40 font-merriweather">
+        <div class="bg-type1">
+            <div class="max-w-7xl mx-auto mt-20 px-4 sm:px-8 xl:px-8 py-20 font-merriweather">
                 <div class="flex flex-col items-center justify-center mb-12">
                     <h1 class="text-2xl font-bold text-accent1">Produk Hukum</h1>
                 </div>
-                <div class="flex xl:flex-row sm:flex-col items-center justify-between mt-4 mb-8 gap-4">
-                    <h1 class="xl:text-xl sm:text-md text-accent2 flex items-center xl:mr-0 sm:mr-80">
-                    <span class="material-symbols-outlined mr-2 text-[1.3em] align-middle">description</span>
+                <div class="flex sm:flex-col xl:flex-row xl:items-center justify-between mt-4 mb-8">
+                    <h1 class="sm:text-base xl:text-xl text-accent2 flex">
+                    <span class="material-symbols-outlined mr-2 sm:text-base xl:text-xl align-middle">description</span>
                     Produk Hukum Desa Pao-Pao
                     </h1>
                     <!-- Filter Bar -->
-                    <div class="flex flex-wrap gap-2 text-sm">
+                    <div class="flex flex-wrap gap-2 text-sm sm:mt-4 xl:mt-0 sm:justify-center xl:justify-end">
                         <!-- Nomor Peraturan -->
                         <div class="relative">
                             <input
                                 type="text"
                                 placeholder="Cari nomor peraturan..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-72 xl:w-44"
                             />
                             <span
                                 class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
@@ -105,7 +105,7 @@ onMounted(() => {
                             <input
                                 type="text"
                                 placeholder="Cari judul..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 w-72 xl:w-44"
                             />
                             <span
                                 class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none"
@@ -114,14 +114,14 @@ onMounted(() => {
                         </div>
                         <!-- Kategori -->
                         <select
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-36"
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-36"
                         >
                             <option>Kategori</option>
                             <!-- Tambahkan opsi lain sesuai kebutuhan -->
                         </select>
                         <!-- Tahun Penetapan -->
                         <select
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-40"
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-40"
                         >
                             <option>Tahun Penetapan</option>
                         </select>
@@ -212,7 +212,7 @@ onMounted(() => {
                 >
                     <button
                         @click="goToPage(pagination.current_page - 1)"
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 disabled:opacity-50 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                         :disabled="pagination.current_page === 1"
                     >
                         &lt;
@@ -226,7 +226,7 @@ onMounted(() => {
                     >{{ p }}</span>
                     <button
                         @click="goToPage(pagination.current_page + 1)"
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 disabled:opacity-50 text-type1 text-xs"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
                         :disabled="
                             pagination.current_page === pagination.last_page
                         "

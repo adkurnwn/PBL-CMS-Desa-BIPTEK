@@ -62,7 +62,7 @@ const albums = ref([
 ]);
 
 const pageAlbumDesa = ref(1);
-const totalPages = 2;
+const totalPagesAlbumDesa = 2;
 const pageGaleriTerkini = ref(1);
 const totalPagesGaleriTerkini = 2;
 </script>
@@ -159,7 +159,7 @@ const totalPagesGaleriTerkini = 2;
                     @click="pageAlbumDesa--"
                 >&lt;</button>
                 <button
-                    v-for="p in totalPages"
+                    v-for="p in totalPagesAlbumDesa"
                     :key="p"
                     class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
                     :class="pageAlbumDesa === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
@@ -167,7 +167,7 @@ const totalPagesGaleriTerkini = 2;
                 >{{ p }}</button>
                 <button
                     class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                    :disabled="pageAlbumDesa === totalPages"
+                    :disabled="pageAlbumDesa === totalPagesAlbumDesa"
                     @click="pageAlbumDesa++"
                 >&gt;</button>
             </div>

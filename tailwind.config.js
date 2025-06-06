@@ -62,6 +62,7 @@ export default {
               },
             fontSize: {
                 'xxs': '0.700rem', // 10px
+                'xxxs': '0.45rem',
             },
         },
     },

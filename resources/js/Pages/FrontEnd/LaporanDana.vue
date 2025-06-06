@@ -49,29 +49,29 @@ function lihatDetail(id) {
 
 <template>
   <UserLayout>
-    <div class="min-h-screen bg-type1">
-      <div class="max-w-7xl mx-auto px-4 sm:px-8 xl:px-8 py-40 font-merriweather">
+    <div class="bg-type1">
+      <div class="max-w-7xl mx-auto mt-20 px-6 sm:px-8 xl:px-8 py-10 sm:py-20 xl:py-20 font-merriweather">
         <div class="flex flex-col items-center justify-center sm:mb-10 xl:mb-12">
-          <h1 class="sm:text-xl xl:text-2xl font-bold text-accent1">Laporan Dana Desa</h1>
+          <h1 class="text-lg sm:text-xl xl:text-2xl font-bold text-accent1">Laporan Dana Desa</h1>
         </div>
-        <div class="flex sm:flex-col xl:flex-row xl:items-center justify-between mt-4 mb-8">
-          <h1 class="sm:text-md xl:text-xl text-accent2 flex">
-            <span class="material-symbols-outlined mr-2 sm:text-base xl:text-xl align-middle">description</span>
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between mt-4 mb-8">
+          <h1 class="text-sm sm:text-base xl:text-xl text-accent2 flex">
+            <span class="material-symbols-outlined mr-2 text-sm sm:text-base xl:text-xl align-middle">description</span>
             Laporan Dana Desa
           </h1>
            <!-- Filter Bar -->
-          <div class="flex flex-wrap gap-2 text-sm sm:mt-2 xl:mt-0 sm:justify-center xl:justify-end">
+          <div class="flex flex-wrap gap-2 text-sm mt-2 sm:mt-4 xl:mt-0 sm:justify-center xl:justify-end">
             <!-- Nomor Peraturan -->
             <div class="relative">
               <input
                 type="text"
                 placeholder="Cari laporan dana desa..."
-                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-300 text-xs focus:outline-none focus:ring-0 sm:w-96 xl:w-80"
+                class="border-gray-300 rounded px-3 py-1 sm:py-2 xl:py-2 bg-type1 text-gray-300 text-xxs sm:text-xs focus:outline-none focus:ring-0 w-60 sm:w-96 xl:w-80"
               />
-              <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-base pointer-events-none">search</span>
+              <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 text-xs sm:text-base pointer-events-none">search</span>
             </div>
               <!-- Tahun Penetapan -->
-              <select class="border rounded px-3 py-2 bg-type1 text-type2 text-xs focus:outline-none focus:ring-0 sm:w-52 xl:w-40">
+              <select class="border rounded px-3 py-1 sm:py-2 xl:py-2 bg-type1 text-type2 text-xxs sm:text-xs focus:outline-none focus:ring-0 w-20 sm:w-52 xl:w-40">
                 <option>Tahun</option>
               </select>
           </div>
@@ -88,34 +88,34 @@ function lihatDetail(id) {
               <!-- Nomor Urut & Judul -->
               <div class="flex-1 min-w-0 mt-1">
                 <div class="flex items-center mb-1">
-                  <span class="text-accent1 mr-3 text-sm flex-shrink-0">{{ idx + 1 }}.</span>
-                  <div class="text-sm font-medium text-accent1 truncate">
+                  <span class="text-accent1 mr-3 text-xxs sm:text-sm flex-shrink-0">{{ idx + 1 }}.</span>
+                  <div class="text-xxs sm:text-sm font-medium text-accent1 truncate">
                     {{ laporan.judul }}
                   </div>
                 </div>
                 <!-- Metadata -->
-                <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1 mb-1 ml-6">
+                <div class="flex sm:flex-wrap sm:items-center text-xxxs sm:text-xs text-filterBorder gap-x-2 sm:gap-x-4 gap-y-1 mb-1 ml-6">
                   <span>
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span>
+                    <span class="material-symbols-outlined align-middle text-xxxs sm:text-xs">calendar_today</span>
                     Tanggal: {{ laporan.tanggal }}
                   </span>
                   <span>
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
+                    <span class="material-symbols-outlined align-middle text-xxxs sm:text-xs">visibility</span>
                     Dilihat {{ laporan.views || 0 }} kali
                   </span>
                   <span>
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">file_save</span>
+                    <span class="material-symbols-outlined align-middle text-xxxs sm:text-xs">file_save</span>
                     Diunduh {{ laporan.downloads || 0 }} kali
                   </span>
                 </div>
               </div>
               <!-- Tombol Download -->
-              <div class="ml-4">
+              <div class="mt-1 sm:mt-0 ml-4">
                 <a
                   v-if="laporan.file"
                   :href="`/storage/${laporan.file}`"
                   target="_blank"
-                  class="inline-flex items-center justify-center w-8 h-8 rounded text-accent1 bg-secondary hover:bg-yellow-500"
+                  class="inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded text-accent1 bg-secondary hover:bg-yellow-500"
                   title="Download"
                   @click.stop
                 >
@@ -125,7 +125,7 @@ function lihatDetail(id) {
             </div>
           <!-- Empty State -->
           <div v-if="laporanDana.length === 0" class="col-span-full text-center py-12">
-            <p class="text-gray-500 text-lg">Belum ada laporan dana yang tersedia.</p>
+            <p class="text-gray-500 text-sm sm:text-base xl:text-lg">Belum ada laporan dana yang tersedia.</p>
           </div>
         </div>
         <!-- Pagination -->
@@ -135,7 +135,7 @@ function lihatDetail(id) {
         >
           <button
             @click="goToPage(pagination.current_page - 1)"
-            class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs disabled:opacity-50"
+            class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
             :disabled="pagination.current_page === 1"
           >
             &lt;
@@ -143,13 +143,13 @@ function lihatDetail(id) {
           <span
             v-for="p in totalPages"
             :key="p"
-            class="w-8 h-8 rounded-full flex items-center justify-center text-xs cursor-pointer"
+            class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs cursor-pointer"
             :class="pagination.current_page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
             @click="goToPage(p)"
           >{{ p }}</span>
           <button
             @click="goToPage(pagination.current_page + 1)"
-            class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs disabled:opacity-50"
+            class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
             :disabled="pagination.current_page === pagination.last_page"
           >
             &gt;
