@@ -4,3 +4,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (min-width: 1920px) and (max-width: 1920px) and (min-height: 1080px) and (max-height: 1080px) {
+  .scale-125-1920 {
+    transform: scale(1.25);
+    transform-origin: top left;
+    width: 80vw;
+    height: 80vh;
+}
