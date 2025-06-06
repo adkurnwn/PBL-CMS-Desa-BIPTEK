@@ -5,6 +5,7 @@ import Map from "@/Components/FrontendComponent/Map.vue";
 import { useApiCache } from "@/Utility/useApiCache";
 import { parseFasilitas, parseMisi, parseBatas } from "@/Utility/useParser";
 import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
+import { Head } from "@inertiajs/vue3";
 
 const profile = ref({});
 const demografi = ref({});
@@ -39,6 +40,7 @@ const handleCoordinatesUpdate = (coords) => {
 </script>
 <!-- Profileview.vue -->
 <template>
+    <Head title="Profil Desa" />
     <UserLayout v-slot="{ layout }">
         <header class="flex items-center justify-center font-merriweather">
             <!--Sejarah Desa-->

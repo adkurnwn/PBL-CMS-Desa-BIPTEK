@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted, watch } from "vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { Link, usePage, Head } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import { formatDate } from "@/Utility/useComment";
@@ -58,6 +58,7 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head :title="news.title" />
     <UserLayout>
         <div v-if="error">
             <NotFound />
@@ -126,7 +127,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="20px"
-                                            viewBox="0 -960 960 960"
+                                            viewBox="http://www.w3.org/2000/svg"
                                             width="20px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -143,7 +144,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="24px"
-                                            viewBox="0 -960 960 960"
+                                            viewBox="http://www.w3.org/2000/svg"
                                             width="24px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -160,7 +161,7 @@ onMounted(() => {
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             height="24px"
-                                            viewBox="0 -960 960 960"
+                                            viewBox="http://www.w3.org/2000/svg"
                                             width="24px"
                                             fill="currentColor"
                                             class="text-accent2 lg:w-6 lg:h-6"
@@ -202,9 +203,15 @@ onMounted(() => {
 
                                     <!-- Content -->
                                     <div
-                                        class="text-sm lg:text-lg text-semiBlack"
+                                        class="text-sm lg:text-lg text-semiBlack text-justify"
                                         v-html="news.content"
                                     ></div>
+                                    <!-- Video -->
+                                    <div v-if="news.video">
+                                        <video controls class="w-full mt-4 rounded-lg shadow-lg"
+                                            :src="`/storage/${news.video}`"
+                                        ></video>
+                                    </div>
 
                                     <!-- Back Button -->
                                     <!-- <div class="mt-8">
@@ -242,7 +249,7 @@ onMounted(() => {
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     height="24px"
-                                    viewBox="0 -960 960 960"
+                                    viewBox="http://www.w3.org/2000/svg"
                                     width="24px"
                                     fill="currentColor"
                                     class="text-type1"

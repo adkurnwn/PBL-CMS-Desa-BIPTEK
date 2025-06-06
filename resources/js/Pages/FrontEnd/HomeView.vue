@@ -225,7 +225,7 @@ onMounted(() => {
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Pusat layanan dan informasi resmi dari Pemerintah Desa untuk masyarakat.</p>
           </h2>
-          <div class="flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row space-y-2 sm:space-y-0 justify-between py-4 sm:gap-4  ">
+          <div class="flex flex-col sm:grid sm:grid-cols-2 lg:flex lg:flex-row space-y-2 sm:space-y-0 justify-between py-4 sm:gap-4  ">
             <a v-if="layout.produk_hukum" href="/produk-hukum"
               class="flex w-full sm:w-full lg:w-1/3 space-x-6  sm:mx-0">
               <div
