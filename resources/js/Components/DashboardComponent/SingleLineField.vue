@@ -116,3 +116,11 @@ export default {
   emits: ['update:modelValue', 'click', 'add-numbered-item', 'input']
 }
 </script>
+
+<style scoped>
+/* Remove browser default outline */
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+</style>
