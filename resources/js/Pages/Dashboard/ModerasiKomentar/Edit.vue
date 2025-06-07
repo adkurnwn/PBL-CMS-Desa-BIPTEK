@@ -407,7 +407,7 @@ const stripHtml = (html) => {
                         :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        :white-background="true" empty-state-message="No comments found"
+                        :white-background="true" empty-state-message="Tidak ada komentar yang ditemukan."
                         @filter-changed="handleFilterChange" @sort="handleSort"
                         @page-changed="handlePageChanged">
 

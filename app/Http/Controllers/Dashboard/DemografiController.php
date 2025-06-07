@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Events\CacheInvalidationRequested;
 use Inertia\Inertia;
 use App\Models\Demografi;
 use Illuminate\Http\Request;
@@ -73,6 +74,7 @@ class DemografiController extends Controller
         Demografi::create($demografiData);
 
         $this->logHelper->logActivity('create', 'demografi', 'Menambahkan demografi ' . $request->title);
+        event(new CacheInvalidationRequested(['demografi_preview']));
         return redirect()->route('dashboard.demografi.index')->with('success', 'Data demografi Berhasil Ditambahkan');
     }
 
@@ -102,6 +104,7 @@ class DemografiController extends Controller
         $demografi->update($demografiData);
 
         $this->logHelper->logActivity('update', 'demografi', 'Memperbarui demografi ' . $request->title);
+        event(new CacheInvalidationRequested(['demografi_preview']));
         return redirect()->route('dashboard.demografi.index')->with('success', 'Data demografi Berhasil Diperbarui');
     }
 }

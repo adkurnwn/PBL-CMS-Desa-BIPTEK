@@ -9,6 +9,7 @@ use App\Services\MediaService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validation\UpdateProfileRequest;
+use App\Events\CacheInvalidationRequested; // Add this import
 
 class ProfileController extends Controller
 {
@@ -49,24 +50,45 @@ class ProfileController extends Controller
             'hero_image_2',
             'hero_image_3',
             'lembaga',
-            'fasilitas'
+            'fasilitas',
+            'media_sosial',
+            'batas_desa'
         ]);
 
         $village = Village::find($request->kelurahan);
         if ($village) {
-            $profileData['name'] = "Desa " . ucwords(strtolower($village->name));
+            $governmentType = ucfirst($request->tipe_pemerintahan);
+            $profileData['name'] = $governmentType . " " . ucwords(strtolower($village->name));
         }
 
         $profileData['lembaga'] = json_encode($request->lembaga);
         $profileData['fasilitas'] = json_encode($request->fasilitas);
         $profileData['kode_pos'] = $request->kode_pos;
+        
+        // Handle media_sosial as JSON array
+        if ($request->has('media_sosial')) {
+            $mediaSosial = $request->media_sosial;
+            // Ensure we always have 4 elements: [instagram, x, facebook, youtube]
+            while (count($mediaSosial) < 4) {
+                $mediaSosial[] = '';
+            }
+            $profileData['media_sosial'] = json_encode(array_slice($mediaSosial, 0, 4));
+        }
+
+        // Handle batas_desa as JSON array
+        if ($request->has('batas_desa')) {
+            $batasDesa = $request->batas_desa;
+            // Ensure we always have 4 elements: [batas_utara, batas_timur, batas_selatan, batas_barat]
+            while (count($batasDesa) < 4) {
+                $batasDesa[] = '';
+            }
+            $profileData['batas_desa'] = json_encode(array_slice($batasDesa, 0, 4));
+        }
 
         if ($request->hasFile('logo')) {
             if ($profile->logo) $this->mediaService->delete($profile->logo);
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
             $profileData['logo'] = $logoPath;
-
-            // Favicon is now handled in SettingsController
         }
 
         if ($request->hasFile('organization_image')) {
@@ -93,6 +115,13 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
+
+        // Fire cache invalidation event after successful profile update
+        event(new CacheInvalidationRequested([
+            'profile.layout',
+            'profile.detail',
+        ]));
+
         return redirect()->route('dashboard.profiles.edit', [$profile->name])->with('success', 'Profil berhasil diperbarui');
     }
 }

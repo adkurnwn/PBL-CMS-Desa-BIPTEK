@@ -23,6 +23,9 @@ class NewsDetail extends JsonResource
             'created_at' => $this->created_at,
             'category_name' => $this->category->name,
             'images' => $this->images,
+            'user' => [
+                'name' => $this->user->name,
+            ],
         ];
     }
 }

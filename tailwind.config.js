@@ -13,8 +13,8 @@ export default {
     theme: {
         extend: {
             colors: {
-                'accent1': 'var(--accent1, #244031)',
-                'accent2': 'var(--accent2, #3B614A)',
+                'accent1': '#244031',
+                'accent2': '#3B614A',
                 'type1': '#F6F5F1',
                 'type2': '#40483D',
                 'secondary': '#DEA521',
@@ -51,9 +51,9 @@ export default {
                 'sm': '640px',
                 md: '800px', // Mengubah md dari 768px menjadi 800px
                 lg: '1025px', // Mengubah lg dari 1024px menjadi 1025px
-                xl: '1280px',
-                '2xl': '1440px',
-                '3xl': '1536px',
+                xl: '1280px', // UKURAN FHD 150%
+                '2xl': '1440px', //
+                '3xl': '1536px', //// UKURAN FHD 125%
                 '4xl': '1920px', // Your default design width
             },
             maxWidth: {
@@ -62,6 +62,7 @@ export default {
               },
             fontSize: {
                 'xxs': '0.700rem', // 10px
+                'xxxs': '0.45rem',
             },
         },
     },

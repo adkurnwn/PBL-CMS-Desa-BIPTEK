@@ -19,8 +19,8 @@ class EventPreview extends JsonResource
             'slug' => $this->slug,
             'date' => $this->date,
             'time' => $this->time,
+            'description' => $this->description,
             'location' => $this->location,
-            'created_at' => $this->created_at,
         ];
     }
 }

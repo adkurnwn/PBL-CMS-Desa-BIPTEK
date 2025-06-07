@@ -45,13 +45,13 @@ class PermissionSeeder extends Seeder
         // Give admin all permissions by default
         $admin->givePermissionTo(Permission::all());
         $kepalaDesa->givePermissionTo([
-            'manage_dashboard',
+            'manage_home',
             'manage_demografi',
             'manage_statistics',
             'manage_feedbacks',
         ]);
         $aparatDesa->givePermissionTo([
-            'manage_dashboard',
+            'manage_home',
             'manage_news',
             'manage_galleries',
             'manage_events',

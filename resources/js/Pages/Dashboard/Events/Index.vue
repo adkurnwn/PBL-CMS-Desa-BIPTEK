@@ -300,7 +300,7 @@ watch(() => props.filters, (newValue) => {
                         :items-per-page="pagination?.perPage || 10" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || eventItems.length"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        empty-state-message="No events found. Create a new event to get started."
+                        empty-state-message="Tiidak ada agenda yang ditemukan"
                         @sort="handleSort" @filter-changed="handleFilterChange" @page-changed="handlePageChange">
                         
                         <!-- Template for Nama Kegiatan column -->

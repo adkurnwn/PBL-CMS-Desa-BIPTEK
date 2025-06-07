@@ -4,12 +4,14 @@ import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
 import { ref, onMounted, } from "vue";
 import useFilter from "@/Utility/useFilter";
+import {Head } from "@inertiajs/vue3";
 import axios from "axios";
 
 const news = ref([]);
 const categories = ref([]);
 const error = ref(null);
-const pagination = ref(null);
+const pagination = ref(2);
+const totalPages= 2;
 const newsApi = useApiFetch();
 const categoriesApi = useApiFetch();
 
@@ -58,28 +60,28 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head title="Berita Desa" />
     <UserLayout>
         <main
             class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather"
         >
             <!-- Judul -->
             <h1
-                class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2 mt-40"
+                class="xl:text-2xl sm:text-xl text-md font-semibold text-accent1 mt-40"
             >
                 Berita Desa
             </h1>
-            <!-- Search Bar -->
-            <div class="relative flex flex-grow items-center max-w-7xl mx-auto">
+            <!-- Search Bar & Filter -->
+            <div class="flex items-center justify-center w-full max-w-3xl mx-auto mt-6 relative">
                 <input
                     type="text"
                     v-model="searchQuery"
                     placeholder="Cari Informasi atau Kegiatan..."
-                    style="width: 800px"
-                    class="flex-grow items-center mt-6 xl:max-w-2xl sm:max-w-md py-2 mr-5 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-ligh"
+                    class="flex-grow py-2 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-light px-6"
                 />
                 <!-- Button Ikon Search -->
                 <button
-                    class="absolute right-20 mt-6 transform text-accent1"
+                    class="absolute right-20 text-accent1"
                     @click="handleSearch"
                 >
                     <svg
@@ -97,13 +99,13 @@ onMounted(() => {
                 <!-- Button Filter Waktu Berita -->
                 <button
                     @click="openFilter"
-                    class="transform mt-6 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
+                    class="ml-5 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
                 >
                     <svg
                         class="ml-2"
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
-                        viewBox="http://www.w3.org/2000/svg"
+                        viewBox="0 -960 960 960"
                         width="24px"
                         fill="244031"
                     >
@@ -115,7 +117,7 @@ onMounted(() => {
             </div>
             <!-- Kategori Berita -->
             <div
-                class="flex relative items-center xl:space-x-7 space-x-5 mt-7 ml-10 overflow-x-auto xl:text-lg text-sm text-accent1"
+                class="flex items-center justify-center w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 mt-6 xl:text-lg text-sm text-accent1"
             >
                 <button
                     @click="selectCategory('Semua')"
@@ -143,6 +145,19 @@ onMounted(() => {
                     }"
                 >
                     {{ category.name }}
+                </button>
+
+                <!-- Button Kategori Berit Lainnya -->
+                <button
+                    class="transform w-11 h-11 text-accent1 hover:text-white transition"
+                >
+                    <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        height="24px" 
+                        viewBox="0 -960 960 960" 
+                        width="24px" fill="244031">
+                        <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/>
+                    </svg>
                 </button>
             </div>
             <!--Berita Terkini-->
@@ -192,23 +207,23 @@ onMounted(() => {
                 </div>
 
                 <!-- Pagination -->
-                <div class="flex justify-center gap-2 mb-10">
+                <div class="flex justify-center mt-5 gap-2 mb-10">
                     <button
-                        class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                        :disabled="page === 1"
-                        @click="page--"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="pagination === 1"
+                        @click="pagination--"
                     >&lt;</button>
                     <button
                         v-for="p in totalPages"
                         :key="p"
-                        class="w-7 h-7 rounded-full flex items-center justify-center text-xs"
-                        :class="page === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
-                        @click="page = p"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
+                        :class="pagination === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
+                        @click="pagination = p"
                     >{{ p }}</button>
                     <button
-                        class="w-7 h-7 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                        :disabled="page === totalPages"
-                        @click="page++"
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
+                        :disabled="pagination === totalPages"
+                        @click="pagination++"
                     >&gt;</button>
                 </div>
             </article>

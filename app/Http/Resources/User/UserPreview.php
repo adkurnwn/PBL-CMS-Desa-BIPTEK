@@ -19,6 +19,7 @@ class UserPreview extends JsonResource
             'email' => $this->email,
             'position' => $this->position->name ?? null,
             'image' => $this->photo_profile ?? null,
+            'job_description' => $this->position->job_description ?? null,
         ];
     }
 }

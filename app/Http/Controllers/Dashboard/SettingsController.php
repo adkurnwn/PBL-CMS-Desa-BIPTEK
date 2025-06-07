@@ -240,12 +240,10 @@ class SettingsController extends Controller
 
     public function updateTheme(UpdateThemeRequest $request)
     {
-
         // Update theme colors in the profile
         if ($request->filled('primary_color') || $request->filled('secondary_color')) {
             $profile = Profile::first();
             if (!$profile) {
-                // Create profile if it doesn't exist
                 $profile = new Profile();
             }
 
@@ -258,6 +256,7 @@ class SettingsController extends Controller
             if ($request->filled('secondary_color')) {
                 $profileData['secondary_color'] = $request->secondary_color;
             }
+
             $result = $profile->updateOrCreate(['id' => $profile->id ?? 1], $profileData);
         }
 

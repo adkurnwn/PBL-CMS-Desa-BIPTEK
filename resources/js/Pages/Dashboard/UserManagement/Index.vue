@@ -274,7 +274,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                         :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        empty-state-message="No users found" @filter-changed="handleFilterChange" @sort="handleSort">
+                        empty-state-message="Tidak ada pengguna yang ditemukan" @filter-changed="handleFilterChange" @sort="handleSort">
                         <!-- Add slot templates for different columns -->
                         <!-- Add a template for the Kontak column -->
                         <template #['item.Kontak']="{ item }">

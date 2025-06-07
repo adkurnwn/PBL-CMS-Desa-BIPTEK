@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import Comment from "@/Components/Comment.vue";
 import { formatDate } from "@/Utility/useComment";
+import { Head } from "@inertiajs/vue3";
 
 const props = defineProps({
     slug: {
@@ -36,7 +37,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <UserLayout>
+    <Head :title="dokumen.title" />
+    <UserLayout v-slot="{ layout }">
         <div class="min-h-screen bg-type1">
             <div class="max-w-screen-2xl mx-auto px-6 lg:px-28 py-6 lg:py-12">
                 <!-- Loading State -->
@@ -72,7 +74,7 @@ onMounted(() => {
                         <h1
                             class="lg:text-lg text-accent2 -mb-0.5 font-merriweather"
                         >
-                            Peraturan Desa
+                            Produk Hukum {{ layout.name }}
                         </h1>
                     </div>
 
@@ -181,13 +183,13 @@ onMounted(() => {
                                     target="_blank"
                                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent2 hover:bg-accent1"
                                 >
-                                    Download Document
+                                    Unduh Dokumen
                                 </a>
                             </div>
                         </div>
                         <div
                             v-if="dokumen.file && isPreviewable(dokumen.file)"
-                            class="m-1 pt-4"
+                            class="pt-4"
                         >
                             <iframe
                                 :src="`/storage/${dokumen.file}`"
@@ -225,16 +227,6 @@ onMounted(() => {
                 View External Link
               </a>
             </div> -->
-
-                    <!-- Back Button -->
-                    <div class="mt-8">
-                        <Link
-                            href="/produk-hukum-test"
-                            class="text-accent1 hover:text-accent2 transition-color duration-300 font-medium"
-                        >
-                            ← Back to Daftar Produk Hukum
-                        </Link>
-                    </div>
                 </div>
 
                 <div class="mt-12">

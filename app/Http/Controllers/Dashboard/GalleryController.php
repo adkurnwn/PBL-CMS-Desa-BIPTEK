@@ -6,12 +6,13 @@ use Inertia\Inertia;
 use App\Models\Gallery;
 use App\Models\Category;
 use App\Helpers\SlugHelper;
+use Illuminate\Http\Request;
 use App\Services\MediaService;
 use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Events\CacheInvalidationRequested;
 use App\Http\Requests\Validation\StoreGalleryRequest;
 use App\Http\Requests\Validation\UpdateGalleryRequest;
 
@@ -34,28 +35,28 @@ class GalleryController extends Controller
         $search = $request->input('search');
         $sortField = $request->input('sort', 'title');
         $sortDirection = $request->input('direction', 'asc');
-        
+
         // Get filter parameters
         $filters = [];
         if ($request->has('category_id')) {
             $filters['category_id'] = $request->input('category_id');
         }
-        
+
         // Start building the query
         $query = Gallery::with(['category', 'images']);
-        
+
         // Apply search filter if provided
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'LIKE', "%{$search}%");
             });
         }
-        
+
         // Apply category filter if provided
         if (isset($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
-        
+
         // Handle sorting
         if ($sortField === 'category.name') {
             $query->join('categories', 'galleries.category_id', '=', 'categories.id')
@@ -64,10 +65,10 @@ class GalleryController extends Controller
         } else {
             $query->orderBy($sortField, $sortDirection);
         }
-        
+
         // Paginate the results
         $galleries = $query->paginate(25)->withQueryString();
-        
+
         return Inertia::render('Dashboard/Gallery/Index', [
             'galleries' => $galleries,
             'search' => $search,
@@ -101,6 +102,10 @@ class GalleryController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'gallery', 'Menambahkan gallery ' . $gallery->title);
+        event(new CacheInvalidationRequested([
+            'gallery_highlight',
+            'categories_index_1'
+        ]));
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Ditambahkan');
     }
 
@@ -146,6 +151,10 @@ class GalleryController extends Controller
         }
 
         $this->logHelper->logActivity('edit', 'gallery', 'Memperbarui gallery ' . $gallery->title);
+        event(new CacheInvalidationRequested([
+            'gallery_highlight',
+            'categories_index_1'
+        ]));
         return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diperbarui');
     }
 
@@ -155,28 +164,28 @@ class GalleryController extends Controller
         $search = $request->input('search');
         $sortField = $request->input('sort', 'deleted_at');
         $sortDirection = $request->input('direction', 'desc');
-        
+
         // Get filter parameters
         $filters = [];
         if ($request->has('category_id')) {
             $filters['category_id'] = $request->input('category_id');
         }
-        
+
         // Start building the query
         $query = Gallery::onlyTrashed()->with(['category', 'images']);
-        
+
         // Apply search filter if provided
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'LIKE', "%{$search}%");
             });
         }
-        
+
         // Apply category filter if provided
         if (isset($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
-        
+
         // Handle sorting
         if ($sortField === 'category.name') {
             $query->join('categories', 'galleries.category_id', '=', 'categories.id')
@@ -185,10 +194,10 @@ class GalleryController extends Controller
         } else {
             $query->orderBy($sortField, $sortDirection);
         }
-        
+
         // Paginate the results
         $galleries = $query->paginate(25)->withQueryString();
-        
+
         return Inertia::render('Dashboard/Gallery/Archive', [
             'galleries' => $galleries,
             'search' => $search,
@@ -204,6 +213,10 @@ class GalleryController extends Controller
         $gallery = Gallery::withTrashed()->where('slug', $slug)->firstOrFail();
         $gallery->restore();
         $this->logHelper->logActivity('restore', 'gallery', 'Memulihkan gallery ' . $gallery->title);
+        event(new CacheInvalidationRequested([
+            'gallery_highlight',
+            'categories_index_1'
+        ]));
         return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dipulihkan');
     }
 
@@ -214,10 +227,18 @@ class GalleryController extends Controller
             $this->mediaService->deleteAllMedia($gallery);
             $gallery->forceDelete();
             $this->logHelper->logActivity('delete', 'gallery', 'Menghapus gallery ' . $gallery->title);
+            event(new CacheInvalidationRequested([
+                'gallery_highlight',
+                'categories_index_1'
+            ]));
             return redirect()->route('dashboard.galleries.archive')->with('success', 'Gallery Berhasil Dihapus');
         } else {
             $gallery->delete();
             $this->logHelper->logActivity('archive', 'gallery', 'Mengarsipkan gallery ' . $gallery->title);
+            event(new CacheInvalidationRequested([
+                'gallery_highlight',
+                'categories_index_1'
+            ]));
             return redirect()->route('dashboard.galleries.index')->with('success', 'Gallery Berhasil Diarsipkan');
         }
     }

@@ -42,34 +42,4 @@ class UserController extends Controller
             ], 500);
         }
     }
-
-    public function kepalaDesa()
-    {
-        try {
-            $kepalaDesa = User::whereHas('roles', function ($query) {
-                $query->where('name', 'Kepala Desa');
-            })->where('status', true)->first();
-
-            if (!$kepalaDesa) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kepala Desa not found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'name' => $kepalaDesa->name,
-                    'photo_profile' => $kepalaDesa->photo_profile ??  null,
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal Server Error',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
 }
