@@ -87,10 +87,14 @@ const socialMedia = computed(() =>
                         </a>
                     </div>
                     <p class="text-white text-sm md:text-base">
-                        <i class="bi bi-telephone text-sm mr-2"></i>{{ layout.phone }}
+                        <a :href="`tel:${layout.phone}`" class=" hover:text-yellow-600 transition-colors duration-200">
+                            <i class="bi bi-telephone text-sm mr-2"></i>{{ layout.phone }}
+                        </a>
                     </p>
                     <p class="text-white text-sm md:text-base">
-                        <i class="bi bi-envelope text-sm mr-2"></i>{{ layout.email }}
+                        <a :href="`mailto:${layout.email}`" class=" hover:text-yellow-600 transition-colors duration-200">
+                            <i class="bi bi-envelope text-sm mr-2"></i>{{ layout.email }}
+                        </a>
                     </p>
                 </div>
             </div>
