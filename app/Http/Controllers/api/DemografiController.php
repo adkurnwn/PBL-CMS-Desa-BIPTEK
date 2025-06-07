@@ -52,21 +52,20 @@ class DemografiController extends Controller
     public function preview()
     {
         try {
-            return Cache::remember('demografi.preview', 600, function () {
-                $demografi = Demografi::latest()->first();
-
-                if (!$demografi) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Demografi data not found'
-                    ], 404);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => new DemografiPreview($demografi)
-                ], 200);
+            $demografi = Cache::remember('demografi_preview', now()->addDay(), function () {
+                return Demografi::latest()->first();
             });
+            if (!$demografi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Demografi data not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new DemografiPreview($demografi)
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

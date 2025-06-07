@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Events\CacheInvalidationRequested;
 use Inertia\Inertia;
 use App\Models\Event;
 use App\Helpers\SlugHelper;
@@ -23,26 +24,26 @@ class EventController extends Controller
     {
         // Get the search term from request
         $search = $request->input('search');
-        
+
         // Get the sort parameters from request (default to 'title' and 'asc')
         $sort = $request->input('sort', 'title');
         $direction = $request->input('direction', 'asc');
-        
+
         // Process filters if any
         $filters = $request->input('filters', []);
-        
+
         // Build the query
         $query = Event::query();
-        
+
         // Apply search if provided
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
-        
+
         // Apply filters if any
         if (!empty($filters)) {
             // Example: Filter by date range
@@ -56,19 +57,19 @@ class EventController extends Controller
                     $query->whereDate('date', now()->format('Y-m-d'));
                 }
             }
-            
+
             // Example: Filter by location
             if (isset($filters['location']) && $filters['location']) {
                 $query->where('location', $filters['location']);
             }
         }
-        
+
         // Apply sorting
         $query->orderBy($sort, $direction);
-        
+
         // Get paginated results (10 items per page)
         $events = $query->paginate(25)->withQueryString();
-        
+
         return Inertia::render('Dashboard/Events/Index', [
             'events' => $events,
             'search' => $search,
@@ -102,6 +103,7 @@ class EventController extends Controller
         Event::create($data);
 
         $this->logHelper->logActivity('create', 'event', 'Menambahkan event ' . $request->title);
+        event(new CacheInvalidationRequested(['upcoming_events']));
         return redirect()->route('dashboard.events.index')->with('success', 'Agenda Berhasil Ditambahkan');
     }
 
@@ -144,6 +146,7 @@ class EventController extends Controller
         $event->update($data);
 
         $this->logHelper->logActivity('update', 'event', 'Memperbarui event ' . $request->title);
+        event(new CacheInvalidationRequested(['upcoming_events']));
         return redirect()->route('dashboard.events.index')->with('success', 'Agenda Berhasil Diperbarui');
     }
 }
