@@ -38,7 +38,7 @@ class GalleryController extends Controller
             if ($galleries->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No galleries found'
+                    'message' => 'Galeri tidak ditemukan'
                 ], 404);
             }
 

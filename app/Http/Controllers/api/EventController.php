@@ -37,7 +37,7 @@ class EventController extends Controller
             if ($events->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No news found'
+                    'message' => 'Event & Agenda tidak ditemukan'
                 ], 404);
             }
 
@@ -120,7 +120,7 @@ class EventController extends Controller
             if ($events->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No events found'
+                    'message' => 'Event & Agenda tidak ditemukan'
                 ], 404);
             }
 

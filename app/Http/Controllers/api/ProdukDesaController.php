@@ -39,7 +39,7 @@ class ProdukDesaController extends Controller
             if ($produkDesa->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No Produk Desa found'
+                    'message' => 'Produk Desa tidak ditemukan'
                 ], 404);
             }
 

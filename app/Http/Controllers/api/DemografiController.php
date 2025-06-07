@@ -27,7 +27,7 @@ class DemografiController extends Controller
             if ($demografi->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No Demografi data found'
+                    'message' => 'Data Demografi tidak ditemukan'
                 ], 404);
             }
             return response()->json([

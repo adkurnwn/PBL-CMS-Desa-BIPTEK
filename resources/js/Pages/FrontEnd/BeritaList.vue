@@ -4,6 +4,7 @@ import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
 import { ref, onMounted, } from "vue";
 import useFilter from "@/Utility/useFilter";
+import {Head } from "@inertiajs/vue3";
 import axios from "axios";
 
 const news = ref([]);
@@ -59,13 +60,14 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head title="Berita Desa" />
     <UserLayout>
         <main
             class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather"
         >
             <!-- Judul -->
             <h1
-                class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2 mt-40"
+                class="xl:text-2xl sm:text-xl text-md font-semibold text-accent1 mt-40"
             >
                 Berita Desa
             </h1>

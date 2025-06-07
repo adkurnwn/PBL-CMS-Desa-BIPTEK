@@ -215,7 +215,7 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
                         :items-per-page="pagination?.perPage || 25" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || 0"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        empty-state-message="No positions found" @page-changed="handlePageChanged" @sort="handleSort">
+                        empty-state-message="Tidak ada posisi yang ditemukan" @page-changed="handlePageChanged" @sort="handleSort">
                         
                         <!-- Custom template for actions column -->
                         <template #['item.Aksi']="{ item }">

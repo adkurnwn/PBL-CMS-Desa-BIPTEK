@@ -55,7 +55,7 @@ class NewsController extends Controller
             if ($news->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No news found'
+                    'message' => 'Berita tidak ditemukan'
                 ], 404);
             }
 

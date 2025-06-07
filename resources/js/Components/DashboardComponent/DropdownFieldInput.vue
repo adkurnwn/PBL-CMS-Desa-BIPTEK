@@ -84,7 +84,7 @@
                         
                         <!-- No results message -->
                         <div v-if="filteredOptions.length === 0" class="p-[1.8px] sm:p-[2px] md:p-[2.2px] lg:p-[2.4px] xl:p-[2.67px] 2xl:p-[3px] 3xl:p-[3.6px] 4xl:p-[4px] text-gray-500 text-center text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]">
-                            No matching options found
+                            Tidak ada opsi yang sesuai
                         </div>
                     </div>
                 </div>

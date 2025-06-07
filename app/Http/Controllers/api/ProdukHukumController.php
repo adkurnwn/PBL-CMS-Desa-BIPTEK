@@ -22,6 +22,7 @@ class ProdukHukumController extends Controller
         try {
             $search = $request->query('search');
             $category = $request->query('category');
+            $year = $request->query('year');
             $sort = $request->query('sort');
 
             $query = ProdukHukum::with(['category']);
@@ -39,6 +40,11 @@ class ProdukHukumController extends Controller
                 $query->where('category_id', $category);
             }
 
+            // Filter by year
+            if ($year) {
+                $query->whereYear('date', $year);
+            }
+
             // Sort by views or downloads
             if ($sort === 'views') {
                 $query->orderBy('views', 'desc');
@@ -53,7 +59,7 @@ class ProdukHukumController extends Controller
             if ($produkHukum->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No Produk Hukum found'
+                    'message' => 'Produk Hukum tidak ditemukan'
                 ], 404);
             }
 

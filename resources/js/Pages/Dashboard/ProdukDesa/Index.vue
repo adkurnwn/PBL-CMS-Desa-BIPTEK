@@ -291,7 +291,7 @@ watch(() => props.filters, (newValue) => {
                         :items-per-page="pagination?.perPage || 10" :current-page="pagination?.currentPage || 1"
                         :total-pages="pagination?.lastPage || 1" :total-items="pagination?.total || produkItems.length"
                         :filters="filterState" :sort-field="sortField" :sort-direction="sortDirection"
-                        empty-state-message="No products found. Create a new product to get started."
+                        empty-state-message="Belum ada produk yang ditambahkan"
                         @sort="handleSort" @filter-changed="handleFilterChange" @page-changed="handlePageChange"
                         @error="handleError">
                         
