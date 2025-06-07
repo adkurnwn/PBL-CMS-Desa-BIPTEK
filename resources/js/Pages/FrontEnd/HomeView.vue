@@ -263,7 +263,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/#" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
+            <a href="/statistik-penduduk" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"

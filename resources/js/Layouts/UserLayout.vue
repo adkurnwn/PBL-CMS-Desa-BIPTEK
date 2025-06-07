@@ -39,7 +39,7 @@ provide("layout", layout);
 </script>
 
 <template>
-    <div :style="{ '--accent1': primaryColor, '--accent2': secondaryColor }">
+    <div :style="{ '--accent1': primaryColor, '--accent2': secondaryColor }" id="app-accent-root">
         
         <div class="fixed top-20 sm:top-24 md:top-28 right-2 sm:right-4 z-50 flex flex-col items-end w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl space-y-2 px-2">
             <ToastNotification
