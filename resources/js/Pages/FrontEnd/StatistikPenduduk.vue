@@ -38,7 +38,7 @@ onMounted(() => {
           <div class="flex flex-col items-center justify-center sm:mb-8">
             <h1 class="text-lg sm:text-xl xl:text-3xl font-bold text-accent1 text-center">Komposisi Penduduk Berdasarkan Kategori Demografis Tahun {{ demografi.tahun }}</h1>
           </div>
-          <div class="flex flex-wrap lg:grid lg:grid-cols-4 gap-5 mt-3 sm:mb-24">
+          <div class="flex flex-wrap sm:grid sm:grid-cols-2 xl:grid-cols-4 gap-5 mt-3 sm:mb-24">
             <!-- Grid 1 -->
             <div class="bg-accent2 text-type1 p-4 rounded-lg shadow-lg w-full h-40 text-center hover:bg-accent1 transition duration-500 ease-in-out">
                 <svg class="flex ml-auto" xmlns="http://www.w3.org/2000/svg" height="48px"
