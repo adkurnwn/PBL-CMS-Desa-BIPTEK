@@ -103,12 +103,24 @@ const socialMedia = computed(() =>
                     Layanan Publik
                 </h1>
                 <div class="space-y-2 text-sm md:text-base">
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Berita Desa</p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Event & Agenda</p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Produk Hukum</p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Laporan Dana Desa</p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Produk Unggul</p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">Feedback & Saran</p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="/berita">Berita Desa</a>
+                    </p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="/event">Event & Agenda</a>
+                    </p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="/produk-hukum">Produk Hukum</a>
+                    </p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="/dana-desa">Laporan Dana Desa</a>
+                    </p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="/produk-unggulan">Produk Unggulan</a>
+                    </p>
+                    <p class="text-white hover:text-yellow-600 cursor-pointer">
+                        <a href="">Feedback & Saran</a>
+                    </p>
                 </div>
             </div>
         </div>

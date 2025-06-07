@@ -4,10 +4,11 @@ namespace App\Http\Controllers\api;
 
 use App\Models\News;
 use Illuminate\Http\Request;
+use App\Services\StatisticsService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\News\NewsDetail;
 use App\Http\Resources\News\NewsPreview;
-use App\Services\StatisticsService;
 
 class NewsController extends Controller
 {
@@ -55,7 +56,7 @@ class NewsController extends Controller
             if ($news->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No news found'
+                    'message' => 'Berita tidak ditemukan'
                 ], 404);
             }
 
@@ -82,17 +83,24 @@ class NewsController extends Controller
     {
         $limit = $request->input('limit', 3);
         $sort = $request->input('sort', 'created_at');
+
         try {
-            $query = News::with(['images', 'category', 'user:id,name'])
-                ->where('is_draft', false);
+            // Create cache key that includes sort and limit parameters
+            $cacheKey = "news_preview_{$sort}_{$limit}";
 
-            if ($sort === 'views') {
-                $query->orderBy('views', 'desc');
-            } else {
-                $query->latest();
-            }
+            $news = Cache::remember($cacheKey, now()->addDay(), function () use ($sort, $limit) {
+                $query = News::with(['images', 'category', 'user:id,name'])
+                    ->where('is_draft', false);
 
-            $news = $query->take($limit)->get();
+                if ($sort === 'views') {
+                    $query->orderBy('views', 'desc');
+                } else {
+                    $query->latest();
+                }
+
+                // Return the actual data, not the query builder
+                return $query->take($limit)->get();
+            });
 
             if ($news->isEmpty()) {
                 return response()->json([

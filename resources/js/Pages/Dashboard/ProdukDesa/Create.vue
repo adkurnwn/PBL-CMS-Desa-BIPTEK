@@ -13,7 +13,7 @@ import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
 
 const form = useForm({
     product_name: "",
-    description: "",
+    description: "Deskripsi produk:\n\nJumlah produk:\nBerat produk:",
     price: "",
     instagram: "",
     facebook: "",

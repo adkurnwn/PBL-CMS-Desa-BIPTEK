@@ -1,5 +1,6 @@
 <template>
-  <UserLayout>
+  <Head :title="dokumen.title" />
+  <UserLayout v-slot="{layout}">
     <div class="min-h-screen bg-type1">
       <div class="max-w-screen-2xl mx-auto px-6 lg:px-28 py-6 lg:py-12">
         <!-- Loading State -->
@@ -19,13 +20,13 @@
                     <path d="M280-280q17 0 28.5-11.5T320-320q0-17-11.5-28.5T280-360q-17 0-28.5 11.5T240-320q0 17 11.5 28.5T280-280Zm-40-160h80v-240h-80v240Zm200 160h280v-80H440v80Zm0-160h280v-80H440v80Zm0-160h280v-80H440v80ZM160-120q-33 0-56.5-23.5T80-200v-560q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v560q0 33-23.5 56.5T800-120H160Zm0-80h640v-560H160v560Zm0 0v-560 560Z"/>
                 </svg>
                 <h1 class="lg:text-lg  text-accent2 -mb-0.5 font-merriweather ">
-                    Peraturan Desa
+                    Dana Desa {{ layout.name }}
                 </h1>
             </div>
 
             <!-- Title -->
             <h1 class="flex text-xl lg:text-3xl w-full mx-auto justify-start lg:justify-center items-center font-bold text-accent1 mb-4">
-              Detail Produk Hukum
+              Detail Laporan Dana Desa
             </h1>
             
             
@@ -69,12 +70,12 @@
                    target="_blank"
                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent2 hover:bg-accent1"
                 >
-                  Download Document
+                  Unduh Laporan
                 </a>
               </div>
                 
               </div>
-              <div v-if="dokumen.file && isPreviewable(dokumen.file)" class="m-1 pt-4">
+              <div v-if="dokumen.file && isPreviewable(dokumen.file)" class="pt-4">
                 <iframe
                   :src="`/storage/${dokumen.file}`"
                   width="100%"
@@ -112,13 +113,6 @@
                 View External Link
               </a>
             </div> -->
-
-            <!-- Back Button -->
-            <div class="mt-8">
-              <Link href="/produk-hukum-test" class="text-blue-600 hover:text-blue-800 font-medium">
-                ← Back to Documents List
-              </Link>
-            </div>
         </div>
 
       </div>
@@ -129,9 +123,9 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { ref, onMounted } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
-import Comment from '@/Components/Comment.vue';
+
 
 const props = defineProps({
   id: {
