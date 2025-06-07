@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
 use App\Events\CacheInvalidationRequested;
+use App\Events\SitemapUpdateRequested;
 
 use function Laravel\Prompts\clear;
 
@@ -176,6 +177,9 @@ class NewsController extends Controller
 
         // Fire cache invalidation event after successful creation
         $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update event
+        event(new SitemapUpdateRequested());
 
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil ditambahkan');
     }
@@ -251,6 +255,9 @@ class NewsController extends Controller
 
         // Fire cache invalidation event after successful update
         $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update
+        event(new SitemapUpdateRequested());
 
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diperbarui');
     }
@@ -433,6 +440,9 @@ class NewsController extends Controller
 
         // Fire cache invalidation event after successful restore
         $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update event
+        event(new SitemapUpdateRequested());
 
         return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dipulihkan');
     }
@@ -449,6 +459,9 @@ class NewsController extends Controller
 
             // Fire cache invalidation event after successful deletion/archiving
             $this->clearAllNewsPreviewCache();
+            
+            // Fire sitemap update event
+            event(new SitemapUpdateRequested());
 
             return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dihapus');
         } else {
@@ -458,6 +471,9 @@ class NewsController extends Controller
 
             // Fire cache invalidation event after successful deletion/archiving
             $this->clearAllNewsPreviewCache();
+            
+            // Fire sitemap update event
+            event(new SitemapUpdateRequested());
 
             return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diarsipkan');
         }
