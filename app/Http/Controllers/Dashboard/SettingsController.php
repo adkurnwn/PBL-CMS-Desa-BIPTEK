@@ -12,6 +12,7 @@ use App\Services\MediaService;
 use App\Http\Requests\Validation\UpdateSettingsRequest;
 use App\Http\Requests\Validation\UpdateThemeRequest;
 use App\Models\Profile;
+use App\Events\CacheInvalidationRequested; // Add this import
 
 class SettingsController extends Controller
 {
@@ -163,6 +164,14 @@ class SettingsController extends Controller
                 }
 
                 $profile->update($profileData);
+
+                // Fire cache invalidation event when profile colors are updated
+                event(new CacheInvalidationRequested([
+                    'profile.layout',
+                    'profile.detail',
+                    'frontend_statistics',
+                    'homepage_data'
+                ]));
             }
         }
 
@@ -174,15 +183,13 @@ class SettingsController extends Controller
 
     public function updateTheme(UpdateThemeRequest $request)
     {
-        
         // Update theme colors in the profile
         if ($request->filled('primary_color') || $request->filled('secondary_color')) {
             $profile = Profile::first();
             if (!$profile) {
-                // Create profile if it doesn't exist
                 $profile = new Profile();
             }
-            
+
             $profileData = [];
 
             if ($request->filled('primary_color')) {
@@ -192,7 +199,16 @@ class SettingsController extends Controller
             if ($request->filled('secondary_color')) {
                 $profileData['secondary_color'] = $request->secondary_color;
             }
+
             $result = $profile->updateOrCreate(['id' => $profile->id ?? 1], $profileData);
+
+            // Fire cache invalidation event when theme colors are updated
+            event(new CacheInvalidationRequested([
+                'profile.layout',
+                'profile.detail',
+                'frontend_statistics',
+                'homepage_data'
+            ]));
         }
 
         // Handle favicon upload

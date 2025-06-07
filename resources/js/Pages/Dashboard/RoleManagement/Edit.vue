@@ -37,7 +37,7 @@ const permissionDisplayMap = {
 
 // Section definitions
 const sections = {
-    'Manajemen Pengguna': ['Users Manage', 'Positions Manage'],
+    'Pengguna': ['Users Manage', 'Positions Manage'],
     'Informasi Desa': ['Profiles Manage', 'Demografi Manage'],
     'Konten & Publikasi': ['News Manage', 'Galleries Manage', 'Events Manage', 'Produk-desa Manage'],
     'Regulasi Desa': ['Produk-hukum Manage', 'Dana-desa Manage'],
@@ -94,6 +94,39 @@ const togglePermission = (permissionName) => {
 
 const hasPermission = (permissionName) => {
     return form.permissions.includes(permissionName);
+};
+
+// Check if all permissions in a section are selected
+const isAllSectionSelected = (sectionPermissions) => {
+    return sectionPermissions.every(permission => hasPermission(permission.name));
+};
+
+// Get count of selected permissions in a section
+const getSelectedCount = (sectionPermissions) => {
+    return sectionPermissions.filter(permission => hasPermission(permission.name)).length;
+};
+
+// Toggle all permissions in a section
+const toggleSectionPermissions = (sectionPermissions) => {
+    const allSelected = isAllSectionSelected(sectionPermissions);
+    
+    sectionPermissions.forEach(permission => {
+        const index = form.permissions.indexOf(permission.name);
+        
+        if (allSelected) {
+            // Remove all permissions from this section
+            if (index > -1) {
+                form.permissions.splice(index, 1);
+            }
+        } else {
+            // Add all permissions from this section
+            if (index === -1) {
+                form.permissions.push(permission.name);
+            }
+        }
+    });
+    
+    console.log('Section permissions toggled:', form.permissions);
 };
 
 // Add feedback messages
@@ -165,17 +198,39 @@ const submit = () => {
 
                     <form @submit.prevent="submit">
                         <!-- Sections of permissions -->
-                        <div class="grid grid-cols-1 md:grid-cols-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                             <!-- Sections of permissions -->
                             <div v-for="(permissions, sectionName) in organizedPermissions" :key="sectionName"
-                                class="mb-8">
-                                <!-- Section Title -->
-                                <h4 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px] mb-[19px]">{{ sectionName }}</h4>
+                                class="mb-8 bg-menuBG p-4 rounded-lg flex flex-col">
+                                <!-- Section Title with Select All -->
+                                <div class="flex items-center justify-between mb-[19px]">
+                                    <!-- Section Title -->
+                                    <h4 class="text-selectedText font-medium text-[12px] md:text-[13px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[14px] 4xl:text-[15px]">
+                                        {{ sectionName }}
+                                    </h4>
+                                    
+                                    <!-- Select All Checkbox -->
+                                    <div class="flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            :id="`select-all-${sectionName}`"
+                                            :checked="isAllSectionSelected(permissions)"
+                                            @change="toggleSectionPermissions(permissions)"
+                                            class="w-4 h-4 mr-2 rounded border-blueBorder text-blueBorder focus:ring-blueBorder cursor-pointer"
+                                        />
+                                        <label 
+                                            :for="`select-all-${sectionName}`"
+                                            class="text-TableText text-[10px] md:text-[11px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[12px] 4xl:text-[13px] cursor-pointer"
+                                        >
+                                            Pilih Semua
+                                        </label>
+                                    </div>
+                                </div>
 
                                 <!-- Permissions as vertical list -->
-                                <div class="">
+                                <div class="flex-grow">
                                     <div v-for="permission in permissions" :key="permission.id"
-                                        class=" pb-[13px] pt-[13px] flex items-center">
+                                        class=" py-[6px] flex items-center">
                                         <div class="relative flex items-center">
                                             <!-- Custom checkbox design -->
                                             <div class="w-[14px] h-[14px] sm:w-[15px] sm:h-[15px] md:w-[16px] md:h-[16px] xl:w-[16px] xl:h-[16px] 2xl:w-[20px] 2xl:h-[20px] 3xl:w-[22px] 3xl:h-[22px] 4xl:w-[24px] 4xl:h-[24px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] border border-blueBorder flex items-center justify-center cursor-pointer"
@@ -202,6 +257,13 @@ const submit = () => {
                                             {{ permission.displayName }}
                                         </label>
                                     </div>
+                                </div>
+                                
+                                <!-- Permission Counter at bottom -->
+                                <div class="text-right mt-auto">
+                                    <span class="text-TableText text-[10px] md:text-[11px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[12px] 4xl:text-[13px]">
+                                        {{ getSelectedCount(permissions) }} permission dipilih
+                                    </span>
                                 </div>
                             </div>
                         </div>

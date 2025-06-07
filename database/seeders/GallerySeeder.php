@@ -14,20 +14,39 @@ class GallerySeeder extends Seeder
      */
     public function run(): void
     {
-        $gallery = Gallery::create([
-            'title' => 'Gallery',
-            'slug' => Str::of('Gallery')->slug('-'),
+        // First Gallery
+        $gallery1 = Gallery::create([
+            'title' => 'Kegiatan Desa',
+            'slug' => Str::of('Kegiatan Desa')->slug('-'),
             'user_id' => 1,
             'category_id' => 1,
-            'description' => 'Gallery',
+            'description' => 'Dokumentasi berbagai kegiatan yang dilaksanakan di desa',
         ]);
 
-        $images = [1, 2, 3, 4, 5];
+        $images1 = [1, 2, 3, 4, 5];
 
-        foreach ($images as $image) {
-            $gallery->images()->create([
-                'path' => '/gallery-images/' . $image . '.jpg',
-                'alt' => 'Image ' . $image,
+        foreach ($images1 as $image) {
+            $gallery1->images()->create([
+                'path' => '/gallery-images/kegiatan-' . $image . '.jpg',
+                'alt' => 'Kegiatan Desa ' . $image,
+            ]);
+        }
+
+        // Second Gallery
+        $gallery2 = Gallery::create([
+            'title' => 'Pemandangan Desa',
+            'slug' => Str::of('Pemandangan Desa')->slug('-'),
+            'user_id' => 1,
+            'category_id' => 1,
+            'description' => 'Koleksi foto pemandangan indah dan fasilitas desa',
+        ]);
+
+        $images2 = [6, 7, 8, 9, 10];
+
+        foreach ($images2 as $image) {
+            $gallery2->images()->create([
+                'path' => '/gallery-images/pemandangan-' . $image . '.jpg',
+                'alt' => 'Pemandangan Desa ' . $image,
             ]);
         }
     }

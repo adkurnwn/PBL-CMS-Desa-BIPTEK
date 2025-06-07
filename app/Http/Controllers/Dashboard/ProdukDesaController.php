@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Events\CacheInvalidationRequested;
 use Inertia\Inertia;
 use App\Models\ProdukDesa;
 use App\Helpers\SlugHelper;
@@ -67,9 +68,6 @@ class ProdukDesaController extends Controller
         // Paginate results
         $produkDesa = $query->paginate($perPage)->withQueryString();
 
-        // Log activity
-        $this->logHelper->logActivity('view', 'produk_desa', 'Melihat daftar produk desa');
-
         return Inertia::render('Dashboard/ProdukDesa/Index', [
             'produkDesa' => $produkDesa,
             'search' => $search,
@@ -97,6 +95,7 @@ class ProdukDesaController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'produk_desa', 'Menambahkan produk desa ' . $request->product_name);
+        event(new CacheInvalidationRequested(['produk_desa_preview']));
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa berhasil ditambahkan');
     }
 
@@ -129,6 +128,7 @@ class ProdukDesaController extends Controller
         }
 
         $this->logHelper->logActivity('update', 'produk_desa', 'Memperbarui produk desa ' . $produkDesa->product_name);
+        event(new CacheInvalidationRequested(['produk_desa_preview']));
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa berhasil diperbarui');
     }
 
@@ -145,6 +145,7 @@ class ProdukDesaController extends Controller
         $statusMessage = $newStatus ? 'Diaktifkan' : 'Dinonaktifkan';
         $logStatus = $newStatus ? 'restore' : 'delete';
         $this->logHelper->logActivity($logStatus, 'produk_desa', $logMessage . ' produk desa ' . $produkDesa->product_name);
+        event(new CacheInvalidationRequested(['produk_desa_preview']));
         return redirect()->route('dashboard.produk-desa.index')->with('success', 'Produk Desa berhasil ' . $statusMessage);
     }
 }

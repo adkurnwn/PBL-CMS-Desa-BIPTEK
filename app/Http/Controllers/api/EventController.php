@@ -37,7 +37,7 @@ class EventController extends Controller
             if ($events->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No news found'
+                    'message' => 'No events found'
                 ], 404);
             }
 
@@ -106,16 +106,18 @@ class EventController extends Controller
     public function preview()
     {
         try {
-            $events = Event::orderBy('date', 'asc')
-                ->where(function ($query) {
-                    $now = now();
-                    $query->where('date', '>', $now->format('Y-m-d'))
-                        ->orWhere(function ($q) use ($now) {
-                            $q->where('date', '=', $now->format('Y-m-d'))
-                                ->where('time', '>=', $now->format('H:i:s'));
-                        });
-                })
-                ->get();
+            $events = Cache::remember('upcoming_events', now()->addDay(), function () {
+                return
+                    Event::orderBy('date', 'asc')
+                    ->where(function ($query) {
+                        $now = now();
+                        $query->where('date', '>', $now->format('Y-m-d'))
+                            ->orWhere(function ($q) use ($now) {
+                                $q->where('date', '=', $now->format('Y-m-d'))
+                                    ->where('time', '>=', $now->format('H:i:s'));
+                            });
+                    })->take(3)->get();
+            });
 
             if ($events->isEmpty()) {
                 return response()->json([
