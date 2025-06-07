@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
+use App\Events\CacheInvalidationRequested;
+
+use function Laravel\Prompts\clear;
 
 class NewsController extends Controller
 {
@@ -170,6 +173,10 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
+
+        // Fire cache invalidation event after successful creation
+        $this->clearAllNewsPreviewCache();
+
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil ditambahkan');
     }
 
@@ -241,6 +248,10 @@ class NewsController extends Controller
         $news->update($data);
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
+
+        // Fire cache invalidation event after successful update
+        $this->clearAllNewsPreviewCache();
+
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diperbarui');
     }
 
@@ -419,6 +430,10 @@ class NewsController extends Controller
         $news = News::withTrashed()->where('slug', $slug)->firstOrFail();
         $news->restore();
         $this->logHelper->logActivity('restore', 'news', 'Memulihkan berita ' . $news->title);
+
+        // Fire cache invalidation event after successful restore
+        $this->clearAllNewsPreviewCache();
+
         return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dipulihkan');
     }
 
@@ -431,12 +446,34 @@ class NewsController extends Controller
             $news->forceDelete();
 
             $this->logHelper->logActivity('delete', 'news', 'Menghapus berita ' . $news->title);
+
+            // Fire cache invalidation event after successful deletion/archiving
+            $this->clearAllNewsPreviewCache();
+
             return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dihapus');
         } else {
             $news->delete();
 
             $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
+
+            // Fire cache invalidation event after successful deletion/archiving
+            $this->clearAllNewsPreviewCache();
+
             return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diarsipkan');
         }
+    }
+
+    private function clearAllNewsPreviewCache()
+    {
+        // Get all cache keys that start with 'news_preview_'
+        $cacheKeys = [
+            'news_preview_created_at_3',
+            'news_preview_views_3',
+            'news_preview_created_at_6',
+            'news_preview_views_6',
+            'categories_index_1',
+        ];
+
+        event(new CacheInvalidationRequested($cacheKeys));
     }
 }

@@ -64,21 +64,20 @@ class GalleryController extends Controller
     public function highlight()
     {
         try {
-            return Cache::remember('gallery.highlight', 600, function () {
-                $gallery = Gallery::with('images')->latest()->first();
-
-                if (!$gallery) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Gallery data not found'
-                    ], 404);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => new GalleryHighlight($gallery)
-                ], 200);
+            $gallery = Cache::remember('gallery_highlight', now()->addDay(), function () {
+                return Gallery::with('images')->latest()->first();
             });
+            if (!$gallery) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gallery data not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new GalleryHighlight($gallery)
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

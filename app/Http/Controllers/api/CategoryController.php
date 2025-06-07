@@ -16,8 +16,8 @@ class CategoryController extends Controller
     {
         try {
             $type = $request->query('type');
-            $cacheKey = 'categories.index.{$type}';
-            $categories = Cache::remember($cacheKey, 600, function () use ($type) {
+            $cacheKey = "categories_index_{$type}";
+            $categories = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($type) {
                 return Category::where('category_type', $type)->get();
             });
             if ($categories->isEmpty()) {

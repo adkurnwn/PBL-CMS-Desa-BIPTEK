@@ -9,6 +9,7 @@ use App\Services\MediaService;
 use App\Helpers\LogActivityHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Validation\UpdateProfileRequest;
+use App\Events\CacheInvalidationRequested; // Add this import
 
 class ProfileController extends Controller
 {
@@ -88,8 +89,6 @@ class ProfileController extends Controller
             if ($profile->logo) $this->mediaService->delete($profile->logo);
             $logoPath = $this->mediaService->upload($request->file('logo'), 'profile-logo');
             $profileData['logo'] = $logoPath;
-
-            // Favicon is now handled in SettingsController
         }
 
         if ($request->hasFile('organization_image')) {
@@ -116,6 +115,13 @@ class ProfileController extends Controller
         $profile->update($profileData);
 
         $this->logHelper->logActivity('update', 'profile', 'Memperbarui profil ' . $profile->name);
+
+        // Fire cache invalidation event after successful profile update
+        event(new CacheInvalidationRequested([
+            'profile.layout',
+            'profile.detail',
+        ]));
+
         return redirect()->route('dashboard.profiles.edit', [$profile->name])->with('success', 'Profil berhasil diperbarui');
     }
 }
