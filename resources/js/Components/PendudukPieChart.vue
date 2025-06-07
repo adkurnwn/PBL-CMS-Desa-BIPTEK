@@ -36,15 +36,16 @@ let chartInstance = null;
 
 const fetchData = async () => {
   try {
-    // Fetch the preview data (assume it returns an array, take the latest by tahun)
+    // Fetch the preview data (returns a single object in data)
     const response = await fetch('/api/demografi/preview');
     const result = await response.json();
+    const data = result.data || {};
 
     return [
-      { label: 'Lansia', value: result.jumlah_lansia ?? 0 },
-      { label: 'Dewasa', value: result.jumlah_dewasa ?? 0 },
-      { label: 'Remaja', value: result.jumlah_remaja ?? 0 },
-      { label: 'Anak', value: result.jumlah_anak ?? 0 }
+      { label: 'Lansia', value: data.jumlah_lansia ?? 0 },
+      { label: 'Dewasa', value: data.jumlah_dewasa ?? 0 },
+      { label: 'Remaja', value: data.jumlah_remaja ?? 0 },
+      { label: 'Anak', value: data.jumlah_anak ?? 0 }
     ];
   } catch (error) {
     console.error('Error fetching data:', error);
