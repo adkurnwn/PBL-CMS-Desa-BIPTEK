@@ -1,13 +1,15 @@
 <?php
 
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FrontendController;
 use App\Services\StatisticsService;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MetaCrawler\HomeController;
+use App\Http\Controllers\MetaCrawler\BeritaController;
+
 
 Route::get('/', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Home', request());
-    return Inertia::render('FrontEnd/HomeView');
+    return app(HomeController::class)->index();
 })->name('home');
 
 Route::get('/profile', function (StatisticsService $statisticsService) {
@@ -33,9 +35,7 @@ Route::prefix('berita')->group(function () {
 
     Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
         $statisticsService->trackFeatureVisit('Berita', request());
-        return Inertia::render('FrontEnd/BeritaDetail', [
-            'slug' => $slug
-        ]);
+        return app(BeritaController::class)->show($slug);
     })->name('berita.show');
 });
 
