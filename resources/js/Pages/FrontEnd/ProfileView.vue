@@ -59,6 +59,9 @@ const fasilitasList = computed(() =>
 const batasList = computed(() =>
     parseBatas(profile.value.batas_desa || "")
 );
+const lembagaList = computed(() =>
+    parseFasilitas(profile.value.lembaga || "")
+);
 
 const handleCoordinatesUpdate = (coords) => {
     coordinates.value = coords;
@@ -96,11 +99,11 @@ const handleCoordinatesUpdate = (coords) => {
                 <div class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"></div>
                 <div
                     class="flex flex-col justify-center items-center h-full px-[6.56%] pb-[6.56%] sm:justify-end sm:items-start sm:pl-[6.56%] sm:pr-[25%] sm:pb-[6.56%] sm:px-0">
-                    <h1 class="text-type1 text-lg font-bold z-0 text-center sm:text-left md:text-4xl xl:text-3xl">
+                    <h1 class="text-type1 text-xl font-bold z-0 text-center sm:text-left md:text-4xl xl:text-3xl">
                         Sejarah Desa
                     </h1>
                     <p
-                        class="text-type1 text-xs font-thin relative z-0 mt-2 sm:text-justify text-justify sm:text-base md:text-2xl xl:text-xl">
+                        class="text-type1 text-base font-thin relative z-0 mt-2 sm:text-justify text-justify sm:text-base md:text-2xl xl:text-xl">
                         {{ profile.history }}
                     </p>
                 </div>
@@ -110,9 +113,9 @@ const handleCoordinatesUpdate = (coords) => {
         <main class="max-w-screen-4xl mx-auto w-full px-[6.56%] font-merriweather space-y-10 xl:mt-24 md:mt-6 mt-5 xl:mb-24 md:mb-6 mb-5">
             <!-- Visi & Misi -->
             <article
-                class="flex xl:flex-row flex-col relative justify-center w-full font-merriweather bg-type1 lg:space-x-20">
+                class="flex xl:flex-row flex-col relative justify-center w-full font-merriweather space-y-10 bg-type1 lg:space-x-20 lg:space-y-0">
                 <div class="justify-start items-center flex flex-col">
-                    <div class="xl:w-80 md:w-80 sm:w-72">
+                    <div class="xl:w-80 md:w-80 w-72">
                         <!-- Lingkaran Putih -->
                         <div class="relative overflow-hidden rounded-full aspect-[514/620] w-full">
                             <img :src="getImageSrc(`/storage/${profile.kepala_desa_image}`)"
@@ -121,7 +124,7 @@ const handleCoordinatesUpdate = (coords) => {
                         </div>
 
                         <!-- Kotak Hijau -->
-                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-16">
+                        <div class="bg-accent2 text-white text-center p-2 rounded-lg relative z-0 -mt-6">
                             <p class="font-bold xl:text-xl md:text-xl sm:text-base text-sm">
                                 {{ profile.kepala_desa_name }}
                             </p>
@@ -135,7 +138,7 @@ const handleCoordinatesUpdate = (coords) => {
                     <h1 class="font-bold text-accent1 xl:text-3xl md:text-2xl sm:text-xl text-lg text-center">
                         Visi
                     </h1>
-                    <p class="text-xs sm:text-base md:text-lg xl:text-xl text-semiBlack text-center italic xl:mt-1">
+                    <p class="text-base md:text-lg xl:text-xl text-semiBlack text-center italic xl:mt-1">
                         “{{ profile.vision }}”
                     </p>
                     <h1
@@ -144,7 +147,7 @@ const handleCoordinatesUpdate = (coords) => {
                     </h1>
                     <div class="text-justify xl:mt-1">
                         <ol
-                            class="list-decimal space-y-3 text-semiBlack text-xs sm:text-base md:text-lg xl:text-xl italic">
+                            class="list-decimal list-outside pl-5 space-y-3 text-semiBlack text-base md:text-lg xl:text-xl italic">
                             <li v-for="(misi, index) in missionList" :key="index">
                                 {{ misi }}
                             </li>
@@ -158,12 +161,12 @@ const handleCoordinatesUpdate = (coords) => {
                 <h1 id="struktur-pemerintahan" class="font-bold text-accent2 xl:text-3xl md:text-2xl text-xl">
                     Struktur Pemerintahan
                 </h1>
-                <p class="xl:text-xl md:text-lg sm:text-base text-xs text-semiBlack text-left italic">
+                <p class="text-sm md:text-xl text-semiBlack text-left italic">
                     Susunan organisasi yang bertanggung jawab dalam mengelola
                     administrasi dan pelayanan publik di {{ layout.name }}.
                 </p>
                 <div
-                    class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 p-7 bg-transparant -mt-3 items-center justify-center">
+                    class="relative flex xl:flex-row flex-col xl:gap-7 sm:gap-5 gap-3 py-7 bg-transparant -mt-3 items-center justify-center">
                     <!-- Card 1 -->
                     <div class=" bg-white rounded-xl shadow-lg text-center">
                         <img :src="getImageSrc(`/storage/${profile.organization_image}`)" alt="Struktur Organisasi"
@@ -174,6 +177,7 @@ const handleCoordinatesUpdate = (coords) => {
                     </div>
                 </div>
                 <div class="flex items-center justify-end">
+                    <a href="/aparat-desa">
                     <p class="flex items-center xl:-mt-4 text-secondary text-lg">
                         Selengkapnya
                         <svg class="mt-0 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
@@ -182,32 +186,53 @@ const handleCoordinatesUpdate = (coords) => {
                                 d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z" />
                         </svg>
                     </p>
+                    </a>
                 </div>
             </div>
             <!-- Infrastruktur Desa -->
             <div class="flex flex-col w-full font-merriweather bg-type1">
-                <h1 class="text-accent2 xl:text-3xl sm:text-xl font-bold">
+                <h1 class="text-accent2 xl:text-3xl md:text-2xl text-xl font-bold">
                     Infrastruktur Desa
                 </h1>
-                <p class="xl:text-xl sm:text-base text-semiBlack max-w-7xl italic">
+                <p class="text-sm md:text-xl text-semiBlack text-left italic">
                     Informasi tentang sarana dan prasarana yang tersedia di desa
                     yang mendukung kehidupan masyarakat.
                 </p>
                 <div class="text-accent2 mt-2">
-                    <ol class="columns-2 list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-3xl space-y-1">
-                        <li v-for="(fasilitas, index) in fasilitasList" :key="index">
-                            {{ fasilitas }}
+                    <ol class="columns-2 list-disc max-w-3xl space-y-1 font-semibold xl:text-xl sm:text-sm">
+                        <li v-for="(fasilitas, index) in fasilitasList" :key="index" class="ml-5">
+                            <span>{{ fasilitas }}</span>
                         </li>
                     </ol>
                 </div>
 
             </div>
+
+            <!-- Lembaga Desa -->
+            <div class="flex flex-col w-full font-merriweather bg-type1">
+                <h1 class="text-accent2 xl:text-3xl md:text-2xl text-xl font-bold">
+                    Lembaga Desa
+                </h1>
+                <p class="text-sm md:text-xl text-semiBlack text-left italic">
+                    Informasi tentang Lembaga Desa yang berperan dalam
+                    pengelolaan dan pengembangan {{ layout.name }}.
+                </p>
+                <div class="text-accent2 mt-2">
+                    <ol class="columns-2 list-disc max-w-3xl space-y-1 font-semibold xl:text-xl sm:text-sm">
+                        <li v-for="(lembaga, index) in lembagaList" :key="index" class="ml-5">
+                            <span>{{ lembaga }}</span>
+                        </li>
+                    </ol>
+                </div>
+
+            </div>
+
             <!-- Data Geografi -->
             <div class="flex flex-col w-full font-merriweather bg-type1">
-                <h1 class="font-bold text-accent2 xl:text-3xl text-xl">
+                <h1 class="font-bold text-accent2 xl:text-3xl md:text-2xl text-xl">
                     Data Geografi
                 </h1>
-                <div class="flex flex-col w-96 xl:text-xl text-base">
+                <div class="flex flex-col w-auto xl:text-xl text-base">
                     <div class="flex w-full">
                         <p class="w-1/3 font-bold text-accent1">
                             Koordinat
@@ -216,38 +241,41 @@ const handleCoordinatesUpdate = (coords) => {
                             : {{ coordinates.lat && coordinates.lon ? `${coordinates.lat}, ${coordinates.lon}` : '-' }}
                         </p>
                     </div>
-                    <div class="flex w-full">
-                        <p class="w-1/3 font-bold text-accent1">
-                            Luas Desa
-                        </p>
-                        <p class="w-2/3 text-accent2">: 9.300.000 m²</p>
-                    </div>
                 </div>
-                <div class="flex space-x-[2%]">
-                    <!-- Pass location data to Map component if available -->
-                    <div class="w-[58.06%] mt-2 z-0">
-                        <Map :location-name="[
-                            layout?.provinsi,
-                            layout?.kabupaten,
-                            layout?.kecamatan,
-                            layout?.name,
-                        ]
-                            .filter(Boolean)
-                            .join(' ')
-                            " :kelurahan="profile?.name" :kode-pos="profile.kode_pos"
-                            @coordinates-found="handleCoordinatesUpdate" />
-                    </div>
-                    <div class="text-accent1 xl:text-xl text-sm">
-                        <h1 class="font-bold">Batas Desa</h1>
-                        <div class="xl:max-w-96 max-w-40">
+                <div class="flex my-2 space-x-[2%]">
+                <!-- Left: Map -->
+                <div class="w-[58.06%] z-0">
+                    <Map :location-name="[
+                        layout?.provinsi,
+                        layout?.kabupaten,
+                        layout?.kecamatan,
+                        layout?.name,
+                    ].filter(Boolean).join(' ')"
+                    :kelurahan="profile?.name"
+                    :kode-pos="profile.kode_pos"
+                    @coordinates-found="handleCoordinatesUpdate" />
+                </div>
+
+                <!-- Right: Batas Desa -->
+                <div class="text-accent1 xl:text-xl text-sm flex flex-col justify-between">
+                    <h1 class="font-bold">Batas Desa</h1>
+                    <div class="xl:max-w-96 max-w-40 flex flex-col justify-between h-full">
+                        <div>
                             <p class="font-bold xl:mt-3 mt-2">Utara</p>
                             <span>{{ batasList.utara }}</span>
+                        </div>
+                        <div>
                             <p class="font-bold xl:mt-3 mt-2">Barat</p>
                             <span>{{ batasList.barat }}</span>
+                        </div>
+                        <div>
                             <p class="font-bold xl:mt-3 mt-2">Timur</p>
                             <span>{{ batasList.timur }}</span>
+                        </div>
+                        <div>
                             <p class="font-bold xl:mt-3 mt-2">Selatan</p>
                             <span>{{ batasList.selatan }}</span>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -259,10 +287,10 @@ const handleCoordinatesUpdate = (coords) => {
             </div>
             <!-- Data Demografi -->
             <div class="flex flex-col w-full font-merriweather bg-type1">
-                <h1 class="font-bold text-accent1 xl:text-3xl text-xl">
+                <h1 class="font-bold text-accent1 xl:text-3xl md:text-2xl text-xl">
                     Data Demografi
                 </h1>
-                <p class="xl:text-xl text-base text-accent1 xl:max-w-5xl max-w-xl italic">
+                <p class="text-sm md:text-xl text-accent1 xl:max-w-5xl max-w-xl italic">
                     Menyajikan informasi mengenai aspek kependudukan yang
                     memberikan gambaran mengenai kondisi sosial ekonomi
                     masyarakat desa.

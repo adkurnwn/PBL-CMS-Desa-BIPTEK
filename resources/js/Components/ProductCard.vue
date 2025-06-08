@@ -24,7 +24,7 @@ defineProps({
                 <img
                     :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
                     :alt="produkDesa?.alt"
-                    class="w-full h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
+                    class="w-full h-[125px] md:h-60 rounded-[5px] overflow-hidden object-cover"
                     @error="handleImageError(`/storage/${produkDesa.thumbnail}`)"
                 />
             </div>
@@ -44,7 +44,7 @@ defineProps({
                 >
                     <Link
                         :href="`/produk-unggulan/${produkDesa.slug}`"
-                        class="flex w-full mx-auto justify-center bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
+                        class="flex w-full mx-auto justify-center bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-lg"
                     >
                         <p>Lihat Katalog</p>
                     </Link>
