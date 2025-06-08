@@ -136,7 +136,7 @@ const closeFilePreview = () => {
                                     <div
                                         class="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[35px] md:h-[35px] lg:w-[39px] lg:h-[39px] xl:w-[44px] xl:h-[44px] 2xl:w-[50px] 2xl:h-[50px] 3xl:w-[58px] 3xl:h-[58px] 4xl:w-[66px] 4xl:h-[66px] rounded-full overflow-hidden flex-shrink-0">
                                         <img :src="avatarUrl" :alt="feedback.nama_user" class="w-full h-full object-cover"
-                                            @error="handleImageError" />
+                                             />
                                     </div>
                                     <div class="flex-1 relative ">
                                         <div

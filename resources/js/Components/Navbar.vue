@@ -56,7 +56,7 @@ onUnmounted(() => {
                 :src="getImageSrc(`/storage/${layout.logo}`)"
                 :alt="'Logo ' + layout.name"
                 class="w-10 h-12 2xl:w-12 2xl:h-16  4xl:w-20 4xl:h-24 " 
-                @error="handleImageError"
+                @error="handleImageError(`/storage/${layout.logo}`)"
             />
             <div class="flex flex-col">
                 <h1

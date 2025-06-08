@@ -1,11 +1,40 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { Head } from "@inertiajs/vue3";
+import { Head, usePage } from "@inertiajs/vue3";
 import { ref, onMounted } from "vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import useFilter from "@/Utility/useFilter";
+import { useMeta } from "@/Utility/useMeta";
 import { computed } from "vue";
 import Pagination from "@/Components/FrontendComponent/Pagination.vue";
+
+// Reactive meta description
+const metaDescriptionText = ref('Kumpulan dokumen produk hukum desa termasuk peraturan, keputusan, dan dokumen resmi lainnya yang dapat diakses dan diunduh oleh masyarakat.');
+
+// Get layout data from Inertia page props
+const page = usePage();
+const layout = computed(() => page.props.layout || {});
+
+// Meta tags setup
+const {
+  metaTitle,
+  metaDescription,
+  metaImage,
+  canonicalUrl,
+  metaType,
+  metaSiteName
+} = useMeta({
+  title: 'Produk Hukum',
+  description: metaDescriptionText,
+  type: 'website',
+  url: `${window.location.origin}/produk-hukum`,
+});
+
+// Function to update description
+const updateMetaData = (layoutName) => {
+  metaDescriptionText.value = `Kumpulan dokumen produk hukum ${layoutName} termasuk peraturan, keputusan, dan dokumen resmi lainnya yang dapat diakses dan diunduh oleh masyarakat.`;
+  return null; // Return null to not render anything
+};
 
 const produkHukumApi = useApiFetch();
 const categoriesApi = useApiFetch();
@@ -131,8 +160,32 @@ const handlePageChange = (page) => {
 </script>
 
 <template>
-    <Head title="Produk Hukum" />
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
+
     <UserLayout v-slot="{layout}">
+        <!-- Call function when template renders -->
+        {{ updateMetaData(layout.name) }}
+        
         <div class="bg-type1">
             <div class="max-w-7xl mx-auto mt-20 px-4 sm:px-8 xl:px-8 pt-12 lg:pt-20 font-merriweather">
                 <div class="flex flex-col items-center justify-center mb-12">

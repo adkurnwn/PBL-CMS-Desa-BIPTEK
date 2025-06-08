@@ -1,11 +1,13 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { Link, usePage, Head } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
+import { useMeta } from "@/Utility/useMeta";
 import { formatDate } from "@/Utility/useComment";
 import NotFound from "@/Components/NotFound.vue";
+import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
 
 const props = defineProps({
     slug: {
@@ -17,6 +19,8 @@ const props = defineProps({
 const news = ref({});
 const loading = ref(true);
 const error = ref(null);
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 // News fetch logic
 const newsApi = useApiFetch();
@@ -49,6 +53,36 @@ const fetchRelatedNews = async () => {
     relatedNewsLoading.value = relatedNewsApi.loading.value;
 };
 
+// Meta tags setup using the composable
+const {
+    metaTitle,
+    metaDescription,
+    metaImage,
+    canonicalUrl,
+    metaType,
+    metaSiteName,
+    metaAuthor,
+    metaPublishedTime,
+    metaSection
+} = useMeta({
+    title: computed(() => news.value.title || 'Berita'),
+    description: computed(() => {
+        if (!news.value.content) return 'Baca berita terbaru dari desa kami';
+        
+        // Strip HTML tags and limit to 160 characters for description
+        const textContent = news.value.content.replace(/<[^>]*>/g, '');
+        return textContent.length > 160 
+            ? textContent.substring(0, 157) + '...' 
+            : textContent;
+    }),
+    type: 'article',
+    image: computed(() => news.value.images?.length > 0 ? news.value.images[0].path : null),
+    url: computed(() => `${window.location.origin}/berita/${props.slug}`),
+    author: computed(() => news.value.user?.name || 'Admin'),
+    publishedTime: computed(() => news.value.created_at),
+    section: computed(() => news.value.category_name)
+});
+
 watch(activeTab, fetchRelatedNews);
 
 onMounted(() => {
@@ -58,7 +92,33 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head :title="news.title" />
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Article specific -->
+        <meta property="article:published_time" :content="metaPublishedTime" v-if="metaPublishedTime" />
+        <meta property="article:author" :content="metaAuthor" v-if="metaAuthor" />
+        <meta property="article:section" :content="metaSection" v-if="metaSection" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
+
     <UserLayout>
         <div v-if="error">
             <NotFound />
@@ -184,9 +244,10 @@ onMounted(() => {
                                     class="relative min-h-48 lg:min-h-96"
                                 >
                                     <img
-                                        :src="`/storage/${news.images[0].path}`"
+                                        :src="getImageSrc(`/storage/${news.images[0].path}`)"
                                         :alt="news.images[0].alt"
                                         class="w-full h-full object-cover"
+                                        @error="handleImageError(`/storage/${news.images[0].path}`)"
                                     />
                                 </div>
                                 <!-- <div class="flex relative h-full w-full p-2">
@@ -203,7 +264,7 @@ onMounted(() => {
 
                                     <!-- Content -->
                                     <div
-                                        class="text-sm lg:text-lg text-semiBlack text-justify"
+                                        class="xl:text-xl md:text-lg text-base text-semiBlack text-justify prose prose-lg max-w-none [&>p]:mb-4 [&>p:last-child]:mb-0"
                                         v-html="news.content"
                                     ></div>
                                     <!-- Video -->
@@ -313,12 +374,16 @@ onMounted(() => {
                                         >
                                             <div class="flex w-1/2">
                                                 <img
-                                                    :src="`/storage/${
-                                                        item.thumbnail ||
-                                                        'default.jpg'
-                                                    }`"
+                                                    :src="getImageSrc(`/storage/${
+                                                        item.thumbnail
+                                                    }`)"
                                                     alt="News Image"
                                                     class="w-full h-20 object-cover rounded-md"
+                                                    @error="
+                                                        handleImageError(
+                                                            `/storage/${item.thumbnail}`
+                                                        )"
+
                                                 />
                                             </div>
 

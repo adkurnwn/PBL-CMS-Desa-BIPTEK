@@ -2,24 +2,29 @@ import { ref } from 'vue';
 import notFoundImage from '../../images/not-found.png';
 
 export function useImageErrorHandler() {
-  const imageError = ref(false);
+  const imageErrors = ref(new Map());
 
-  const handleImageError = () => {
-    imageError.value = true;
+  const handleImageError = (imageSrc) => {
+    imageErrors.value.set(imageSrc, true);
   };
 
   const getImageSrc = (originalSrc) => {
-    return imageError.value ? notFoundImage : originalSrc;
+    return imageErrors.value.get(originalSrc) ? notFoundImage : originalSrc;
   };
 
-  const resetImageError = () => {
-    imageError.value = false;
+  const resetImageError = (imageSrc) => {
+    imageErrors.value.delete(imageSrc);
+  };
+
+  const resetAllImageErrors = () => {
+    imageErrors.value.clear();
   };
 
   return {
-    imageError,
+    imageErrors,
     handleImageError,
     getImageSrc,
-    resetImageError
+    resetImageError,
+    resetAllImageErrors
   };
 }

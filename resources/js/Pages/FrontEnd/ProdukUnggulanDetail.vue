@@ -1,47 +1,115 @@
 <template>
-  <UserLayout>
+  <Head>
+    <title>{{ metaTitle }}</title>
+    <meta name="description" :content="metaDescription" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" :content="metaType" />
+    <meta property="og:title" :content="metaTitle" />
+    <meta property="og:description" :content="metaDescription" />
+    <meta property="og:url" :content="canonicalUrl" />
+    <meta property="og:site_name" :content="metaSiteName" />
+    <meta property="og:image" :content="metaImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" :content="metaTitle" />
+    <meta name="twitter:description" :content="metaDescription" />
+    <meta name="twitter:image" :content="metaImage" />
+    
+    <!-- Product specific -->
+    <meta property="product:price:amount" :content="produk.price" v-if="produk.price" />
+    <meta property="product:availability" content="in_stock" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="canonicalUrl" />
+  </Head>
+
+  <UserLayout v-slot="{ layout }">
     <div class="min-h-screen bg-type1">
-      <div class="max-w-screen-3xl mx-auto py-20 px-4">
+      <div class="max-w-screen-4xl mx-auto w-full px-[6.56%] pt-20">
         <div v-if="loading" class="text-center py-8">Memuat detail produk...</div>
         <div v-else-if="error" class="text-center text-red-600 py-8">{{ error }}</div>
         <div v-else>
-          <main class="mx-32 mt-16 font-merriweather ">
+          <main class="mt-16 font-merriweather ">
             <div class="flex items-center space-x-2 mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-accent1 ">
                 <path d="M120-200q-33 0-56.5-23.5T40-280v-400q0-33 23.5-56.5T120-760h400q33 0 56.5 23.5T600-680v400q0 33-23.5 56.5T520-200H120Zm600-320q-17 0-28.5-11.5T680-560v-160q0-17 11.5-28.5T720-760h160q17 0 28.5 11.5T920-720v160q0 17-11.5 28.5T880-520H720Zm40-80h80v-80h-80v80ZM120-280h400v-400H120v400Zm40-80h320L375-500l-75 100-55-73-85 113Zm560 160q-17 0-28.5-11.5T680-240v-160q0-17 11.5-28.5T720-440h160q17 0 28.5 11.5T920-400v160q0 17-11.5 28.5T880-200H720Zm40-80h80v-80h-80v80Zm-640 0v-400 400Zm640-320v-80 80Zm0 320v-80 80Z"/>
               </svg>
-              <h1 class="flex font-semibold text-accent1">Produk Unggulan Desa {{ produk.nama }}</h1>
+                <h1 class="flex text-accent2">Produk Unggulan <span class="hidden md:inline">{{ layout.name }}</span></h1>
             </div>
             
-            <div class="flex w-full gap-x-8">
-              <!-- Left collage -->
-              <div class="flex flex-row w-2/5 h-96 gap-2">       
-                <div class="flex-col min-w-32 ">
-                  <div class="flex gap-2 h-1/3 p-2">
-                    <img src="../../../images/profile.jpg" alt="" class="w-full h-full object-cover rounded-lg" />
+            <div class="flex flex-col md:flex-row w-full gap-8 pb-8">
+              <!-- Images section - mobile: full width, desktop: left side -->
+              <div class="w-full md:w-2/5">
+                <!-- Multiple images layout -->
+                <div v-if="produk.images?.length > 1" class="flex flex-col gap-2">
+                  <!-- Selected image on top -->
+                  <div class="h-64">
+                    <img 
+                      :src="selectedImage" 
+                      alt="" 
+                      class="w-full h-full object-cover rounded-lg" 
+                      @error="handleImageError(selectedImage)"
+                    />
                   </div>
-                  <div class="flex gap-2 h-1/3 p-2">
-                    <img src="../../../images/jamu.png" alt="" class="w-full h-full object-cover rounded-lg" />
-                  </div>
-                  <div class="flex gap-2 h-1/3 p-2">
-                    <img src="../../../images/profile.jpg" alt="" class="w-full h-full object-cover rounded-lg" />
+                  
+                  <!-- Thumbnail collage below -->
+                  <div class="flex gap-2 h-24">
+                    <div class="flex-1">
+                      <img 
+                        :src="getImageSrc(`/storage/${produk.images[0].path}`)" 
+                        alt="" 
+                        class="w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                        :class="{ 'ring-2 ring-accent2': selectedImageIndex === 0 }"
+                        @click="selectedImageIndex = 0"
+                        @error="handleImageError(`/storage/${produk.images[0].path}`)"
+                      />
+                    </div>
+                    <div v-if="produk.images?.length > 1" class="flex-1">
+                      <img 
+                        :src="getImageSrc(`/storage/${produk.images[1].path}`)" 
+                        alt="" 
+                        class="w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                        :class="{ 'ring-2 ring-accent2': selectedImageIndex === 1 }"
+                        @click="selectedImageIndex = 1"
+                        @error="handleImageError(`/storage/${produk.images[1].path}`)"
+                      />
+                    </div>
+                    <div v-if="produk.images?.length > 2" class="flex-1">
+                      <img 
+                        :src="getImageSrc(`/storage/${produk.images[2].path}`)" 
+                        alt="" 
+                        class="w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                        :class="{ 'ring-2 ring-accent2': selectedImageIndex === 2 }"
+                        @click="selectedImageIndex = 2"
+                        @error="handleImageError(`/storage/${produk.images[2].path}`)"
+                      />
+                    </div>
                   </div>
                 </div>
                 
-                <div class="flex gap-2 h-full py-2">
-                  <img src="../../../images/profile.jpg" alt="" class="w-full h-full object-cover rounded-lg" />
+                <!-- Single image display -->
+                <div v-else-if="produk.images?.length === 1" class="h-64">
+                  <img 
+                    :src="getImageSrc(`/storage/${produk.images[0].path}`)" 
+                    alt="" 
+                    class="w-full h-full object-cover rounded-lg" 
+                    @error="handleImageError(`/storage/${produk.images[0].path}`)"
+                  />
                 </div>
               </div>
-              <!-- Right content: fills remaining space -->
-              <div class="flex flex-col mt-3 mb-8 justify-start flex-1">
+              
+              <!-- Content section - mobile: full width below images, desktop: right side -->
+              <div class="flex flex-col justify-start flex-1">
                 <div class="flex items-center justify-start">
                   <p class="text-accent-1 text-4xl">{{ produk.name || '-' }}</p>
                 </div>
                 <div class="flex items-center justify-start">
-                  <p class="mt-2 mb-2">{{ produk.description }}</p>
+                  <p class="mt-2 mb-2 text-justify whitespace-pre-line">{{ produk.description }}</p>
                 </div>
                 <div class="flex items-center justify-start my-3">
-                  <p class="mb-2 text-2xl">Harga : {{ produk.price ? `${produk.price}` : '-' }}</p>
+                  <p class="mb-2 text-2xl">{{ produk.price ? `${produk.price}` : '-' }}</p>
                 </div>
                 <div class="flex items-center justify-start mb-1 space-x-2">
                   <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" class="text-accent1">
@@ -56,7 +124,7 @@
                   <p class="font-light">{{ produk.phone ? `${produk.phone}` : '-' }}</p>
                 </div>
                 
-                <div class="flex items-center justify-start mb-1 space-x-2 mt-1">
+                <div class="flex items-center justify-start mb-1 space-x-4 mt-1">
                   <a
                     v-if="produk.instagram"
                     :href="produk.instagram"
@@ -102,15 +170,24 @@
                   >
                     <i class="bi bi-youtube md:text-xl relative"></i>
                   </a>
+                  <a
+                    v-if="produk.alamat"
+                    :href="produk.alamat"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-accent1 hover:text-accent2 transition-colors duration-300"
+                  >
+                    <i class="bi bi-geo-alt-fill md:text-xl relative"></i>
+                  </a>
                 </div>
                 
-                <div>
+                <div class="flex items-center justify-start mb-1 space-x-4 mt-1">
                   <a
                       v-if="produk.phone"
                       :href="`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Haloo saya .... dari ..., saya ingin bertanya apakah produk ' + (produk.name || '-') + ' masih tersedia?')}`"
                       target="_blank"
                       rel="noopener"
-                      class="flex w-1/4 justify-center bg-accent2 text-white space-x-2 text-xs md:text-sm py-2 md:py-2 rounded-xl mt-4"
+                      class="flex justify-center bg-accent2 text-white space-x-2 text-xs md:text-sm p-2 rounded-lg mt-4"
                     >
                       <i class="bi bi-whatsapp text-lg"></i>
                       <p class="mt-1">Hubungi Penjual</p>
@@ -130,13 +207,51 @@
 <script setup>
 import { ref, onMounted,computed } from 'vue';
 import axios from 'axios';
+import { Head } from "@inertiajs/vue3";
 import UserLayout from '@/Layouts/UserLayout.vue';
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
+import { useMeta } from "@/Utility/useMeta";
 
 const props = defineProps({ slug: String });
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 const produk = ref({});
 const loading = ref(true);
 const error = ref(null);
+const selectedImageIndex = ref(0);
+
+const selectedImage = computed(() => {
+  if (!produk.value.images || produk.value.images.length === 0) {
+    return '';
+  }
+  const selectedImg = produk.value.images[selectedImageIndex.value];
+  return selectedImg ? getImageSrc(`/storage/${selectedImg.path}`) : '';
+});
+
+// Meta tags setup using the composable
+const {
+    metaTitle,
+    metaDescription,
+    metaImage,
+    canonicalUrl,
+    metaType,
+    metaSiteName
+} = useMeta({
+    title: computed(() => produk.value.name ? `${produk.value.name}` : 'Produk Unggulan'),
+    description: computed(() => {
+        if (!produk.value.description) return 'Produk unggulan dari desa kami dengan kualitas terbaik';
+        
+        // Limit description to 160 characters
+        const description = produk.value.description;
+        return description.length > 160 
+            ? description.substring(0, 157) + '...' 
+            : description;
+    }),
+    type: 'product',
+    image: computed(() => produk.value.images?.length > 0 ? produk.value.images[0].path : null),
+    url: computed(() => `${window.location.origin}/produk-unggulan/${props.slug}`)
+});
 
 onMounted(async () => {
   try {
@@ -148,6 +263,7 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
 const whatsappNumber = computed(() => {
   if (!produk.value.phone) return '';
   // Remove all non-digit characters

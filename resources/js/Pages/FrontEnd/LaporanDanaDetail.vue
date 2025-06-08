@@ -1,5 +1,30 @@
 <template>
-  <Head :title="dokumen.title" />
+  <Head>
+    <title>{{ metaTitle }}</title>
+    <meta name="description" :content="metaDescription" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" :content="metaType" />
+    <meta property="og:title" :content="metaTitle" />
+    <meta property="og:description" :content="metaDescription" />
+    <meta property="og:url" :content="canonicalUrl" />
+    <meta property="og:site_name" :content="metaSiteName" />
+    <meta property="og:image" :content="metaImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" :content="metaTitle" />
+    <meta name="twitter:description" :content="metaDescription" />
+    <meta name="twitter:image" :content="metaImage" />
+    
+    <!-- Article specific -->
+    <meta property="article:published_time" :content="metaPublishedTime" v-if="metaPublishedTime" />
+    <meta property="article:author" :content="metaAuthor" v-if="metaAuthor" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="canonicalUrl" />
+  </Head>
+
   <UserLayout v-slot="{layout}">
     <div class="min-h-screen bg-type1">
       <div class="max-w-screen-2xl mx-auto px-6 lg:px-28 py-6 lg:py-12">
@@ -20,7 +45,7 @@
                     <path d="M280-280q17 0 28.5-11.5T320-320q0-17-11.5-28.5T280-360q-17 0-28.5 11.5T240-320q0 17 11.5 28.5T280-280Zm-40-160h80v-240h-80v240Zm200 160h280v-80H440v80Zm0-160h280v-80H440v80Zm0-160h280v-80H440v80ZM160-120q-33 0-56.5-23.5T80-200v-560q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v560q0 33-23.5 56.5T800-120H160Zm0-80h640v-560H160v560Zm0 0v-560 560Z"/>
                 </svg>
                 <h1 class="lg:text-lg  text-accent2 -mb-0.5 font-merriweather ">
-                    Dana Desa {{ layout.name }}
+                    Dana Desa <span class="hidden md:inline">{{ layout.name }}</span> 
                 </h1>
             </div>
 
@@ -122,8 +147,9 @@
 
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import { useMeta } from '@/Utility/useMeta';
 import axios from 'axios';
 
 
@@ -144,6 +170,31 @@ const error = ref(null);
 
 const comments = ref([]);
 
+
+
+// Meta tags setup
+const {
+  metaTitle,
+  metaDescription,
+  metaImage,
+  canonicalUrl,
+  metaType,
+  metaSiteName,
+  metaAuthor,
+  metaPublishedTime
+} = useMeta({
+  title: computed(() => dokumen.value.title || 'Laporan Dana Desa'),
+  description: computed(() => {
+    if (dokumen.value.title) {
+      return `Detail laporan dana desa: ${dokumen.value.title}. Akses dokumen transparan penggunaan anggaran dana desa.`;
+    }
+    return 'Detail laporan dana desa - Transparansi penggunaan anggaran dana desa untuk pembangunan dan pemberdayaan masyarakat.';
+  }),
+  type: 'article',
+  url: computed(() => `${window.location.origin}/dana-desa/${props.slug}`),
+  author: 'Admin',
+  publishedTime: computed(() => dokumen.value.date)
+});
 
 
 // Home data
