@@ -63,6 +63,18 @@ const batasList = computed(() =>
 const handleCoordinatesUpdate = (coords) => {
     coordinates.value = coords;
 };
+
+// Data dummy lembaga desa
+const lembagaDesa = [
+  "Posyandu",
+  "PKK (Pemberdayaan Kesejahteraan Keluarga)",
+  "Karang Taruna",
+  "LPM (Lembaga Pemberdayaan Masyarakat)",
+  "BPD (Badan Permusyawaratan Desa)",
+  "Kelompok Tani",
+  "KWT (Kelompok Wanita Tani)",
+  "RT/RW (Rukun Tetangga/Rukun Warga)"
+];
 </script>
 <!-- Profileview.vue -->
 <template>
@@ -194,13 +206,28 @@ const handleCoordinatesUpdate = (coords) => {
                     yang mendukung kehidupan masyarakat.
                 </p>
                 <div class="text-accent2 mt-2">
-                    <ol class="columns-2 list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-3xl space-y-1">
+                    <ol class="columns-2 list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-5xl space-y-1">
                         <li v-for="(fasilitas, index) in fasilitasList" :key="index">
                             {{ fasilitas }}
                         </li>
                     </ol>
                 </div>
-
+            </div>
+            <!-- Lembaga Desa -->
+            <div class="flex flex-col w-full font-merriweather bg-type1">
+                <h1 class="text-accent2 xl:text-3xl sm:text-xl font-bold">
+                    Lembaga Desa
+                </h1>
+                <p class="xl:text-xl sm:text-base text-semiBlack max-w-7xl italic">
+                    Informasi tentang sarana dan prasarana yang tersedia di desa yang mendukung kehidupan masyarakat.
+                </p>
+                <div class="text-accent2 mt-2">
+                    <ol class="columns-2 list-disc list-inside font-semibold xl:text-xl sm:text-sm max-w-5xl space-y-1">
+                        <li v-for="(lembaga, index) in lembagaDesa" :key="index">
+                            {{ lembaga }}
+                        </li>
+                    </ol>
+                </div>
             </div>
             <!-- Data Geografi -->
             <div class="flex flex-col w-full font-merriweather bg-type1">
