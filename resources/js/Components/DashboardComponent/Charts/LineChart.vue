@@ -61,6 +61,14 @@ const destroyChart = () => {
   }
 };
 
+function getAccent1Color() {
+  const el = document.getElementById('app-accent-root');
+  if (el) {
+    return getComputedStyle(el).getPropertyValue('--accent1') || '#244031';
+  }
+  return '#244031';
+}
+
 const createChart = () => {
   if (!chartCanvas.value || !props.data) return;
   
@@ -70,6 +78,8 @@ const createChart = () => {
   const ctx = chartCanvas.value.getContext('2d');
 
   let datasets = [];
+  // Use the accent1 color
+  const accent1 = getAccent1Color().trim();
   
   if (props.multiDataset && props.data.datasets) {
     // Multi-dataset configuration
@@ -98,15 +108,16 @@ const createChart = () => {
     datasets = [{
       label: props.title,
       data: props.data.values || [],
-      borderColor: props.color,
-      backgroundColor: props.color + '20',
+      borderColor: accent1,
+      backgroundColor: accent1 + '50',
+      borderWidth: 2,
       fill: true,
       tension: 0.4,
-      pointBackgroundColor: props.color,
+      pointBackgroundColor: accent1,
       pointBorderColor: '#fff',
       pointBorderWidth: 2,
       pointRadius: 4,
-      pointHoverRadius: 6
+      pointHoverRadius: 10
     }];
   }
 

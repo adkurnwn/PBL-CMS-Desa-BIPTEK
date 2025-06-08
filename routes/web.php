@@ -91,6 +91,11 @@ Route::get('/galeri-desa', function (StatisticsService $statisticsService) {
     return Inertia::render('FrontEnd/GaleriList');
 });
 
+Route::get('/statistik-penduduk', function (StatisticsService $statisticsService) {
+    $statisticsService->trackFeatureVisit('Statistik', request());
+    return Inertia::render('FrontEnd/StatistikPenduduk');
+});
+
 Route::get('/galeri-desa-detail', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Galeri', request());
     return Inertia::render('FrontEnd/GaleriDetail');
