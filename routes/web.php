@@ -13,6 +13,7 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/permissions', [InstallController::class, 'permissions'])->name('permissions');
     Route::get('/database', [InstallController::class, 'database'])->name('database');
     Route::post('/database', [InstallController::class, 'setDatabase'])->name('setDatabase');
+    Route::post('/database/test', [InstallController::class, 'testDatabaseConnection'])->name('testConnection'); // Add this line
     Route::get('/admin', [InstallController::class, 'admin'])->name('admin');
     Route::post('/admin', [InstallController::class, 'setAdmin'])->name('setAdmin');
     Route::get('/setup-profile', [InstallController::class, 'setupProfile'])->name('setupProfile');

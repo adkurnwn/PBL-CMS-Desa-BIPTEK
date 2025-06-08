@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 
 class InstallController extends Controller
 {
@@ -391,7 +392,8 @@ class InstallController extends Controller
     private function testConnection($host, $port, $username, $password, $database)
     {
         try {
-            $connection = [
+            // Create temporary database configuration (like SettingsController)
+            $config = [
                 'driver' => 'mysql',
                 'host' => $host,
                 'port' => $port,
@@ -405,12 +407,18 @@ class InstallController extends Controller
                 'engine' => null,
             ];
 
-            $pdo = new \PDO(
-                "mysql:host={$host};port={$port};dbname={$database}",
-                $username,
-                $password,
-                [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION]
-            );
+            // Set temporary database configuration
+            Config::set('database.connections.test_connection', $config);
+
+            // Test the connection
+            $pdo = DB::connection('test_connection')->getPdo();
+
+            if (!$pdo) {
+                throw new \Exception('Could not establish database connection');
+            }
+
+            // Test if we can run a simple query
+            DB::connection('test_connection')->select('SELECT 1');
 
             return ['success' => true];
         } catch (\Exception $e) {
@@ -487,5 +495,43 @@ class InstallController extends Controller
         Artisan::call('cache:clear');
 
         return redirect('/login');
+    }
+
+    public function testDatabaseConnection(Request $request)
+    {
+        $request->validate([
+            'host' => 'required|string',
+            'port' => 'required|numeric',
+            'database' => 'required|string',
+            'username' => 'required|string',
+            'password' => 'nullable|string',
+        ]);
+
+        try {
+            $connection = $this->testConnection(
+                $request->host,
+                $request->port,
+                $request->username,
+                $request->password,
+                $request->database
+            );
+
+            if (!$connection['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $connection['message']
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Database connection successful'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

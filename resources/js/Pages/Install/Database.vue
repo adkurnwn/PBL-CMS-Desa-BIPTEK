@@ -1,6 +1,7 @@
 <script setup>
 import { Link, useForm } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
+import axios from "axios";
 
 const props = defineProps({
     currentConfig: Object,
@@ -23,13 +24,12 @@ const isFormValid = computed(() => {
     return form.host && form.port && form.database && form.username;
 });
 
-const testConnection = () => {
+const testConnection = async () => {
     if (!isFormValid.value) return;
 
     loading.value = true;
     testStatus.value = "testing";
 
-    // Using the same form data but not submitting it yet
     const testData = {
         host: form.host,
         port: form.port,
@@ -38,37 +38,27 @@ const testConnection = () => {
         password: form.password,
     };
 
-    // Make a POST request to test the connection
-    fetch(route("install.setDatabase"), {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content"),
-        },
-        body: JSON.stringify(testData),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            loading.value = false;
-            if (data.errors) {
-                testStatus.value = "failed";
-                errorMessage.value =
-                    data.errors.connection ||
-                    data.errors.error ||
-                    "Koneksi ke database gagal.";
-            } else {
-                testStatus.value = "success";
-            }
-        })
-        .catch((error) => {
-            loading.value = false;
+    try {
+        const response = await axios.post(
+            route("install.testConnection"),
+            testData
+        );
+        loading.value = false;
+        if (response.data.success) {
+            testStatus.value = "success";
+        } else {
             testStatus.value = "failed";
             errorMessage.value =
-                "Terjadi kesalahan saat menguji koneksi database.";
-            console.error(error);
-        });
+                response.data.message || "Database connection failed.";
+        }
+    } catch (error) {
+        loading.value = false;
+        testStatus.value = "failed";
+        errorMessage.value =
+            error.response?.data?.message ||
+            "An error occurred while testing the database connection.";
+        console.error(error);
+    }
 };
 
 const submit = () => {
