@@ -7,6 +7,7 @@ import useApiFetch from "@/Utility/useApiFetch";
 import { useMeta } from "@/Utility/useMeta";
 import { formatDate } from "@/Utility/useComment";
 import NotFound from "@/Components/NotFound.vue";
+import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
 
 const props = defineProps({
     slug: {
@@ -18,6 +19,8 @@ const props = defineProps({
 const news = ref({});
 const loading = ref(true);
 const error = ref(null);
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 // News fetch logic
 const newsApi = useApiFetch();
@@ -241,9 +244,10 @@ onMounted(() => {
                                     class="relative min-h-48 lg:min-h-96"
                                 >
                                     <img
-                                        :src="`/storage/${news.images[0].path}`"
+                                        :src="getImageSrc(`/storage/${news.images[0].path}`)"
                                         :alt="news.images[0].alt"
                                         class="w-full h-full object-cover"
+                                        @error="handleImageError(`/storage/${news.images[0].path}`)"
                                     />
                                 </div>
                                 <!-- <div class="flex relative h-full w-full p-2">
@@ -260,7 +264,7 @@ onMounted(() => {
 
                                     <!-- Content -->
                                     <div
-                                        class="text-sm lg:text-lg text-semiBlack text-justify"
+                                        class="xl:text-xl md:text-lg text-base text-semiBlack text-justify prose prose-lg max-w-none [&>p]:mb-4 [&>p:last-child]:mb-0"
                                         v-html="news.content"
                                     ></div>
                                     <!-- Video -->
@@ -370,12 +374,16 @@ onMounted(() => {
                                         >
                                             <div class="flex w-1/2">
                                                 <img
-                                                    :src="`/storage/${
-                                                        item.thumbnail ||
-                                                        'default.jpg'
-                                                    }`"
+                                                    :src="getImageSrc(`/storage/${
+                                                        item.thumbnail
+                                                    }`)"
                                                     alt="News Image"
                                                     class="w-full h-20 object-cover rounded-md"
+                                                    @error="
+                                                        handleImageError(
+                                                            `/storage/${item.thumbnail}`
+                                                        )"
+
                                                 />
                                             </div>
 

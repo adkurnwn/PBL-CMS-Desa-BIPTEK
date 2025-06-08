@@ -129,7 +129,7 @@ onMounted(() => {
                         <h1
                             class="lg:text-lg text-accent2 -mb-0.5 font-merriweather"
                         >
-                            Produk Hukum {{ layout.name }}
+                            Produk Hukum <span class="hidden md:inline">{{ layout.name }}</span>
                         </h1>
                     </div>
 
