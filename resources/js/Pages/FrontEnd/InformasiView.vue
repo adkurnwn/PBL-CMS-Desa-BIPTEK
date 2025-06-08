@@ -4,11 +4,28 @@ import NewsCard from "@/Components/NewsCard.vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { ref, onMounted } from "vue";
 import useApiFetch from "@/Utility/useApiFetch";
-import { Link } from "@inertiajs/vue3";
+import { useMeta } from "@/Utility/useMeta";
+import { Link, Head } from "@inertiajs/vue3";
 
 const gallery = ref({});
 const events = ref([]);
 const news = ref([]);
+
+// Meta tags setup
+const {
+  metaTitle,
+  metaDescription,
+  metaImage,
+  canonicalUrl,
+  metaType,
+  metaSiteName
+} = useMeta({
+  title: 'Informasi - CMS Desa',
+  description: 'Pusat informasi terkini tentang galeri desa, event terdekat, dan berita terbaru dari pemerintah desa.',
+  type: 'website',
+  url: `${window.location.origin}/informasi`,
+  image: 'default-info-image.jpg'
+});
 
 const fetchData = async () => {
     const galleryLoading = ref(true);
@@ -36,6 +53,28 @@ onMounted(fetchData);
 </script>
 
 <template>
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
+
     <UserLayout>
         <header
             class="relative flex flex-col items-center justify-center max-w-fit mx-auto w-full bg-type1"

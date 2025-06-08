@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import EventCard from '@/Components/EventCard.vue';
 import NewsCard from '@/Components/NewsCard.vue';
 import ProductCard from '@/Components/ProductCard.vue';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import useApiFetch from '@/Utility/useApiFetch';
-import { Link } from '@inertiajs/vue3';
+import { useMeta } from '@/Utility/useMeta';
+import { Link, Head, usePage } from '@inertiajs/vue3';
 import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
 
 const events = ref([]);
@@ -14,6 +15,40 @@ const gallery = ref({});
 const produkDesa = ref([]);
 const { handleImageError, getImageSrc } = useImageErrorHandler();
 
+// Reactive meta description and image
+const metaDescriptionText = ref('Website resmi pemerintah desa - Sumber informasi terbaru tentang pemerintahan, berita, event, dan layanan publik desa.');
+const metaImagePath = ref('default-home-image.jpg');
+
+// Meta tags setup
+const {
+  metaTitle,
+  metaDescription,
+  metaImage,
+  canonicalUrl,
+  metaType,
+  metaSiteName
+} = useMeta({
+  title: 'Beranda',
+  description: metaDescriptionText,
+  type: 'website',
+  url: window.location.origin,
+  image: metaImagePath
+});
+
+// Function to update description and image
+const updateMetaData = (layoutName, heroImage) => {
+  metaDescriptionText.value = `Selamat datang di website resmi Pemerintah ${layoutName}! Sumber informasi terbaru tentang pemerintahan, berita, event, dan layanan publik desa.`;
+  if (heroImage) {
+    metaImagePath.value = heroImage;
+  }
+  return null; // Return null to not render anything
+};
+
+// Get layout data from Inertia page props
+const page = usePage();
+const layout = computed(() => page.props.layout || {});
+
+// Fetch data function
 const fetchData = async () => {
   const eventApi = useApiFetch();
   const newsApi = useApiFetch();
@@ -49,10 +84,35 @@ onMounted(() => {
 </script>
 <!-- Homeview.vue -->
 <template>
+  <Head>
+    <title>{{ metaTitle }}</title>
+    <meta name="description" :content="metaDescription" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" :content="metaType" />
+    <meta property="og:title" :content="metaTitle" />
+    <meta property="og:description" :content="metaDescription" />
+    <meta property="og:url" :content="canonicalUrl" />
+    <meta property="og:site_name" :content="metaSiteName" />
+    <meta property="og:image" :content="metaImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" :content="metaTitle" />
+    <meta name="twitter:description" :content="metaDescription" />
+    <meta name="twitter:image" :content="metaImage" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="canonicalUrl" />
+  </Head>
+
   <UserLayout v-slot="{ layout }">
+    <!-- Call function when template renders -->
+    {{ updateMetaData(layout.name, layout.hero_image) }}
+    
     <header class="relative flex flex-col items-center justify-center w-full h-screen bg-red-100">
       <img :src="getImageSrc(`/storage/${layout.hero_image}`)" alt="Hero Image"
-        class="absolute z-0 w-full h-screen object-cover" @error="handleImageError" />
+        class="absolute z-0 w-full h-screen object-cover" @error="handleImageError(`/storage/${layout.hero_image}`)" />
       <div class="absolute bg-black z-0 w-full h-screen opacity-60">
 
       </div>
@@ -89,7 +149,7 @@ onMounted(() => {
         <!-- Image Section -->
         <figure class="w-48 h-48 my-12 lg:w-80 lg:h-80 flex items-center justify-center rounded-full">
           <img :src="getImageSrc(`/storage/${layout.circle_image}`)" alt="Hero Image"
-            class=" h-full object-cover rounded-full" @error="handleImageError"/>
+            class=" h-full object-cover rounded-full" @error="handleImageError(`/storage/${layout.circle_image}`)"/>
         </figure>
       </article>
 
@@ -164,10 +224,10 @@ onMounted(() => {
             <div class="flex flex-row w-full justify-between space-x-2">
               <img v-if="gallery.images[0]" :src="getImageSrc(`/storage/${gallery.images[0].path}`)"
                 :alt="gallery.images[0].alt" class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
-                @error="handleImageError" />
+                @error="handleImageError(`/storage/${gallery.images[0].path}`)" />
               <img v-if="gallery.images[1]" :src="getImageSrc(`/storage/${gallery.images[1].path}`)"
                 :alt="gallery.images[1].alt" class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
-                @error="handleImageError" />
+                @error="handleImageError(`/storage/${gallery.images[1].path}`)" />
             </div>
 
             <!-- Second row - 3 images -->
@@ -175,14 +235,14 @@ onMounted(() => {
               <img v-if="gallery.images[2]" :src="getImageSrc(`/storage/${gallery.images[2].path}`)"
                 :alt="gallery.images[2].alt"
                 class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
-                @error="handleImageError" />
+                @error="handleImageError(`/storage/${gallery.images[2].path}`)" />
               <img v-if="gallery.images[3]" :src="getImageSrc(`/storage/${gallery.images[3].path}`)"
                 :alt="gallery.images[3].alt"
                 class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
-                @error="handleImageError" />
+                @error="handleImageError(`/storage/${gallery.images[3].path}`)" />
               <img v-if="gallery.images[4]" :src="getImageSrc(`/storage/${gallery.images[4].path}`)"
                 :alt="gallery.images[4].alt" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
-                @error="handleImageError" />
+                @error="handleImageError(`/storage/${gallery.images[4].path}`)" />
             </div>
           </div>
 

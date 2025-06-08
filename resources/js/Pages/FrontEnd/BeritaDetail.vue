@@ -1,9 +1,10 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { Link, usePage, Head } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
+import { useMeta } from "@/Utility/useMeta";
 import { formatDate } from "@/Utility/useComment";
 import NotFound from "@/Components/NotFound.vue";
 
@@ -49,6 +50,36 @@ const fetchRelatedNews = async () => {
     relatedNewsLoading.value = relatedNewsApi.loading.value;
 };
 
+// Meta tags setup using the composable
+const {
+    metaTitle,
+    metaDescription,
+    metaImage,
+    canonicalUrl,
+    metaType,
+    metaSiteName,
+    metaAuthor,
+    metaPublishedTime,
+    metaSection
+} = useMeta({
+    title: computed(() => news.value.title || 'Berita'),
+    description: computed(() => {
+        if (!news.value.content) return 'Baca berita terbaru dari desa kami';
+        
+        // Strip HTML tags and limit to 160 characters for description
+        const textContent = news.value.content.replace(/<[^>]*>/g, '');
+        return textContent.length > 160 
+            ? textContent.substring(0, 157) + '...' 
+            : textContent;
+    }),
+    type: 'article',
+    image: computed(() => news.value.images?.length > 0 ? news.value.images[0].path : null),
+    url: computed(() => `${window.location.origin}/berita/${props.slug}`),
+    author: computed(() => news.value.user?.name || 'Admin'),
+    publishedTime: computed(() => news.value.created_at),
+    section: computed(() => news.value.category_name)
+});
+
 watch(activeTab, fetchRelatedNews);
 
 onMounted(() => {
@@ -58,7 +89,33 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head :title="news.title" />
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Article specific -->
+        <meta property="article:published_time" :content="metaPublishedTime" v-if="metaPublishedTime" />
+        <meta property="article:author" :content="metaAuthor" v-if="metaAuthor" />
+        <meta property="article:section" :content="metaSection" v-if="metaSection" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
+
     <UserLayout>
         <div v-if="error">
             <NotFound />

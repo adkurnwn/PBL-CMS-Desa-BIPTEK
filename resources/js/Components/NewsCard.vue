@@ -57,7 +57,7 @@ const processedContent = computed(() => {
                     :src="getImageSrc(`/storage/${news.thumbnail}`)"
                     :alt="news.alt || 'Default Image'"
                     class="w-full h-60 lg:h-72 object-cover p-4 rounded-3xl overflow-hidden"
-                    @error="handleImageError"
+                    @error="handleImageError(`/storage/${news.thumbnail}`)"
                 />
             </div>
             <div class="flex flex-col px-2 w-full justify-center h-full h-">

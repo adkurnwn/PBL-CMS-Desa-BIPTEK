@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Map from "@/Components/FrontendComponent/Map.vue";
 import { useApiCache } from "@/Utility/useApiCache";
+import { useMeta } from "@/Utility/useMeta";
 import { parseFasilitas, parseMisi, parseBatas } from "@/Utility/useParser";
 import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
 import { Head, Link } from "@inertiajs/vue3";
@@ -11,6 +12,31 @@ const profile = ref({});
 const demografi = ref({});
 const coordinates = ref({ lat: null, lon: null, display_name: null });
 const { handleImageError, getImageSrc } = useImageErrorHandler();
+
+// Meta tags setup
+const {
+  metaTitle,
+  metaDescription,
+  metaImage,
+  canonicalUrl,
+  metaType,
+  metaSiteName
+} = useMeta({
+  title: 'Profil Desa',
+  description: computed(() => {
+    if (profile.value.history) {
+      // Strip HTML tags and limit description
+      const textContent = profile.value.history.replace(/<[^>]*>/g, '');
+      return textContent.length > 160 
+        ? textContent.substring(0, 157) + '...' 
+        : textContent;
+    }
+    return 'Profil lengkap desa meliputi sejarah, visi misi, struktur pemerintahan, infrastruktur, data geografi dan demografi.';
+  }),
+  type: 'website',
+  url: `${window.location.origin}/profile`,
+  image: computed(() => profile.value.hero_image || 'default-profile-image.jpg')
+});
 
 const fetchData = async () => {
     const profileApi = useApiCache("profileData", "/api/profile/profile");
@@ -40,13 +66,33 @@ const handleCoordinatesUpdate = (coords) => {
 </script>
 <!-- Profileview.vue -->
 <template>
-    <Head title="Profil Desa" />
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
     <UserLayout v-slot="{ layout }">
         <header class="flex items-center justify-center font-merriweather">
             <!--Sejarah Desa-->
             <article class="h-screen font-merriweather">
                 <img :src="getImageSrc(`/storage/${profile.hero_image}`)" alt="Logo"
-                    class="absolute z-0 left-0 w-full h-screen object-cover" @error="handleImageError" />
+                    class="absolute z-0 left-0 w-full h-screen object-cover" @error="handleImageError(`/storage/${profile.hero_image}`)" />
                 <div class="absolute bg-black z-0 left-0 w-full h-screen opacity-60"></div>
                 <div
                     class="flex flex-col justify-center items-center h-full px-[6.56%] pb-[6.56%] sm:justify-end sm:items-start sm:pl-[6.56%] sm:pr-[25%] sm:pb-[6.56%] sm:px-0">
@@ -71,7 +117,7 @@ const handleCoordinatesUpdate = (coords) => {
                         <div class="relative overflow-hidden rounded-full aspect-[514/620] w-full">
                             <img :src="getImageSrc(`/storage/${profile.kepala_desa_image}`)"
                                 :alt="`${profile.kepala_desa_name} Profile`" class="w-full h-full object-cover"
-                                @error="handleImageError" />
+                                @error="handleImageError(`/storage/${profile.kepala_desa_image}`)" />
                         </div>
 
                         <!-- Kotak Hijau -->
@@ -121,7 +167,7 @@ const handleCoordinatesUpdate = (coords) => {
                     <!-- Card 1 -->
                     <div class=" bg-white rounded-xl shadow-lg text-center">
                         <img :src="getImageSrc(`/storage/${profile.organization_image}`)" alt="Struktur Organisasi"
-                            class="w-full xl:h-72 object-contain" @error="handleImageError" />
+                            class="w-full xl:h-72 object-contain" @error="handleImageError(`/storage/${profile.organization_image}`)" />
                         <p class="text-accent1 text-sm xl:text-lg sm:text-lg font-semibold py-2 xl:-mt-1">
                             Struktur Organisasi Pemerintahan {{ layout.name }}
                         </p>

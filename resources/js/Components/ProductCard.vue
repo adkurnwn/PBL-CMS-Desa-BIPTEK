@@ -25,7 +25,7 @@ defineProps({
                     :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
                     :alt="produkDesa?.alt"
                     class="w-full h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
-                    @error="handleImageError"
+                    @error="handleImageError(`/storage/${produkDesa.thumbnail}`)"
                 />
             </div>
             <div class="px-4">

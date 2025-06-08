@@ -5,7 +5,7 @@
             class="flex flex-row items-center justify-start gap-[7px] sm:gap-[7px] md:gap-[7px] xl:gap-[7px] 2xl:gap-[8px] 3xl:gap-[9px] 4xl:gap-[10px]">
             <div
                 class="w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] md:w-[35px] md:h-[35px] xl:w-[26px] xl:h-[26px] 2xl:w-[30px] 2xl:h-[30px] 3xl:w-[35px] 3xl:h-[35px] 4xl:w-[40px] 4xl:h-[40px] rounded-full overflow-hidden flex-shrink-0">
-                <img :src="avatarUrl" :alt="userName" class="w-full h-full object-cover" @error="handleImageError" />
+                <img :src="avatarUrl" :alt="userName" class="w-full h-full object-cover" />
             </div>
             <div>
                 <div
