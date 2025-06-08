@@ -128,13 +128,13 @@ onMounted(() => {
     <main class="max-w-screen-3xl mx-auto w-full ">
       <!-- Bagian Selamat Datang -->
       <article
-        class="relative w-full  flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 sm:px-[13.91%] py-10 pt-4 md:pt-16 lg:pt-40">
+        class="relative w-full flex flex-col-reverse lg:flex-row items-center justify-center font-merriweather bg-type1 sm:px-[13.91%] py-4 md:mt-10 md:py-10">
         <!-- Text Section -->
-        <section class="flex flex-col  w-2/3 space-y-3 md:mx-8">
-          <h1 class="text-xl 3xl:md:text-3xl xl:text-xl font-semibold text-accent2 text-center lg:text-left">
+        <section class="flex flex-col w-2/3 space-y-3 md:mx-8">
+          <h1 class="xl:text-3xl sm:text-xl text-md font-semibold text-accent2 text-center lg:text-left">
             Selamat datang di website resmi Pemerintah {{ layout.name }}!
           </h1>
-          <div class="space-y-3 3xl:md:text-xl  text-semiBlack text-justify font-thin">
+          <div class="space-y-3 xl:text-xl sm:text-lg text-xs  text-semiBlack text-justify font-thin">
             <p>
               Kami berkomitmen untuk menghadirkan layanan yang transparan, informatif, dan bermanfaat bagi seluruh
               masyarakat serta para pengunjung yang ingin mengenal desa kami lebih dekat.
@@ -147,7 +147,7 @@ onMounted(() => {
         </section>
 
         <!-- Image Section -->
-        <figure class="w-48 h-48 my-12 lg:w-80 lg:h-80 flex items-center justify-center rounded-full">
+        <figure class="w-48 h-48 my-5 lg:w-80 lg:h-80 flex items-center justify-center rounded-full">
           <img :src="getImageSrc(`/storage/${layout.circle_image}`)" alt="Hero Image"
             class=" h-full object-cover rounded-full" @error="handleImageError(`/storage/${layout.circle_image}`)"/>
         </figure>
@@ -291,11 +291,10 @@ onMounted(() => {
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <div>
-                  <svg xmlns=w3.org/2000/svg height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor"
+                  <svg xmlns="http://w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor"
                     class="text-accent1">
                     <path
                       d="M160-120v-60h480v60H160Zm222-212L160-554l70-72 224 222-72 72Zm254-254L414-810l72-70 222 222-72 72Zm202 426L302-696l42-42 536 536-42 42Z" />
-                    "http://www.
                   </svg>
                 </div>
 
@@ -342,11 +341,11 @@ onMounted(() => {
             <a href="/profile#struktur-pemerintahan" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
-                <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
-                  fill="currentColor" class="text-accent1">
-                  <path
-                    d="M480-400q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400ZM320-240h320v-23q0-24-13-44t-36-30q-26-11-53.5-17t-57.5-6q-30 0-57.5 6T369-337q-23 10-36 30t-13 44v23ZM720-80H240q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80Zm0-80v-446L526-800H240v640h480Zm-480 0v-640 640Z" />
-                </svg>
+                  <svg class=" text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
+                    viewBox="0 -960 960 960" width="48px" fill="currentColor">
+                    <path
+                        d="M480-242q-67 0-129 23.5T235-149v9h490v-9q-54-46-116-69.5T480-242Zm0-60q74 0 139.5 24.5T740-211v-609H220v609q55-42 120.5-66.5T480-302Zm2-139q-32.5 0-55.25-22.75T404-519q0-32.5 22.75-55.25T482-597q32.5 0 55.25 22.75T560-519q0 32.5-22.75 55.25T482-441ZM220-80q-24 0-42-18t-18-42v-680q0-24 18-42t42-18h520q24 0 42 18t18 42v680q0 24-18 42t-42 18H220Zm262-301q58 0 98-40t40-98q0-58-40-98t-98-40q-58 0-98 40t-40 98q0 58 40 98t98 40Zm-2-138Z" />
+                  </svg>
                 <div class="mt-2 space-y-1 ">
                   <h2 class="px-1 text-xl font-semibold text-accent1">Struktur Organisasi</h2>
                   <h3 class="px-1 text-base font-normal  text-accent1 leading-5">Susunan kepengurusan dan perangkat desa
