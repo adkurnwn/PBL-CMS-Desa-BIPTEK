@@ -14,6 +14,17 @@ const pagination = ref(2);
 const totalPages= 2;
 const newsApi = useApiFetch();
 const categoriesApi = useApiFetch();
+const showFilterModal = ref(false);
+const filterWaktu = ref("semua");
+const tanggalMulai = ref("");
+const tanggalAkhir = ref("");
+
+function openFilter() {
+    showFilterModal.value = true;
+}
+function closeFilter() {
+    showFilterModal.value = false;
+}
 
 const {
     searchQuery,
@@ -97,23 +108,81 @@ onMounted(() => {
                     </svg>
                 </button>
                 <!-- Button Filter Waktu Berita -->
-                <button
-                    @click="openFilter"
-                    class="ml-5 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
-                >
-                    <svg
-                        class="ml-2"
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="0 -960 960 960"
-                        width="24px"
-                        fill="244031"
+                <div class="relative inline-block">
+                    <button
+                        @click="openFilter"
+                        class="ml-5 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
                     >
-                        <path
-                            d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"
-                        />
-                    </svg>
-                </button>
+                        <svg
+                            class="ml-2"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="244031"
+                        >
+                            <path
+                                d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"
+                            />
+                        </svg>
+                    </button>
+                    <!-- Pop Up Filter Berita -->
+                    <div
+                        v-if="showFilterModal"
+                        class="absolute left-full top-12 flex items-start justify-start -ml-5"
+                    >
+                        <div class="bg-white rounded-lg p-3 w-72 shadow-lg relative">
+                            <button
+                                class="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
+                                @click="closeFilter"
+                            >&#10005;</button>
+                            <div class="mb-2 ml-2 text-accent1 text-base">Waktu</div>
+                            <div class="flex flex-col gap-2 text-accent1 text-xs ml-2">
+                                <label class="flex gap-2 custom-radio">
+                                    <input type="radio" v-model="filterWaktu" value="semua" />
+                                    Semua Waktu
+                                </label>
+                                <label class="flex gap-2 custom-radio">
+                                    <input type="radio" v-model="filterWaktu" value="hari_ini" />
+                                    Hari ini
+                                </label>
+                                <label class="flex gap-2 custom-radio">
+                                    <input type="radio" v-model="filterWaktu" value="kemarin" />
+                                    Kemarin
+                                </label>
+                                <label class="flex gap-2 custom-radio">
+                                    <input type="radio" v-model="filterWaktu" value="sebulan" />
+                                    Sebulan lalu
+                                </label>
+                                <label class="flex items-center gap-2 custom-radio">
+                                    <input type="radio" v-model="filterWaktu" value="custom" />
+                                    Pilih waktu
+                                </label>
+                                <div v-if="filterWaktu === 'custom'" class="flex gap-2 mt-2">
+                                    <input
+                                        type="date"
+                                        v-model="tanggalMulai"
+                                        class="border rounded px-2 py-1 text-accent1 text-xxs w-28 h-6"
+                                    />
+                                    <span class="mt-1">-</span>
+                                    <input
+                                        type="date"
+                                        v-model="tanggalAkhir"
+                                        class="border rounded px-2 py-1 text-accent1 text-xxs w-28 h-6"
+                                    />
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <button
+                                    class="px-3 py-1 bg-accent1 text-white text-xs rounded hover:bg-accent2"
+                                    @click="closeFilter"
+                                >
+                                    Cari
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- Kategori Berita -->
             <div
@@ -147,7 +216,7 @@ onMounted(() => {
                     {{ category.name }}
                 </button>
 
-                <!-- Button Kategori Berit Lainnya -->
+                <!-- Button Kategori Berita Lainnya -->
                 <button
                     class="transform w-11 h-11 text-accent1 hover:text-white transition"
                 >
@@ -162,7 +231,7 @@ onMounted(() => {
             </div>
             <!--Berita Terkini-->
             <h1
-                class="w-full text-center text-xl font-bold text-gray-800 mt-5 mr-96 pr-96 -ml-60"
+                class="w-full text-center text-xl font-bold text-accent1 mt-5 mr-96 pr-96 -ml-60"
             >
                 Berita Terkini
             </h1>
@@ -173,7 +242,7 @@ onMounted(() => {
                     class="flex justify-center items-center py-12"
                 >
                     <div
-                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent1"
                     ></div>
                 </div>
 
