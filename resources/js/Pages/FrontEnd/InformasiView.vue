@@ -198,15 +198,15 @@ onMounted(fetchData);
                             :event="eventItem" />
                     </template>
                 </div>
-                <Link href="/event"
-                    class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 xl:my-8ml-2 text-right justify-end">
-                Selengkapnya &gt;&gt;
-                </Link>
+                <a href="/event"
+                    class="text-lg md:text-xl font-semibold text-secondary my-4 ml-2 text-right justify-end">
+                    Selengkapnya >>
+                </a>
             </article>
 
             <!-- Berita Terbaru-->
-            <article class="w-full px-8 sm:px-10 lg:px-8 flex flex-col xl:py-4 mb-10 bg-type1 font-merriweather">
-                <h1 class="text-xl md:text-3xl font-semibold text-accent2 mb-3 ml-2">
+            <article class="w-full flex flex-col xl:py-4 mb-10 bg-type1 font-merriweather">
+                <h1 class="text-xl md:text-3xl font-semibold text-accent2 mb-3">
                     Berita Terbaru
                 </h1>
                 <div class="flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 justify-center gap-4 xl:gap-2">
