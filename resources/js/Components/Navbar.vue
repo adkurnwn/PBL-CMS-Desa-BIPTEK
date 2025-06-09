@@ -166,7 +166,7 @@ onUnmounted(() => {
             <template v-else>
                 <a
                     :href="item.link"
-                    class="relative inline-block pb-1 font-merriweather"
+                    class="relative inline-block pb-1  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
                     :class="{
                         'after:w-full after:left-0': isActive(item.link),
                     }"
@@ -219,7 +219,7 @@ onUnmounted(() => {
                     <a
                         v-else
                         :href="item.link"
-                        class="block text-white font-semibold"
+                        class="block text-white font-semibold  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
                     >
                     {{ item.name }}
                     </a>
@@ -235,7 +235,7 @@ onUnmounted(() => {
                         >
                         <a
                             :href="child.link"
-                            class="block text-white text-sm py-0.5 pl-2 border-l-2 border-accent2"
+                            class="block text-white text-sm py-0.5 pl-2 border-l-2 border-accent2  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
                         >
                             {{ child.name }}
                         </a>
