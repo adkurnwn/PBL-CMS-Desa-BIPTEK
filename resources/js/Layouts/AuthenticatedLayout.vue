@@ -106,6 +106,7 @@ const handleSidebarCollapse = (collapsed) => {
     <div 
         class="flex flex-col h-screen bg-white overflow-hidden"
         :style="{ '--accent1': primaryColor, '--accent2': secondaryColor, }"
+        id="app-accent-root"
     >
         <!-- Header -->
         <Header :sidebarOpen="sidebarOpen" @toggle="toggleSidebar" />

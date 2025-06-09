@@ -48,6 +48,8 @@ const convertTempImagesToPlaceholders = () => {
   let content = editor.value.getHTML()
   
   // Replace temporary images with placeholders
+  // Note: The first image from ImageUploader will be excluded from content processing
+  // This is handled by the parent component's processContentForSubmission function
   content = content.replace(/<img[^>]*data-is-temp-upload="true"[^>]*>/g, '{{IMAGEUPLOADER_PLACEHOLDER}}')
   
   return content

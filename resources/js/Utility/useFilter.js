@@ -8,7 +8,7 @@ export default function useFilter(fetchCallback) {
         fetchCallback({
             search: searchQuery.value,
             category:
-                selectedCategory.value !== "Semua"
+                selectedCategory.value !== "Semua" && selectedCategory.value !== ""
                     ? selectedCategory.value
                     : null,
         });
@@ -18,7 +18,7 @@ export default function useFilter(fetchCallback) {
         selectedCategory.value = category;
         fetchCallback({
             search: searchQuery.value,
-            category: category !== "Semua" ? category : null,
+            category: category !== "Semua" && category !== "" ? category : null,
         });
     };
 
@@ -26,7 +26,7 @@ export default function useFilter(fetchCallback) {
         fetchCallback({
             search: searchQuery.value,
             category:
-                selectedCategory.value !== "Semua"
+                selectedCategory.value !== "Semua" && selectedCategory.value !== ""
                     ? selectedCategory.value
                     : null,
             page,

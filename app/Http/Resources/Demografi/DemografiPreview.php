@@ -15,10 +15,22 @@ class DemografiPreview extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'penduduk' => $this->jumlah_penduduk,
-            'kepala_keluarga' => $this->jumlah_keluarga,
-            'penduduk_laki_laki' => $this->penduduk_pria,
-            'penduduk_perempuan' => $this->penduduk_wanita,
+            'tahun' => $this->tahun,
+            'penduduk_pria' => $this->penduduk_pria,
+            'penduduk_wanita' => $this->penduduk_wanita,
+            'jumlah_peserta_bpjs' => $this->jumlah_peserta_bpjs,
+            'jumlah_pindah_keluar' => $this->jumlah_pindah_keluar,
+            'jumlah_pendatang' => $this->jumlah_pendatang,
+            'tamat_pt' => $this->tamat_pt,
+            'tamat_sma' => $this->tamat_sma,
+            'tamat_smp' => $this->tamat_smp,
+            'tamat_sd' => $this->tamat_sd,
+            'jumlah_lansia' => $this->jumlah_lansia,
+            'jumlah_dewasa' => $this->jumlah_dewasa,
+            'jumlah_remaja' => $this->jumlah_remaja,
+            'jumlah_anak' => $this->jumlah_anak,
+            'jumlah_penduduk' => $this->jumlah_penduduk,
+            'jumlah_keluarga' => $this->jumlah_keluarga,
         ];
     }
 }

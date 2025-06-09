@@ -48,7 +48,7 @@ class DanaDesaController extends Controller
             if ($danaDesa->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No Dana Desa found'
+                    'message' => 'Dana Desa tidak ditemukan'
                 ], 404);
             }
 

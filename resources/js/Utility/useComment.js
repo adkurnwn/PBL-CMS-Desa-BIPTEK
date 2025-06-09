@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { ref, watch, inject } from "vue";
 import axios from "axios";
 
 export const formatDate = (date) => {
@@ -27,7 +27,7 @@ const getCookie = (name) => {
     return null;
 };
 
-export default function useComments(type, itemId, isModerated = false) {
+export default function useComments(type, itemId, isModerated = false ) {
     const comments = ref([]);
     const submitting = ref(false);
     const activeReplyId = ref(null);
@@ -35,6 +35,7 @@ export default function useComments(type, itemId, isModerated = false) {
     const replyCaptchaData = ref(null);
     const mainCaptchaCode = ref("");
     const replyCaptchaCode = ref("");
+    const showToast = inject("showToast");
 
     // Initialize form data based on the content type
     const commentForm = ref({
@@ -198,12 +199,20 @@ export default function useComments(type, itemId, isModerated = false) {
 
             commentForm.value.komentar = "";
             commentForm.value.captcha = "";
-            alert(response.data.message);
+            if (showToast) {
+                showToast(response.data.message, "success");
+            } else {
+                alert(response.data.message);
+            }
         } catch (err) {
             console.error("Error submitting comment:", err);
             await refreshCaptcha("main");
             commentForm.value.captcha = "";
-            alert(err.response?.data?.message || "Failed to submit comment");
+            if (showToast) {
+                showToast(err.response?.data?.message || "Failed to submit comment", "error");
+            } else {
+                alert(err.response?.data?.message || "Failed to submit comment");
+            }
         } finally {
             submitting.value = false;
         }
@@ -271,12 +280,20 @@ export default function useComments(type, itemId, isModerated = false) {
             }
 
             cancelReply();
-            alert(response.data.message);
+            if (showToast) {
+                showToast(response.data.message, "success");
+            } else {
+                alert(response.data.message);
+            }
         } catch (err) {
             console.error("Error submitting reply:", err);
             await refreshCaptcha("reply");
             replyForm.value.captcha = "";
-            alert(err.response?.data?.message || "Failed to submit reply");
+            if (showToast) {
+                showToast(err.response?.data?.message || "Failed to submit reply", "error");
+            } else {
+                alert(err.response?.data?.message || "Failed to submit reply");
+            }
         } finally {
             submitting.value = false;
         }

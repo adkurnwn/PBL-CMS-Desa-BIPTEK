@@ -1,10 +1,13 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { ref, onMounted, watch } from "vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { ref, onMounted, watch, computed } from "vue";
+import { Link, usePage, Head } from "@inertiajs/vue3";
 import Comment from "@/Components/Comment.vue";
 import useApiFetch from "@/Utility/useApiFetch";
+import { useMeta } from "@/Utility/useMeta";
 import { formatDate } from "@/Utility/useComment";
+import NotFound from "@/Components/NotFound.vue";
+import { useImageErrorHandler } from "@/Utility/useImageErrorHandler";
 
 const props = defineProps({
     slug: {
@@ -16,6 +19,8 @@ const props = defineProps({
 const news = ref({});
 const loading = ref(true);
 const error = ref(null);
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 // News fetch logic
 const newsApi = useApiFetch();
@@ -48,6 +53,36 @@ const fetchRelatedNews = async () => {
     relatedNewsLoading.value = relatedNewsApi.loading.value;
 };
 
+// Meta tags setup using the composable
+const {
+    metaTitle,
+    metaDescription,
+    metaImage,
+    canonicalUrl,
+    metaType,
+    metaSiteName,
+    metaAuthor,
+    metaPublishedTime,
+    metaSection
+} = useMeta({
+    title: computed(() => news.value.title || 'Berita'),
+    description: computed(() => {
+        if (!news.value.content) return 'Baca berita terbaru dari desa kami';
+        
+        // Strip HTML tags and limit to 160 characters for description
+        const textContent = news.value.content.replace(/<[^>]*>/g, '');
+        return textContent.length > 160 
+            ? textContent.substring(0, 157) + '...' 
+            : textContent;
+    }),
+    type: 'article',
+    image: computed(() => news.value.images?.length > 0 ? news.value.images[0].path : null),
+    url: computed(() => `${window.location.origin}/berita/${props.slug}`),
+    author: computed(() => news.value.user?.name || 'Admin'),
+    publishedTime: computed(() => news.value.created_at),
+    section: computed(() => news.value.category_name)
+});
+
 watch(activeTab, fetchRelatedNews);
 
 onMounted(() => {
@@ -57,10 +92,41 @@ onMounted(() => {
 </script>
 
 <template>
+    <Head>
+        <title>{{ metaTitle }}</title>
+        <meta name="description" :content="metaDescription" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" :content="metaType" />
+        <meta property="og:title" :content="metaTitle" />
+        <meta property="og:description" :content="metaDescription" />
+        <meta property="og:url" :content="canonicalUrl" />
+        <meta property="og:site_name" :content="metaSiteName" />
+        <meta property="og:image" :content="metaImage" />
+        
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" :content="metaTitle" />
+        <meta name="twitter:description" :content="metaDescription" />
+        <meta name="twitter:image" :content="metaImage" />
+        
+        <!-- Article specific -->
+        <meta property="article:published_time" :content="metaPublishedTime" v-if="metaPublishedTime" />
+        <meta property="article:author" :content="metaAuthor" v-if="metaAuthor" />
+        <meta property="article:section" :content="metaSection" v-if="metaSection" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" :href="canonicalUrl" />
+    </Head>
+
     <UserLayout>
-        <div class="min-h-screen bg-type1">
+        <div v-if="error">
+            <NotFound />
+        </div>
+        
+        <div v-else-if="!error" class="min-h-screen bg-type1">
             <div
-                class="max-w-screen-2xl w-full px-4 lg:px-20 mx-auto py-0 pt-32 pb-6 lg:pt-36"
+                class="max-w-screen-3xl w-full px-4 sm:px-12 md:px-20 mx-auto py-0 pt-32 pb-6 lg:pt-36 4xl:pt-44"
             >
                 <!-- Loading State -->
                 <div
@@ -68,7 +134,7 @@ onMounted(() => {
                     class="flex justify-center items-center py-12"
                 >
                     <div
-                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent2"
                     ></div>
                 </div>
 
@@ -99,15 +165,15 @@ onMounted(() => {
                         </h1>
                     </div>
 
-                    <div class="flex flex-row">
-                        <div class="flex flex-col w-2/3">
+                    <div class="flex flex-col lg:flex-row">
+                        <div class="flex flex-col w-full lg:w-2/3">
                             <!-- News Detail -->
                             <div
                                 class="flex flex-col bg-white rounded-lg shadow overflow-hidden mx-auto p-6"
                             >
                                 <!-- Title -->
                                 <h1
-                                    class="flex text-3xl font-bold text-accent1 mb-4 font-merriweather"
+                                    class="flex text-xl sm:text-3xl font-bold text-accent1 mb-4 font-merriweather"
                                 >
                                     {{ news.title }}
                                 </h1>
@@ -130,7 +196,7 @@ onMounted(() => {
                                                 d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm80 240v-80h400v80H280Zm0 160v-80h280v80H280Z"
                                             />
                                         </svg>
-                                        <h3 class="flex -mb-1">
+                                        <h3 class="flex -mb-0.5 sm:-mb-1 text-sm sm:text-base">
                                             {{ formatDate(news.created_at) }}
                                         </h3>
                                     </div>
@@ -141,14 +207,14 @@ onMounted(() => {
                                             viewBox="0 -960 960 960"
                                             width="24px"
                                             fill="currentColor"
-                                            class="text-accent2"
+                                            class="text-accent2 lg:w-6 lg:h-6"
                                         >
                                             <path
                                                 d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"
                                             />
                                         </svg>
-                                        <h3 class="flex -mb-1">
-                                            {{ news.user?.name || "Admin" }}
+                                        <h3 class="flex -mb-0.5 sm:-mb-1 text-sm sm:text-base">
+                                            {{ news.user?.name || "bchaekbo" }}
                                         </h3>
                                     </div>
                                     <div class="flex items-center space-x-2">
@@ -158,14 +224,14 @@ onMounted(() => {
                                             viewBox="0 -960 960 960"
                                             width="24px"
                                             fill="currentColor"
-                                            class="text-accent2"
+                                            class="text-accent2 lg:w-6 lg:h-6"
                                         >
                                             <path
                                                 d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"
                                             />
                                         </svg>
                                         <h3
-                                            class="flex lg:-mb-1 text-sm lg:text-lg"
+                                            class="flex -mb-0.5 sm:-mb-1 text-sm sm:text-base"
                                         >
                                             {{ news.views }} views
                                         </h3>
@@ -178,9 +244,10 @@ onMounted(() => {
                                     class="relative min-h-48 lg:min-h-96"
                                 >
                                     <img
-                                        :src="`/storage/${news.images[0].path}`"
+                                        :src="getImageSrc(`/storage/${news.images[0].path}`)"
                                         :alt="news.images[0].alt"
                                         class="w-full h-full object-cover"
+                                        @error="handleImageError(`/storage/${news.images[0].path}`)"
                                     />
                                 </div>
                                 <!-- <div class="flex relative h-full w-full p-2">
@@ -197,9 +264,15 @@ onMounted(() => {
 
                                     <!-- Content -->
                                     <div
-                                        class="text-sm lg:text-lg text-semiBlack"
+                                        class="xl:text-xl md:text-lg text-base text-semiBlack text-justify prose prose-lg max-w-none [&>p]:mb-4 [&>p:last-child]:mb-0"
                                         v-html="news.content"
                                     ></div>
+                                    <!-- Video -->
+                                    <div v-if="news.video">
+                                        <video controls class="w-full mt-4 rounded-lg shadow-lg"
+                                            :src="`/storage/${news.video}`"
+                                        ></video>
+                                    </div>
 
                                     <!-- Back Button -->
                                     <!-- <div class="mt-8">
@@ -232,7 +305,7 @@ onMounted(() => {
                             class="flex flex-col w-full lg:w-1/3 px-1 lg:px-4 my-3 lg:my-0 font-merriweather"
                         >
                             <div
-                                class="flex bg-accent1 shadow-md rounded-sm p-3 space-x-2"
+                                class="flex bg-accent1 shadow-md rounded-lg rounded-b-none p-3 space-x-2"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -301,12 +374,16 @@ onMounted(() => {
                                         >
                                             <div class="flex w-1/2">
                                                 <img
-                                                    :src="`/storage/${
-                                                        item.thumbnail ||
-                                                        'default.jpg'
-                                                    }`"
+                                                    :src="getImageSrc(`/storage/${
+                                                        item.thumbnail
+                                                    }`)"
                                                     alt="News Image"
                                                     class="w-full h-20 object-cover rounded-md"
+                                                    @error="
+                                                        handleImageError(
+                                                            `/storage/${item.thumbnail}`
+                                                        )"
+
                                                 />
                                             </div>
 

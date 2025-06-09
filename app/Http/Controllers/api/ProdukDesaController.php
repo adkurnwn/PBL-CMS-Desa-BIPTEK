@@ -9,6 +9,7 @@ use App\Http\Resources\ProdukDesaResource;
 use App\Models\ProdukDesa;
 use Illuminate\Http\Request;
 use App\Services\StatisticsService;
+use Illuminate\Support\Facades\Cache;
 
 class ProdukDesaController extends Controller
 {
@@ -39,7 +40,7 @@ class ProdukDesaController extends Controller
             if ($produkDesa->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No Produk Desa found'
+                    'message' => 'Produk Desa tidak ditemukan'
                 ], 404);
             }
 
@@ -65,10 +66,13 @@ class ProdukDesaController extends Controller
     public function preview()
     {
         try {
-            $produkDesa = ProdukDesa::with(['images', 'user:id,name'])
-                ->orderBy('created_at', 'desc')
-                ->take(4)
-                ->get();
+            $produkDesa = Cache::remember("produk_desa_preview", now()->addDay(), function () {
+                return ProdukDesa::with(['images', 'user:id,name'])
+                    ->where('status', true) // Only get active products
+                    ->orderBy('created_at', 'desc')
+                    ->take(4)
+                    ->get();
+            });
 
             if ($produkDesa->isEmpty()) {
                 return response()->json([

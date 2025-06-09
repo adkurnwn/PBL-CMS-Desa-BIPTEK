@@ -98,7 +98,7 @@ class KomentarBeritaController extends Controller
         ];
 
         $request->validate($rules, [
-            'captcha.captcha_api' => 'Invalid captcha code'
+            'captcha.captcha_api' => 'Kode captcha tidak valid.',
         ]);
 
         $news = News::where('slug', $request->id_berita)
@@ -120,8 +120,8 @@ class KomentarBeritaController extends Controller
         }
 
         $message = $news->is_moderate
-            ? 'Comment submitted and waiting for approval'
-            : 'Comment posted successfully';
+            ? 'Komentar telah dikirim dan menunggu persetujuan'
+            : 'Komentar berhasil dikirim';
 
         return response()->json([
             'message' => $message,

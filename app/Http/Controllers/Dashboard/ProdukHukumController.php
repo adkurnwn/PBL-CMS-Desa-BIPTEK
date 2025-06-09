@@ -6,17 +6,19 @@ use Inertia\Inertia;
 use App\Models\Category;
 use App\Helpers\SlugHelper;
 use App\Models\ProdukHukum;
+use Illuminate\Http\Request;
+use App\Services\MediaService;
+use Illuminate\Support\Carbon;
 use App\Services\CategoryService;
 use App\Helpers\LogActivityHelper;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Events\SitemapUpdateRequested;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Events\CacheInvalidationRequested;
 use App\Http\Requests\Validation\StoreProdukHukumRequest;
 use App\Http\Requests\Validation\UpdateProdukHukumRequest;
-use App\Services\MediaService;
 
 class ProdukHukumController extends Controller
 {
@@ -116,6 +118,8 @@ class ProdukHukumController extends Controller
         ProdukHukum::create($data);
 
         $this->logHelper->logActivity('create', 'produk_hukum', 'Menambahkan produk hukum ' . $request->title);
+        event(new CacheInvalidationRequested(['categories_index_0']));
+        event(new SitemapUpdateRequested());
         return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil ditambahkan');
     }
 
@@ -170,6 +174,25 @@ class ProdukHukumController extends Controller
         $produkHukum->update($data);
 
         $this->logHelper->logActivity('update', 'produk_hukum', 'Memperbarui produk hukum ' . $produkHukum->title);
+        event(new CacheInvalidationRequested(['categories_index_0']));
+        event(new SitemapUpdateRequested());
         return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil diperbarui');
+    }
+
+    public function destroy($slug)
+    {
+        $produkHukum = ProdukHukum::where('slug', $slug)->firstOrFail();
+
+        // Delete the associated file if it exists
+        if ($produkHukum->file) {
+            $this->mediaService->delete($produkHukum->file);
+        }
+
+        $title = $produkHukum->title;
+        $produkHukum->delete();
+        event(new CacheInvalidationRequested(['categories_index_0']));
+
+        $this->logHelper->logActivity('delete', 'produk_hukum', 'Menghapus produk hukum ' . $title);
+        return redirect()->route('dashboard.produk-hukum.index')->with('success', 'Produk Hukum berhasil dihapus');
     }
 }

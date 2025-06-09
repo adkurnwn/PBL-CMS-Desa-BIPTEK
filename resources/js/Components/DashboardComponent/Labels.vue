@@ -53,6 +53,12 @@ const labelClass = computed(() => {
             return 'bg-blueLabel text-blueLabelText';
         case 'keluhan':
             return 'bg-greenLabel text-greenLabelText';
+        case 'Berita':
+            return 'bg-blueLabel text-blueLabelText';
+        case 'Produk Hukum':
+            return 'bg-redLabel text-redLabelText';
+        case 'Dana Desa':
+            return 'bg-greenLabel text-greenLabelText';
         default:
             return 'bg-gray-100 text-gray-800';
     }

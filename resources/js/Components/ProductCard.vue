@@ -1,5 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
+
+const { handleImageError, getImageSrc } = useImageErrorHandler();
 
 defineProps({
     produkDesa: {
@@ -13,19 +16,16 @@ defineProps({
 });
 </script>
 <template>
-    <div class="w-full max-w-sm p-1">
+    <div class="w-full max-w-lg p-1">
         <div
             class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-lg transition-colors duration-300"
         >
             <div class="px-3 mt-5">
                 <img
-                    :src="
-                        produkDesa?.thumbnail
-                            ? `/storage/${produkDesa.thumbnail}`
-                            : '/default-image.jpg'
-                    "
-                    :alt="produkDesa?.alt || 'Default Image'"
-                    class="w-96 h-[125px] md:h-60 rounded-xl overflow-hidden object-cover"
+                    :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
+                    :alt="produkDesa?.alt"
+                    class="w-full h-[125px] md:h-60 rounded-[5px] overflow-hidden object-cover"
+                    @error="handleImageError(`/storage/${produkDesa.thumbnail}`)"
                 />
             </div>
             <div class="px-4">
@@ -44,7 +44,7 @@ defineProps({
                 >
                     <Link
                         :href="`/produk-unggulan/${produkDesa.slug}`"
-                        class="flex w-full mx-auto justify-center bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-xl"
+                        class="flex w-full mx-auto justify-center bg-accent2 text-white text-xs md:text-sm py-2 md:py-3 rounded-lg"
                     >
                         <p>Lihat Katalog</p>
                     </Link>

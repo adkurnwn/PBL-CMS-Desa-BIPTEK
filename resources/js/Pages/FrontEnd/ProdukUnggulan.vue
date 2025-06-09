@@ -56,7 +56,7 @@ onMounted(async () => {
                 </div>
                 <div
                     v-else
-                    class="grid grid-rows-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"
+                    class="grid grid-rows-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
                 >
                     <ProductCard
                         v-for="produk in produkDesa"

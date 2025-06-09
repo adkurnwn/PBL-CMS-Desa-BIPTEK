@@ -80,7 +80,7 @@ const tableHeaders = [
 ];
 
 // Empty state message
-const emptyStateMessage = "No backups available. Create your first backup to get started.";
+const emptyStateMessage = "Tidak ada data pencadangan yang tersedia. Lakukan pencadangan data untuk melihat data cadangan.";
 </script>
 
 <template>

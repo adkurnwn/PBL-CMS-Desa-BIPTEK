@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Profile;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Profile\ProfileDetail;
 use App\Http\Resources\Profile\ProfileLayout;
-use App\Models\DanaDesa;
-use App\Models\Demografi;
-use App\Models\ProdukHukum;
 use Illuminate\Support\Facades\Cache;
 
 class ProfileController extends Controller
@@ -20,7 +16,7 @@ class ProfileController extends Controller
     public function layout()
     {
         try {
-            $profile = Cache::remember('profile.layout', 1200, function () {
+            $profile = Cache::remember('profile.layout', now()->addDay(), function () {
                 return Profile::with(['province', 'regency', 'district'])->first();
             });
 
@@ -47,7 +43,7 @@ class ProfileController extends Controller
     public function profilePage()
     {
         try {
-            $profile = Cache::remember('profile.detail', 1200, function () {
+            $profile = Cache::remember('profile.detail', now()->addMinutes(20), function () {
                 return Profile::latest()->first();
             });
 

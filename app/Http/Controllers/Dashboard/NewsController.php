@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\Validation\StoreNewsRequest;
 use App\Http\Requests\Validation\UpdateNewsRequest;
+use App\Events\CacheInvalidationRequested;
+use App\Events\SitemapUpdateRequested;
+
+use function Laravel\Prompts\clear;
 
 class NewsController extends Controller
 {
@@ -170,6 +174,13 @@ class NewsController extends Controller
         }
 
         $this->logHelper->logActivity('create', 'news', 'Menambahkan berita ' . $news->title);
+
+        // Fire cache invalidation event after successful creation
+        $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update event
+        event(new SitemapUpdateRequested());
+
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil ditambahkan');
     }
 
@@ -241,6 +252,13 @@ class NewsController extends Controller
         $news->update($data);
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
+
+        // Fire cache invalidation event after successful update
+        $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update
+        event(new SitemapUpdateRequested());
+
         return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diperbarui');
     }
 
@@ -260,7 +278,7 @@ class NewsController extends Controller
 
     /**
      * Process image placeholders in content and replace with HTML img tags
-     * Modified to append ImageUploader images at the end
+     * Modified to exclude the first image from content and append remaining images at the end
      */
     private function processImagePlaceholdersInContent($content, $uploadedImages)
     {
@@ -292,10 +310,12 @@ class NewsController extends Controller
         // Replace preview classes with final classes
         $processedContent = preg_replace('/class="richtext-preview-image"/', 'class="w-full h-auto block my-2"', $processedContent);
 
-        // Now append all ImageUploader images at the end
-        if (!empty($uploadedImages)) {
+        // Now append images starting from index 1 (skip the first image) at the end
+        if (!empty($uploadedImages) && count($uploadedImages) > 1) {
             $appendedImages = '';
-            foreach ($uploadedImages as $imageData) {
+            // Skip the first image (index 0) and append the rest
+            for ($i = 1; $i < count($uploadedImages); $i++) {
+                $imageData = $uploadedImages[$i];
                 $appendedImages .= sprintf(
                     '<img src="%s" alt="%s" class="w-full h-auto block my-2" />',
                     asset('storage/' . $imageData['path']),
@@ -417,6 +437,13 @@ class NewsController extends Controller
         $news = News::withTrashed()->where('slug', $slug)->firstOrFail();
         $news->restore();
         $this->logHelper->logActivity('restore', 'news', 'Memulihkan berita ' . $news->title);
+
+        // Fire cache invalidation event after successful restore
+        $this->clearAllNewsPreviewCache();
+        
+        // Fire sitemap update event
+        event(new SitemapUpdateRequested());
+
         return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dipulihkan');
     }
 
@@ -429,12 +456,40 @@ class NewsController extends Controller
             $news->forceDelete();
 
             $this->logHelper->logActivity('delete', 'news', 'Menghapus berita ' . $news->title);
+
+            // Fire cache invalidation event after successful deletion/archiving
+            $this->clearAllNewsPreviewCache();
+            
+            // Fire sitemap update event
+            event(new SitemapUpdateRequested());
+
             return redirect()->route('dashboard.news.archive')->with('success', 'Berita berhasil dihapus');
         } else {
             $news->delete();
 
             $this->logHelper->logActivity('archive', 'news', 'Mengarsipkan berita ' . $news->title);
+
+            // Fire cache invalidation event after successful deletion/archiving
+            $this->clearAllNewsPreviewCache();
+            
+            // Fire sitemap update event
+            event(new SitemapUpdateRequested());
+
             return redirect()->route('dashboard.news.index')->with('success', 'Berita berhasil diarsipkan');
         }
+    }
+
+    private function clearAllNewsPreviewCache()
+    {
+        // Get all cache keys that start with 'news_preview_'
+        $cacheKeys = [
+            'news_preview_created_at_3',
+            'news_preview_views_3',
+            'news_preview_created_at_6',
+            'news_preview_views_6',
+            'categories_index_1',
+        ];
+
+        event(new CacheInvalidationRequested($cacheKeys));
     }
 }

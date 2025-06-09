@@ -82,7 +82,6 @@ Route::middleware(['auth', 'verified', 'user.status'])->group(function () {
         Route::middleware(['permission:manage_produk-hukum'])->group(function () {
             Route::resource('produk-hukum', ProdukHukumController::class, [
                 'as' => 'dashboard',
-                'except' => ['destroy'],
                 'parameters' => ['produk-hukum' => 'slug']
             ]);
         });
