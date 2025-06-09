@@ -6,7 +6,7 @@
                 v-model="searchQuery"
                 @input="handleInput"
                 @keyup.enter="handleSearch"
-                placeholder="Cari Informasi atau Kegiatan..."
+                :placeholder="placeholder"
                 class="w-full py-2 pl-4 pr-12 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-light focus:outline-none focus:ring-2 focus:ring-accent1"
             />
             <button
@@ -36,7 +36,7 @@
                 class="ml-2"
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"
-                viewBox="0 -960 960 960"
+                viewBox="http://www.w3.org/2000/svg"
                 width="24px"
                 fill="currentColor"
             >
@@ -60,6 +60,10 @@ const props = defineProps({
         type: String,
         default: 'default', // 'default' or 'with-filter'
         validator: (value) => ['default', 'with-filter'].includes(value)
+    },
+    placeholder: {
+        type: String,
+        default: 'Cari Informasi atau Kegiatan...'
     }
 });
 
