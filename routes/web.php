@@ -86,22 +86,26 @@ Route::prefix('produk-unggulan')->group(function () {
     })->name('produk-desa.detail');
 });
 
-Route::get('/galeri-desa', function (StatisticsService $statisticsService) {
+Route::prefix('galeri')->group(function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Galeri', request());
+        return Inertia::render('FrontEnd/GaleriList');
+    });
+
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Galeri', request());
-    return Inertia::render('FrontEnd/GaleriList');
+    return Inertia::render('FrontEnd/GaleriDetail', [
+        'slug' => $slug
+    ]);
+    })->name('galeri.detail');
 });
 
-Route::get('/statistik-penduduk', function (StatisticsService $statisticsService) {
+Route::get('/data-demografi', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Statistik', request());
     return Inertia::render('FrontEnd/StatistikPenduduk');
 });
 
-Route::get('/galeri-desa-detail', function (StatisticsService $statisticsService) {
-    $statisticsService->trackFeatureVisit('Galeri', request());
-    return Inertia::render('FrontEnd/GaleriDetail');
-});
-
-Route::get('/aparat-desa', function () {
+Route::get('/struktur-organisasi', function () {
     return Inertia::render('FrontEnd/AparatDesa');
 });
 

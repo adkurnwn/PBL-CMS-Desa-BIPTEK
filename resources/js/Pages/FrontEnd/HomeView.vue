@@ -237,7 +237,7 @@ onMounted(() => {
                 <div v-else class="flex flex-col w-full justify-between space-y-4">
                     <div class="flex flex-row w-full h-full justify-between space-x-3"
                         v-if="gallery.images.length >= 1">
-                        <Link href="/galeri-desa" v-if="gallery.images[0]"
+                        <Link href="/galeri" v-if="gallery.images[0]"
                             :class="gallery.images[1] ? 'w-3/5' : 'w-full'"
                             class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
                         <img :src="`/storage/${gallery.images[0].path}`" :alt="gallery.images[0].alt"
@@ -247,7 +247,7 @@ onMounted(() => {
                             <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
                         </div>
                         </Link>
-                        <Link href="/galeri-desa" v-if="gallery.images[1]"
+                        <Link href="/galeri" v-if="gallery.images[1]"
                             class="w-2/5 relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
                         <img :src="`/storage/${gallery.images[1].path}`" :alt="gallery.images[1].alt"
                             class="w-full h-[150px] sm:h-[225px] md:h-[400px] object-cover transition-all duration-300 group-hover:brightness-50" />
@@ -259,7 +259,7 @@ onMounted(() => {
                     </div>
                     <div class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:space-x-3"
                         v-if="gallery.images.length >= 3">
-                        <Link href="/galeri-desa" v-if="gallery.images[2]"
+                        <Link href="/galeri" v-if="gallery.images[2]"
                             :class="gallery.images.length === 3 ? 'w-full' : (gallery.images.length === 4 ? 'w-full sm:w-1/2' : 'w-full sm:w-1/3')"
                             class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
                         <img :src="`/storage/${gallery.images[2].path}`" :alt="gallery.images[2].alt"
@@ -269,7 +269,7 @@ onMounted(() => {
                             <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
                         </div>
                         </Link>
-                        <Link href="/galeri-desa" v-if="gallery.images[3]"
+                        <Link href="/galeri" v-if="gallery.images[3]"
                             :class="gallery.images.length === 4 ? 'w-full sm:w-1/2' : 'w-full sm:w-1/3'"
                             class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
                         <img :src="`/storage/${gallery.images[3].path}`" :alt="gallery.images[3].alt"
@@ -279,7 +279,7 @@ onMounted(() => {
                             <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
                         </div>
                         </Link>
-                        <Link href="/galeri-desa" v-if="gallery.images[4]"
+                        <Link href="/galeri" v-if="gallery.images[4]"
                             class="w-full sm:w-1/3 relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
                         <img :src="`/storage/${gallery.images[4].path}`" :alt="gallery.images[4].alt"
                             class="w-full h-[200px] md:h-[300px] object-cover transition-all duration-300 group-hover:brightness-50" />
@@ -362,7 +362,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/statistik-penduduk" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
+            <a href="/data-demografi" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
