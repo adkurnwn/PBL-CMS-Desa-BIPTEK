@@ -4,6 +4,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InstallController;
 use App\Services\StatisticsService;
+use App\Http\Controllers\MetaCrawler\HomeController;
+use App\Http\Controllers\MetaCrawler\BeritaController;
+
 
 // routes/web.php
 
@@ -29,7 +32,7 @@ Route::fallback(function ($name = null) {
 
 Route::get('/', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Home', request());
-    return Inertia::render('FrontEnd/HomeView');
+    return app(HomeController::class)->index();
 })->name('home');
 
 Route::get('/profile', function (StatisticsService $statisticsService) {
@@ -55,9 +58,7 @@ Route::prefix('berita')->group(function () {
 
     Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
         $statisticsService->trackFeatureVisit('Berita', request());
-        return Inertia::render('FrontEnd/BeritaDetail', [
-            'slug' => $slug
-        ]);
+        return app(BeritaController::class)->show($slug);
     })->name('berita.show');
 });
 
@@ -108,22 +109,26 @@ Route::prefix('produk-unggulan')->group(function () {
     })->name('produk-desa.detail');
 });
 
-Route::get('/galeri-desa', function (StatisticsService $statisticsService) {
+Route::prefix('galeri')->group(function () {
+    Route::get('/', function (StatisticsService $statisticsService) {
+        $statisticsService->trackFeatureVisit('Galeri', request());
+        return Inertia::render('FrontEnd/GaleriList');
+    });
+
+    Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Galeri', request());
-    return Inertia::render('FrontEnd/GaleriList');
+    return Inertia::render('FrontEnd/GaleriDetail', [
+        'slug' => $slug
+    ]);
+    })->name('galeri.detail');
 });
 
-Route::get('/statistik-penduduk', function (StatisticsService $statisticsService) {
+Route::get('/data-demografi', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Statistik', request());
     return Inertia::render('FrontEnd/StatistikPenduduk');
 });
 
-Route::get('/galeri-desa-detail', function (StatisticsService $statisticsService) {
-    $statisticsService->trackFeatureVisit('Galeri', request());
-    return Inertia::render('FrontEnd/GaleriDetail');
-});
-
-Route::get('/aparat-desa', function () {
+Route::get('/struktur-organisasi', function () {
     return Inertia::render('FrontEnd/AparatDesa');
 });
 

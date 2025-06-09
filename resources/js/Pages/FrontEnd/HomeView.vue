@@ -15,6 +15,12 @@ const gallery = ref({});
 const produkDesa = ref([]);
 const { handleImageError, getImageSrc } = useImageErrorHandler();
 
+// Loading states moved to component scope
+const eventsLoading = ref(true);
+const newsLoading = ref(true);
+const galleryLoading = ref(true);
+const produkLoading = ref(true);
+
 // Reactive meta description and image
 const metaDescriptionText = ref('Website resmi pemerintah desa - Sumber informasi terbaru tentang pemerintahan, berita, event, dan layanan publik desa.');
 const metaImagePath = ref('default-home-image.jpg');
@@ -55,11 +61,6 @@ const fetchData = async () => {
   const galleryApi = useApiFetch();
   const produkApi = useApiFetch();
 
-  const eventsLoading = ref(true);
-  const newsLoading = ref(true);
-  const galleryLoading = ref(true);
-  const produkLoading = ref(true);
-
   await Promise.all([
     eventApi.fetchData('/api/events/preview'),
     newsApi.fetchData('/api/news/preview'),
@@ -72,10 +73,10 @@ const fetchData = async () => {
   gallery.value = galleryApi.data.value || {};
   produkDesa.value = produkApi.data.value || [];
 
-  eventsLoading.value = eventApi.loading.value;
-  newsLoading.value = newsApi.loading.value;
-  galleryLoading.value = galleryApi.loading.value;
-  produkLoading.value = produkApi.loading.value;
+  eventsLoading.value = false;
+  newsLoading.value = false;
+  galleryLoading.value = false;
+  produkLoading.value = false;
 };
 
 onMounted(() => {
@@ -157,20 +158,39 @@ onMounted(() => {
       <div class="px-[6.56%]">
         <!-- Berita Terbaru-->
         <article class="w-full flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 md:ml-2">
+          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3">
             Berita Terbaru
           </h1>
 
-          <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
-            <div v-if="newsLoading" class="text-center w-full">
-              <p>Memuat berita...</p>
-            </div>
+          <div class="flex flex-col lg:flex-row justify-center gap-4 space-y-4 md:space-y-0 ">
+            <!-- Loading State - Show skeleton cards -->
+            <template v-if="newsLoading">
+              <NewsCard
+                v-for="n in 3"
+                :key="`news-skeleton-${n}`"
+                :loading="true"
+                :href="'#'"
+                :isHome="true"
+                :news="{}"
+              />
+            </template>
+
+            <!-- Empty State -->
             <div v-else-if="news.length === 0" class="text-center w-full">
               <p>Tidak ada berita terbaru</p>
             </div>
-            <NewsCard v-else v-for="newsItem in news" :key="newsItem.id" :href="`/berita/${newsItem.slug}`"
-              :isHome="true" :news="newsItem" />
 
+            <!-- Actual News Content -->
+            <template v-else>
+              <NewsCard
+                v-for="newsItem in news"
+                :key="newsItem.id"
+                :loading="false"
+                :href="`/berita/${newsItem.slug}`"
+                :isHome="true"
+                :news="newsItem"
+              />
+            </template>
           </div>
           <a href="/berita" class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 ml-2 text-right justify-end">
             Selengkapnya >>
@@ -205,52 +225,92 @@ onMounted(() => {
 
         <!-- Galeri Desa -->
         <article class="w-full flex flex-col py-6 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2">
-            Galeri Desa
-          </h1>
-          <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
-            <p class="italic">Foto atau Video seputar Desa</p>
-          </h2>
+                <div v-if="galleryLoading" class="flex flex-col w-full justify-between space-y-4">
+                    <div class="flex flex-row w-full h-full justify-between space-x-3">
+                        <div class="w-3/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                        <div class="w-2/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:space-x-3">
+                        <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                        <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                        <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                    </div>
+                </div>
 
-          <!-- Loading state -->
-          <div v-if="!gallery || Object.keys(gallery).length === 0" class="text-center py-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent2"></div>
-          </div>
+                <div v-else-if="!gallery.images || gallery.images.length === 0">
+                    <div v-if="!galleryTimeout" class="flex flex-col w-full justify-between space-y-4">
+                        <div class="flex flex-row w-full h-full justify-between space-x-3">
+                            <div class="w-3/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                            <div class="w-2/5 h-[150px] sm:h-[225px] md:h-[400px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:space-x-3">
+                            <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                            <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                            <div class="w-full sm:w-1/3 h-[200px] md:h-[300px] rounded-lg md:rounded-xl xl:rounded-2xl bg-gray-400 animate-pulse"></div>
+                        </div>
+                    </div>
+                    <div v-else class="flex justify-center items-center h-[500px]">
+                        <p>Gallery images not available</p>
+                    </div>
+                </div>
 
-          <!-- Gallery content -->
-          <div v-else-if="gallery && gallery.images && gallery.images.length > 0"
-            class="flex flex-col w-full justify-between space-y-4">
-            <!-- First row - 2 images -->
-            <div class="flex flex-row w-full justify-between space-x-2">
-              <img v-if="gallery.images[0]" :src="getImageSrc(`/storage/${gallery.images[0].path}`)"
-                :alt="gallery.images[0].alt" class="w-3/5 h-[150px] md:h-[400px] rounded-lg object-cover md:mr-2"
-                @error="handleImageError(`/storage/${gallery.images[0].path}`)" />
-              <img v-if="gallery.images[1]" :src="getImageSrc(`/storage/${gallery.images[1].path}`)"
-                :alt="gallery.images[1].alt" class="w-2/5 h-[150px] md:h-[400px] rounded-lg object-cover"
-                @error="handleImageError(`/storage/${gallery.images[1].path}`)" />
-            </div>
-
-            <!-- Second row - 3 images -->
-            <div class="flex flex-col md:flex-row w-full justify-between space-y-3 md:space-y-0">
-              <img v-if="gallery.images[2]" :src="getImageSrc(`/storage/${gallery.images[2].path}`)"
-                :alt="gallery.images[2].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
-                @error="handleImageError(`/storage/${gallery.images[2].path}`)" />
-              <img v-if="gallery.images[3]" :src="getImageSrc(`/storage/${gallery.images[3].path}`)"
-                :alt="gallery.images[3].alt"
-                class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover md:mr-2"
-                @error="handleImageError(`/storage/${gallery.images[3].path}`)" />
-              <img v-if="gallery.images[4]" :src="getImageSrc(`/storage/${gallery.images[4].path}`)"
-                :alt="gallery.images[4].alt" class="w-full md:w-1/3 h-[200px] md:h-[300px] rounded-2xl object-cover"
-                @error="handleImageError(`/storage/${gallery.images[4].path}`)" />
-            </div>
-          </div>
-
-          <!-- No images fallback -->
-          <div v-else class="text-center py-8 text-gray-500">
-            Belum ada gambar dalam galeri
-          </div>
-        </article>
+                <div v-else class="flex flex-col w-full justify-between space-y-4">
+                    <div class="flex flex-row w-full h-full justify-between space-x-3"
+                        v-if="gallery.images.length >= 1">
+                        <Link href="/galeri" v-if="gallery.images[0]"
+                            :class="gallery.images[1] ? 'w-3/5' : 'w-full'"
+                            class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
+                        <img :src="`/storage/${gallery.images[0].path}`" :alt="gallery.images[0].alt"
+                            class="w-full h-[150px] sm:h-[225px] md:h-[400px] object-cover transition-all duration-300 group-hover:brightness-50" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
+                        </div>
+                        </Link>
+                        <Link href="/galeri" v-if="gallery.images[1]"
+                            class="w-2/5 relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
+                        <img :src="`/storage/${gallery.images[1].path}`" :alt="gallery.images[1].alt"
+                            class="w-full h-[150px] sm:h-[225px] md:h-[400px] object-cover transition-all duration-300 group-hover:brightness-50" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
+                        </div>
+                        </Link>
+                    </div>
+                    <div class="flex flex-col sm:flex-row w-full justify-between space-y-3 sm:space-y-0 sm:space-x-3"
+                        v-if="gallery.images.length >= 3">
+                        <Link href="/galeri" v-if="gallery.images[2]"
+                            :class="gallery.images.length === 3 ? 'w-full' : (gallery.images.length === 4 ? 'w-full sm:w-1/2' : 'w-full sm:w-1/3')"
+                            class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
+                        <img :src="`/storage/${gallery.images[2].path}`" :alt="gallery.images[2].alt"
+                            class="w-full h-[200px] md:h-[300px] object-cover transition-all duration-300 group-hover:brightness-50" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
+                        </div>
+                        </Link>
+                        <Link href="/galeri" v-if="gallery.images[3]"
+                            :class="gallery.images.length === 4 ? 'w-full sm:w-1/2' : 'w-full sm:w-1/3'"
+                            class="relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
+                        <img :src="`/storage/${gallery.images[3].path}`" :alt="gallery.images[3].alt"
+                            class="w-full h-[200px] md:h-[300px] object-cover transition-all duration-300 group-hover:brightness-50" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
+                        </div>
+                        </Link>
+                        <Link href="/galeri" v-if="gallery.images[4]"
+                            class="w-full sm:w-1/3 relative group cursor-pointer overflow-hidden rounded-lg md:rounded-xl xl:rounded-2xl">
+                        <img :src="`/storage/${gallery.images[4].path}`" :alt="gallery.images[4].alt"
+                            class="w-full h-[200px] md:h-[300px] object-cover transition-all duration-300 group-hover:brightness-50" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="text-white text-lg md:text-xl font-semibold">Selengkapnya</span>
+                        </div>
+                        </Link>
+                    </div>
+                </div>
+            </article>
 
 
         <!-- Produk Unggulan-->
@@ -322,7 +382,7 @@ onMounted(() => {
                 </div>
               </div>
             </a>
-            <a href="/statistik-penduduk" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
+            <a href="/data-demografi" class="flex w-full sm:w-full lg:w-1/3 space-x-6 sm:mx-0">
               <div
                 class="flex px-8 py-8 flex-col bg-secondary rounded-lg shadow-sm overflow-hidden hover:shadow-lg hover:bg-secondary/75 transition-colors duration-300 h-">
                 <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px"
