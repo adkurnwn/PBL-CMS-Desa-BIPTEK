@@ -64,6 +64,51 @@ const closePreview = () => {
     showPreview.value = false;
 };
 
+// Process content for edit mode - hide placeholders and count them
+const processContentForEditMode = (content) => {
+  if (props.type !== 'for_edit') return content
+  
+  // Count EXISTING_IMAGE_PLACEHOLDER
+  const placeholderMatches = content.match(/\{\{EXISTING_IMAGE_PLACEHOLDER\}\}/g)
+  existingImagePlaceholderCount.value = placeholderMatches ? placeholderMatches.length : 0
+  
+  // Remove EXISTING_IMAGE_PLACEHOLDER from display
+  let processedContent = content.replace(/\{\{EXISTING_IMAGE_PLACEHOLDER\}\}/g, '')
+  
+  return processedContent
+}
+
+// Process content before submission to replace image URLs with placeholders
+const processContentForSubmission = (content) => {
+    let processedContent = content
+
+    // Replace blob URLs and images with data-is-temp-upload="true" with indexed placeholders
+    // Start from index 1 to skip the first image
+    let imageIndex = 1
+
+    // First, replace images with data-is-temp-upload attribute
+    const imgWithTempUploadRegex = /<img[^>]*data-is-temp-upload="true"[^>]*>/g
+    processedContent = processedContent.replace(imgWithTempUploadRegex, (match) => {
+        const placeholder = `{{IMAGE_${imageIndex}}}`
+        imageIndex++
+        return placeholder
+    })
+
+    // Also replace any remaining blob URLs that might not have the data attribute
+    const blobUrlRegex = /<img[^>]*src="blob:[^"]*"[^>]*>/g
+    processedContent = processedContent.replace(blobUrlRegex, (match) => {
+        // Only replace if it doesn't already have a placeholder
+        if (!match.includes('{{IMAGE_')) {
+            const placeholder = `{{IMAGE_${imageIndex}}}`
+            imageIndex++
+            return placeholder
+        }
+        return match
+    })
+
+    return processedContent
+}
+
 const submit = (isDraft = null) => {
     // Only update the draft status if explicitly passed
     if (isDraft !== null) {
@@ -89,13 +134,9 @@ const submit = (isDraft = null) => {
         );
     }
 
-    // Process content to restore EXISTING_IMAGE_PLACEHOLDER for edit mode
+    // Process content to handle image placeholders like Create.vue does
     const originalContent = form.content;
-    if (richTextRef.value && richTextRef.value.restoreImageUploaderPlaceholders) {
-        form.content = richTextRef.value.restoreImageUploaderPlaceholders();
-    } else {
-        form.content = processContentForSubmission(originalContent);
-    }
+    form.content = processContentForSubmission(originalContent);
 
     form.post(route("dashboard.news.update", props.news.slug), {
         preserveScroll: true,

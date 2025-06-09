@@ -128,14 +128,94 @@ onMounted(() => {
             <div
                 class="max-w-screen-3xl w-full px-4 sm:px-12 md:px-20 mx-auto py-0 pt-32 pb-6 lg:pt-36 4xl:pt-44"
             >
-                <!-- Loading State -->
-                <div
-                    v-if="loading"
-                    class="flex justify-center items-center py-12"
-                >
-                    <div
-                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent2"
-                    ></div>
+                <!-- Loading State with Skeleton -->
+                <div v-if="loading" class="flex flex-col rounded-lg overflow-hidden">
+                    <!-- Category skeleton -->
+                    <div class="flex space-x-2 items-center mb-6">
+                        <div class="w-6 h-6 bg-gray-300 rounded animate-pulse"></div>
+                        <div class="h-6 bg-gray-300 rounded w-48 animate-pulse"></div>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row">
+                        <div class="flex flex-col w-full lg:w-2/3">
+                            <!-- News Detail Skeleton -->
+                            <div class="flex flex-col bg-white rounded-lg shadow overflow-hidden p-6">
+                                <!-- Title skeleton -->
+                                <div class="space-y-3 mb-4">
+                                    <div class="h-8 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-8 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                                </div>
+
+                                <!-- Metadata skeleton -->
+                                <div class="flex items-center space-x-6 mb-8">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-5 h-5 bg-gray-300 rounded animate-pulse"></div>
+                                        <div class="h-4 bg-gray-300 rounded w-24 animate-pulse"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-5 h-5 bg-gray-300 rounded animate-pulse"></div>
+                                        <div class="h-4 bg-gray-300 rounded w-20 animate-pulse"></div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-5 h-5 bg-gray-300 rounded animate-pulse"></div>
+                                        <div class="h-4 bg-gray-300 rounded w-16 animate-pulse"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Image skeleton -->
+                                <div class="relative min-h-48 lg:min-h-96 bg-gray-300 rounded animate-pulse mb-6"></div>
+
+                                <!-- Content skeleton -->
+                                <div class="space-y-4">
+                                    <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded w-5/6 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded w-4/5 animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                                </div>
+                            </div>
+
+                            <!-- Comments Section Skeleton -->
+                            <div class="flex flex-col mt-4 lg:mt-12 bg-white rounded-lg shadow-lg overflow-hidden p-6">
+                                <div class="h-8 bg-gray-300 rounded w-32 animate-pulse mb-4"></div>
+                                <div class="space-y-4">
+                                    <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                    <div class="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Aside Skeleton -->
+                        <div class="flex flex-col w-full lg:w-1/3 px-1 lg:px-4 my-3 lg:my-0">
+                            <div class="flex bg-gray-300 rounded-lg rounded-b-none p-3 animate-pulse">
+                                <div class="h-6 bg-gray-400 rounded w-32"></div>
+                            </div>
+                            <!-- Tabs skeleton -->
+                            <div class="flex flex-row bg-white w-full">
+                                <div class="flex flex-col w-full bg-gray-200 p-1">
+                                    <div class="h-5 bg-gray-300 rounded animate-pulse"></div>
+                                </div>
+                                <div class="flex flex-col w-full bg-gray-200 p-1">
+                                    <div class="h-5 bg-gray-300 rounded animate-pulse"></div>
+                                </div>
+                            </div>
+                            <!-- News List Skeleton -->
+                            <div class="flex flex-col w-full bg-white shadow-md px-3">
+                                <div v-for="i in 6" :key="i" class="flex flex-row py-3 gap-2">
+                                    <div class="flex w-1/2">
+                                        <div class="w-full h-20 bg-gray-300 rounded-md animate-pulse"></div>
+                                    </div>
+                                    <div class="flex flex-col w-full space-y-2">
+                                        <div class="h-4 bg-gray-300 rounded animate-pulse"></div>
+                                        <div class="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                                        <div class="h-3 bg-gray-300 rounded w-1/2 animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Error State -->
@@ -169,7 +249,7 @@ onMounted(() => {
                         <div class="flex flex-col w-full lg:w-2/3">
                             <!-- News Detail -->
                             <div
-                                class="flex flex-col bg-white rounded-lg shadow overflow-hidden mx-auto p-6"
+                                class="flex flex-col bg-white rounded-lg shadow overflow-hidden p-6"
                             >
                                 <!-- Title -->
                                 <h1

@@ -4,13 +4,14 @@
     <main>
         <!-- Event Terdekat-->
       <article class="w-full mx-auto max-w-screen-4xl px-[6.56%] flex flex-col py-4 mt-20 md:py-10 bg-type1 font-merriweather">
-        <h1 class="flex text-xl md:text-3xl font-semibold text-accent2 justify-center mt-8">
+        <h1 class="flex text-xl xl:text-2xl font-semibold text-accent1 justify-center mt-8">
           Agenda Desa
         </h1>
         <!-- Search Bar -->
         <div class="relative flex w-full flex-grow items-center justify-center max-w-7xl mx-auto mb-4">
-            <div class="flex-grow mt-6 xl:max-w-2xl sm:max-w-md">
+            <div class="flex-grow mt-6">
                 <Search 
+                    class="lg:px-[3%]"
                     v-model="searchQuery"
                     type="with-filter"
                     @search="handleSearch"

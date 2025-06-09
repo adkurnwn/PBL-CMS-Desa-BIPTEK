@@ -265,11 +265,11 @@ onUnmounted(() => {
 <template>
     <UserLayout>
         <!--Menu Bar-->
-        <main class="flex flex-col items-center justify-center min-h-screen pt-32 4xl:pt-44 pb-8 xl:pb-16 bg-type1 font-merriweather px-[6.56%]">
+        <main class="flex max-w-screen-4xl mx-auto flex-col items-center justify-center min-h-screen pt-32 4xl:pt-44 pb-8 xl:pb-16 bg-type1 font-merriweather px-[6.56%]">
             <article
                 class="flex mb-5 xl:mb-10 lg:px-[9%] flex-col items-center justify-center bg-type1 font-merriweather space-y-5 w-full">
                 <!-- Judul -->
-                <h1 class="xl:text-2xl sm:text-xl text-md font-semibold text-accent2">Galeri Desa</h1>
+                <h1 class="xl:text-2xl text-xl font-semibold text-accent1 justify-center mt-8">Galeri Desa</h1>
                 <!-- Search Bar -->
                 <Search 
                     class="lg:px-[3%]"

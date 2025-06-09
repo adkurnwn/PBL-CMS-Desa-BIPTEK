@@ -15,6 +15,12 @@ const gallery = ref({});
 const produkDesa = ref([]);
 const { handleImageError, getImageSrc } = useImageErrorHandler();
 
+// Loading states moved to component scope
+const eventsLoading = ref(true);
+const newsLoading = ref(true);
+const galleryLoading = ref(true);
+const produkLoading = ref(true);
+
 // Reactive meta description and image
 const metaDescriptionText = ref('Website resmi pemerintah desa - Sumber informasi terbaru tentang pemerintahan, berita, event, dan layanan publik desa.');
 const metaImagePath = ref('default-home-image.jpg');
@@ -55,11 +61,6 @@ const fetchData = async () => {
   const galleryApi = useApiFetch();
   const produkApi = useApiFetch();
 
-  const eventsLoading = ref(true);
-  const newsLoading = ref(true);
-  const galleryLoading = ref(true);
-  const produkLoading = ref(true);
-
   await Promise.all([
     eventApi.fetchData('/api/events/preview'),
     newsApi.fetchData('/api/news/preview'),
@@ -72,10 +73,10 @@ const fetchData = async () => {
   gallery.value = galleryApi.data.value || {};
   produkDesa.value = produkApi.data.value || [];
 
-  eventsLoading.value = eventApi.loading.value;
-  newsLoading.value = newsApi.loading.value;
-  galleryLoading.value = galleryApi.loading.value;
-  produkLoading.value = produkApi.loading.value;
+  eventsLoading.value = false;
+  newsLoading.value = false;
+  galleryLoading.value = false;
+  produkLoading.value = false;
 };
 
 onMounted(() => {
@@ -157,20 +158,39 @@ onMounted(() => {
       <div class="px-[6.56%]">
         <!-- Berita Terbaru-->
         <article class="w-full flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3 md:ml-2">
+          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3">
             Berita Terbaru
           </h1>
 
-          <div class="flex flex-col lg:flex-row justify-center space-y-4 md:space-y-0 ">
-            <div v-if="newsLoading" class="text-center w-full">
-              <p>Memuat berita...</p>
-            </div>
+          <div class="flex flex-col lg:flex-row justify-center gap-4 space-y-4 md:space-y-0 ">
+            <!-- Loading State - Show skeleton cards -->
+            <template v-if="newsLoading">
+              <NewsCard
+                v-for="n in 3"
+                :key="`news-skeleton-${n}`"
+                :loading="true"
+                :href="'#'"
+                :isHome="true"
+                :news="{}"
+              />
+            </template>
+
+            <!-- Empty State -->
             <div v-else-if="news.length === 0" class="text-center w-full">
               <p>Tidak ada berita terbaru</p>
             </div>
-            <NewsCard v-else v-for="newsItem in news" :key="newsItem.id" :href="`/berita/${newsItem.slug}`"
-              :isHome="true" :news="newsItem" />
 
+            <!-- Actual News Content -->
+            <template v-else>
+              <NewsCard
+                v-for="newsItem in news"
+                :key="newsItem.id"
+                :loading="false"
+                :href="`/berita/${newsItem.slug}`"
+                :isHome="true"
+                :news="newsItem"
+              />
+            </template>
           </div>
           <a href="/berita" class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 my-6 ml-2 text-right justify-end">
             Selengkapnya >>

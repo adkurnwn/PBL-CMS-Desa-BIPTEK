@@ -203,7 +203,6 @@ class NewsController extends Controller
 
     public function update(UpdateNewsRequest $request, $slug)
     {
-
         $news = News::where('slug', $slug)->firstOrFail();
         $category_id = $this->categoryService->handleCategoryCreationOrUpdate($request->category ?? []);
 
@@ -213,12 +212,16 @@ class NewsController extends Controller
         }
 
         $data = $request->all();
-        $originalContent = $data['content'];
         $data['category_id'] = $category_id;
         if ($news->title !== $request->title) {
             $data['slug'] = SlugHelper::generateUniqueSlug(News::class, $request->title);
         }
 
+        // Store content temporarily without processing
+        $originalContent = $data['content'];
+
+        // Update news with basic data first (excluding content)
+        unset($data['content']);
         $news->update($data);
 
         if ($request->removed_images) {
@@ -237,19 +240,19 @@ class NewsController extends Controller
 
         // Process content to replace image placeholders with actual HTML
         $processedContent = $this->processImagePlaceholdersInContent($originalContent, $uploadedImages);
-        $data['content'] = $processedContent;
 
         // Handle existing video removal
         if ($request->remove_existing_video) {
             $this->mediaService->handleVideoRemoval($news);
         }
 
+        // Handle video upload (same as store method)
         if ($request->hasFile('video')) {
             $this->mediaService->handleVideoUpload($news, $request->file('video'));
         }
 
-        // Update news record
-        $news->update($data);
+        // Update news with processed content
+        $news->update(['content' => $processedContent]);
 
         $this->logHelper->logActivity('edit', 'news', 'Memperbarui berita ' . $news->title);
 
