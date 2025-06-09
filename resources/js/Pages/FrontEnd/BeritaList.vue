@@ -10,6 +10,7 @@ import axios from "axios";
 const news = ref([]);
 const categories = ref([]);
 const error = ref(null);
+const newsLoading = ref(false);
 const pagination = ref(2);
 const totalPages= 2;
 const newsApi = useApiFetch();
@@ -35,7 +36,8 @@ const {
 } = useFilter(fetchNews);
 
 async function fetchNews({ search = "", category = null, page = 1 } = {}) {
-    const newsLoading = ref(true);
+    newsLoading.value = true;
+    error.value = null;
     const params = new URLSearchParams();
 
     if (search) params.append("search", search);
@@ -53,10 +55,12 @@ async function fetchNews({ search = "", category = null, page = 1 } = {}) {
     if (newsApi.data.value) {
         news.value = newsApi.data.value;
         pagination.value = newsApi.pagination.value;
+    }else {
+        news.value = [];
     }
 
     error.value = newsApi.error.value;
-    newsLoading.value = newsApi.loading.value;
+    newsLoading.value = false;
 }
 
 const fetchCategories = async () => {
@@ -159,17 +163,29 @@ onMounted(() => {
                                     Pilih waktu
                                 </label>
                                 <div v-if="filterWaktu === 'custom'" class="flex gap-2 mt-2">
-                                    <input
-                                        type="date"
-                                        v-model="tanggalMulai"
-                                        class="border rounded px-2 py-1 text-accent1 text-xxs w-28 h-6"
-                                    />
+                                    <div class="relative w-28">
+                                        <input
+                                            type="date"
+                                            v-model="tanggalMulai"
+                                            class="border rounded px-2 py-1 text-accent1 text-xxs w-full h-6"
+                                            style="appearance: none; -webkit-appearance: none;"
+                                        />
+                                        <svg class="custom-calendar-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="244031">
+                                            <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
+                                        </svg>
+                                    </div>
                                     <span class="mt-1">-</span>
-                                    <input
-                                        type="date"
-                                        v-model="tanggalAkhir"
-                                        class="border rounded px-2 py-1 text-accent1 text-xxs w-28 h-6"
-                                    />
+                                    <div class="relative w-28">
+                                        <input
+                                            type="date"
+                                            v-model="tanggalAkhir"
+                                            class="border rounded px-2 py-1 text-accent1 text-xxs w-full h-6"
+                                            style="appearance: none; -webkit-appearance: none;"
+                                        />
+                                        <svg class="custom-calendar-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="244031">
+                                            <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex justify-end mt-4">
@@ -247,8 +263,10 @@ onMounted(() => {
                 </div>
 
                 <!-- Error State -->
-                <div v-else-if="error" class="text-center py-12">
-                    <p class="text-red-600">{{ error }}</p>
+                <div v-else-if="error || news.length === 0" class="text-center py-12">
+                    <p class="text-gray-500 text-lg">
+                        {{ error ? error : 'Berita tidak ditemukan.' }}
+                    </p>
                 </div>
 
                 <!-- News Grid -->
@@ -313,5 +331,27 @@ onMounted(() => {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.custom-calendar-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 22px;
+    height: 22px;
+}
+
+.custom-calendar-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 16px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
 }
 </style>
