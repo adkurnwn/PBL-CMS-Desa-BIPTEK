@@ -197,7 +197,7 @@ const handlePageChange = (page) => {
                     Produk Hukum {{ layout.name }}
                     </h1>
                     <!-- Filter Bar -->
-                    <div class="flex flex-wrap gap-2 text-sm sm:mt-4 xl:mt-0 mt-4 ml-1 sm:ml-0 xl:justify-end">
+                    <div class="flex flex-wrap gap-2 text-sm sm:mt-4 xl:mt-0 mt-4 ml-1 sm:ml-0 justify-center xl:justify-end">
                         <!-- Nomor Peraturan -->
                         <div class="relative">
                             <input
@@ -206,7 +206,7 @@ const handlePageChange = (page) => {
                                 @blur="handleNomorSearch"
                                 type="text"
                                 placeholder="Cari nomor peraturan..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-700 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
                             />
                             <span
                                 @click="handleNomorSearch"
@@ -222,7 +222,7 @@ const handlePageChange = (page) => {
                                 @blur="handleJudulSearch"
                                 type="text"
                                 placeholder="Cari judul..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-700 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
                             />
                             <span
                                 @click="handleJudulSearch"

@@ -8,6 +8,8 @@ use App\Helpers\LogActivityHelper;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RecoveryController extends Controller
 {
@@ -80,7 +82,7 @@ class RecoveryController extends Controller
         }
     }
 
-    public function restore($fileName)
+    public function restore($fileName, $returnResponse = true)
     {
         try {
             $backupPath = storage_path('app/backup-temp/' . $fileName);
@@ -90,8 +92,13 @@ class RecoveryController extends Controller
             }
 
             if (!file_exists($backupPath)) {
-                return redirect()->route('dashboard.recovery.index')
-                    ->with('error', 'Backup file not found');
+                $error = 'Backup file not found';
+                if ($returnResponse) {
+                    return redirect()->route('dashboard.recovery.index')
+                        ->with('error', $error);
+                } else {
+                    throw new \Exception($error);
+                }
             }
 
             $extractPath = storage_path('app/backup-restore-temp');
@@ -112,47 +119,90 @@ class RecoveryController extends Controller
             $sqlFiles = glob($extractPath . '/db-dumps/*.sql');
 
             if (!empty($sqlFiles)) {
-                $sqlFile = $sqlFiles[0]; // Use the first SQL file found
+                $sqlFile = $sqlFiles[0];
 
-                $dbConnection = config('database.default');
-                $dbConfig = config('database.connections.' . $dbConnection);
+                Log::info("Reading SQL file: " . $sqlFile);
 
-                $passwordFlag = $dbConfig['password'] !== ''
-                    ? "-p" . $dbConfig['password']
-                    : "";
+                // Read the SQL file content
+                $sql = file_get_contents($sqlFile);
 
-                $command = sprintf(
-                    'mysql -h%s -u%s %s %s < %s',
-                    escapeshellarg($dbConfig['host']),
-                    escapeshellarg($dbConfig['username']),
-                    $passwordFlag,
-                    escapeshellarg($dbConfig['database']),
-                    escapeshellarg($sqlFile)
-                );
-
-                $output = [];
-                $returnVar = 0;
-                exec($command, $output, $returnVar);
-
-                if ($returnVar !== 0) {
-                    throw new \Exception('Database import failed: ' . implode("\n", $output));
+                if ($sql === false) {
+                    throw new \Exception('Unable to read SQL file: ' . $sqlFile);
                 }
+
+                Log::info("SQL file size: " . strlen($sql) . " characters");
+
+                // Disable foreign key checks for import
+                DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+                // Split SQL into individual statements and execute without transactions
+                $statements = preg_split('/;\s*$/m', $sql);
+                $executedCount = 0;
+                $failedCount = 0;
+
+                foreach ($statements as $statement) {
+                    $statement = trim($statement);
+                    if (!empty($statement) && !preg_match('/^(\/\*|\-\-)/', $statement)) {
+                        try {
+                            DB::unprepared($statement . ';');
+                            $executedCount++;
+                        } catch (\Exception $e) {
+                            $failedCount++;
+                            Log::warning("Failed to execute statement #{$failedCount}: " . substr($statement, 0, 100) . "... Error: " . $e->getMessage());
+
+                            // Continue execution even if some statements fail
+                            // Only abort if too many critical failures
+                            if ($failedCount > 50) {
+                                Log::error("Too many failed statements ({$failedCount}), aborting restore");
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Re-enable foreign key checks
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+                Log::info("Database restore completed. Executed {$executedCount} statements, {$failedCount} failed from: " . $sqlFile);
+
+                // Run IndoRegion seeder after database restore
+                $this->runIndoRegionSeeder();
+            } else {
+                Log::warning("No SQL files found in backup archive");
+                Log::info("Contents of backup extraction directory: " . print_r(glob($extractPath . '/*'), true));
+
+                // Still run seeder even if no SQL files found
+                $this->runIndoRegionSeeder();
             }
 
             $publicBackupPath = $extractPath . '/public';
             if (is_dir($publicBackupPath)) {
                 $this->copyDirectory($publicBackupPath, public_path());
 
-                $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
+                // Only log if we're not in a migration context (to avoid FK issues)
+                if ($returnResponse && Auth::check()) {
+                    $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
+                }
             }
 
             $this->cleanupTempFiles($extractPath);
 
-            return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Cadangan berhasil dipulihkan');
+            if ($returnResponse) {
+                return redirect()->route('dashboard.recovery.index')
+                    ->with('success', 'Cadangan berhasil dipulihkan');
+            } else {
+                return true; // Success indicator for programmatic calls
+            }
         } catch (\Exception $e) {
-            return redirect()->route('dashboard.recovery.index')
-                ->with('error', 'Failed to restore backup: ' . $e->getMessage());
+            Log::error("Backup restoration failed: " . $e->getMessage());
+            Log::error("Exception trace: " . $e->getTraceAsString());
+
+            if ($returnResponse) {
+                return redirect()->route('dashboard.recovery.index')
+                    ->with('error', 'Failed to restore backup: ' . $e->getMessage());
+            } else {
+                throw $e; // Re-throw for programmatic calls
+            }
         }
     }
 
@@ -273,5 +323,62 @@ class RecoveryController extends Controller
             }
         }
         closedir($directory);
+    }
+
+    private function runIndoRegionSeeder()
+    {
+        try {
+            Log::info("Starting IndoRegion seeder after database restore");
+
+            // Check if IndoRegion tables exist and have data
+            $indoRegionTables = ['provinces', 'regencies', 'districts', 'villages'];
+            $needsSeeding = false;
+
+            foreach ($indoRegionTables as $table) {
+                if (DB::getSchemaBuilder()->hasTable($table)) {
+                    $count = DB::table($table)->count();
+                    Log::info("Table {$table} has {$count} records");
+                    if ($count == 0) {
+                        $needsSeeding = true;
+                    }
+                } else {
+                    Log::warning("Table {$table} does not exist");
+                    $needsSeeding = true;
+                }
+            }
+
+            if (!$needsSeeding) {
+                Log::info("IndoRegion tables already have data, skipping seeder");
+                return;
+            }
+
+            // Run the IndoRegion seeder with full namespace and force flag
+            $exitCode = Artisan::call('db:seed', [
+                '--class' => 'Database\\Seeders\\IndoRegionSeeder',
+                '--force' => true
+            ]);
+
+            $output = Artisan::output();
+            Log::info("IndoRegion seeder exit code: {$exitCode}");
+            Log::info("IndoRegion seeder output: " . $output);
+
+            if ($exitCode === 0) {
+                Log::info("IndoRegion seeder completed successfully");
+
+                // Verify data was inserted
+                foreach ($indoRegionTables as $table) {
+                    if (DB::getSchemaBuilder()->hasTable($table)) {
+                        $count = DB::table($table)->count();
+                        Log::info("Table {$table} now has {$count} records");
+                    }
+                }
+            } else {
+                Log::error("IndoRegion seeder failed with exit code: {$exitCode}");
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to run IndoRegion seeder: " . $e->getMessage());
+            Log::error("IndoRegion seeder exception trace: " . $e->getTraceAsString());
+            // Don't throw the exception to avoid breaking the restore process
+        }
     }
 }

@@ -162,12 +162,12 @@ onMounted(() => {
             >
                 Kirim Komentar
             </h2>
-            <div class="flex border-l-accent2 border-l-4 bg-accent2/25">
+            <div class="flex border-l-accent2 border-l-4 bg-selectedBG">
                 <p
                     v-if="props.data.is_moderate"
                     class="text-accent1 opacity-100 pl-2 lg:pl-4 py-2 text-xxs lg:text-base"
                 >
-                    Komentar Anda akan ditampilkan setelah moderasi.
+                    Komentar baru terbit setelah disetujui Admin.
                 </p>
             </div>
         </div>

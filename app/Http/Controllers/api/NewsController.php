@@ -28,6 +28,9 @@ class NewsController extends Controller
             $search = $request->query('search');
             $category = $request->query('category');
             $sort = $request->query('sort');
+            $timeFilter = $request->query('time_filter');
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
 
             $query = News::with(['images', 'category', 'user:id,name'])
                 ->where('is_draft', false)
@@ -43,6 +46,33 @@ class NewsController extends Controller
 
             if ($category) {
                 $query->where('category_id', $category);
+            }
+
+            // Add time filtering
+            if ($timeFilter) {
+                switch ($timeFilter) {
+                    case 'hari_ini':
+                        $query->whereDate('created_at', today());
+                        break;
+                    case 'kemarin':
+                        $query->whereDate('created_at', today()->subDay());
+                        break;
+                    case 'sebulan':
+                        $query->where('created_at', '>=', today()->subMonth());
+                        break;
+                    case 'custom':
+                        if ($startDate && $endDate) {
+                            $query->whereBetween('created_at', [
+                                $startDate . ' 00:00:00',
+                                $endDate . ' 23:59:59'
+                            ]);
+                        } elseif ($startDate) {
+                            $query->where('created_at', '>=', $startDate . ' 00:00:00');
+                        } elseif ($endDate) {
+                            $query->where('created_at', '<=', $endDate . ' 23:59:59');
+                        }
+                        break;
+                }
             }
 
             if ($sort === 'views') {

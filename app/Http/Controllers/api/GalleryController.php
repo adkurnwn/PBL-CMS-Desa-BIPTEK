@@ -20,6 +20,7 @@ class GalleryController extends Controller
         try {
             $search = $request->query('search');
             $category = $request->query('category');
+            $page = $request->query('page', 1);
 
             $query = Gallery::with(['images', 'category', 'user:id,name']);
 
@@ -34,7 +35,7 @@ class GalleryController extends Controller
                 $query->where('category_id', $category);
             }
 
-            $galleries = $query->latest()->paginate(12);
+            $galleries = $query->latest()->paginate(6);
             if ($galleries->isEmpty()) {
                 return response()->json([
                     'success' => false,
@@ -49,7 +50,9 @@ class GalleryController extends Controller
                     'current_page' => $galleries->currentPage(),
                     'last_page' => $galleries->lastPage(),
                     'total' => $galleries->total(),
-                    'per_page' => $galleries->perPage()
+                    'per_page' => $galleries->perPage(),
+                    'from' => $galleries->firstItem(),
+                    'to' => $galleries->lastItem()
                 ]
             ], 200);
         } catch (\Exception $e) {

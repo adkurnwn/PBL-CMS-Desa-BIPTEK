@@ -2,7 +2,9 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import useApiFetch from "@/Utility/useApiFetch";
 import NewsCard from "@/Components/NewsCard.vue";
-import { ref, onMounted, } from "vue";
+import Search from "@/Components/FrontendComponent/Search.vue";
+import Pagination from "@/Components/FrontendComponent/Pagination.vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import useFilter from "@/Utility/useFilter";
 import {Head } from "@inertiajs/vue3";
 import axios from "axios";
@@ -11,11 +13,12 @@ const news = ref([]);
 const categories = ref([]);
 const error = ref(null);
 const newsLoading = ref(false);
-const pagination = ref(2);
-const totalPages= 2;
+const pagination = ref({});
+const totalPages = ref(1);
 const newsApi = useApiFetch();
 const categoriesApi = useApiFetch();
 const showFilterModal = ref(false);
+const showDropdown = ref(false); // Add dropdown state
 const filterWaktu = ref("semua");
 const tanggalMulai = ref("");
 const tanggalAkhir = ref("");
@@ -27,6 +30,21 @@ function closeFilter() {
     showFilterModal.value = false;
 }
 
+// Handle filter button click from Search component
+const handleFilter = () => {
+    openFilter();
+};
+
+// Handle search input changes from Search component
+const handleSearchInput = (query) => {
+    searchQuery.value = query;
+};
+
+// Handle search from Search component
+const handleSearchSubmit = (query) => {
+    handleSearch();
+};
+
 const {
     searchQuery,
     selectedCategory,
@@ -35,7 +53,19 @@ const {
     goToPage,
 } = useFilter(fetchNews);
 
-async function fetchNews({ search = "", category = null, page = 1 } = {}) {
+const applyTimeFilter = () => {
+    fetchNews({ 
+        search: searchQuery.value, 
+        category: selectedCategory.value === 'Semua' ? null : selectedCategory.value,
+        timeFilter: filterWaktu.value,
+        startDate: tanggalMulai.value,
+        endDate: tanggalAkhir.value,
+        page: 1 
+    });
+    closeFilter();
+};
+
+async function fetchNews({ search = "", category = null, page = 1, timeFilter = "semua", startDate = "", endDate = "" } = {}) {
     newsLoading.value = true;
     error.value = null;
     const params = new URLSearchParams();
@@ -48,15 +78,32 @@ async function fetchNews({ search = "", category = null, page = 1 } = {}) {
             params.append("category", category);
         }
     }
+    
+    // Add time filter parameters
+    if (timeFilter && timeFilter !== "semua") {
+        params.append("time_filter", timeFilter);
+        if (timeFilter === "custom") {
+            if (startDate) params.append("start_date", startDate);
+            if (endDate) params.append("end_date", endDate);
+        }
+    }
+    
     params.append("page", page);
 
     await newsApi.fetchData(`/api/news?${params.toString()}`);
 
     if (newsApi.data.value) {
         news.value = newsApi.data.value;
-        pagination.value = newsApi.pagination.value;
-    }else {
+        pagination.value = newsApi.pagination.value || {};
+        
+        // Update total pages from pagination data
+        if (newsApi.pagination?.value?.last_page) {
+            totalPages.value = newsApi.pagination.value.last_page;
+        }
+    } else {
         news.value = [];
+        pagination.value = {};
+        totalPages.value = 1;
     }
 
     error.value = newsApi.error.value;
@@ -68,9 +115,59 @@ const fetchCategories = async () => {
     categories.value = categoriesApi.data.value;
 };
 
+// Function to handle category selection
+const handleCategorySelect = (categoryId = null) => {
+    if (categoryId === null) {
+        selectCategory('Semua');
+    } else if (categoryId === 'Populer') {
+        selectCategory('Populer');
+    } else {
+        selectCategory(categoryId);
+    }
+    showDropdown.value = false; // Close dropdown after selection
+};
+
+// Function to toggle dropdown
+const toggleDropdown = (event) => {
+    event.stopPropagation();
+    showDropdown.value = !showDropdown.value;
+};
+
+// Close dropdown when clicking outside
+const handleOutsideClick = (event) => {
+    const dropdownContainer = document.querySelector('.dropdown-container');
+    const filterContainer = document.querySelector('.filter-container');
+    
+    if (dropdownContainer && !dropdownContainer.contains(event.target) &&
+        filterContainer && !filterContainer.contains(event.target)) {
+        showDropdown.value = false;
+        showFilterModal.value = false;
+    }
+};
+
+// Function to handle pagination with time filter
+const handlePageChange = async (page) => {
+    await fetchNews({ 
+        search: searchQuery.value, 
+        category: selectedCategory.value === 'Semua' ? null : selectedCategory.value, 
+        timeFilter: filterWaktu.value,
+        startDate: tanggalMulai.value,
+        endDate: tanggalAkhir.value,
+        page: page 
+    });
+};
+
 onMounted(() => {
+    // Add global click listener for closing dropdown
+    document.addEventListener('click', handleOutsideClick);
+    
     fetchNews();
     fetchCategories();
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+    document.removeEventListener('click', handleOutsideClick);
 });
 </script>
 
@@ -78,242 +175,333 @@ onMounted(() => {
     <Head title="Berita Desa" />
     <UserLayout>
         <main
-            class="flex flex-col items-center justify-center min-h-screen bg-type1 font-merriweather"
+            class="flex flex-col w-full mx-auto max-w-screen-4xl px-[6.56%] py-4 mt-20 md:py-10 bg-type1 font-merriweather"
         >
+        <div class="flex flex-col items-center justify-center">
             <!-- Judul -->
             <h1
-                class="xl:text-2xl sm:text-xl text-md font-semibold text-accent1 mt-40"
+                class="xl:text-2xl text-xl font-semibold text-accent1 justify-center mt-8"
             >
                 Berita Desa
             </h1>
             <!-- Search Bar & Filter -->
-            <div class="flex items-center justify-center w-full max-w-3xl mx-auto mt-6 relative">
-                <input
-                    type="text"
-                    v-model="searchQuery"
-                    placeholder="Cari Informasi atau Kegiatan..."
-                    class="flex-grow py-2 border-2 border-accent1 bg-type1 shadow-lg rounded-full italic font-light px-6"
-                />
-                <!-- Button Ikon Search -->
-                <button
-                    class="absolute right-20 text-accent1"
-                    @click="handleSearch"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="0 -960 960 960"
-                        width="24px"
-                        fill="244031"
-                    >
-                        <path
-                            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
-                        />
-                    </svg>
-                </button>
-                <!-- Button Filter Waktu Berita -->
-                <div class="relative inline-block">
-                    <button
-                        @click="openFilter"
-                        class="ml-5 w-11 h-11 border-2 border-accent1 shadow-lg rounded-full text-accent1 hover:text-white transition"
-                    >
-                        <svg
-                            class="ml-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="24px"
-                            viewBox="0 -960 960 960"
-                            width="24px"
-                            fill="244031"
-                        >
-                            <path
-                                d="M520-600v-80h120v-160h80v160h120v80H520Zm120 480v-400h80v400h-80Zm-400 0v-160H120v-80h320v80H320v160h-80Zm0-320v-400h80v400h-80Z"
-                            />
-                        </svg>
-                    </button>
-                    <!-- Pop Up Filter Berita -->
+            <div class="relative flex w-full flex-grow items-center justify-center max-w-7xl mx-auto mb-4">
+            <div class="flex-grow mt-6">
+                    <Search
+                        class="lg:px-[3%]"
+                        type="with-filter"
+                        :model-value="searchQuery"
+                        @update:model-value="handleSearchInput"
+                        @search="handleSearchSubmit"
+                        @filter="handleFilter"
+                        placeholder="Cari Berita..."
+                    />
+                    
+                    <!-- Filter Dropdown -->
                     <div
                         v-if="showFilterModal"
-                        class="absolute left-full top-12 flex items-start justify-start -ml-5"
+                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl w-80 z-50"
+                        :class="{
+                            'right-0': true,
+                            'left-0 sm:left-auto sm:right-0': true
+                        }"
+                        style="top: calc(100% + 8px);"
                     >
-                        <div class="bg-white rounded-lg p-3 w-72 shadow-lg relative">
-                            <button
-                                class="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
-                                @click="closeFilter"
-                            >&#10005;</button>
-                            <div class="mb-2 ml-2 text-accent1 text-base">Waktu</div>
-                            <div class="flex flex-col gap-2 text-accent1 text-xs ml-2">
-                                <label class="flex gap-2 custom-radio">
-                                    <input type="radio" v-model="filterWaktu" value="semua" />
-                                    Semua Waktu
-                                </label>
-                                <label class="flex gap-2 custom-radio">
-                                    <input type="radio" v-model="filterWaktu" value="hari_ini" />
-                                    Hari ini
-                                </label>
-                                <label class="flex gap-2 custom-radio">
-                                    <input type="radio" v-model="filterWaktu" value="kemarin" />
-                                    Kemarin
-                                </label>
-                                <label class="flex gap-2 custom-radio">
-                                    <input type="radio" v-model="filterWaktu" value="sebulan" />
-                                    Sebulan lalu
-                                </label>
-                                <label class="flex items-center gap-2 custom-radio">
-                                    <input type="radio" v-model="filterWaktu" value="custom" />
-                                    Pilih waktu
-                                </label>
-                                <div v-if="filterWaktu === 'custom'" class="flex gap-2 mt-2">
-                                    <div class="relative w-28">
-                                        <input
-                                            type="date"
-                                            v-model="tanggalMulai"
-                                            class="border rounded px-2 py-1 text-accent1 text-xxs w-full h-6"
-                                            style="appearance: none; -webkit-appearance: none;"
-                                        />
-                                        <svg class="custom-calendar-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="244031">
-                                            <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
-                                        </svg>
-                                    </div>
-                                    <span class="mt-1">-</span>
-                                    <div class="relative w-28">
-                                        <input
-                                            type="date"
-                                            v-model="tanggalAkhir"
-                                            class="border rounded px-2 py-1 text-accent1 text-xxs w-full h-6"
-                                            style="appearance: none; -webkit-appearance: none;"
-                                        />
-                                        <svg class="custom-calendar-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="244031">
-                                            <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex justify-end mt-4">
+                        <div class="p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="text-accent1 text-lg font-semibold">Filter Waktu</div>
                                 <button
-                                    class="px-3 py-1 bg-accent1 text-white text-xs rounded hover:bg-accent2"
+                                    class="text-gray-400 hover:text-gray-700 p-1"
                                     @click="closeFilter"
                                 >
-                                    Cari
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-col gap-3 text-accent1 text-sm">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filterWaktu" value="semua" class="text-accent1" />
+                                    Semua Waktu
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filterWaktu" value="hari_ini" class="text-accent1" />
+                                    Hari ini
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filterWaktu" value="kemarin" class="text-accent1" />
+                                    Kemarin
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filterWaktu" value="sebulan" class="text-accent1" />
+                                    Sebulan lalu
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" v-model="filterWaktu" value="custom" class="text-accent1" />
+                                    Pilih waktu
+                                </label>
+                                
+                                <div v-if="filterWaktu === 'custom'" class="flex flex-col gap-2 mt-2 pl-6">
+                                    <div class="text-xs text-gray-600 mb-2">Dari tanggal:</div>
+                                    <input
+                                        type="date"
+                                        v-model="tanggalMulai"
+                                        class="border rounded px-3 py-2 text-accent1 text-sm w-full"
+                                    />
+                                    <div class="text-xs text-gray-600 mb-2 mt-2">Sampai tanggal:</div>
+                                    <input
+                                        type="date"
+                                        v-model="tanggalAkhir"
+                                        class="border rounded px-3 py-2 text-accent1 text-sm w-full"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end mt-6 gap-2">
+                                <button
+                                    class="px-4 py-2 text-gray-600 border rounded hover:bg-gray-50 text-sm"
+                                    @click="closeFilter"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    class="px-4 py-2 bg-accent1 text-white rounded hover:bg-accent2 text-sm"
+                                    @click="applyTimeFilter"
+                                >
+                                    Terapkan Filter
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <!-- Kategori Berita -->
             <div
-                class="flex items-center justify-center w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 mt-6 xl:text-lg text-sm text-accent1"
+                class="flex items-center justify-center xl:justify-end w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 xl:text-lg text-sm text-accent1"
             >
+                <!-- Always visible "Semua" button -->
                 <button
-                    @click="selectCategory('Semua')"
-                    class="hover:underline"
+                    @click="handleCategorySelect(null)"
+                    class="hover:underline whitespace-nowrap"
                     :class="{ 'font-medium': selectedCategory === 'Semua' }"
                 >
                     Semua
                 </button>
+                
+                <!-- Always visible "Populer" button -->
                 <button
-                    @click="selectCategory('Populer')"
-                    class="hover:underline"
+                    @click="handleCategorySelect('Populer')"
+                    class="hover:underline whitespace-nowrap"
                     :class="{ 'font-medium': selectedCategory === 'Populer' }"
                 >
                     Populer
                 </button>
 
-                <!-- Dynamic categories from API -->
-                <button
-                    v-for="category in categories"
-                    :key="category.id"
-                    @click="selectCategory(category.id)"
-                    class="hover:underline"
-                    :class="{
-                        'font-medium': selectedCategory === category.id,
-                    }"
-                >
-                    {{ category.name }}
-                </button>
+                <!-- Categories visible on larger screens -->
+                <div class="hidden xl:flex xl:space-x-7">
+                    <button
+                        v-for="category in categories.slice(0, 6)"
+                        :key="category.id"
+                        @click="handleCategorySelect(category.id)"
+                        class="hover:underline whitespace-nowrap"
+                        :class="{
+                            'font-medium': selectedCategory === category.id,
+                        }"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
+                
+                <!-- Categories visible on large screens (limited to 4) -->
+                <div class="hidden lg:flex xl:hidden space-x-7">
+                    <button
+                        v-for="category in categories.slice(0, 4)"
+                        :key="category.id"
+                        @click="handleCategorySelect(category.id)"
+                        class="hover:underline whitespace-nowrap"
+                        :class="{
+                            'font-medium': selectedCategory === category.id,
+                        }"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
+                
+                <!-- Categories visible on medium screens (limited to 3) -->
+                <div class="hidden md:flex lg:hidden space-x-7">
+                    <button
+                        v-for="category in categories.slice(0, 3)"
+                        :key="category.id"
+                        @click="handleCategorySelect(category.id)"
+                        class="hover:underline whitespace-nowrap"
+                        :class="{
+                            'font-medium': selectedCategory === category.id,
+                        }"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
+                
+                <!-- Categories visible on small screens (limited to 1) -->
+                <div class="flex md:hidden space-x-7">
+                    <button
+                        v-for="category in categories.slice(0, 1)"
+                        :key="category.id"
+                        @click="handleCategorySelect(category.id)"
+                        class="hover:underline whitespace-nowrap"
+                        :class="{
+                            'font-medium': selectedCategory === category.id,
+                        }"
+                    >
+                        {{ category.name }}
+                    </button>
+                </div>
 
-                <!-- Button Kategori Berita Lainnya -->
-                <button
-                    class="transform w-11 h-11 text-accent1 hover:text-white transition"
-                >
-                    <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        height="24px" 
-                        viewBox="0 -960 960 960" 
-                        width="24px" fill="244031">
-                        <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/>
-                    </svg>
-                </button>
+                <!-- Dropdown button -->
+                <div class="relative dropdown-container">
+                    <button
+                        @click="toggleDropdown"
+                        class="transform w-11 h-11 text-accent1 hover:text-white transition flex items-center justify-center"
+                    >
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            height="24px" 
+                            viewBox="0 -960 960 960" 
+                            width="24px" fill="244031">
+                            <path d="M80-160v-160h160v160H80Zm240 0v-160h560v160H320ZM80-400v-160h160v160H80Zm240 0v-160h560v160H320ZM80-640v-160h160v160H80Zm240 0v-160h560v160H320Z"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown menu -->
+                    <div 
+                        v-if="showDropdown"
+                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl min-w-48 max-h-64 overflow-y-auto"
+                        :style="{
+                            top: '100%',
+                            right: '0',
+                            zIndex: 9999
+                        }">
+                        <div class="py-1">
+                            <!-- All categories in dropdown for extra small screens -->
+                            <div class="sm:hidden">
+                                <button 
+                                    v-for="category in categories" 
+                                    :key="`dropdown-${category.id}`"
+                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors duration-150 text-sm"
+                                    :class="selectedCategory === category.id ? 'font-medium bg-blue-50 text-blue-600' : ''"
+                                    @click.stop="handleCategorySelect(category.id)">
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                            
+                            <!-- Remaining categories for small screens -->
+                            <div class="hidden sm:block md:hidden">
+                                <button 
+                                    v-for="category in categories.slice(1)" 
+                                    :key="`dropdown-sm-${category.id}`"
+                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors duration-150 text-sm"
+                                    :class="selectedCategory === category.id ? 'font-medium bg-blue-50 text-blue-600' : ''"
+                                    @click.stop="handleCategorySelect(category.id)">
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                            
+                            <!-- Remaining categories for medium screens -->
+                            <div class="hidden md:block lg:hidden">
+                                <button 
+                                    v-for="category in categories.slice(3)" 
+                                    :key="`dropdown-md-${category.id}`"
+                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors duration-150 text-sm"
+                                    :class="selectedCategory === category.id ? 'font-medium bg-blue-50 text-blue-600' : ''"
+                                    @click.stop="handleCategorySelect(category.id)">
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                            
+                            <!-- Remaining categories for large screens -->
+                            <div class="hidden lg:block xl:hidden">
+                                <button 
+                                    v-for="category in categories.slice(4)" 
+                                    :key="`dropdown-lg-${category.id}`"
+                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors duration-150 text-sm"
+                                    :class="selectedCategory === category.id ? 'font-medium bg-blue-50 text-blue-600' : ''"
+                                    @click.stop="handleCategorySelect(category.id)">
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                            
+                            <!-- Remaining categories for xl screens -->
+                            <div class="hidden xl:block">
+                                <button 
+                                    v-for="category in categories.slice(6)" 
+                                    :key="`dropdown-xl-${category.id}`"
+                                    class="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 transition-colors duration-150 text-sm"
+                                    :class="selectedCategory === category.id ? 'font-medium bg-blue-50 text-blue-600' : ''"
+                                    @click.stop="handleCategorySelect(category.id)">
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
             <!--Berita Terkini-->
+        <div class="">
             <h1
-                class="w-full text-center text-xl font-bold text-accent1 mt-5 mr-96 pr-96 -ml-60"
+                class="w-full text-left text-xl font-bold text-accent2 mt-5 mb-4"
             >
                 Berita Terkini
             </h1>
             <article>
-                <!-- Loading State -->
-                <div
-                    v-if="newsLoading"
-                    class="flex justify-center items-center py-12"
-                >
-                    <div
-                        class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent1"
-                    ></div>
-                </div>
-
-                <!-- Error State -->
-                <div v-else-if="error || news.length === 0" class="text-center py-12">
-                    <p class="text-gray-500 text-lg">
-                        {{ error ? error : 'Berita tidak ditemukan.' }}
-                    </p>
-                </div>
-
                 <!-- News Grid -->
-                <div
-                    v-else
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 xl:max-w-6xl max-w-xl mb-4"
-                >
-                    <NewsCard
-                        v-for="newsItem in news"
-                        :key="newsItem.id"
-                        :href="`/berita/${newsItem.slug}`"
-                        :isHome="true"
-                        :news="newsItem"
-                    />
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-4">
+                    <!-- Loading State - Show skeleton cards -->
+                    <template v-if="newsLoading">
+                        <NewsCard
+                            v-for="n in 12"
+                            :key="`skeleton-${n}`"
+                            :loading="true"
+                            :href="'#'"
+                            :isHome="false"
+                            :news="{}"
+                        />
+                    </template>
+
+                    <!-- Error State -->
+                    <div v-else-if="error" class="col-span-full text-center py-12">
+                        <p class="text-gray-500 text-lg">{{ error }}</p>
+                    </div>
 
                     <!-- Empty State -->
-                    <div
-                        v-if="news.length === 0"
-                        class="col-span-full text-center py-12"
-                    >
-                        <p class="text-gray-500 text-lg">
-                            Belum ada berita yang tersedia.
-                        </p>
+                    <div v-else-if="news.length === 0" class="col-span-full text-center py-12">
+                        <p class="text-gray-500 text-lg">Berita tidak ditemukan.</p>
                     </div>
+
+                    <!-- Actual News Content -->
+                    <template v-else>
+                        <NewsCard
+                            v-for="newsItem in news"
+                            :key="newsItem.id"
+                            :loading="false"
+                            :href="`/berita/${newsItem.slug}`"
+                            :isHome="false"
+                            :news="newsItem"
+                        />
+                    </template>
                 </div>
 
                 <!-- Pagination -->
-                <div class="flex justify-center mt-5 gap-2 mb-10">
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                        :disabled="pagination === 1"
-                        @click="pagination--"
-                    >&lt;</button>
-                    <button
-                        v-for="p in totalPages"
-                        :key="p"
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                        :class="pagination === p ? 'bg-accent1 text-type1' : 'border text-accent1 bg-type1'"
-                        @click="pagination = p"
-                    >{{ p }}</button>
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-accent1 text-type1 text-xs"
-                        :disabled="pagination === totalPages"
-                        @click="pagination++"
-                    >&gt;</button>
-                </div>
+                <Pagination
+                    v-if="news.length > 0 && totalPages > 1"
+                    :current-page="pagination?.current_page || 1"
+                    :last-page="totalPages"
+                    @page-changed="handlePageChange"
+                />
             </article>
+        </div>
         </main>
     </UserLayout>
 </template>

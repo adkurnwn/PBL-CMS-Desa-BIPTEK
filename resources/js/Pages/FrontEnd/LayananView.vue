@@ -8,16 +8,19 @@ import { ref, onMounted } from "vue";
 
 const produkDesa = ref([]);
 const { handleImageError, getImageSrc } = useImageErrorHandler();
+const eventsLoading = ref(false);
 
 const fetchData = async () => {
+    eventsLoading.value = true;
     const produkDesaLoading = ref(true);
     const produkDesaApi = useApiFetch();
     await produkDesaApi.fetchData("/api/produk-desa/preview");
     produkDesa.value = produkDesaApi.data.value || [];
     produkDesaLoading.value = produkDesaApi.loading.value;
+    eventsLoading.value = false;
 };
 
-onMounted(fetchData());
+onMounted(fetchData);
 </script>
 <!-- Homeview.vue -->
 <template>

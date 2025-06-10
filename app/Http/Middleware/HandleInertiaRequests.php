@@ -63,7 +63,13 @@ class HandleInertiaRequests extends Middleware
                 'info' => $request->session()->get('info'),
             ],
             // Share the profile data with all requests
-            'profile' => Profile::first(),
+            'profile' => Profile::first() ? [
+                'primary_color' => Profile::first()->primary_color,
+                'secondary_color' => Profile::first()->secondary_color,
+                'logo' => Profile::first()->logo,
+                'name' => Profile::first()->name,
+            ] : null,
+            'app_name' => config('app.name'),
         ];
     }
 }

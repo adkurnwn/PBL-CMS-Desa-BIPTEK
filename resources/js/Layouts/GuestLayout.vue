@@ -22,13 +22,16 @@ const secondaryColor = computed(() => {
 </script>
 
 <template>
-    <div 
-        class="min-h-screen bg-accent1"
-        :style="{ '--accent1': primaryColor, '--accent2': secondaryColor }"
-    >
-        <main
-            class="flex flex-col justify-center items-center min-h-screen">
+    <div class="min-h-screen bg-accent1" :style="{ '--accent1': primaryColor, '--accent2': secondaryColor }">
+        <main class="flex flex-col items-center justify-center min-h-screen">
             <slot></slot>
+            <div class="bg-accent1 absolute bottom-2">
+                <p
+                    class=" text-white font-thin text-xs md:text-sm text-center">
+                    © {{ new Date().getFullYear() }} Powered by PT BIPTEK Tokodata Indonesia
+                </p>
+            </div>
         </main>
+
     </div>
 </template>
