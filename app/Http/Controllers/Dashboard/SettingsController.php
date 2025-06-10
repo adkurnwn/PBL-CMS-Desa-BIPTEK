@@ -11,14 +11,13 @@ use App\Helpers\LogActivityHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\UpdateThemeRequest;
 use App\Http\Requests\Validation\UpdateSettingsRequest;
-use App\Http\Requests\Validation\UpdateThemeRequest;
-use App\Models\Profile;
 use App\Events\CacheInvalidationRequested; // Add this import
 
 class SettingsController extends Controller
@@ -93,10 +92,15 @@ class SettingsController extends Controller
         $dbSettingsChanged = $this->isDatabaseSettingsChanged($request);
 
         if ($dbSettingsChanged) {
+            $originalSessionDriver = null;
+            $originalCacheStore = null;
+
             try {
                 // Step 1: Change session and cache drivers to file before DB changes
                 $originalSessionDriver = env('SESSION_DRIVER');
                 $originalCacheStore = env('CACHE_STORE');
+
+                Log::info("Original drivers - Session: {$originalSessionDriver}, Cache: {$originalCacheStore}");
 
                 $envContent = $this->switchToFileDrivers($envContent);
                 File::put($envFilePath, $envContent);
@@ -118,30 +122,35 @@ class SettingsController extends Controller
                 // Step 5: Clear config cache to reload new DB settings
                 Artisan::call('config:clear');
 
-                config([
-                    'database.connections.mysql.host' => env('DB_HOST'),
-                    'database.connections.mysql.port' => env('DB_PORT'),
-                    'database.connections.mysql.database' => env('DB_DATABASE'),
-                    'database.connections.mysql.username' => env('DB_USERNAME'),
-                    'database.connections.mysql.password' => env('DB_PASSWORD'),
-                ]);
                 // Step 6: Run migrations on new database
                 $this->runMigrationsOnNewDatabase();
 
                 // Step 7: Switch session and cache drivers back to database
+                Log::info("Switching back to database drivers - Session: {$originalSessionDriver}, Cache: {$originalCacheStore}");
+
                 $envContent = File::get($envFilePath); // Re-read after DB changes
                 $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver, $originalCacheStore);
                 File::put($envFilePath, $envContent);
 
+                // Force reload environment variables after switching back
+                $this->reloadEnvironmentVariables();
+
                 // Final config clear to apply database drivers
                 Artisan::call('config:clear');
+
+                Log::info("Database drivers restored successfully");
             } catch (Exception $e) {
                 // If anything fails, restore original drivers and return error
+                Log::error("Database change failed, restoring original drivers: " . $e->getMessage());
+
                 try {
                     $envContent = File::get($envFilePath);
-                    $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver ?? 'database', $originalCacheStore ?? 'database');
+                    $envContent = $this->switchBackToDatabaseDrivers($envContent, $originalSessionDriver ?: 'database', $originalCacheStore ?: 'database');
                     File::put($envFilePath, $envContent);
+                    $this->reloadEnvironmentVariables();
                     Artisan::call('config:clear');
+
+                    Log::info("Original drivers restored after error");
                 } catch (Exception $restoreException) {
                     // Log the restore failure but still show the original error
                     $this->logHelper->logActivity('error', 'settings_restore', 'Failed to restore original drivers: ' . $restoreException->getMessage());
@@ -220,8 +229,6 @@ class SettingsController extends Controller
                 event(new CacheInvalidationRequested([
                     'profile.layout',
                     'profile.detail',
-                    'frontend_statistics',
-                    'homepage_data'
                 ]));
             }
         }
@@ -262,8 +269,6 @@ class SettingsController extends Controller
             event(new CacheInvalidationRequested([
                 'profile.layout',
                 'profile.detail',
-                'frontend_statistics',
-                'homepage_data'
             ]));
         }
 
@@ -443,23 +448,214 @@ class SettingsController extends Controller
     protected function runMigrationsOnNewDatabase()
     {
         try {
-            DB::purge('mysql');
-            DB::reconnect('mysql');
+            // Force reload environment variables
+            $this->reloadEnvironmentVariables();
+
+            // Pastikan koneksi database baru dengan konfigurasi eksplisit
+            $this->ensureDatabaseConnection();
+
             $databaseName = DB::connection()->getDatabaseName();
             Log::info("Connected to database: " . $databaseName);
 
-            // Run migrations (this will create sessions and cache tables if needed)
-            Artisan::call('migrate', ['--force' => true]);
-            Log::info(Artisan::output());
+            // Cek apakah database benar-benar kosong/baru
+            $tables = DB::select('SHOW TABLES');
+            if (empty($tables)) {
+                Log::info("Database is empty, running fresh migrations");
+            } else {
+                Log::info("Database has " . count($tables) . " existing tables");
+            }
 
+            // Jalankan migrasi fresh dengan force reload database config
+            Artisan::call('migrate:fresh', [
+                '--force' => true,
+                '--database' => config('database.default') // Explicitly specify database connection
+            ]);
 
-            // Check if migrations ran successfully
             $output = Artisan::output();
+            Log::info("Migration output: " . $output);
 
-            // Log migration completion
-            $this->logHelper->logActivity('run', 'database_migration', 'Database migrations completed on new database');
+            // Re-check database connection after migration
+            $newDatabaseName = DB::connection()->getDatabaseName();
+            Log::info("After migration, connected to database: " . $newDatabaseName);
+
+            // Verifikasi bahwa table penting sudah dibuat
+            $requiredTables = ['users', 'sessions', 'cache', 'migrations'];
+            foreach ($requiredTables as $table) {
+                if (!DB::getSchemaBuilder()->hasTable($table)) {
+                    throw new Exception("Required table '{$table}' was not created");
+                }
+            }
+
+            Log::info("All required tables created successfully");
+
+            // Restore database data from the most recent backup using RecoveryController
+            $this->restoreFromLatestBackup();
+
+            $this->logHelper->logActivity('run', 'database_migration', 'Database migrations completed on new database: ' . $newDatabaseName);
         } catch (Exception $e) {
+            Log::error("Migration failed: " . $e->getMessage());
             throw new Exception('Migration failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Restore from the latest backup using RecoveryController
+     */
+    protected function restoreFromLatestBackup()
+    {
+        try {
+            $recoveryController = new \App\Http\Controllers\Dashboard\RecoveryController();
+            $backups = $this->getAvailableBackups();
+
+            if (empty($backups)) {
+                Log::info("No backups available for restoration");
+                return;
+            }
+
+            $latestBackup = $backups[0];
+            $backupFileName = $latestBackup['path'];
+
+            Log::info("Restoring from latest backup: " . $backupFileName);
+
+            // Temporarily disable activity logging during restoration
+            $originalUserId = Auth::id();
+            Auth::logout(); // Clear authentication to prevent logging
+
+            // Use RecoveryController's restore method in programmatic mode
+            $result = $recoveryController->restore($backupFileName, false); // false = don't return redirect
+
+            if ($result === true) {
+                Log::info("Database successfully restored from backup: " . $backupFileName);
+
+                // Re-authenticate if possible after restoration
+                if ($originalUserId) {
+                    $user = \App\Models\User::find($originalUserId);
+                    if ($user instanceof \Illuminate\Contracts\Auth\Authenticatable) {
+                        Auth::login($user);
+                    }
+                }
+
+                // Log activity only after successful restoration and re-authentication
+                if (Auth::check()) {
+                    $this->logHelper->logActivity('restore', 'database_migration', 'Database restored from backup during migration: ' . $backupFileName);
+                }
+            } else {
+                throw new Exception("Restoration returned unexpected result");
+            }
+        } catch (Exception $e) {
+            Log::error("Failed to restore from backup during migration: " . $e->getMessage());
+            throw $e; // Re-throw to let the calling code handle it
+        }
+    }
+
+    /**
+     * Get available backups (replicating RecoveryController's getBackups logic)
+     */
+    protected function getAvailableBackups()
+    {
+        $backups = [];
+
+        // Get backup files from both locations (same as RecoveryController)
+        $tempFiles = glob(storage_path('app/backup-temp/*.zip'));
+        $laravelFiles = glob(storage_path('app/Data Recovery/*.zip'));
+
+        $files = array_merge($tempFiles ?: [], $laravelFiles ?: []);
+
+        foreach ($files as $file) {
+            $fileName = basename($file);
+            $backups[] = [
+                'path' => $fileName,
+                'date' => \Carbon\Carbon::createFromTimestamp(filemtime($file))->format('Y-m-d H:i:s'),
+                'size' => filesize($file)
+            ];
+        }
+
+        // Sort by date (newest first) - same as RecoveryController
+        usort($backups, function ($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+
+        return $backups;
+    }
+
+    protected function ensureDatabaseConnection()
+    {
+        try {
+            // Clear all caches
+            Artisan::call('config:clear');
+            Artisan::call('cache:clear');
+
+            // Purge all existing database connections
+            DB::purge();
+
+            // Force reload database configuration from .env
+            Config::set('database.connections.' . config('database.default'), [
+                'driver' => env('DB_CONNECTION'),
+                'host' => env('DB_HOST'),
+                'port' => env('DB_PORT'),
+                'database' => env('DB_DATABASE'),
+                'username' => env('DB_USERNAME'),
+                'password' => env('DB_PASSWORD'),
+                'charset' => 'utf8mb4',
+                'collation' => 'utf8mb4_unicode_ci',
+                'prefix' => '',
+                'strict' => true,
+                'engine' => null,
+            ]);
+
+            // Reconnect to the new database
+            DB::reconnect();
+
+            // Test connection with the new database
+            $result = DB::statement('SELECT 1');
+            $currentDb = DB::connection()->getDatabaseName();
+
+            Log::info("Successfully connected to new database: " . $currentDb);
+
+            return true;
+        } catch (Exception $e) {
+            throw new Exception('Cannot establish database connection: ' . $e->getMessage());
+        }
+    }
+
+    protected function reloadEnvironmentVariables()
+    {
+        try {
+            // Clear the config cache to force reload .env
+            Artisan::call('config:clear');
+
+            // Re-read .env file manually
+            $envPath = base_path('.env');
+            if (file_exists($envPath)) {
+                $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ($lines as $line) {
+                    if (strpos(trim($line), '#') === 0) {
+                        continue;
+                    }
+
+                    if (strpos($line, '=') !== false) {
+                        list($name, $value) = explode('=', $line, 2);
+                        $name = trim($name);
+                        $value = trim($value);
+
+                        // Remove quotes if present
+                        if (preg_match('/^"(.*)"$/', $value, $matches)) {
+                            $value = $matches[1];
+                        } elseif (preg_match("/^'(.*)'$/", $value, $matches)) {
+                            $value = $matches[1];
+                        }
+
+                        $_ENV[$name] = $value;
+                        $_SERVER[$name] = $value;
+                        putenv("$name=$value");
+                    }
+                }
+            }
+
+            Log::info("Environment variables reloaded. New DB: " . env('DB_DATABASE'));
+        } catch (Exception $e) {
+            Log::error("Failed to reload environment variables: " . $e->getMessage());
+            throw $e;
         }
     }
 }
