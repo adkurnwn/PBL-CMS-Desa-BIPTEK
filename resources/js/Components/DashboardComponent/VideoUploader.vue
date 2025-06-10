@@ -94,10 +94,10 @@ const processFile = (file) => {
         return;
     }
     
-    // Validate file size (max 100MB)
-    const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+    // Validate file size (max 20MB)
+    const maxSize = 20 * 1024 * 1024; // 20MB in bytes
     if (file.size > maxSize) {
-        alert('Ukuran video terlalu besar. Maksimal 100MB.');
+        alert('Ukuran video terlalu besar. Maksimal 20MB.');
         return;
     }
     
@@ -227,7 +227,7 @@ const hasVideo = computed(() => {
                         Pilih video atau tarik dan lepaskan disini
                     </div>
                     <div class="self-stretch relative text-searchIcon text-[8.8px] sm:text-[10px] md:text-[11.2px] lg:text-[12.2px] xl:text-[13.34px] 2xl:text-[15.4px] 3xl:text-[17.8px] 4xl:text-[20px]">
-                        MP4, OGG, dan WebM. Maksimal 50 MB.
+                        MP4, OGG, dan WebM. Maksimal 20 MB.
                     </div>
                 </div>
             </div>
