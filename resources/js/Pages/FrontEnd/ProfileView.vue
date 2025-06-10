@@ -208,7 +208,7 @@ const handleCoordinatesUpdate = (coords) => {
             </div>
             <!-- Lembaga Desa -->
             <div class="flex flex-col w-full font-merriweather bg-type1">
-                <h1 class="text-accent2 xl:text-3xl sm:text-xl font-bold">
+                <h1 class="font-bold text-accent2 xl:text-3xl sm:text-2xl text-xl">
                     Lembaga Desa
                 </h1>
                 <p class="xl:text-xl sm:text-base text-semiBlack max-w-7xl italic">

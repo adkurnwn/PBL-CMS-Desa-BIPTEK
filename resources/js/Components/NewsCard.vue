@@ -58,7 +58,7 @@ const processedContent = computed(() => {
         >
             <!-- Loading State -->
             <template v-if="loading">
-                <div class="flex max-w-full w-full rounded-full">
+                <div class="flex flex-col max-w-full w-full rounded-full">
                     <div class="w-full h-60 lg:h-72 bg-gray-200 animate-pulse p-4 rounded-xl overflow-hidden"></div>
                 </div>
                 <div class="flex flex-col px-2 w-full justify-center h-full">
@@ -96,7 +96,8 @@ const processedContent = computed(() => {
 
             <!-- Actual Content -->
             <template v-else>
-                <div class="flex max-w-full w-full h-full rounded-full">
+                <div class="flex max-w-full w-full h-full rounded-full"
+                >
                     <img
                         :src="getImageSrc(`/storage/${news.thumbnail}`)"
                         :alt="news.alt || 'Default Image'"

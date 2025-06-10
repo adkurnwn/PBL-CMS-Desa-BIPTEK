@@ -132,41 +132,47 @@ class RecoveryController extends Controller
 
                 Log::info("SQL file size: " . strlen($sql) . " characters");
 
-                try {
-                    // Disable foreign key checks and autocommit
-                    DB::statement('SET FOREIGN_KEY_CHECKS=0');
-                    DB::statement('SET AUTOCOMMIT=0');
-                    DB::beginTransaction();
+                // Disable foreign key checks for import
+                DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-                    // Split SQL into individual statements and execute
-                    $statements = preg_split('/;\s*$/m', $sql);
-                    $executedCount = 0;
+                // Split SQL into individual statements and execute without transactions
+                $statements = preg_split('/;\s*$/m', $sql);
+                $executedCount = 0;
+                $failedCount = 0;
 
-                    foreach ($statements as $statement) {
-                        $statement = trim($statement);
-                        if (!empty($statement) && !preg_match('/^(\/\*|\-\-)/', $statement)) {
-                            try {
-                                DB::unprepared($statement . ';');
-                                $executedCount++;
-                            } catch (\Exception $e) {
-                                Log::warning("Failed to execute statement: " . substr($statement, 0, 100) . "... Error: " . $e->getMessage());
+                foreach ($statements as $statement) {
+                    $statement = trim($statement);
+                    if (!empty($statement) && !preg_match('/^(\/\*|\-\-)/', $statement)) {
+                        try {
+                            DB::unprepared($statement . ';');
+                            $executedCount++;
+                        } catch (\Exception $e) {
+                            $failedCount++;
+                            Log::warning("Failed to execute statement #{$failedCount}: " . substr($statement, 0, 100) . "... Error: " . $e->getMessage());
+
+                            // Continue execution even if some statements fail
+                            // Only abort if too many critical failures
+                            if ($failedCount > 50) {
+                                Log::error("Too many failed statements ({$failedCount}), aborting restore");
+                                break;
                             }
                         }
                     }
-
-                    DB::commit();
-                    Log::info("Database restore completed successfully. Executed {$executedCount} statements from: " . $sqlFile);
-                } catch (\Exception $e) {
-                    DB::rollback();
-                    throw $e;
-                } finally {
-                    // Re-enable foreign key checks and autocommit
-                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
-                    DB::statement('SET AUTOCOMMIT=1');
                 }
+
+                // Re-enable foreign key checks
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+                Log::info("Database restore completed. Executed {$executedCount} statements, {$failedCount} failed from: " . $sqlFile);
+
+                // Run IndoRegion seeder after database restore
+                $this->runIndoRegionSeeder();
             } else {
                 Log::warning("No SQL files found in backup archive");
                 Log::info("Contents of backup extraction directory: " . print_r(glob($extractPath . '/*'), true));
+
+                // Still run seeder even if no SQL files found
+                $this->runIndoRegionSeeder();
             }
 
             $publicBackupPath = $extractPath . '/public';
@@ -317,5 +323,62 @@ class RecoveryController extends Controller
             }
         }
         closedir($directory);
+    }
+
+    private function runIndoRegionSeeder()
+    {
+        try {
+            Log::info("Starting IndoRegion seeder after database restore");
+
+            // Check if IndoRegion tables exist and have data
+            $indoRegionTables = ['provinces', 'regencies', 'districts', 'villages'];
+            $needsSeeding = false;
+
+            foreach ($indoRegionTables as $table) {
+                if (DB::getSchemaBuilder()->hasTable($table)) {
+                    $count = DB::table($table)->count();
+                    Log::info("Table {$table} has {$count} records");
+                    if ($count == 0) {
+                        $needsSeeding = true;
+                    }
+                } else {
+                    Log::warning("Table {$table} does not exist");
+                    $needsSeeding = true;
+                }
+            }
+
+            if (!$needsSeeding) {
+                Log::info("IndoRegion tables already have data, skipping seeder");
+                return;
+            }
+
+            // Run the IndoRegion seeder with full namespace and force flag
+            $exitCode = Artisan::call('db:seed', [
+                '--class' => 'Database\\Seeders\\IndoRegionSeeder',
+                '--force' => true
+            ]);
+
+            $output = Artisan::output();
+            Log::info("IndoRegion seeder exit code: {$exitCode}");
+            Log::info("IndoRegion seeder output: " . $output);
+
+            if ($exitCode === 0) {
+                Log::info("IndoRegion seeder completed successfully");
+
+                // Verify data was inserted
+                foreach ($indoRegionTables as $table) {
+                    if (DB::getSchemaBuilder()->hasTable($table)) {
+                        $count = DB::table($table)->count();
+                        Log::info("Table {$table} now has {$count} records");
+                    }
+                }
+            } else {
+                Log::error("IndoRegion seeder failed with exit code: {$exitCode}");
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to run IndoRegion seeder: " . $e->getMessage());
+            Log::error("IndoRegion seeder exception trace: " . $e->getTraceAsString());
+            // Don't throw the exception to avoid breaking the restore process
+        }
     }
 }
