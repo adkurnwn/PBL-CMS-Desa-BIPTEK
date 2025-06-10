@@ -115,7 +115,7 @@ const emptyStateMessage = "Tidak ada data pencadangan yang tersedia. Lakukan pen
                 Anda.
                 Membuat cadangan akan menyimpan database dan semua file dari website CMS Desa. Secara default, pencadangan data
                 dilakukan secara
-                otomatis setiap minggu. Anda dapat mengatur frekuensi pencadangan di halaman Pengaturan. 
+                otomatis setiap hari. 
             </p>
         </div>
 
