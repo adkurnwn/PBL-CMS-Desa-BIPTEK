@@ -46,12 +46,12 @@ const dropdownStyles = {
                     />
 
                     <!-- Display CMS title and village name -->
-                    <div class="ml-[6px] sm:ml-[8px] md:ml-[10px] flex flex-col w-[180px] sm:w-[220px] md:w-[260px] xl:w-[310px] h-auto justify-center">
-                        <div class="text-[16px] sm:text-[18px] md:text-[20px] xl:text-[14.67px] 2xl:text-[16.5px] 3xl:text-[17.6px] 4xl:text-[22px] font-normal">
-                            <span class="hidden max-md:inline">CMS</span>
-                            <span class="inline max-md:hidden">Content Management System</span>
+                    <div class="ml-[6px] sm:ml-[8px] md:ml-[10px] flex flex-col h-auto justify-center">
+                        <div class="text-[14.67px] 2xl:text-[16.5px] 3xl:text-[17.6px] 4xl:text-[22px] font-normal">
+                            
+                            <span class="inline ">Content Management System</span>
                         </div>
-                        <div class="font-bold text-[18px] sm:text-[22px] md:text-[25px] xl:text-[20px] 2xl:text-[22px] 3xl:text-[24px] 4xl:text-[31px] leading-tight">{{ villageName }}</div>
+                        <div class="font-bold xl:text-[20px] 2xl:text-[22px] 3xl:text-[24px] 4xl:text-[31px] leading-tight">{{ villageName }}</div>
                     </div>
                 </div>
             </div>

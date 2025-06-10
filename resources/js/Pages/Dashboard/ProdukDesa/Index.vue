@@ -374,9 +374,11 @@ watch(() => props.filters, (newValue) => {
                         </template>
 
                         <template #['item.Status']="{ item }">
-                            <div @click.prevent="toggleProdukStatus(item.slug)" class="cursor-pointer">
-                                <SwitchToggle :type="item.status" :text="item.status ? 'Aktif' : 'Nonaktif'" />
-                            </div>
+                            <SwitchToggle 
+                                :type="item.status" 
+                                :text="item.status ? 'Aktif' : 'Nonaktif'" 
+                                @update:type="(newValue) => toggleProdukStatus(item.slug, newValue)"
+                            />
                         </template>
                     </Tabel>
                 </div>
