@@ -211,8 +211,8 @@ const toggleCommentModerator = () => {
                 class="fixed bg-white pt-[30px] sm:pt-[35px] md:pt-[40px] xl:pt-[35px] 2xl:pt-[40px] 3xl:pt-[45px] 4xl:pt-[50px] pb-[10px] sm:pb-[12px] md:pb-[13px] xl:pb-[10px] 2xl:pb-[12px] 3xl:pb-[13px] 4xl:pb-[15px] z-10"
                 :class="[
                     sidebarCollapsed
-                        ? 'w-[60px] pl-[20px] sm:pl-[20px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]'
-                        : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] sm:pl-[20px] pr-[12px]',
+                        ? 'w-[60px] pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]'
+                        : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] xl:pl-[20px] pr-[12px]',
                 ]"
                 :style="{
                     transition: 'width 300ms ease-in-out',
