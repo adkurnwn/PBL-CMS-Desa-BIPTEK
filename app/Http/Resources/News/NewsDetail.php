@@ -26,6 +26,7 @@ class NewsDetail extends JsonResource
             'user' => [
                 'name' => $this->user->name,
             ],
+            'is_moderate' => $this->is_moderate,
         ];
     }
 }
