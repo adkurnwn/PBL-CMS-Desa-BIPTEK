@@ -14,11 +14,12 @@ class ProdukDesaSeeder extends Seeder
      */
     public function run(): void
     {
-        $produkDesa = ['Produk 1', 'Produk 2', 'Produk 3'];
-        $images = [1, 2, 3,];
-        $i = 1;
-        foreach ($produkDesa as $produk) {
-            $produkDesa = ProdukDesa::create([
+        $produkDesaNames = ['Tanaman Hias', 'Kain Batik', 'Tas Tenun'];
+        $images = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        $imageIndex = 0;
+
+        foreach ($produkDesaNames as $produk) {
+            $produkDesaModel = ProdukDesa::create([
                 'product_name' => $produk,
                 'slug' => Str::of($produk)->slug('-'),
                 'user_id' => 1,
@@ -29,10 +30,14 @@ class ProdukDesaSeeder extends Seeder
                 'price' => rand(10000, 100000),
                 'status' => true,
             ]);
-            $produkDesa->images()->create([
-                'path' => '/produk-desa-images/' . $i . '.jpg',
-            ]);
-            $i++;
+
+            // Menambahkan 3 gambar untuk setiap produk
+            for ($j = 0; $j < 3; $j++) {
+                $produkDesaModel->images()->create([
+                    'path' => '/produk-desa-images/' . $images[$imageIndex] . '.webp',
+                ]);
+                $imageIndex++;
+            }
         }
     }
 }
