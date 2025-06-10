@@ -27,12 +27,16 @@ class BeritaController extends Controller
             ]);
         }
 
-        // Increment views
-        $news->increment('views');
-
         // Prepare meta data
-        $profile = Profile::first();
+        $profile = Profile::with(['district', 'regency', 'province'])->first();
         $siteName = $profile ? $profile->name : 'Desa';
+
+        $keywords = $siteName;
+        if ($profile) {
+            if ($profile->district) $keywords .= ', Kecamatan ' . ucwords(strtolower($profile->district->name));
+            if ($profile->regency) $keywords .= ', ' . ucwords(strtolower($profile->regency->name));
+            if ($profile->province) $keywords .= ', Provinsi ' . ucwords(strtolower($profile->province->name));
+        }
         
         // Clean content for description
         $cleanContent = strip_tags($news->content);
@@ -49,7 +53,11 @@ class BeritaController extends Controller
         }
 
         $metaData = [
+            'robots' => 'index, follow',
+            'googlebot' => 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
+            'google-bot-news' => 'index, follow',
             'title' => $news->title . ' - ' . $siteName,
+            'keywords' => $keywords,
             'description' => $description ?: 'Baca berita terbaru dari desa kami',
             'og:type' => 'article',
             'og:title' => $news->title . ' - ' . $siteName,
