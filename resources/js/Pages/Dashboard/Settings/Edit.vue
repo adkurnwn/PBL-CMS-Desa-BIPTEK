@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm, Link } from "@inertiajs/vue3";
+import { Head, useForm, Link, usePage } from "@inertiajs/vue3";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
@@ -22,6 +22,8 @@ const props = defineProps({
     colorOptions: Object,
     secondaryColorOptions: Object,
 });
+
+const page = usePage();
 
 const activeTab = ref("theme");
 const faviconPreview = ref(null);
@@ -978,10 +980,29 @@ const testDatabaseConnection = () => {
                                                     ),
                                                 }"
                                             >
-                                                <h1>
-                                                    Content Management System
-                                                </h1>
-                                                <h5 class="font-bold">Desa</h5>
+                                            <div class="flex gap-x-3 items-center">
+                                                <div class="flex-shrink-0 flex items-center h-full">
+                                                    <img
+                                                        v-if="page.props.profile?.logo"
+                                                        :src="`/storage/${page.props.profile.logo
+                                                        }`"
+                                                        alt="Logo"
+                                                        class="h-full w-auto max-h-12 object-contain"
+                                                    />
+                                                    <span
+                                                        v-else
+                                                        class="text-lg font-bold"
+                                                    >
+                                                        Logo Desa
+                                                    </span>
+                                                </div>
+                                                <div class="flex flex-col justify-center">
+                                                    <h1>
+                                                        Content Management System
+                                                    </h1>
+                                                    <h5 class="font-bold">{{ page.props.profile?.name }}</h5>
+                                                </div>
+                                            </div>
                                             </div>
                                             <div class="flex space-x-2 mb-4">
                                                 <PrimaryButton

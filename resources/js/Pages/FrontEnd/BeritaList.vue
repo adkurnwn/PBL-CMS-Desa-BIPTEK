@@ -279,7 +279,7 @@ onUnmounted(() => {
             
             <!-- Kategori Berita -->
             <div
-                class="flex items-center justify-end w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 xl:text-lg text-sm text-accent1"
+                class="flex items-center justify-center xl:justify-end w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 xl:text-lg text-sm text-accent1"
             >
                 <!-- Always visible "Semua" button -->
                 <button
@@ -457,7 +457,7 @@ onUnmounted(() => {
             </h1>
             <article>
                 <!-- News Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-4">
                     <!-- Loading State - Show skeleton cards -->
                     <template v-if="newsLoading">
                         <NewsCard
@@ -465,7 +465,7 @@ onUnmounted(() => {
                             :key="`skeleton-${n}`"
                             :loading="true"
                             :href="'#'"
-                            :isHome="true"
+                            :isHome="false"
                             :news="{}"
                         />
                     </template>
@@ -487,7 +487,7 @@ onUnmounted(() => {
                             :key="newsItem.id"
                             :loading="false"
                             :href="`/berita/${newsItem.slug}`"
-                            :isHome="true"
+                            :isHome="false"
                             :news="newsItem"
                         />
                     </template>
