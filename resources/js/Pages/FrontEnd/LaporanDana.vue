@@ -180,13 +180,13 @@ onMounted(async () => {
         </div>
 
         <!-- Loading State -->
-        <div v-if="laporanDanaApi.loading.value" class="flex justify-center items-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div v-if="laporanDanaApi.loading.value" class="flex justify-center items-center py-20 sm:py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent1"></div>
         </div>
 
         <!-- Error State -->
         <div v-else-if="laporanDanaApi.error.value" class="text-center py-12">
-          <p class="text-red-600">{{ laporanDanaApi.error.value }}</p>
+          <p class="text-grey-500">{{ laporanDanaApi.error.value }}</p>
         </div>
 
         <!--Document Grid-->
@@ -195,24 +195,30 @@ onMounted(async () => {
             :href="`/dana-desa/${laporan.slug}`"
             class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
             style="text-decoration: none;">
-            <div class="flex-1 min-w-0 flex flex-col mt-2">
+            <div class="flex-1 flex flex-col mt-2 truncate">
               <!-- Nomor & Judul -->
-              <span class="text-accent1 mr-3 text-sm flex-shrink-0">{{ idx + 1 }}. <span class="ml-5">{{ laporan.title
-                  }}</span></span>
-
-              <div class="flex items-center gap-2 ml-8 mt-1 mb-2">
+              <div class="flex items-center">
+                <span class="text-accent1 text-xs sm:text-sm flex-shrink-0">{{ idx + 1 }}.</span>
+                <span
+                  class="text-xs sm:text-sm ml-3 xl:ml-5 truncate block max-w-[300px] sm:max-w-[500px] md:max-w-[420px] lg:max-w-[600px]"
+                  :title="laporan.title"
+                >
+                  {{ laporan.title }}
+                </span>
+              </div>
+              <div class="flex items-center gap-2 ml-5 sm:ml-6 xl:ml-8 mt-1 mb-2">
                 <!-- Metadata -->
                 <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1">
-                  <span class="inline-block" style="width: 26ch;">
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span>
+                  <span class="inline-block" style="width: 28ch;">
+                    <span class="material-symbols-outlined align-middle text-xxs sm:text-sm mr-1">calendar_today</span>
                     Diunggah: {{ formatDate(laporan.date) }}
                   </span>
                   <span class="inline-block" style="width: 20ch;">
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
+                    <span class="material-symbols-outlined align-middle text-xxs sm:text-sm mr-1">visibility</span>
                     Dilihat {{ laporan.views || 0 }} kali
                   </span>
                   <span>
-                    <span class="material-symbols-outlined align-middle text-sm mr-1">file_save</span>
+                    <span class="material-symbols-outlined align-middle text-xxs sm:text-sm mr-1">file_save</span>
                     Diunduh {{ laporan.downloads || 0 }} kali
                   </span>
                 </div>

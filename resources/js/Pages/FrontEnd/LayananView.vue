@@ -73,7 +73,7 @@ onMounted(fetchData);
             </article>
             <!--Layanan Publik-->
             <article
-                class="w-full flex flex-col bg-type1 font-merriweather py-6 lg:py-10">
+                class="w-full flex flex-col bg-type1 font-merriweather py-6 lg:py-10 mb-10">
                 <h1 class="xl:text-3xl sm:text-xl text-md font-semibold text-accent2">
                     Layanan Publik
                 </h1>
@@ -86,8 +86,7 @@ onMounted(fetchData);
                 </h2>
                 <div class="flex flex-wrap max-w-3xl xl:gap-4 sm:gap-3 gap-2 mt-2">
                     <!-- Grid 1 -->
-                    <div v-if="layout.produk_hukum"
-                        class="bg-secondary text-accent1 text-center p-4 rounded-lg shadow-lg xl:w-8/12 sm:w-64 w-72 xl:h-44 sm:h-40 h-32">
+                    <a v-if="layout.produk_hukum" href="/produk-hukum" class="bg-secondary text-accent1 text-center p-4 rounded-lg shadow-lg xl:w-8/12 sm:w-64 w-72 xl:h-44 sm:h-40 h-32">
                         <svg class="xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="40px" fill="currentColor">
                             <path
@@ -100,10 +99,9 @@ onMounted(fetchData);
                             Kumpulan peraturan, keputusan, dan kebijakan resmi
                             yang berlaku di desa.
                         </p>
-                    </div>
+                    </a>
                     <!-- Grid 2 -->
-                    <div v-if="layout.dana_desa"
-                        class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 text-center">
+                    <a v-if="layout.dana_desa" href="/dana-desa" class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 text-center">
                         <svg class="-ml-1 xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="48px" fill="currentColor">
                             <path
@@ -116,9 +114,9 @@ onMounted(fetchData);
                             Kumpulan laporan dana desa sebagai bentuk
                             transparansi kepada masyarakat.
                         </p>
-                    </div>
+                    </a>
                     <!-- Grid 3 -->
-                    <div v-if="layout.demografi"
+                    <a v-if="layout.demografi" href="/statistik-penduduk"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 text-center">
                         <svg class="xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="48px" fill="currentColor">
@@ -132,9 +130,9 @@ onMounted(fetchData);
                             Statistik jumlah penduduk berdasarkan kategori
                             tertentu.
                         </p>
-                    </div>
+                    </a>
                     <!-- Grid 4 -->
-                    <div
+                    <a href="/aparat-desa"
                         class="bg-secondary text-accent1 text-center rounded-lg shadow-lg p-4 xl:w-8/12 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 col-span-1">
                         <svg class="-ml-1 xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg"
                             height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor">
@@ -148,7 +146,7 @@ onMounted(fetchData);
                             Susunan kepengurusan dan perangkat desa yang
                             bertugas melayani masyarakat.
                         </p>
-                    </div>
+                    </a>
                 </div>
             </article>
         </main>
