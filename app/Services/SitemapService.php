@@ -81,14 +81,14 @@ class SitemapService
             Url::create(route('informasi'))
                 ->setLastModificationDate(now())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                ->setPriority(0.7)
+                ->setPriority(0.6)
         );
 
         $sitemap->add(
             Url::create(route('profil-desa'))
                 ->setLastModificationDate(now())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                ->setPriority(0.6)
+                ->setPriority(0.9)
         );
 
         $sitemap->add(
@@ -116,18 +116,43 @@ class SitemapService
     private function addNewsPages(Sitemap $sitemap): void
     {
         $newsCount = 0;
-        News::where('is_draft', false)
+        News::with('images')
+            ->where('is_draft', false)
             ->whereNull('deleted_at')
             ->orderBy('updated_at', 'desc')
             ->chunk(100, function ($newsItems) use ($sitemap, &$newsCount) {
                 foreach ($newsItems as $news) {
                     try {
-                        $sitemap->add(
-                            Url::create(route('berita.show', $news->slug))
-                                ->setLastModificationDate($news->updated_at)
-                                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                                ->setPriority(0.8)
-                        );
+                        $url = Url::create(route('berita.show', $news->slug))
+                            ->setLastModificationDate($news->updated_at)
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
+                            ->setPriority(0.8);
+
+                        // Add first image if exists
+                        if ($news->images && $news->images->count() > 0) {
+                            $firstImage = $news->images->first();
+                            $imageUrl = asset('storage/' . $firstImage->path);
+                            $imageCaption = $firstImage->alt ?: $news->title;
+                            $url->addImage($imageUrl, $imageCaption);
+                        }
+
+                        // Add video if exists
+                        if ($news->video) {
+                            $videoUrl = asset('storage/' . $news->video);
+                            $thumbnailUrl = $news->images && $news->images->count() > 0 
+                                ? asset($news->images->first()->path) 
+                                : '';
+                            
+                            $url->addVideo(
+                                $thumbnailUrl,
+                                $news->title,
+                                strip_tags(substr($news->content, 0, 200)),
+                                $videoUrl,
+                                route('berita.show', $news->slug)
+                            );
+                        }
+
+                        $sitemap->add($url);
                         $newsCount++;
                     } catch (\Exception $e) {
                         Log::warning("Failed to add news item {$news->slug} to sitemap: " . $e->getMessage());
