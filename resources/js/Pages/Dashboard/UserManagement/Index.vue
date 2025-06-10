@@ -300,9 +300,11 @@ watch(() => [props.sort, props.direction], ([newSort, newDirection]) => {
 
                         <!-- Fix the slot syntax for Status column -->
                         <template #['item.Status']="{ item }">
-                            <div @click.stop="toggleUserStatus(item.id)" class="cursor-pointer">
-                                <SwitchToggle :type="item.status" :text="item.status ? 'Aktif' : 'Nonaktif'" />
-                            </div>
+                            <SwitchToggle 
+                                :type="item.status" 
+                                :text="item.status ? 'Aktif' : 'Nonaktif'" 
+                                @update:type="(newValue) => toggleUserStatus(item.id, newValue)"
+                            />
                         </template>
 
                         <!-- Fixed Actions column template to match the header label 'Aksi' -->
