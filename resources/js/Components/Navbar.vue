@@ -30,7 +30,7 @@ const menuItems = [
         name: "Layanan Publik",
         link: "/layanan",
         children: [
-            { name: "Laporan Dana Desa", link: "/laporan-dana" },
+            { name: "Laporan Dana Desa", link: "/dana-desa" },
             { name: "Produk Hukum", link: "/produk-hukum" },
             { name: "Produk Unggulan", link: "/produk-unggulan" },
             { name: "Statistik Penduduk", link: "/statistik-penduduk" },
@@ -47,6 +47,11 @@ const handleScroll = () => {
 };
 
 const isActive = (link) => currentPath.value === link;
+const isChildActive = (item) => {
+  if (!item.children) return false;
+  return item.children.some(child => isActive(child.link));
+};
+
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
 };
@@ -198,54 +203,77 @@ onUnmounted(() => {
             </button>
             <ul class="space-y-4 mt-12">
                 <li v-for="(item, index) in menuItems" :key="index">
-                <div>
-                    <button
-                    v-if="item.children"
-                    @click="toggleDropdown(index)"
-                    class="flex items-center justify-between w-full text-white font-semibold"
+                    <div>
+                    <div
+                        v-if="item.children"
+                        class="flex items-center justify-between w-full text-white font-semibold rounded-md px-2 py-2 transition-all duration-200"
+                        :class="{
+                            'bg-accent2/40 border-l-4 border-accent2': isActive(item.link)
+                        }"
                     >
-                    <span>{{ item.name }}</span>
-                    <svg
-                        :class="{ 'rotate-180': dropdownOpen === index }"
-                        class="w-4 h-4 transform transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M19 9l-7 7-7-7" />
-                    </svg>
-                    </button>
+                        <a
+                            :href="item.link"
+                            class="flex-1"
+                            style="min-width:0"
+                        >
+                            {{ item.name }}
+                        </a>
+                        <!-- Dropdown arrow button -->
+                        <button
+                            @click.stop="toggleDropdown(index)"
+                            class="ml-2 flex-shrink-0 p-1 rounded hover:bg-accent2/30 transition bg-accent2"
+                            aria-label="Tampilkan submenu"
+                            type="button"
+                        >
+                            <svg
+                            :class="{ 'rotate-180': dropdownOpen === index }"
+                            class="w-5 h-5 transform transition-transform duration-300"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24"
+                            >
+                            <path d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
                     <a
                         v-else
                         :href="item.link"
-                        class="block text-white font-semibold  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
+                        class="flex items-center justify-between w-full text-white font-semibold rounded-md px-2 py-2 transition-all duration-200"
+                        :class="{
+                        'bg-accent2/40 border-l-4 ml-1 border-accent2': isActive(item.link) || isChildActive(item.link) || dropdownOpen === index
+                        }"
                     >
-                    {{ item.name }}
+                        {{ item.name }}
                     </a>
                     <!-- Dropdown Children -->
                     <transition name="fade-slide">
-                    <ul
+                        <ul
                         v-show="dropdownOpen === index"
                         class="mt-2 mb-4 ml-4 space-y-2"
-                    >
+                        >
                         <li
-                        v-for="(child, cidx) in item.children"
-                        :key="cidx"
+                            v-for="(child, cidx) in item.children"
+                            :key="cidx"
                         >
-                        <a
+                            <a
                             :href="child.link"
-                            class="block text-white text-sm py-0.5 pl-2 border-l-2 border-accent2  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
-                        >
+                            class="block text-white text-sm py-2 px-4 rounded-md transition-all duration-200 border-l-4 border-transparent"
+                            :class="{
+                                'bg-accent2 border-accent2 opacity-95 font-bold ': isChildActive(item)
+                            }"
+                            >
                             {{ child.name }}
-                        </a>
+                            </a>
                         </li>
-                    </ul>
+                        </ul>
                     </transition>
-                </div>
+                    </div>
                 </li>
-            </ul>
+                </ul>
             </aside>
+            
         </transition>
 
 
@@ -261,6 +289,7 @@ onUnmounted(() => {
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+  transition: all 0.3s ease;
 }
 
 /* Slide-in/out from right */
