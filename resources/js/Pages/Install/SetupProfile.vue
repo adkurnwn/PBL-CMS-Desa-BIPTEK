@@ -27,6 +27,7 @@ const form = useForm({
     email: "",
     phone: "",
     logo: null,
+    tipe_pemerintahan: "",
     provinsi: "",
     kabupaten: "",
     kecamatan: "",
@@ -260,6 +261,24 @@ onMounted(() => {
                                     <InputError
                                         :message="form.errors.phone"
                                         class="mt-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <DropdownFieldInput
+                                        id="tipe_pemerintahan"
+                                        v-model="form.tipe_pemerintahan"
+                                        fieldName="Tipe Pemerintahan"
+                                        placeholder="Pilih Tipe Pemerintahan"
+                                        :options="[
+                                            { value: 'desa', label: 'Desa' },
+                                            {
+                                                value: 'kelurahan',
+                                                label: 'Kelurahan',
+                                            },
+                                        ]"
+                                        required
+                                        custom-width="100%"
                                     />
                                 </div>
 
