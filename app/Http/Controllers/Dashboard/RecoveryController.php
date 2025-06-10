@@ -8,6 +8,8 @@ use App\Helpers\LogActivityHelper;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RecoveryController extends Controller
 {
@@ -80,7 +82,7 @@ class RecoveryController extends Controller
         }
     }
 
-    public function restore($fileName)
+    public function restore($fileName, $returnResponse = true)
     {
         try {
             $backupPath = storage_path('app/backup-temp/' . $fileName);
@@ -90,8 +92,13 @@ class RecoveryController extends Controller
             }
 
             if (!file_exists($backupPath)) {
-                return redirect()->route('dashboard.recovery.index')
-                    ->with('error', 'Backup file not found');
+                $error = 'Backup file not found';
+                if ($returnResponse) {
+                    return redirect()->route('dashboard.recovery.index')
+                        ->with('error', $error);
+                } else {
+                    throw new \Exception($error);
+                }
             }
 
             $extractPath = storage_path('app/backup-restore-temp');
@@ -112,47 +119,84 @@ class RecoveryController extends Controller
             $sqlFiles = glob($extractPath . '/db-dumps/*.sql');
 
             if (!empty($sqlFiles)) {
-                $sqlFile = $sqlFiles[0]; // Use the first SQL file found
+                $sqlFile = $sqlFiles[0];
 
-                $dbConnection = config('database.default');
-                $dbConfig = config('database.connections.' . $dbConnection);
+                Log::info("Reading SQL file: " . $sqlFile);
 
-                $passwordFlag = $dbConfig['password'] !== ''
-                    ? "-p" . $dbConfig['password']
-                    : "";
+                // Read the SQL file content
+                $sql = file_get_contents($sqlFile);
 
-                $command = sprintf(
-                    'mysql -h%s -u%s %s %s < %s',
-                    escapeshellarg($dbConfig['host']),
-                    escapeshellarg($dbConfig['username']),
-                    $passwordFlag,
-                    escapeshellarg($dbConfig['database']),
-                    escapeshellarg($sqlFile)
-                );
-
-                $output = [];
-                $returnVar = 0;
-                exec($command, $output, $returnVar);
-
-                if ($returnVar !== 0) {
-                    throw new \Exception('Database import failed: ' . implode("\n", $output));
+                if ($sql === false) {
+                    throw new \Exception('Unable to read SQL file: ' . $sqlFile);
                 }
+
+                Log::info("SQL file size: " . strlen($sql) . " characters");
+
+                try {
+                    // Disable foreign key checks and autocommit
+                    DB::statement('SET FOREIGN_KEY_CHECKS=0');
+                    DB::statement('SET AUTOCOMMIT=0');
+                    DB::beginTransaction();
+
+                    // Split SQL into individual statements and execute
+                    $statements = preg_split('/;\s*$/m', $sql);
+                    $executedCount = 0;
+
+                    foreach ($statements as $statement) {
+                        $statement = trim($statement);
+                        if (!empty($statement) && !preg_match('/^(\/\*|\-\-)/', $statement)) {
+                            try {
+                                DB::unprepared($statement . ';');
+                                $executedCount++;
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to execute statement: " . substr($statement, 0, 100) . "... Error: " . $e->getMessage());
+                            }
+                        }
+                    }
+
+                    DB::commit();
+                    Log::info("Database restore completed successfully. Executed {$executedCount} statements from: " . $sqlFile);
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    throw $e;
+                } finally {
+                    // Re-enable foreign key checks and autocommit
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1');
+                    DB::statement('SET AUTOCOMMIT=1');
+                }
+            } else {
+                Log::warning("No SQL files found in backup archive");
+                Log::info("Contents of backup extraction directory: " . print_r(glob($extractPath . '/*'), true));
             }
 
             $publicBackupPath = $extractPath . '/public';
             if (is_dir($publicBackupPath)) {
                 $this->copyDirectory($publicBackupPath, public_path());
 
-                $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
+                // Only log if we're not in a migration context (to avoid FK issues)
+                if ($returnResponse && Auth::check()) {
+                    $this->logHelper->logActivity('restore', 'backup', 'Restored public files from backup: ' . $fileName);
+                }
             }
 
             $this->cleanupTempFiles($extractPath);
 
-            return redirect()->route('dashboard.recovery.index')
-                ->with('success', 'Cadangan berhasil dipulihkan');
+            if ($returnResponse) {
+                return redirect()->route('dashboard.recovery.index')
+                    ->with('success', 'Cadangan berhasil dipulihkan');
+            } else {
+                return true; // Success indicator for programmatic calls
+            }
         } catch (\Exception $e) {
-            return redirect()->route('dashboard.recovery.index')
-                ->with('error', 'Failed to restore backup: ' . $e->getMessage());
+            Log::error("Backup restoration failed: " . $e->getMessage());
+            Log::error("Exception trace: " . $e->getTraceAsString());
+
+            if ($returnResponse) {
+                return redirect()->route('dashboard.recovery.index')
+                    ->with('error', 'Failed to restore backup: ' . $e->getMessage());
+            } else {
+                throw $e; // Re-throw for programmatic calls
+            }
         }
     }
 

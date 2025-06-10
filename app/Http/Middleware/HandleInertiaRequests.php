@@ -63,8 +63,11 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
-            // Share the profile data with all requests - but only if table exists
-            'profile' => $this->getProfile(),
+            // Share the profile data with all requests
+            'profile' => Profile::first() ? [
+                'primary_color' => Profile::first()->primary_color,
+                'secondary_color' => Profile::first()->secondary_color,
+            ] : null,
         ];
     }
 

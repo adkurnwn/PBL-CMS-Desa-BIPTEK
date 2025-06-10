@@ -6,7 +6,8 @@ use App\Http\Controllers\InstallController;
 use App\Services\StatisticsService;
 use App\Http\Controllers\MetaCrawler\HomeController;
 use App\Http\Controllers\MetaCrawler\BeritaController;
-
+use App\Http\Controllers\MetaCrawler\ProfileController;
+use App\Http\Controllers\MetaCrawler\ProdukHukumController;
 
 // routes/web.php
 
@@ -37,7 +38,7 @@ Route::get('/', function (StatisticsService $statisticsService) {
 
 Route::get('/profile', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Profil Desa', request());
-    return Inertia::render('FrontEnd/ProfileView');
+    return app(ProfileController::class)->index();
 })->name('profil-desa');
 
 Route::get('/informasi', function (StatisticsService $statisticsService) {
@@ -70,9 +71,7 @@ Route::prefix('produk-hukum')->group(function () {
 
     Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
         $statisticsService->trackFeatureVisit('Produk Hukum', request());
-        return Inertia::render('FrontEnd/ProdukHukumDetail', [
-            'slug' => $slug
-        ]);
+        return app(ProdukHukumController::class)->show($slug);
     })->name('produk-hukum.show');
 });
 
