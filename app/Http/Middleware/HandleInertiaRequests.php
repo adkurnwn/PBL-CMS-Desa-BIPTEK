@@ -66,6 +66,7 @@ class HandleInertiaRequests extends Middleware
             'profile' => Profile::first() ? [
                 'primary_color' => Profile::first()->primary_color,
                 'secondary_color' => Profile::first()->secondary_color,
+                'name' => Profile::first()->name,
             ] : null,
         ];
     }
