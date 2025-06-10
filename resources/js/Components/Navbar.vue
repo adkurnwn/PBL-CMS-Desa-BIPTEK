@@ -2,18 +2,20 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useImageErrorHandler } from '@/Utility/useImageErrorHandler';
 
-defineProps({
+const props = defineProps({
     layout: {
         type: Object,
         default: () => ({}),
     },
 });
 
+
 const { handleImageError, getImageSrc } = useImageErrorHandler();
 const isScrolled = ref(false);
 const isMenuOpen = ref(false);
 const currentPath = ref(window.location.pathname);
 const isHomePage = computed(() => currentPath.value === "/");
+
 const menuItems = [
     { name: "Beranda", link: "/" },
     { name: "Profil Desa", link: "/profile" },
@@ -39,6 +41,23 @@ const menuItems = [
 
     },
 ];
+
+const filteredMenuItems = computed(() => {
+    return menuItems.map(item => {
+        if (item.name === "Layanan Publik" && item.children) {
+            return {
+                ...item,
+                children: item.children.filter(child => {
+                    if (child.name === "Produk Hukum") return !!props.layout.produk_hukum;
+                    if (child.name === "Laporan Dana Desa") return !!props.layout.dana_desa;
+                    if (child.name === "Data Demografi") return !!props.layout.demografi;
+                    return true;
+                })
+            };
+        }
+        return item;
+    });
+});
 
 const handleScroll = () => {
     if (isHomePage) {
@@ -92,19 +111,19 @@ onUnmounted(() => {
     >
         <div class="flex items-center space-x-4 xl:space-x-6 4xl:space-x-8">
             <img
-                :src="getImageSrc(`/storage/${layout.logo}`)"
-                :alt="'Logo ' + layout.name"
+                :src="getImageSrc(`/storage/${props.layout.logo}`)"
+                :alt="'Logo ' + props.layout.name"
                 class="w-10 h-12 2xl:w-12 2xl:h-16  4xl:w-20 4xl:h-24 " 
-                @error="handleImageError(`/storage/${layout.logo}`)"
+                @error="handleImageError(`/storage/${props.layout.logo}`)"
             />
             <div class="flex flex-col">
                 <h1
                     class="text-white font-bold text-base sm:text-2xl xl:md:text-xl 4xl:text-3xl"
                 >
-                    {{ layout.name }}
+                    {{ props.layout.name }}
                 </h1>
                 <p class="text-white text-[12px] sm:text-base md:text-xs 3xl:text-sm 4xl:text-lg 4xl:mt-1">
-                    {{ layout.kabupaten }}
+                    {{ props.layout.kabupaten }}
                 </p>
             </div>
         </div>
@@ -128,7 +147,7 @@ onUnmounted(() => {
                 'absolute lg:static w-1/2 top-20 my-1 rounded-lg right-0 lg:w-auto bg-accent1 lg:bg-transparent lg:flex flex-col lg:flex-row space-y-4 sm:space-y-6 py-5 sm:py-8 lg:py-0 lg:space-y-0 text-center xl:text-left p-4 lg:p-0',
             ]"
         >
-        <li v-for="(item, index) in menuItems" :key="index" class="relative group">
+        <li v-for="(item, index) in filteredMenuItems" :key="index" class="relative group">
             <template v-if="item.children">
                 <a
                 :href="item.link"
@@ -209,7 +228,7 @@ onUnmounted(() => {
                 ✕
             </button>
             <ul class="space-y-4 mt-12">
-                <li v-for="(item, index) in menuItems" :key="index">
+                <li v-for="(item, index) in filteredMenuItems" :key="index">
                     <div>
                     <div
                         v-if="item.children"
