@@ -67,7 +67,7 @@ onMounted(fetchData);
                         :produkDesa="produkDesa" />
                 </div>
                 <a href="produk-unggulan"
-                    class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 mt-6 xl:mt-8 ml-2 text-right justify-end">
+                    class="text-lg font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 mt-6 xl:mt-8 ml-2 text-right justify-end">
                     Selengkapnya >>
                 </a>
             </article>
@@ -116,7 +116,7 @@ onMounted(fetchData);
                         </p>
                     </a>
                     <!-- Grid 3 -->
-                    <a v-if="layout.demografi" href="/statistik-penduduk"
+                    <a v-if="layout.demografi" href="/data-demografi"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 text-center">
                         <svg class="xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="48px" fill="currentColor">
@@ -132,7 +132,7 @@ onMounted(fetchData);
                         </p>
                     </a>
                     <!-- Grid 4 -->
-                    <a href="/aparat-desa"
+                    <a href="/struktur-organisasi"
                         class="bg-secondary text-accent1 text-center rounded-lg shadow-lg p-4 xl:w-8/12 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 col-span-1">
                         <svg class="-ml-1 xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg"
                             height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor">
