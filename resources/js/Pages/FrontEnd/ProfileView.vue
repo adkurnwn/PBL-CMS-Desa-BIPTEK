@@ -177,7 +177,7 @@ const handleCoordinatesUpdate = (coords) => {
                     </div>
                 </div>
                 <div class="flex items-center justify-end">
-                    <a href="/aparat-desa">
+                    <a href="/struktur-organisasi">
                     <p class="flex items-center xl:-mt-4 text-secondary text-lg">
                         Selengkapnya
                         <svg class="mt-0 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
@@ -343,7 +343,7 @@ const handleCoordinatesUpdate = (coords) => {
                     </div>
                 </div>
                 <Link
-                    href="/statistik-penduduk"
+                    href="/data-demografi"
                     class="flex items-center justify-end mt-2 text-secondary text-xl"
                 >
                     Selengkapnya

@@ -23,7 +23,7 @@ const menuItems = [
         children: [
             { name: "Daftar Berita", link: "/berita" },
             { name: "Daftar Event", link: "/event" },
-            { name: "Galeri Desa", link: "/galeri-desa" },
+            { name: "Galeri Desa", link: "/galeri" },
         ]
     },
     { 
@@ -33,8 +33,8 @@ const menuItems = [
             { name: "Laporan Dana Desa", link: "/dana-desa" },
             { name: "Produk Hukum", link: "/produk-hukum" },
             { name: "Produk Unggulan", link: "/produk-unggulan" },
-            { name: "Statistik Penduduk", link: "/statistik-penduduk" },
-            { name: "Struktur Organisasi", link: "/aparat-desa" },
+            { name: "Data Demografi", link: "/data-demografi" },
+            { name: "Struktur Organisasi", link: "/struktur-organisasi" },
         ] 
 
     },

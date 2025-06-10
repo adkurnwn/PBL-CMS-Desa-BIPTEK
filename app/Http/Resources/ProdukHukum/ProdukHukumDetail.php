@@ -21,6 +21,7 @@ class ProdukHukumDetail extends JsonResource
             'file' => $this->file,
             'link' => $this->link,
             'date' => $this->date,
+            'is_moderate' => $this->is_moderate,
         ];
     }
 }

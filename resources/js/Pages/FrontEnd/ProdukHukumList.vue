@@ -197,7 +197,7 @@ const handlePageChange = (page) => {
                     Produk Hukum {{ layout.name }}
                     </h1>
                     <!-- Filter Bar -->
-                    <div class="flex flex-wrap gap-2 text-sm sm:mt-4 xl:mt-0 mt-4 xl:justify-end">
+                    <div class="flex flex-wrap gap-2 text-sm sm:mt-4 xl:mt-0 mt-4 ml-1 sm:ml-0 xl:justify-end">
                         <!-- Nomor Peraturan -->
                         <div class="relative">
                             <input
@@ -206,7 +206,7 @@ const handlePageChange = (page) => {
                                 @blur="handleNomorSearch"
                                 type="text"
                                 placeholder="Cari nomor peraturan..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
                             />
                             <span
                                 @click="handleNomorSearch"
@@ -222,7 +222,7 @@ const handlePageChange = (page) => {
                                 @blur="handleJudulSearch"
                                 type="text"
                                 placeholder="Cari judul..."
-                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-44"
+                                class="border-gray-300 rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-80 sm:w-72 xl:w-44"
                             />
                             <span
                                 @click="handleJudulSearch"
@@ -234,7 +234,7 @@ const handlePageChange = (page) => {
                         <select
                             v-model="selectedCategory"
                             @change="selectCategory(selectedCategory)"
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-36"
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-38 sm:w-72 xl:w-36"
                         >
                             <option value="">Semua Kategori</option>
                             <option 
@@ -249,7 +249,7 @@ const handlePageChange = (page) => {
                         <select
                             v-model="selectedYear"
                             @change="handleYearChange"
-                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-72 xl:w-40"
+                            class="border rounded px-3 py-2 bg-type1 text-gray-500 text-xs focus:outline-none focus:ring-0 w-[170px] sm:w-72 xl:w-40"
                         >
                             <option value="">Tahun Penetapan</option>
                             <option 
@@ -268,12 +268,12 @@ const handlePageChange = (page) => {
                     v-if="produkHukumApi.loading.value"
                     class="flex justify-center items-center py-12"
                 >
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-accent1"></div>
                 </div>
 
                 <!-- Error State -->
                 <div v-else-if="produkHukumApi.error.value" class="text-center py-12">
-                    <p class="text-red-600">{{ produkHukumApi.error.value }}</p>
+                    <p class="text-grey-500">{{ produkHukumApi.error.value }}</p>
                 </div>
 
                 <!-- Documents Grid -->
@@ -282,14 +282,22 @@ const handlePageChange = (page) => {
                         v-for="(dokumen, idx) in produkHukumApi.data.value"
                         :key="dokumen.id"
                         :href="`/produk-hukum/${dokumen.slug}`"
-                        class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
+                        class="flex items-center bg-white rounded-lg shadow px-2 sm:px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
                         style="text-decoration: none;"
                     >
-                        <div class="flex-1 min-w-0 flex flex-col mt-2">
+                        <div class="flex-1 flex flex-col mt-2 truncate">
                             <!-- Nomor & Judul -->
-                            <span class="text-accent1 mr-3 text-sm flex-shrink-0">{{ idx + 1 }}. <span class="ml-5">{{ dokumen.title }}</span></span>
+                            <div class="flex items-center">
+                                <span class="text-accent1 text-xs sm:text-sm flex-shrink-0">{{ idx + 1 }}.</span>
+                                <span
+                                    class="text-xs sm:text-sm ml-3 xl:ml-5 truncate block max-w-[300px] sm:max-w-[500px] md:max-w-[420px] lg:max-w-[600px]"
+                                    :title="dokumen.title"
+                                >
+                                    {{ dokumen.title }}
+                                </span>
+                            </div>
                             <!-- Kategori -->
-                            <div class="ml-8">
+                            <div class="ml-5 sm:ml-6 xl:ml-8">
                                 <span
                                     v-if="dokumen.category"
                                     class="inline-block px-2 py-0.5 text-[9px] font-semibold text-white bg-accent1 rounded-full whitespace-nowrap mx-auto"
@@ -297,15 +305,15 @@ const handlePageChange = (page) => {
                                     {{ dokumen.category }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-2 ml-8 mt-1 mb-2">
+                            <div class="flex items-center gap-2 ml-5 sm:ml-6 xl:ml-8 mt-1 mb-2">
                                 <!-- Metadata -->
                                 <div class="flex flex-wrap items-center text-xs text-filterBorder gap-x-4 gap-y-1">
                                     <span class="inline-block" style="width: 28ch;">
-                                        <span class="material-symbols-outlined align-middle text-sm mr-1">calendar_today</span>
+                                        <span class="material-symbols-outlined align-middle text-xxs sm:text-sm mr-1">calendar_today</span>
                                         Ditetapkan: {{ formatDate(dokumen.date) }}
                                     </span>
                                     <span>
-                                        <span class="material-symbols-outlined align-middle text-sm mr-1">visibility</span>
+                                        <span class="material-symbols-outlined align-middle text-xxs sm:text-sm mr-1">visibility</span>
                                         Dilihat {{ dokumen.views || 0 }} kali
                                     </span>
                                 </div>
