@@ -47,6 +47,10 @@ const handleScroll = () => {
 };
 
 const isActive = (link) => currentPath.value === link;
+const isActiveWithChildren = (item) => {
+  if (isActive(item.link)) return true;
+  return item.children && item.children.some(child => isActive(child.link));
+};
 const isChildActive = (item) => {
   if (!item.children) return false;
   return item.children.some(child => isActive(child.link));
@@ -130,7 +134,7 @@ onUnmounted(() => {
                 :href="item.link"
                 class="relative inline-block pb-1 after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
                     :class="{
-                        'after:w-full after:left-0': isActive(item.link),
+                        'after:w-full after:left-0': isActive(item.link) || isActiveWithChildren(item),
                     }"
                 >
                 {{ item.name }}
@@ -153,6 +157,9 @@ onUnmounted(() => {
                         <a
                         :href="child.link"
                         class="hidden lg:flex items-center gap-2 text-sm px-4 py-2 rounded-md hover:bg-accent2 hover:text-white hover:pl-6 border-l-4 border-transparent hover:border-accent2 transition-all duration-200"
+                        :class="{
+                            'bg-accent2 border-accent2 opacity-95 font-bold': isChildActive(child.link) || isActive(child.link),
+                        }"
                         >
                         <span>{{ child.name }}</span>
                         <svg
@@ -173,7 +180,7 @@ onUnmounted(() => {
                     :href="item.link"
                     class="relative inline-block pb-1  after:content-[''] after:absolute after:left-0 after:bottom-0 after:-mt-1 after:w-0 after:h-[2px] after:bg-white after:transition-all after:duration-300 after:ease-in-out hover:after:w-full hover:after:left-0 font-merriweather"
                     :class="{
-                        'after:w-full after:left-0': isActive(item.link),
+                    'after:w-full after:left-0': isActive(item.link)
                     }"
                 >
                     {{ item.name }}
@@ -208,7 +215,7 @@ onUnmounted(() => {
                         v-if="item.children"
                         class="flex items-center justify-between w-full text-white font-semibold rounded-md px-2 py-2 transition-all duration-200"
                         :class="{
-                            'bg-accent2/40 border-l-4 border-accent2': isActive(item.link)
+                            'bg-accent2/40 border-l-4 border-accent2': isActive(item.link) || isActiveWithChildren(item) 
                         }"
                     >
                         <a
@@ -242,7 +249,7 @@ onUnmounted(() => {
                         :href="item.link"
                         class="flex items-center justify-between w-full text-white font-semibold rounded-md px-2 py-2 transition-all duration-200"
                         :class="{
-                        'bg-accent2/40 border-l-4 ml-1 border-accent2': isActive(item.link) || isChildActive(item.link) || dropdownOpen === index
+                        'bg-accent2/40 border-l-4 ml-1 border-accent2': isActive(item.link) || isChildActive(item.link) || dropdownOpen === index,
                         }"
                     >
                         {{ item.name }}
@@ -261,7 +268,7 @@ onUnmounted(() => {
                             :href="child.link"
                             class="block text-white text-sm py-2 px-4 rounded-md transition-all duration-200 border-l-4 border-transparent"
                             :class="{
-                                'bg-accent2 border-accent2 opacity-95 font-bold ': isChildActive(item)
+                                'bg-accent2 border-accent2 opacity-95 font-bold ': isChildActive(item.children[cidx].link) || isActive(child.link),
                             }"
                             >
                             {{ child.name }}
