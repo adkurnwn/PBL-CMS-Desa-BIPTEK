@@ -32,6 +32,13 @@
             :event="event"
         />
         </div>
+        
+        <!-- Pagination -->
+        <Pagination
+            :current-page="pagination?.current_page || 1"
+            :last-page="totalPages"
+            @page-changed="handlePageChange"
+        />
       </article>
       </main>
     </UserLayout>
@@ -41,6 +48,7 @@
 import UserLayout from '@/Layouts/UserLayout.vue';
 import EventCard from '@/Components/EventCard.vue';
 import Search from '@/Components/FrontendComponent/Search.vue';
+import Pagination from '@/Components/FrontendComponent/Pagination.vue';
 import { ref, onMounted } from 'vue';
 import useApiFetch from '@/Utility/useApiFetch';
 import { Head } from '@inertiajs/vue3';
@@ -48,20 +56,40 @@ import { Head } from '@inertiajs/vue3';
 const events = ref([]);
 const loading = ref(true);
 const searchQuery = ref('');
+const pagination = ref({});
+const totalPages = ref(1);
 
-const fetchData = async ({ search = "" } = {}) => {
+const fetchData = async ({ search = "", page = 1 } = {}) => {
     loading.value = true;
     const eventsApi = useApiFetch();
     const params = new URLSearchParams();
     if (search) params.append("search", search);
+    params.append("page", page);
+    
     await eventsApi.fetchData(`/api/events?${params.toString()}`);
     events.value = eventsApi.data.value || [];
+    pagination.value = eventsApi.pagination.value || {};
+    
+    // Update total pages from pagination data
+    if (eventsApi.pagination?.value?.last_page) {
+        totalPages.value = eventsApi.pagination.value.last_page;
+    } else {
+        totalPages.value = 1;
+    }
+    
     loading.value = eventsApi.loading.value;
 };
 
 const handleSearch = (query) => {
     searchQuery.value = query;
-    fetchData({ search: query });
+    fetchData({ search: query, page: 1 });
+};
+
+const handlePageChange = async (page) => {
+    await fetchData({ 
+        search: searchQuery.value, 
+        page: page 
+    });
 };
 
 onMounted(() => fetchData());

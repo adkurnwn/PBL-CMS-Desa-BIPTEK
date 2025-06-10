@@ -24,7 +24,12 @@ class UpdateNewsRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'title' => 'required|string|max:255',
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/[a-zA-Z0-9\p{L}\p{N}]/u'
+            ],
             'content' => 'required|string',
             'images' => 'sometimes|array',
             'images.*' => 'sometimes|image|mimes:jpg,jpeg,png|max:10000',

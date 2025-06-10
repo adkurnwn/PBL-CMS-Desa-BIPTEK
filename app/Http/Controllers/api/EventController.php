@@ -27,12 +27,12 @@ class EventController extends Controller
             }
 
             if ($sort === 'terlama') {
-                $query->oldest();
+                $query->orderBy('date', 'asc')->orderBy('time', 'asc');
             } else {
-                $query->latest();
+                $query->orderBy('date', 'desc')->orderBy('time', 'desc');
             }
 
-            $events = $query->latest()->paginate(12);
+            $events = $query->paginate(12);
 
             if ($events->isEmpty()) {
                 return response()->json([

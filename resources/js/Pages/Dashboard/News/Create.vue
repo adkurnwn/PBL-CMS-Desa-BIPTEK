@@ -12,7 +12,7 @@ import CategoryInput from "@/Components/DashboardComponent/CategoryInput.vue";
 import ImageUploader from "@/Components/DashboardComponent/ImageUploader.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
-import { watch, ref } from 'vue';
+import { watch, ref, computed } from 'vue';
 import PreviewBerita from "@/Components/DashboardComponent/PreviewBerita.vue";
 import CheckboxField from "@/Components/DashboardComponent/CheckboxField.vue";
 import VideoUploader from "@/Components/DashboardComponent/VideoUploader.vue";
@@ -149,6 +149,20 @@ const submit = (isDraft = false) => {
         forceFormData: true,
     });
 };
+
+// Add title validation computed property
+const titleError = computed(() => {
+    if (!form.title) return null;
+    
+    // Check if title contains only symbols/special characters
+    const hasAlphanumeric = /[a-zA-Z0-9\u00C0-\u017F\u0100-\u024F\u1E00-\u1EFF]/.test(form.title);
+    
+    if (!hasAlphanumeric) {
+        return 'Judul berita tidak boleh hanya berisi simbol.';
+    }
+    
+    return null;
+});
 </script>
 
 <template>
@@ -242,7 +256,7 @@ const submit = (isDraft = false) => {
                             <div>
                                 <SingleLineField id="title" v-model="form.title" type="text" class="mt-1 block w-full"
                                     fieldName="Judul Berita" required />
-                                <InputError :message="form.errors.title" class="mt-2" />
+                                <InputError :message="titleError || form.errors.title" class="mt-2" />
                             </div>
 
                             <CategoryInput fieldName="Kategori" v-model="form.category" :categories="categories"
