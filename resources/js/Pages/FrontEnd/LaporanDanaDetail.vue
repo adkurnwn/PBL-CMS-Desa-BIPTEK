@@ -90,13 +90,13 @@
                     </div>
                 </div>
                 <div class="mt-4">
-                <a v-if="dokumen.file"
-                   :href="`/storage/${dokumen.file}`"
-                   target="_blank"
+                <button v-if="dokumen.file"
+                  :href="`/storage/${dokumen.file}`"
+                   @click="handleDownload"
                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-accent2 hover:bg-accent1"
                 >
                   Unduh Laporan
-                </a>
+                </button>
               </div>
                 
               </div>
@@ -245,6 +245,27 @@ const fetchDokumen = async () => {
     console.error('Error fetching document:', err);
   } finally {
     loading.value = false;
+  }
+};
+
+const handleDownload = async () => {
+  try {
+    const response = await fetch(`/api/dana-desa/${props.slug}/download`);
+    const data = await response.json();
+    
+    if (data.success) {
+      // Create a temporary link element and trigger download
+      const link = document.createElement('a');
+      link.href = data.file_url;
+      link.download = ''; // This will use the filename from the server
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error('Download failed:', data.message);
+    }
+  } catch (error) {
+    console.error('Download error:', error);
   }
 };
 
