@@ -272,14 +272,14 @@ onUnmounted(() => {
                 <h1 class="xl:text-2xl text-xl font-semibold text-accent1 justify-center mt-8">Galeri Desa</h1>
                 <!-- Search Bar -->
                 <Search 
-                    class="lg:px-[3%]"
+                    class="px-[10%] text-accent1"
                     :model-value="searchQuery"
                     @update:model-value="handleSearchInput"
                     @search="handleSearch"
                     placeholder="Cari album galeri..."
                 ></Search>
                 <!-- Kategori Galeri -->
-                <div class="flex justify-end space-x-7 text-lg text-accent2 w-full max-w-screen">
+                <div class="flex justify-center space-x-7 text-lg text-accent2 w-full max-w-screen">
                     <!-- Always visible "Semua" button -->
                     <button 
                         class="hover:underline whitespace-nowrap"
