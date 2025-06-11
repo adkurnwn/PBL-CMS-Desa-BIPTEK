@@ -188,7 +188,7 @@ onUnmounted(() => {
             <div class="relative flex w-full flex-grow items-center justify-center max-w-7xl mx-auto mb-4">
             <div class="flex-grow mt-6">
                     <Search
-                        class="lg:px-[3%]"
+                        class="lg:px-[20%]"
                         type="with-filter"
                         :model-value="searchQuery"
                         @update:model-value="handleSearchInput"
@@ -279,7 +279,7 @@ onUnmounted(() => {
             
             <!-- Kategori Berita -->
             <div
-                class="flex items-center justify-center xl:justify-end w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 xl:text-lg text-sm text-accent1"
+                class="flex items-center justify-center w-full max-w-3xl mx-auto xl:space-x-7 space-x-5 xl:text-lg text-sm text-accent1"
             >
                 <!-- Always visible "Semua" button -->
                 <button
