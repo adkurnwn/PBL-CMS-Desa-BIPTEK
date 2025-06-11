@@ -62,8 +62,8 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
                 'info' => $request->session()->get('info'),
             ],
-            // Share the profile data with all requests
-            'profile' => Profile::first() ? [
+            // Share the profile data with all requests only when app is installed
+            'profile' => config('app.installed', false) && Profile::first() ? [
                 'primary_color' => Profile::first()->primary_color,
                 'secondary_color' => Profile::first()->secondary_color,
                 'logo' => Profile::first()->logo,

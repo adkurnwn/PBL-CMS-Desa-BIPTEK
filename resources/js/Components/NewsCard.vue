@@ -126,9 +126,9 @@ const processedContent = computed(() => {
                     </div>
 
                     <!-- Title and Content Section -->
-                    <div class="flex-1 flex flex-col px-4 min-h-32">
+                    <div class="flex-1 flex flex-col px-4 min-h-36">
                         <h2
-                            class="text-lg font-semibold text-accent1 line-clamp-2 overflow-hidden text-ellipsis text-justify"
+                            class="text-lg font-semibold text-accent1 line-clamp-2 overflow-hidden text-ellipsis text-justify title-two-lines"
                         >
                             {{ news.title }}
                         </h2>

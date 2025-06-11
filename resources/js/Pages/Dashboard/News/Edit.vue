@@ -162,6 +162,20 @@ const handleRichTextImageAdded = (imageFile) => {
 const handleRemoveExistingVideo = () => {
     form.remove_existing_video = true;
 };
+
+// Add title validation computed property
+const titleError = computed(() => {
+    if (!form.title) return null;
+    
+    // Check if title contains only symbols/special characters
+    const hasAlphanumeric = /[a-zA-Z0-9\u00C0-\u017F\u0100-\u024F\u1E00-\u1EFF]/.test(form.title);
+    
+    if (!hasAlphanumeric) {
+        return 'Judul berita tidak boleh hanya berisi simbol.';
+    }
+    
+    return null;
+});
 </script>
 
 <template>
@@ -261,7 +275,7 @@ const handleRemoveExistingVideo = () => {
                                     required 
                                     custom-width="100%"
                                 />
-                                <InputError :message="form.errors.title" class="mt-2" />
+                                <InputError :message="titleError || form.errors.title" class="mt-2" />
                             </div>
 
                             <!-- Category Field -->

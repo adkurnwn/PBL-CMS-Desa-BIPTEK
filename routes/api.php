@@ -49,6 +49,7 @@ Route::prefix('gallery')->group(function () {
 Route::prefix('dana-desa')->group(function () {
     Route::get('/', [DanaDesaController::class, 'index']);
     Route::get('/{slug}', [DanaDesaController::class, 'show']);
+    Route::get('/{slug}/download', [DanaDesaController::class, 'download']);
 });
 
 Route::prefix('produk-desa')->group(function () {

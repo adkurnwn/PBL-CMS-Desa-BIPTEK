@@ -51,12 +51,6 @@ class ProdukHukumSeeder extends Seeder
             $hasFile = $index % 2 == 0;
             $hasLink = !$hasFile && ($index % 3 == 0);
 
-            // Create mock file name if needed
-            $filename = null;
-            if ($hasFile) {
-                $filename = 'dokumen-' . ($index + 1) . '.pdf';
-            }
-
             // Select a random category ID
             $categoryId = $categoryIds[array_rand($categoryIds)];
 
@@ -69,8 +63,8 @@ class ProdukHukumSeeder extends Seeder
                 'slug' => SlugHelper::generateUniqueSlug(ProdukHukum::class, $data['title']),
                 'description' => $data['description'],
                 'category_id' => $categoryId,
-                'user_id' => rand(1, 3),
-                'file' => $hasFile ? 'produk-hukum-documents/' . $filename : null,
+                'user_id' => 1,
+                'file' => $hasFile ? 'produk-hukum-documents/document-dummy.pdf' : null,
                 'link' => $hasLink ? 'https://drive.google.com/file/example/produk-hukum-' . ($index + 1) : null,
                 'date' => $data['date'],
                 'is_moderate' => $isModerated,

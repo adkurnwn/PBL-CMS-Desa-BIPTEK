@@ -23,7 +23,12 @@ class StoreNewsRequest extends FormRequest
     {
 
         $rules = [
-            'title' => 'required|string|max:255',
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/[a-zA-Z0-9\p{L}\p{N}]/u'
+            ],
             'content' => 'required|string',
             'images' => 'required|array|max:5',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:10000',
@@ -45,5 +50,15 @@ class StoreNewsRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function messages()
+    {
+        return [
+            'title.required' => 'Judul berita wajib diisi.',
+            'title.string' => 'Judul berita harus berupa teks.',
+            'title.max' => 'Judul berita tidak boleh lebih dari 255 karakter.',
+            'title.regex' => 'Judul berita harus mengandung setidaknya satu huruf atau angka.',
+        ];
     }
 }
