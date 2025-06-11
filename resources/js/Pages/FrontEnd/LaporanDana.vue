@@ -117,6 +117,30 @@ const handlePageChange = (page) => {
   });
 };
 
+// Handle download
+const handleDownload = async (slug, event) => {
+  event.stopPropagation(); // Prevent navigation to detail page
+  
+  try {
+    const response = await fetch(`/api/dana-desa/${slug}/download`);
+    const data = await response.json();
+    
+    if (data.success) {
+      // Create a temporary link element and trigger download
+      const link = document.createElement('a');
+      link.href = data.file_url;
+      link.download = ''; // This will use the filename from the server
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error('Download failed:', data.message);
+    }
+  } catch (error) {
+    console.error('Download error:', error);
+  }
+};
+
 onMounted(async () => {
   await fetchLaporanDanaData();
   generateYearOptions();
@@ -193,11 +217,13 @@ onMounted(async () => {
 
         <!--Document Grid-->
         <div v-else>
-          <a v-for="(laporan, idx) in laporanDanaApi.data.value" :key="laporan.slug"
-            :href="`/dana-desa/${laporan.slug}`"
-            class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group"
-            style="text-decoration: none;">
-            <div class="flex-1 flex flex-col mt-2 truncate">
+          <div v-for="(laporan, idx) in laporanDanaApi.data.value" :key="laporan.slug"
+            class="flex items-center bg-white rounded-lg shadow px-4 py-1 mb-3 overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+            
+            <!-- Clickable content area -->
+            <a :href="`/dana-desa/${laporan.slug}`"
+              class="flex-1 flex flex-col mt-2 truncate cursor-pointer"
+              style="text-decoration: none;">
               <!-- Nomor & Judul -->
               <div class="flex items-center">
                 <span class="text-accent1 text-xs sm:text-sm flex-shrink-0">{{ idx + 1 }}.</span>
@@ -225,24 +251,23 @@ onMounted(async () => {
                   </span>
                 </div>
               </div>
-            </div>
-            <!--Tombol Download-->
+            </a>
+            
+            <!--Tombol Download - Outside the link-->
             <div class="ml-4">
-              <a v-if="laporan.file"
-                :href="`/storage/${laporan.file}`" 
-                target="_blank"
+              <button v-if="laporan.file"
+                @click="handleDownload(laporan.slug, $event)"
                 class="inline-flex items-center justify-center w-8 h-8 rounded text-accent1 bg-secondary hover:bg-yellow-500"
-                title="Download" 
-                @click.stop>
+                title="Download">
                 <span class="material-symbols-outlined">download</span>
-              </a>
+              </button>
               <div v-else
                 class="inline-flex items-center justify-center w-8 h-8 rounded bg-gray-500 text-white cursor-not-allowed"
                 title="File tidak tersedia">
                 <span class="material-symbols-outlined">download</span>
               </div>
             </div>
-          </a>
+          </div>
 
           <!-- Empty State -->
           <div v-if="!laporanDanaApi.data.value || laporanDanaApi.data.value.length === 0"
