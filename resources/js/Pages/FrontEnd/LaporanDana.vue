@@ -37,7 +37,6 @@ const laporanDanaApi = useApiFetch();
 const searchQuery = ref('');
 const selectedYear = ref('');
 
-
 const totalPages = computed(() => {
   if (!laporanDanaApi.pagination.value) return [];
   return Array.from({ length: laporanDanaApi.pagination.value.last_page }, (_, i) => i + 1);
@@ -59,22 +58,16 @@ const fetchLaporanDanaData = async ({
   await laporanDanaApi.fetchData(`/api/dana-desa?${params.toString()}`);
 };
 
+const {
+  searchQuery: filterSearchQuery,
+  handleSearch,
+  goToPage,
+} = useFilter(fetchLaporanDanaData);
+
 // Handle search input
 const handleSearchInput = () => {
-  fetchLaporanDanaData({
-    search: searchQuery.value.trim(),
-    page: 1
-  });
-};
-
-// Handle year selection
-const handleYearChange = () => {
-  fetchLaporanDanaData({
-    search: '',
-    year: selectedYear.value,
-    page: 1
-  });
-  searchQuery.value = ''; // reset kolom search agar tidak ambigu
+  filterSearchQuery.value = searchQuery.value.trim();
+  handleSearch();
 };
 
 // Handle Enter key press
@@ -82,6 +75,15 @@ const handleKeyPress = (event) => {
   if (event.key === 'Enter') {
     handleSearchInput();
   }
+};
+
+// Handle year selection
+const handleYearChange = () => {
+  fetchLaporanDanaData({
+    search: filterSearchQuery.value,
+    year: selectedYear.value,
+    page: 1
+  });
 };
 
 // Generate year options
@@ -110,11 +112,7 @@ function lihatDetail(slug) {
 
 // Handle pagination
 const handlePageChange = (page) => {
-  fetchLaporanDanaData({
-    search: searchQuery.value.trim(),
-    year: selectedYear.value,
-    page
-  });
+  goToPage(page);
 };
 
 onMounted(async () => {
@@ -164,7 +162,7 @@ onMounted(async () => {
           <div class="flex flex-wrap gap-2 text-sm mt-2 sm:mt-4 xl:mt-0 sm:justify-center xl:justify-end">
             <!-- Search Input -->
             <div class="relative">
-              <input v-model="searchQuery" @input="handleSearchInput" type="text"
+              <input v-model="searchQuery" @keypress="handleKeyPress" @blur="handleSearchInput" type="text"
                 placeholder="Cari laporan dana desa..."
                 class="border-gray-300 rounded px-3 py-1 sm:py-2 xl:py-2 bg-type1 text-type2 text-xxs sm:text-xs focus:outline-none focus:ring-0 w-60 sm:w-96 xl:w-80" />
               <span @click="handleSearchInput"
