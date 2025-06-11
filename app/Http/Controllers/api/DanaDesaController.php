@@ -25,6 +25,7 @@ class DanaDesaController extends Controller
         try {
             $search = $request->query('search');
             $sort = $request->query('sort');
+            $year = $request->query('year');
 
             $query = DanaDesa::query();
 
@@ -33,6 +34,11 @@ class DanaDesaController extends Controller
                     $q->where('title', 'like', '%' . $search . '%')
                         ->orWhere('date', 'like', '%' . $search . '%');
                 });
+            }
+
+            // Filter by year
+            if ($year) {
+                $query->whereYear('date', $year);
             }
 
             if ($sort === 'views') {
@@ -86,10 +92,50 @@ class DanaDesaController extends Controller
                 ], 404);
             }
             $this->statisticsService->trackContentView('dana_desa', $danaDesa->id, $request);
+            $danaDesa->increment('views');
 
             return response()->json([
                 'success' => true,
                 'data' => new DanaDesaDetail($danaDesa)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal Server Error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle file download and increment download count.
+     */
+    public function download($slug, Request $request)
+    {
+        try {
+            $danaDesa = DanaDesa::where('slug', $slug)->first();
+
+            if (!$danaDesa) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dana Desa not found'
+                ], 404);
+            }
+
+            if (!$danaDesa->file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File not available'
+                ], 404);
+            }
+
+            // Increment download count
+            $danaDesa->increment('downloads');
+
+            // Return file path for download
+            return response()->json([
+                'success' => true,
+                'file_url' => asset('storage/' . $danaDesa->file)
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
