@@ -67,7 +67,7 @@ onMounted(fetchData);
                         :produkDesa="produkDesa" />
                 </div>
                 <a href="produk-unggulan"
-                    class="text-lg md:text-xl xl:text-2xl font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 mt-6 xl:mt-8 ml-2 text-right justify-end">
+                    class="text-lg font-semibold text-secondary hover:text-secondary/75 transition-colors duration-500 mt-6 xl:mt-8 ml-2 text-right justify-end">
                     Selengkapnya >>
                 </a>
             </article>
@@ -116,9 +116,9 @@ onMounted(fetchData);
                         </p>
                     </a>
                     <!-- Grid 3 -->
-                    <a v-if="layout.demografi" href="/statistik-penduduk"
+                    <a v-if="layout.demografi" href="/data-demografi"
                         class="bg-secondary text-accent1 p-4 rounded-lg shadow-lg xl:w-60 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 text-center">
-                        <svg class="xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
+                        <svg class="xl:mt-1 sm:mt-1 -mt-1 ml-1 text-accent1" xmlns="http://www.w3.org/2000/svg" height="48px"
                             viewBox="0 -960 960 960" width="48px" fill="currentColor">
                             <path
                                 d="M40-160v-160q0-29 20.5-49.5T110-390h141q17 0 32.5 8.5T310-358q29 42 74 65t96 23q51 0 96-23t75-65q11-15 26-23.5t32-8.5h141q29 0 49.5 20.5T920-320v160H660v-119q-36 33-82.5 51T480-210q-51 0-97-18t-83-51v119H40Zm440-170q-35 0-67.5-16.5T360-392q-16-23-38.5-37T273-448q29-30 91-46t116-16q54 0 116.5 16t91.5 46q-26 5-48.5 19T601-392q-20 29-52.5 45.5T480-330ZM160-460q-45 0-77.5-32.5T50-570q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T160-460Zm640 0q-45 0-77.5-32.5T690-570q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T800-460ZM480-580q-45 0-77.5-32.5T370-690q0-46 32.5-78t77.5-32q46 0 78 32t32 78q0 45-32 77.5T480-580Z" />
@@ -132,7 +132,7 @@ onMounted(fetchData);
                         </p>
                     </a>
                     <!-- Grid 4 -->
-                    <a href="/aparat-desa"
+                    <a href="/struktur-organisasi"
                         class="bg-secondary text-accent1 text-center rounded-lg shadow-lg p-4 xl:w-8/12 sm:w-64 w-72 xl:h-44 sm:h-40 h-32 col-span-1">
                         <svg class="-ml-1 xl:mt-1 sm:mt-1 -mt-1 text-accent1" xmlns="http://www.w3.org/2000/svg"
                             height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor">
