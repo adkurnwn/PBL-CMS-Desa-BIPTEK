@@ -222,6 +222,28 @@ onMounted(() => {
                         <h3 class="mt-4 text-2xl font-medium text-gray-900">
                             Profile Desa
                         </h3>
+                        <!-- Kalimat Pengingat -->
+                        <div
+                            class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                        >
+                            <div class="flex items-center justify-center">
+                                <svg
+                                    class="w-5 h-5 text-yellow-600 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                <p class="text-yellow-800 text-sm font-medium">
+                                    Mohon lengkapi semua kolom untuk melanjutkan
+                                    ke tahap berikutnya
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     <form
                         @submit.prevent="submit"
@@ -237,7 +259,7 @@ onMounted(() => {
                                         id="email"
                                         v-model="form.email"
                                         type="email"
-                                        fieldName="Email"
+                                        fieldName="Email *"
                                         placeholder="Masukkan email desa"
                                         required
                                         custom-width="100%"
@@ -253,7 +275,7 @@ onMounted(() => {
                                         id="phone"
                                         v-model="form.phone"
                                         type="text"
-                                        fieldName="Nomor Telepon"
+                                        fieldName="Nomor Telepon *"
                                         placeholder="Masukkan nomor telepon desa"
                                         required
                                         custom-width="100%"
@@ -268,7 +290,7 @@ onMounted(() => {
                                     <DropdownFieldInput
                                         id="tipe_pemerintahan"
                                         v-model="form.tipe_pemerintahan"
-                                        fieldName="Tipe Pemerintahan"
+                                        fieldName="Tipe Pemerintahan *"
                                         placeholder="Pilih Tipe Pemerintahan"
                                         :options="[
                                             { value: 'desa', label: 'Desa' },
@@ -286,7 +308,7 @@ onMounted(() => {
                                     <DropdownFieldInput
                                         id="provinsi"
                                         v-model="form.provinsi"
-                                        fieldName="Provinsi"
+                                        fieldName="Provinsi *"
                                         placeholder="Pilih Provinsi"
                                         :options="
                                             provinces.map((p) => ({
@@ -311,11 +333,11 @@ onMounted(() => {
                                     <DropdownFieldInput
                                         id="kabupaten"
                                         v-model="form.kabupaten"
-                                        fieldName="Kabupaten"
+                                        fieldName="Kabupaten *"
                                         placeholder="Pilih Kabupaten"
                                         :options="
                                             regencies.map((r) => ({
-                                                value: r.id, // Add this line
+                                                value: r.id,
                                                 label: r.name,
                                             }))
                                         "
@@ -339,11 +361,11 @@ onMounted(() => {
                                     <DropdownFieldInput
                                         id="kecamatan"
                                         v-model="form.kecamatan"
-                                        fieldName="Kecamatan"
+                                        fieldName="Kecamatan *"
                                         placeholder="Pilih Kecamatan"
                                         :options="
                                             districts.map((d) => ({
-                                                value: d.id, // Add this line
+                                                value: d.id,
                                                 label: d.name,
                                             }))
                                         "
@@ -367,11 +389,11 @@ onMounted(() => {
                                     <DropdownFieldInput
                                         id="kelurahan"
                                         v-model="form.kelurahan"
-                                        fieldName="Kelurahan"
+                                        fieldName="Kelurahan *"
                                         placeholder="Pilih Kelurahan"
                                         :options="
                                             villages.map((v) => ({
-                                                value: v.id, // Add this line
+                                                value: v.id,
                                                 label: v.name,
                                             }))
                                         "
@@ -393,7 +415,7 @@ onMounted(() => {
                                         id="kode_pos"
                                         v-model="form.kode_pos"
                                         type="text"
-                                        fieldName="Kode Pos"
+                                        fieldName="Kode Pos *"
                                         required
                                         custom-width="100%"
                                     />
@@ -409,23 +431,17 @@ onMounted(() => {
                                         <SingleLineField
                                             id="fasilitas"
                                             v-model="newFasilitas"
-                                            type="text"
+                                            type="add"
                                             fieldName="Fasilitas"
                                             placeholder="Masukkan fasilitas desa"
                                             custom-width="100%"
-                                        />
-                                        <button
-                                            type="button"
                                             @click="addFasilitas"
-                                            class="px-3 py-2 bg-accent1 text-white rounded hover:bg-accent1/90"
-                                        >
-                                            Tambah
-                                        </button>
+                                        />
                                     </div>
 
                                     <!-- Display fasilitas as tags -->
                                     <div
-                                        class="mt-2 flex flex-wrap gap-2"
+                                        class="mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.6px] 3xl:mt-[1.8px] 4xl:mt-[2px] flex flex-wrap gap-[6.7px] sm:gap-[7.5px] md:gap-[8.5px] lg:gap-[9.2px] xl:gap-[10px] 2xl:gap-[11.5px] 3xl:gap-[13.3px] 4xl:gap-[15px]"
                                         v-if="form.fasilitas.length > 0"
                                     >
                                         <div
@@ -433,15 +449,49 @@ onMounted(() => {
                                                 fasilitas, index
                                             ) in form.fasilitas"
                                             :key="index"
-                                            class="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                                            class="bg-[#f3f4f6] h-[18.7px] sm:h-[21.1px] md:h-[23.7px] lg:h-[25.7px] xl:h-[28px] 2xl:h-[32px] 3xl:h-[37px] 4xl:h-[42px] px-[6px] sm:px-[7px] md:px-[8px] lg:px-[9px] xl:px-[10px] 2xl:px-[11.5px] 3xl:px-[13.3px] 4xl:px-[15px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex items-center gap-[0.9px] sm:gap-[1px] md:gap-[1.1px] lg:gap-[1.2px] xl:gap-[1.33px] 2xl:gap-[1.6px] 3xl:gap-[1.8px] 4xl:gap-[2px] shadow-[0_0.9px_0.9px_0px_rgba(0,0,0,0.25)] sm:shadow-[0_1px_1px_0px_rgba(0,0,0,0.25)] md:shadow-[0_1.1px_1.1px_0px_rgba(0,0,0,0.25)] lg:shadow-[0_1.2px_1.2px_0px_rgba(0,0,0,0.25)] xl:shadow-[0_1.33px_1.33px_0px_rgba(0,0,0,0.25)] 2xl:shadow-[0_1.6px_1.6px_0px_rgba(0,0,0,0.25)] 3xl:shadow-[0_1.8px_1.8px_0px_rgba(0,0,0,0.25)] 4xl:shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]"
                                         >
-                                            <span>{{ fasilitas }}</span>
+                                            <span
+                                                class="text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                                >{{ fasilitas }}</span
+                                            >
                                             <button
                                                 type="button"
-                                                @click="removeFasilitas(index)"
-                                                class="text-red-500 hover:text-red-700"
+                                                class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px] flex items-center justify-center focus:outline-none ml-[4px]"
+                                                @click.prevent="
+                                                    removeFasilitas(index)
+                                                "
                                             >
-                                                ×
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px]"
+                                                >
+                                                    <mask
+                                                        id="mask0_fasilitas"
+                                                        style="mask-type: alpha"
+                                                        maskUnits="userSpaceOnUse"
+                                                        x="0"
+                                                        y="0"
+                                                        width="20"
+                                                        height="20"
+                                                    >
+                                                        <rect
+                                                            width="20"
+                                                            height="20"
+                                                            fill="#D9D9D9"
+                                                        />
+                                                    </mask>
+                                                    <g
+                                                        mask="url(#mask0_fasilitas)"
+                                                    >
+                                                        <path
+                                                            d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
+                                                            fill="#DC3545"
+                                                        />
+                                                    </g>
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>
@@ -449,7 +499,8 @@ onMounted(() => {
                                         class="text-gray-500 text-sm ml-2"
                                         v-else
                                     >
-                                        Tambahkan fasilitas yang ada di desa
+                                        Tambahkan minimal satu fasilitas yang
+                                        ada di desa
                                     </p>
                                     <InputError
                                         :message="form.errors.fasilitas"
@@ -466,23 +517,17 @@ onMounted(() => {
                                         <SingleLineField
                                             id="lembaga"
                                             v-model="newLembaga"
-                                            type="text"
+                                            type="add"
                                             fieldName="Lembaga"
                                             placeholder="Masukkan nama lembaga desa"
                                             custom-width="100%"
-                                        />
-                                        <button
-                                            type="button"
                                             @click="addLembaga"
-                                            class="px-3 py-2 bg-accent1 text-white rounded hover:bg-accent1/90"
-                                        >
-                                            Tambah
-                                        </button>
+                                        />
                                     </div>
 
                                     <!-- Display lembaga as tags -->
                                     <div
-                                        class="mt-2 flex flex-wrap gap-2"
+                                        class="mt-[0.9px] sm:mt-[1px] md:mt-[1.1px] lg:mt-[1.2px] xl:mt-[1.33px] 2xl:mt-[1.6px] 3xl:mt-[1.8px] 4xl:mt-[2px] flex flex-wrap gap-[6.7px] sm:gap-[7.5px] md:gap-[8.5px] lg:gap-[9.2px] xl:gap-[10px] 2xl:gap-[11.5px] 3xl:gap-[13.3px] 4xl:gap-[15px]"
                                         v-if="form.lembaga.length > 0"
                                     >
                                         <div
@@ -490,15 +535,49 @@ onMounted(() => {
                                                 lembaga, index
                                             ) in form.lembaga"
                                             :key="index"
-                                            class="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                                            class="bg-[#f3f4f6] h-[18.7px] sm:h-[21.1px] md:h-[23.7px] lg:h-[25.7px] xl:h-[28px] 2xl:h-[32px] 3xl:h-[37px] 4xl:h-[42px] px-[6px] sm:px-[7px] md:px-[8px] lg:px-[9px] xl:px-[10px] 2xl:px-[11.5px] 3xl:px-[13.3px] 4xl:px-[15px] rounded-[2.2px] sm:rounded-[2.5px] md:rounded-[2.9px] lg:rounded-[3.1px] xl:rounded-[3.33px] 2xl:rounded-[3.8px] 3xl:rounded-[4.4px] 4xl:rounded-[5px] flex items-center gap-[0.9px] sm:gap-[1px] md:gap-[1.1px] lg:gap-[1.2px] xl:gap-[1.33px] 2xl:gap-[1.6px] 3xl:gap-[1.8px] 4xl:gap-[2px] shadow-[0_0.9px_0.9px_0px_rgba(0,0,0,0.25)] sm:shadow-[0_1px_1px_0px_rgba(0,0,0,0.25)] md:shadow-[0_1.1px_1.1px_0px_rgba(0,0,0,0.25)] lg:shadow-[0_1.2px_1.2px_0px_rgba(0,0,0,0.25)] xl:shadow-[0_1.33px_1.33px_0px_rgba(0,0,0,0.25)] 2xl:shadow-[0_1.6px_1.6px_0px_rgba(0,0,0,0.25)] 3xl:shadow-[0_1.8px_1.8px_0px_rgba(0,0,0,0.25)] 4xl:shadow-[0_2px_2px_0px_rgba(0,0,0,0.25)]"
                                         >
-                                            <span>{{ lembaga }}</span>
+                                            <span
+                                                class="text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] 4xl:text-[18px]"
+                                                >{{ lembaga }}</span
+                                            >
                                             <button
                                                 type="button"
-                                                @click="removeLembaga(index)"
-                                                class="text-red-500 hover:text-red-700"
+                                                class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px] flex items-center justify-center focus:outline-none ml-[4px]"
+                                                @click.prevent="
+                                                    removeLembaga(index)
+                                                "
                                             >
-                                                ×
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20"
+                                                    fill="none"
+                                                    class="w-[8.9px] h-[8.9px] sm:w-[10.1px] sm:h-[10.1px] md:w-[11.5px] md:h-[11.5px] lg:w-[12.5px] lg:h-[12.5px] xl:w-[13.3px] xl:h-[13.3px] 2xl:w-[15.4px] 2xl:h-[15.4px] 3xl:w-[17.5px] 3xl:h-[17.5px] 4xl:w-[20px] 4xl:h-[20px]"
+                                                >
+                                                    <mask
+                                                        id="mask0_lembaga"
+                                                        style="mask-type: alpha"
+                                                        maskUnits="userSpaceOnUse"
+                                                        x="0"
+                                                        y="0"
+                                                        width="20"
+                                                        height="20"
+                                                    >
+                                                        <rect
+                                                            width="20"
+                                                            height="20"
+                                                            fill="#D9D9D9"
+                                                        />
+                                                    </mask>
+                                                    <g
+                                                        mask="url(#mask0_lembaga)"
+                                                    >
+                                                        <path
+                                                            d="M6.99967 14.166L5.83301 12.9993L8.83301 9.99935L5.83301 7.02018L6.99967 5.85352L9.99967 8.85352L12.9788 5.85352L14.1455 7.02018L11.1455 9.99935L14.1455 12.9993L12.9788 14.166L9.99967 11.166L6.99967 14.166Z"
+                                                            fill="#DC3545"
+                                                        />
+                                                    </g>
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>
@@ -506,7 +585,8 @@ onMounted(() => {
                                         class="text-gray-500 text-sm ml-2"
                                         v-else
                                     >
-                                        Tambahkan lembaga yang ada di desa
+                                        Tambahkan minimal satu lembaga yang ada
+                                        di desa
                                     </p>
                                     <InputError
                                         :message="form.errors.lembaga"
@@ -517,9 +597,9 @@ onMounted(() => {
                                 <div>
                                     <ImageInput
                                         v-model="form.logo"
-                                        label="Logo Desa"
+                                        label="Village Logo"
                                         :error="form.errors.logo"
-                                        required
+                                        image-height="80px"
                                     />
                                     <InputError
                                         :message="form.errors.logo"
@@ -530,9 +610,10 @@ onMounted(() => {
                                 <div>
                                     <ImageInput
                                         v-model="form.organization_image"
-                                        label="Struktur Organisasi"
+                                        label="Struktur Organisasi *"
                                         :error="form.errors.organization_image"
                                         required
+                                        image-height="250px"
                                     />
                                     <InputError
                                         :message="
@@ -547,7 +628,7 @@ onMounted(() => {
                                     <div>
                                         <ImageInput
                                             v-model="form.hero_image_1"
-                                            label="Hero Image 1"
+                                            label="Hero Image 1 *"
                                             :error="form.errors.hero_image_1"
                                             required
                                         />
@@ -555,7 +636,7 @@ onMounted(() => {
                                     <div>
                                         <ImageInput
                                             v-model="form.hero_image_2"
-                                            label="Hero Image 2"
+                                            label="Hero Image 2 *"
                                             :error="form.errors.hero_image_2"
                                             required
                                         />
@@ -563,7 +644,7 @@ onMounted(() => {
                                     <div>
                                         <ImageInput
                                             v-model="form.hero_image_3"
-                                            label="Hero Image 3"
+                                            label="Hero Image 3 *"
                                             :error="form.errors.hero_image_3"
                                             required
                                         />
@@ -575,7 +656,7 @@ onMounted(() => {
                                         id="vision"
                                         v-model="form.vision"
                                         type="text"
-                                        fieldName="Visi"
+                                        fieldName="Visi *"
                                         placeholder="Masukkan visi desa"
                                         required
                                         custom-width="100%"
@@ -591,7 +672,7 @@ onMounted(() => {
                                         id="mission"
                                         v-model="form.mission"
                                         type="text"
-                                        fieldName="Misi"
+                                        fieldName="Misi *"
                                         placeholder="Masukkan misi desa"
                                         required
                                         custom-width="100%"
@@ -610,7 +691,7 @@ onMounted(() => {
                                 id="history"
                                 v-model="form.history"
                                 type="text"
-                                fieldName="Sejarah Desa"
+                                fieldName="Sejarah Desa *"
                                 placeholder="Masukkan sejarah desa"
                                 required
                                 custom-width="100%"
@@ -624,43 +705,17 @@ onMounted(() => {
                     </form>
                 </div>
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between">
-                    <Link
-                        :href="route('install.admin')"
-                        class="inline-flex justify-center rounded-md border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-                    >
-                        Kembali
+                    <Link :href="route('install.admin')">
+                        <SecondaryButton
+                            :disabled="form.processing"
+                            type="button"
+                        >
+                            Kembali
+                        </SecondaryButton>
                     </Link>
-                    <button
-                        type="button"
-                        @click="submit"
-                        :disabled="form.processing"
-                        class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2 disabled:opacity-70"
-                    >
-                        <span v-if="form.processing">
-                            <svg
-                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                ></circle>
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                            </svg>
-                            Sedang Memproses...
-                        </span>
-                        <span v-else>Simpan Profil</span>
-                    </button>
+                    <PrimaryButton :disabled="form.processing" @click="submit">
+                        Simpan Profile Desa
+                    </PrimaryButton>
                 </div>
             </div>
             <!-- Installation progress -->

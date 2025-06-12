@@ -1,6 +1,8 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
     requirements: Object,
@@ -184,22 +186,13 @@ const canContinue = computed(() => {
 
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between">
-                    <Link
-                        href="/install"
-                        class="inline-flex justify-center rounded-md border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-                    >
-                        Kembali
+                    <Link href="/install">
+                        <SecondaryButton> Kembali </SecondaryButton>
                     </Link>
-                    <Link
-                        :href="canContinue ? '/install/permissions' : '#'"
-                        :class="[
-                            'inline-flex justify-center rounded-md border border-transparent py-2 px-6 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2',
-                            canContinue
-                                ? 'bg-accent1 hover:bg-accent1/90 focus:ring-accent1'
-                                : 'bg-gray-400 cursor-not-allowed',
-                        ]"
-                    >
-                        Lanjutkan
+                    <Link :href="canContinue ? '/install/permissions' : '#'">
+                        <PrimaryButton :disabled="!canContinue">
+                            Lanjutkan
+                        </PrimaryButton>
                     </Link>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 </script>
 
 <template>
@@ -93,11 +94,8 @@ import { Link } from "@inertiajs/vue3";
 
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end">
-                    <Link
-                        href="/install/requirements"
-                        class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-                    >
-                        Mulai Instalasi
+                    <Link href="/install/requirements">
+                        <PrimaryButton> Mulai Instalasi </PrimaryButton>
                     </Link>
                 </div>
             </div>

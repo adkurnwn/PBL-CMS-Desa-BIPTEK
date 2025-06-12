@@ -2,6 +2,8 @@
 import { Link, useForm } from "@inertiajs/vue3";
 import { ref } from "vue";
 import ImageInput from "@/Components/DashboardComponent/ImageInput.vue";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const form = useForm({
     name: "",
@@ -56,7 +58,7 @@ const submit = () => {
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             height="80"
-                            viewBox="0 -960 960 960"
+                            viewBox="http://www.w3.org/2000/svg"
                             width="80"
                             class="mx-auto text-accent1 fill-current"
                         >
@@ -67,6 +69,27 @@ const submit = () => {
                         <h3 class="mt-4 text-2xl font-medium text-gray-900">
                             Akun Administrator
                         </h3>
+                        <div
+                            class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                        >
+                            <div class="flex items-center justify-center">
+                                <svg
+                                    class="w-5 h-5 text-yellow-600 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                <p class="text-yellow-800 text-sm font-medium">
+                                    Mohon lengkapi semua kolom untuk melanjutkan
+                                    ke tahap berikutnya
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <form @submit.prevent="submit" class="space-y-6">
@@ -85,7 +108,7 @@ const submit = () => {
                                     <label
                                         for="name"
                                         class="block text-sm font-medium text-gray-700"
-                                        >Nama</label
+                                        >Nama *</label
                                     >
                                     <div class="mt-1">
                                         <input
@@ -109,7 +132,7 @@ const submit = () => {
                                     <label
                                         for="email"
                                         class="block text-sm font-medium text-gray-700"
-                                        >Email</label
+                                        >Email *</label
                                     >
                                     <div class="mt-1">
                                         <input
@@ -133,7 +156,7 @@ const submit = () => {
                                     <label
                                         for="password"
                                         class="block text-sm font-medium text-gray-700"
-                                        >Password</label
+                                        >Password *</label
                                     >
                                     <div class="mt-1">
                                         <input
@@ -157,7 +180,7 @@ const submit = () => {
                                     <label
                                         for="password_confirmation"
                                         class="block text-sm font-medium text-gray-700"
-                                        >Konfirmasi Password</label
+                                        >Konfirmasi Password *</label
                                     >
                                     <div class="mt-1">
                                         <input
@@ -176,7 +199,7 @@ const submit = () => {
                                 <!-- Photo Profile Upload - Using ImageInput component -->
                                 <ImageInput
                                     v-model="form.photo_profile"
-                                    label="Foto Profil"
+                                    label="Foto Profil *"
                                     :error="form.errors.photo_profile"
                                     :current-image="null"
                                     image-height="200px"
@@ -216,43 +239,14 @@ const submit = () => {
 
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between">
-                    <Link
-                        href="/install/database"
-                        class="inline-flex justify-center rounded-md border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-                    >
-                        Kembali
+                    <Link href="/install/database">
+                        <SecondaryButton>Kembali </SecondaryButton>
                     </Link>
-                    <button
-                        type="button"
+                    <PrimaryButton
                         @click="submit"
                         :disabled="loading || form.processing"
-                        class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2 disabled:opacity-70"
+                        >Buat Admin & Lanjutkan</PrimaryButton
                     >
-                        <span v-if="loading || form.processing">
-                            <svg
-                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                ></circle>
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                ></path>
-                            </svg>
-                            Sedang Memproses...
-                        </span>
-                        <span v-else>Buat Admin & Lanjutkan</span>
-                    </button>
                 </div>
             </div>
 

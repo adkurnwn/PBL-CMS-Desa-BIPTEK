@@ -2,6 +2,8 @@
 import { Link, useForm } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 import axios from "axios";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 
 const props = defineProps({
     currentConfig: Object,
@@ -19,9 +21,20 @@ const form = useForm({
 const loading = ref(false);
 const errorMessage = ref("");
 const testStatus = ref(null);
+const connectionTested = ref(false); // Track if connection has been tested
+const connectionSuccessful = ref(false); // Track if the last test was successful
 
 const isFormValid = computed(() => {
     return form.host && form.port && form.database && form.username;
+});
+
+// Check if user can proceed (connection must be tested and successful)
+const canProceed = computed(() => {
+    return (
+        isFormValid.value &&
+        connectionTested.value &&
+        connectionSuccessful.value
+    );
 });
 
 const testConnection = async () => {
@@ -29,6 +42,8 @@ const testConnection = async () => {
 
     loading.value = true;
     testStatus.value = "testing";
+    connectionTested.value = false;
+    connectionSuccessful.value = false;
 
     const testData = {
         host: form.host,
@@ -44,16 +59,22 @@ const testConnection = async () => {
             testData
         );
         loading.value = false;
+        connectionTested.value = true;
+
         if (response.data.success) {
             testStatus.value = "success";
+            connectionSuccessful.value = true;
         } else {
             testStatus.value = "failed";
+            connectionSuccessful.value = false;
             errorMessage.value =
                 response.data.message || "Database connection failed.";
         }
     } catch (error) {
         loading.value = false;
         testStatus.value = "failed";
+        connectionTested.value = true;
+        connectionSuccessful.value = false;
         errorMessage.value =
             error.response?.data?.message ||
             "An error occurred while testing the database connection.";
@@ -61,8 +82,18 @@ const testConnection = async () => {
     }
 };
 
+// Reset connection status when form values change
+const resetConnectionStatus = () => {
+    if (connectionTested.value) {
+        connectionTested.value = false;
+        connectionSuccessful.value = false;
+        testStatus.value = null;
+        errorMessage.value = "";
+    }
+};
+
 const submit = () => {
-    if (!isFormValid.value) return;
+    if (!canProceed.value) return;
 
     loading.value = true;
     errorMessage.value = "";
@@ -118,6 +149,29 @@ const submit = () => {
                         <h3 class="mt-4 text-2xl font-medium text-gray-900">
                             Koneksi Database
                         </h3>
+
+                        <!-- Warning message untuk uji koneksi -->
+                        <div
+                            class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                        >
+                            <div class="flex items-center justify-center">
+                                <svg
+                                    class="w-5 h-5 text-yellow-600 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                <p class="text-yellow-800 text-sm font-medium">
+                                    Wajib melakukan uji koneksi database dan
+                                    berhasil sebelum dapat melanjutkan
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <form @submit.prevent="submit" class="space-y-6">
@@ -134,8 +188,21 @@ const submit = () => {
                             v-if="testStatus === 'success'"
                             class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-6"
                         >
-                            Koneksi database berhasil! Anda dapat melanjutkan ke
-                            langkah berikutnya.
+                            <div class="flex items-center">
+                                <svg
+                                    class="w-5 h-5 text-green-600 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                Koneksi database berhasil! Anda dapat
+                                melanjutkan ke langkah berikutnya.
+                            </div>
                         </div>
 
                         <!-- Database configuration form -->
@@ -145,12 +212,13 @@ const submit = () => {
                                 <label
                                     for="host"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Host Database</label
+                                    >Host Database *</label
                                 >
                                 <div class="mt-1">
                                     <input
                                         id="host"
                                         v-model="form.host"
+                                        @input="resetConnectionStatus"
                                         type="text"
                                         required
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
@@ -170,12 +238,13 @@ const submit = () => {
                                 <label
                                     for="port"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Port</label
+                                    >Port *</label
                                 >
                                 <div class="mt-1">
                                     <input
                                         id="port"
                                         v-model="form.port"
+                                        @input="resetConnectionStatus"
                                         type="text"
                                         required
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
@@ -195,12 +264,13 @@ const submit = () => {
                                 <label
                                     for="database"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Nama Database</label
+                                    >Nama Database *</label
                                 >
                                 <div class="mt-1">
                                     <input
                                         id="database"
                                         v-model="form.database"
+                                        @input="resetConnectionStatus"
                                         type="text"
                                         required
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
@@ -223,12 +293,13 @@ const submit = () => {
                                 <label
                                     for="username"
                                     class="block text-sm font-medium text-gray-700"
-                                    >Username</label
+                                    >Username *</label
                                 >
                                 <div class="mt-1">
                                     <input
                                         id="username"
                                         v-model="form.username"
+                                        @input="resetConnectionStatus"
                                         type="text"
                                         required
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
@@ -254,6 +325,7 @@ const submit = () => {
                                     <input
                                         id="password"
                                         v-model="form.password"
+                                        @input="resetConnectionStatus"
                                         type="password"
                                         class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent1 focus:border-accent1 sm:text-sm"
                                         placeholder="Database password"
@@ -320,78 +392,22 @@ const submit = () => {
 
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between">
-                    <Link
-                        href="/install/permissions"
-                        class="inline-flex justify-center rounded-md border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
-                    >
-                        Kembali
+                    <Link href="/install/permissions">
+                        <SecondaryButton>Kembali</SecondaryButton>
                     </Link>
                     <div class="space-x-2 flex">
-                        <button
-                            type="button"
+                        <PrimaryButton
                             @click="testConnection"
                             :disabled="loading || !isFormValid"
-                            class="inline-flex justify-center rounded-md border border-accent1 py-2 px-4 text-base font-medium text-accent1 shadow-sm hover:bg-accent1/10 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2 disabled:opacity-70"
+                            >Uji Koneksi</PrimaryButton
                         >
-                            <span v-if="testStatus === 'testing'">
-                                <svg
-                                    class="animate-spin -ml-1 mr-2 h-5 w-5 text-accent1 inline-block"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        class="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        stroke-width="4"
-                                    ></circle>
-                                    <path
-                                        class="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                </svg>
-                                Menguji...
-                            </span>
-                            <span v-else>Uji Koneksi</span>
-                        </button>
 
-                        <button
-                            type="button"
+                        <PrimaryButton
+                            v-if="!loading && !form.processing && canProceed"
                             @click="submit"
-                            :disabled="
-                                loading || form.processing || !isFormValid
-                            "
-                            class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2 disabled:opacity-70"
                         >
-                            <span v-if="loading || form.processing">
-                                <svg
-                                    class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        class="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        stroke-width="4"
-                                    ></circle>
-                                    <path
-                                        class="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                </svg>
-                                Menyimpan...
-                            </span>
-                            <span v-else>Simpan & Lanjutkan</span>
-                        </button>
+                            Simpan & Lanjutkan
+                        </PrimaryButton>
                     </div>
                 </div>
             </div>

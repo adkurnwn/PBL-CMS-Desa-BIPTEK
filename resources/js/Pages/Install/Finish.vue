@@ -1,5 +1,7 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
+import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
 </script>
 
 <template>
@@ -53,6 +55,10 @@ import { Link } from "@inertiajs/vue3";
                             </h4>
                             <ul class="list-disc pl-6 space-y-2 text-green-700">
                                 <li>
+                                    Masuk ke url "/login" untuk mengakses
+                                    halaman login admin
+                                </li>
+                                <li>
                                     Login ke dashboard admin menggunakan email
                                     dan password yang telah Anda buat
                                 </li>
@@ -94,9 +100,9 @@ import { Link } from "@inertiajs/vue3";
                                     silakan hubungi tim dukungan kami melalui
                                     email
                                     <a
-                                        href="mailto:support@biptek.id"
+                                        href="mailto:adkur1212@gmail.com"
                                         class="text-accent1 hover:underline"
-                                        >support@biptek.id</a
+                                        >adkur1212@gmail.com</a
                                     >
                                 </p>
                             </div>
@@ -106,13 +112,15 @@ import { Link } from "@inertiajs/vue3";
 
                 <!-- Footer/Actions -->
                 <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end">
+                    <a :href="route('home')" class="mr-2" target="_blank">
+                        <PrimaryButton>Ke Landing Page</PrimaryButton>
+                    </a>
                     <Link
                         :href="route('install.finalize')"
                         method="post"
                         as="button"
-                        class="inline-flex justify-center rounded-md border border-transparent bg-accent1 py-2 px-6 text-base font-medium text-white shadow-sm hover:bg-accent1/90 focus:outline-none focus:ring-2 focus:ring-accent1 focus:ring-offset-2"
                     >
-                        Ke Halaman Login
+                        <PrimaryButton>Ke Halaman Login</PrimaryButton>
                     </Link>
                 </div>
             </div>

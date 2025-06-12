@@ -1,12 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, Link } from "@inertiajs/vue3";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/DashboardComponent/InputError.vue";
 import PrimaryButton from "@/Components/DashboardComponent/PrimaryButton.vue";
 import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue";
-import JsonArrayInput from "@/Components/JsonArrayInput.vue";
 import ImageInput from "@/Components/DashboardComponent/ImageInput.vue";
 import { ref, onMounted, computed, watch } from "vue";
 import HeadingMenu from "@/Components/DashboardComponent/HeadingMenu.vue";
@@ -78,12 +75,14 @@ const form = useForm({
     vision: props.profile.vision,
     mission: props.profile.mission,
     tipe_pemerintahan: props.profile.tipe_pemerintahan,
-    media_sosial: parseJson(props.profile.media_sosial).length === 4 
-        ? parseJson(props.profile.media_sosial) 
-        : ['', '', '', ''], // [instagram, x, facebook, youtube]
-    batas_desa: parseJson(props.profile.batas_desa).length === 4 
-        ? parseJson(props.profile.batas_desa) 
-        : ['', '', '', ''], // [batas_utara, batas_timur, batas_selatan, batas_barat]
+    media_sosial:
+        parseJson(props.profile.media_sosial).length === 4
+            ? parseJson(props.profile.media_sosial)
+            : ["", "", "", ""], // [instagram, x, facebook, youtube]
+    batas_desa:
+        parseJson(props.profile.batas_desa).length === 4
+            ? parseJson(props.profile.batas_desa)
+            : ["", "", "", ""], // [batas_utara, batas_timur, batas_selatan, batas_barat]
     website: props.profile.website,
     primary_color: props.profile.primary_color,
     secondary_color: props.profile.secondary_color,
@@ -797,6 +796,7 @@ const removeLembaga = (index) => {
                                     :current-image="
                                         props.profile.organization_image
                                     "
+                                    image-height="250px"
                                 />
 
                                 <!-- Hero Images -->
