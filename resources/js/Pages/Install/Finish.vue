@@ -100,9 +100,9 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
                                     silakan hubungi tim dukungan kami melalui
                                     email
                                     <a
-                                        href="mailto:adkur1212@gmail.com"
+                                        href="mailto:info@biptek.com"
                                         class="text-accent1 hover:underline"
-                                        >adkur1212@gmail.com</a
+                                        >info@biptek.com</a
                                     >
                                 </p>
                             </div>
