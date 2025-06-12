@@ -6,6 +6,7 @@ use App\Services\StatisticsService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MetaCrawler\HomeController;
 use App\Http\Controllers\MetaCrawler\BeritaController;
+use App\Http\Controllers\MetaCrawler\GalleryController;
 use App\Http\Controllers\MetaCrawler\ProfileController;
 use App\Http\Controllers\MetaCrawler\ProdukHukumController;
 
@@ -94,9 +95,7 @@ Route::prefix('galeri')->group(function () {
 
     Route::get('/{slug}', function ($slug, StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Galeri', request());
-    return Inertia::render('FrontEnd/GaleriDetail', [
-        'slug' => $slug
-    ]);
+    return app(GalleryController::class)->show($slug);
     })->name('galeri.detail');
 });
 
