@@ -176,8 +176,7 @@ const handleCoordinatesUpdate = (coords) => {
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center justify-end">
-                    <a href="/struktur-organisasi">
+                <a href="/struktur-organisasi" class="flex items-center justify-end">
                     <p class="flex items-center xl:-mt-4 text-secondary text-lg">
                         Selengkapnya
                         <svg class="mt-0 w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"
@@ -186,8 +185,7 @@ const handleCoordinatesUpdate = (coords) => {
                                 d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z" />
                         </svg>
                     </p>
-                    </a>
-                </div>
+                </a>
             </div>
             <!-- Infrastruktur Desa -->
             <div class="flex flex-col w-full font-merriweather bg-type1">

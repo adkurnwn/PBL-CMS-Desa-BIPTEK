@@ -1,13 +1,35 @@
 <?php
 
 use Inertia\Inertia;
-use App\Models\Profile;
-use App\Services\StatisticsService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InstallController;
+use App\Services\StatisticsService;
 use App\Http\Controllers\MetaCrawler\HomeController;
 use App\Http\Controllers\MetaCrawler\BeritaController;
 use App\Http\Controllers\MetaCrawler\ProfileController;
 use App\Http\Controllers\MetaCrawler\ProdukHukumController;
+
+// routes/web.php
+
+Route::prefix('install')->name('install.')->group(function () {
+    Route::get('/', [InstallController::class, 'index'])->name('index');
+    Route::get('/requirements', [InstallController::class, 'requirements'])->name('requirements');
+    Route::get('/permissions', [InstallController::class, 'permissions'])->name('permissions');
+    Route::get('/database', [InstallController::class, 'database'])->name('database');
+    Route::post('/database', [InstallController::class, 'setDatabase'])->name('setDatabase');
+    Route::post('/database/test', [InstallController::class, 'testDatabaseConnection'])->name('testConnection'); // Add this line
+    Route::get('/admin', [InstallController::class, 'admin'])->name('admin');
+    Route::post('/admin', [InstallController::class, 'setAdmin'])->name('setAdmin');
+    Route::get('/setup-profile', [InstallController::class, 'setupProfile'])->name('setupProfile');
+    Route::post('/setup-profile', [InstallController::class, 'storeProfile'])->name('storeProfile');
+    Route::get('/finish', [InstallController::class, 'finish'])->name('finish');
+    Route::post('/finalize', [InstallController::class, 'finalize'])->name('finalize');
+});
+
+Route::fallback(function ($name = null) {
+    return app()->make(InstallController::class)->handleProfileNotFound($name);
+});
+
 
 Route::get('/', function (StatisticsService $statisticsService) {
     $statisticsService->trackFeatureVisit('Home', request());

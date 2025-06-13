@@ -120,6 +120,7 @@ class ProdukDesaController extends Controller
         if ($produkDesa->product_name !== $request->product_name) {
             $dataProduk['slug'] = SlugHelper::generateUniqueSlug(ProdukDesa::class, $request->product_name);
         }
+
         $produkDesa->update($dataProduk);
 
         if ($request->removed_images) {

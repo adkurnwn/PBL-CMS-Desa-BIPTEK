@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\DanaDesa;
 use App\Models\Demografi;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,19 +18,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(
             [
-                RoleSeeder::class,
                 PositionSeeder::class,
-                UserSeeder::class,
-                PermissionSeeder::class,
-                IndoRegionSeeder::class,
-                ProfileSeeder::class,
                 CategorySeeder::class,
-                EventSeeder::class,
                 GallerySeeder::class,
                 NewsSeeder::class,
-                ProdukDesaSeeder::class,
                 DanaDesaSeeder::class,
-                DemografiSeeder::class,
                 ProdukHukumSeeder::class,
             ]
         );

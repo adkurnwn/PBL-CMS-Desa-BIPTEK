@@ -14,11 +14,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Validation\UpdateThemeRequest;
 use App\Http\Requests\Validation\UpdateSettingsRequest;
-use App\Events\CacheInvalidationRequested; // Add this import
 
 class SettingsController extends Controller
 {
@@ -108,6 +108,10 @@ class SettingsController extends Controller
                 // Clear config cache to apply file drivers immediately
                 Artisan::call('config:clear');
 
+                // Update runtime config immediately (like InstallController)
+                Config::set('session.driver', 'file');
+                Config::set('cache.default', 'file');
+
                 // Step 2: Create backup of current database
                 $this->createDatabaseBackup();
 
@@ -115,12 +119,20 @@ class SettingsController extends Controller
                 $this->testDatabaseConnection($request);
 
                 // Step 4: Update database settings in .env
-                $envContent = File::get($envFilePath); // Re-read after file driver changes
+                $envContent = File::get($envFilePath);
                 $envContent = $this->updateDatabaseSettings($envContent, $request);
                 File::put($envFilePath, $envContent);
 
-                // Step 5: Clear config cache to reload new DB settings
-                Artisan::call('config:clear');
+                // Step 5: Update runtime database configuration (like InstallController)
+                Config::set('database.connections.mysql.host', $request->db_host);
+                Config::set('database.connections.mysql.port', $request->db_port);
+                Config::set('database.connections.mysql.database', $request->db_database);
+                Config::set('database.connections.mysql.username', $request->db_username);
+                Config::set('database.connections.mysql.password', $request->db_password);
+
+                // Refresh database connection (like InstallController)
+                DB::purge('mysql');
+                DB::reconnect('mysql');
 
                 // Step 6: Run migrations on new database
                 $this->runMigrationsOnNewDatabase();
@@ -152,8 +164,7 @@ class SettingsController extends Controller
 
                     Log::info("Original drivers restored after error");
                 } catch (Exception $restoreException) {
-                    // Log the restore failure but still show the original error
-                    $this->logHelper->logActivity('error', 'settings_restore', 'Failed to restore original drivers: ' . $restoreException->getMessage());
+                    Log::error('Failed to restore original drivers: ' . $restoreException->getMessage());
                 }
 
                 return redirect()->back()->with('error', 'Database change failed: ' . $e->getMessage());
@@ -224,12 +235,6 @@ class SettingsController extends Controller
                 }
 
                 $profile->update($profileData);
-
-                // Fire cache invalidation event when profile colors are updated
-                event(new CacheInvalidationRequested([
-                    'profile.layout',
-                    'profile.detail',
-                ]));
             }
         }
 
@@ -245,7 +250,6 @@ class SettingsController extends Controller
 
     public function updateTheme(UpdateThemeRequest $request)
     {
-
         // Update theme colors in the profile
         if ($request->filled('primary_color') || $request->filled('secondary_color')) {
             $profile = Profile::first();
@@ -264,12 +268,6 @@ class SettingsController extends Controller
             }
 
             $result = $profile->updateOrCreate(['id' => $profile->id ?? 1], $profileData);
-
-            // Fire cache invalidation event when theme colors are updated
-            event(new CacheInvalidationRequested([
-                'profile.layout',
-                'profile.detail',
-            ]));
         }
 
         // Handle favicon upload
@@ -427,8 +425,13 @@ class SettingsController extends Controller
 
     protected function switchToFileDrivers($envContent)
     {
+        // Update .env variables
         $envContent = $this->updateEnvVariable($envContent, 'SESSION_DRIVER', 'file');
         $envContent = $this->updateEnvVariable($envContent, 'CACHE_STORE', 'file');
+
+        // Force immediate runtime configuration changes (like InstallController)
+        Config::set('session.driver', 'file');
+        Config::set('cache.default', 'file');
 
         $this->logHelper->logActivity('update', 'drivers', 'Switched to file-based session and cache drivers');
 
