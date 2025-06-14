@@ -272,7 +272,7 @@ onUnmounted(() => {
                 <h1 class="xl:text-2xl text-xl font-semibold text-accent1 justify-center mt-8">Galeri Desa</h1>
                 <!-- Search Bar -->
                 <Search 
-                    class="px-[10%] text-accent1"
+                    class="px-[14%] text-accent1"
                     :model-value="searchQuery"
                     @update:model-value="handleSearchInput"
                     @search="handleSearch"
