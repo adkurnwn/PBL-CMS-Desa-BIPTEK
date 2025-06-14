@@ -122,9 +122,6 @@ const socialMedia = computed(() =>
                     <p class="text-white hover:text-yellow-600 cursor-pointer">
                         <a href="/produk-unggulan">Produk Unggulan</a>
                     </p>
-                    <p class="text-white hover:text-yellow-600 cursor-pointer">
-                        <a href="">Feedback & Saran</a>
-                    </p>
                 </div>
             </div>
         </div>
