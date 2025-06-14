@@ -188,7 +188,7 @@ onUnmounted(() => {
             <div class="relative flex w-full flex-grow items-center justify-center max-w-7xl mx-auto mb-4">
             <div class="flex-grow mt-6">
                     <Search
-                        class="lg:px-[20%]"
+                        class="lg:px-[3%]"
                         type="with-filter"
                         :model-value="searchQuery"
                         @update:model-value="handleSearchInput"
