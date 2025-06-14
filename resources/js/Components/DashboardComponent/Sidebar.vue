@@ -192,14 +192,20 @@ const toggleCommentModerator = () => {
 </script>
 
 <template>
+    <transition name="fade">
+    <div
+      v-if="!sidebarCollapsed"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden block"
+      @click="toggleSidebar"
+    ></div>
+  </transition>
     <!-- Sidebar container with relative positioning -->
-    <div class="flex">
+    <div class="flex absolute sm:block z-50">
         <!-- Main sidebar with dynamic width based on collapsed state -->
-        <div
-            class="h-full bg-white text-white fixed left-0 top-[60px] sm:top-[65px] md:top-[70px] xl:top-[73px] 2xl:top-[82px] 3xl:top-[88px] 4xl:top-[110px] overflow-hidden sidebar"
+        <div class="fixed h-full bg-accent2 sm:bg-white text-white  right-0 sm:left-0 top-[0px] pt-14 sm:pt-0 sm:top-[65px] md:top-[70px] xl:top-[73px] 2xl:top-[82px] 3xl:top-[88px] 4xl:top-[110px] overflow-hidden sidebar"
             :class="[
                 sidebarCollapsed
-                    ? 'w-[80px]'
+                    ? 'w-[0px] sm:w-[80px]'
                     : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px]',
             ]"
             :style="{
@@ -207,12 +213,11 @@ const toggleCommentModerator = () => {
             }"
         >
             <!-- Fixed Dashboard Menu at the top with 50px padding -->
-            <div
-                class="fixed bg-white pt-[30px] sm:pt-[35px] md:pt-[40px] xl:pt-[35px] 2xl:pt-[40px] 3xl:pt-[45px] 4xl:pt-[50px] pb-[10px] sm:pb-[12px] md:pb-[13px] xl:pb-[10px] 2xl:pb-[12px] 3xl:pb-[13px] 4xl:pb-[15px] z-10"
+            <div class="fixed bg-accent2 shadow-sm sm:bg-white text-white pt-[35px] sm:pt-[35px] md:pt-[40px] xl:pt-[35px] 2xl:pt-[40px] 3xl:pt-[45px] 4xl:pt-[50px] pb-[10px] sm:pb-[12px] md:pb-[13px] xl:pb-[10px] 2xl:pb-[12px] 3xl:pb-[13px] 4xl:pb-[15px] z-10"
                 :class="[
                     sidebarCollapsed
-                        ? 'w-[60px] pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]'
-                        : 'w-[230px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] xl:pl-[20px] pr-[12px]',
+                        ? 'w-[100px] pl-[0px] sm:pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px]'
+                        : 'w-[229px] sm:w-[250px] md:w-[266px] xl:w-[266px] 2xl:w-[300px] 3xl:w-[350px] 4xl:w-[400px] pl-[12px] xl:pl-[20px] pr-[12px]',
                 ]"
                 :style="{
                     transition: 'width 300ms ease-in-out',
@@ -221,7 +226,7 @@ const toggleCommentModerator = () => {
                 <!-- Dashboard menu stays fixed at left -->
                 <div
                     class="transition-all duration-300"
-                    :class="sidebarCollapsed ? '' : ''"
+                    :class="sidebarCollapsed ? 'w-0 hidden sm:block' : ''"
                     v-if="hasPermission('manage_home')"
                 >
                     <MenuBox
@@ -237,17 +242,13 @@ const toggleCommentModerator = () => {
             </div>
 
             <!-- Scrollable content with padding to account for the fixed Dashboard -->
-            <Scrollbar
-                :hideScrollbar="true"
-                :autoHide="true"
-                class="pt-[75px] sm:pt-[85px] md:pt-[95px] xl:pt-[85px] 2xl:pt-[95px] 3xl:pt-[105px] 4xl:pt-[113px] sidebar-scrollbar"
+            <Scrollbar :hideScrollbar="true" :autoHide="true" class="pt-[75px] sm:pt-[85px] md:pt-[95px] xl:pt-[85px] 2xl:pt-[95px] 3xl:pt-[105px] 4xl:pt-[113px] sidebar-scrollbar"
             >
                 <div
-                    class="pb-[100px] pl-[20px] sm:pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px] sm:pt-[0px]"
+                    class="pb-[100px] pl-[12px] sm:pl-[12px] xl:pl-[20px] 2xl:pl-[20px] 3xl:pl-[20px] 4xl:pl-[20px] sm:pt-[0px]"
                     :class="sidebarCollapsed ? 'pr-3 sm:pr-5' : 'pr-0'"
                 >
-                    <div
-                        class="space-y-[10px] sm:space-y-[11px] md:space-y-[12px] xl:space-y-[13px] 2xl:space-y-[15px] 3xl:space-y-[18px] 4xl:space-y-[20px]"
+                    <div class="space-y-[10px] sm:space-y-[11px] md:space-y-[12px] xl:space-y-[13px] 2xl:space-y-[15px] 3xl:space-y-[18px] 4xl:space-y-[20px]"
                         :class="sidebarCollapsed ? '' : 'pr-[12px]'"
                     >
                         <!-- User Management Section - Only show if user has user or role permissions -->
@@ -621,11 +622,10 @@ const toggleCommentModerator = () => {
         </div>
 
         <!-- Collapse button positioned outside the sidebar -->
-        <div
-            class="fixed z-20 top-[90px] sm:top-[100px] md:top-[110px] xl:top-[108px] 2xl:top-[122px] 3xl:top-[133px] 4xl:top-[160px]"
+        <div class="fixed z-20 top-[90px] sm:top-[100px] md:top-[110px] xl:top-[108px] 2xl:top-[122px] 3xl:top-[133px] 4xl:top-[160px]"
             :class="[
                 sidebarCollapsed
-                    ? 'left-[64px] xl:left-[64px] 2xl:left-[72px] 3xl:left-[76px] 4xl:left-[80px]'
+                    ? 'left-[2px] sm:left-[64px] xl:left-[64px] 2xl:left-[72px] 3xl:left-[76px] 4xl:left-[80px]'
                     : 'left-[230px] sm:left-[250px] md:left-[266px] xl:left-[266px] 2xl:left-[300px] 3xl:left-[350px] 4xl:left-[400px]',
             ]"
             :style="{
@@ -732,5 +732,14 @@ const toggleCommentModerator = () => {
     flex-shrink: 0;
     position: relative;
     left: 0;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to, .fade-leave-from {
+  opacity: 1;
 }
 </style>

@@ -131,11 +131,11 @@ const handleSidebarCollapse = (collapsed) => {
 
             <!-- Main Content with Custom Scrollbar -->
             <div 
-                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative pl-[22px] 4xl:pl-[29px] justify-start w-full"
+                class="flex-1 flex flex-col overflow-hidden transition-all duration-300 relative pl-[10px] sm:pl-[22px] 4xl:pl-[29px] justify-start w-full"
                 :class="
                     sidebarCollapsed 
-                    ? 'ml-[64px] xl:ml-[64px] 2xl:ml-[72px] 3xl:ml-[76px] 4xl:ml-[80px] w-[calc(100%-64px)] xl:w-[calc(100%-64px)] 2xl:w-[calc(100%-72px)] 3xl:w-[calc(100%-76px)] 4xl:w-[calc(100%-80px)]' 
-                    : 'ml-[230px] sm:ml-[250px] md:ml-[266px] xl:ml-[266px] 2xl:ml-[300px] 3xl:ml-[350px] 4xl:ml-[400px] w-[calc(100%-230px)] sm:w-[calc(100%-250px)] md:w-[calc(100%-266px)] xl:w-[calc(100%-266px)] 2xl:w-[calc(100%-300px)] 3xl:w-[calc(100%-350px)] 4xl:w-[calc(100%-400px)]'
+                    ? 'sm:ml-[64px] xl:ml-[64px] 2xl:ml-[72px] 3xl:ml-[76px] 4xl:ml-[80px] w-[calc(100%-64px)] xl:w-[calc(100%-64px)] 2xl:w-[calc(100%-72px)] 3xl:w-[calc(100%-76px)] 4xl:w-[calc(100%-80px)]' 
+                    : 'ml-[1px] sm:ml-[250px] md:ml-[266px] xl:ml-[266px] 2xl:ml-[300px] 3xl:ml-[350px] 4xl:ml-[400px] w-[calc(100%-230px)] sm:w-[calc(100%-250px)] md:w-[calc(100%-266px)] xl:w-[calc(100%-266px)] 2xl:w-[calc(100%-300px)] 3xl:w-[calc(100%-350px)] 4xl:w-[calc(100%-400px)]'
                 "
             >
                 <!-- Page Heading - Fixed position relative to parent -->
@@ -152,8 +152,6 @@ const handleSidebarCollapse = (collapsed) => {
                         </div>
                     </div>
                 </div>
-
-                
 
                 <div v-if="$slots['tab-devider']" class=" pt-[7px] sm:pt-[8px] md:pt-[9px] xl:pt-[7px] 2xl:pt-[8px] 3xl:pt-[10px] 4xl:pt-[11px]">
                     <slot name="tab-devider"></slot>

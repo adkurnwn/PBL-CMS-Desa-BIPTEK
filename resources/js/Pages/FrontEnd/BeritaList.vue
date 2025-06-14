@@ -200,7 +200,7 @@ onUnmounted(() => {
                     <!-- Filter Dropdown -->
                     <div
                         v-if="showFilterModal"
-                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl w-80 z-50"
+                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl w-80 z-10"
                         :class="{
                             'right-0': true,
                             'left-0 sm:left-auto sm:right-0': true
@@ -377,13 +377,13 @@ onUnmounted(() => {
                     <!-- Dropdown menu -->
                     <div 
                         v-if="showDropdown"
-                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl min-w-48 max-h-64 overflow-y-auto"
+                        class="absolute bg-white border border-gray-200 rounded-lg shadow-xl min-w-48 max-h-64 overflow-y-auto "
                         :style="{
                             top: '100%',
                             right: '0',
                             zIndex: 9999
                         }">
-                        <div class="py-1">
+                        <div class="py-1 z-10">
                             <!-- All categories in dropdown for extra small screens -->
                             <div class="sm:hidden">
                                 <button 
@@ -433,7 +433,7 @@ onUnmounted(() => {
                             </div>
                             
                             <!-- Remaining categories for xl screens -->
-                            <div class="hidden xl:block">
+                            <div class="hidden xl:block z-10">
                                 <button 
                                     v-for="category in categories.slice(6)" 
                                     :key="`dropdown-xl-${category.id}`"
