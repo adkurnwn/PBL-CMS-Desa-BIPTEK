@@ -39,7 +39,7 @@ const toggleExpand = () => {
         <button
             v-if="!collapsed"
             @click="toggleExpand"
-            class="w-full flex items-center justify-between py-2.5 transition duration-200 text-selectedText text-[10px] sm:text-[10px] md:text-[10px] xl:text-[10px] 2xl:text-[12px] 3xl:text-[13px] 4xl:text-[15px]"
+            class="w-full flex items-center justify-between py-1.5 transition duration-200 text-white sm:text-accent2 text-[10px] sm:text-[10px] md:text-[10px] xl:text-[10px] 2xl:text-[12px] 3xl:text-[13px] 4xl:text-[15px]"
         >
             <div class="flex items-center">
                 <span class="font-medium truncate max-w-[280px]">{{ title }}</span>
