@@ -46,7 +46,7 @@ defineProps({
                 <div class="px-3 mt-5">
                     <img
                         :src="getImageSrc(`/storage/${produkDesa.thumbnail}`)"
-                        :alt="produkDesa?.alt"
+                        :alt="produkDesa?.name || 'Produk UMKM'"
                         class="w-full h-[125px] md:h-60 rounded-[5px] overflow-hidden object-cover"
                         @error="handleImageError(`/storage/${produkDesa.thumbnail}`)"
                         loading="lazy"

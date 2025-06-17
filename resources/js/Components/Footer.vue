@@ -26,27 +26,27 @@ const socialMedia = computed(() =>
                     class="w-16 h-auto mb-4"
                 />
                 <div class="text-center md:text-left">
-                    <h1
+                    <h2
                         class="text-yellow-600 font-bold text-lg mb-2"
                     >
                         Pemerintah {{ layout.name }}
-                    </h1>
-                    <p
+                    </h2>
+                    <address
                         class="text-white text-sm md:text-base leading-relaxed"
                     >
                         {{ layout.name }}, Kecamatan {{ layout.kecamatan }},
                         {{ layout.kabupaten }}, Provinsi {{ layout.provinsi }}.
-                    </p>
+                    </address>
                 </div>
             </div>
 
             <!-- Contact & Social Media Section -->
             <div class="text-center md:text-left">
-                <h1
+                <h2
                     class="text-yellow-600 font-bold text-lg mb-4"
                 >
                     Kontak & Media Sosial
-                </h1>
+                </h2>
                 <div class="space-y-3">
                     <div class="flex justify-center md:justify-start space-x-4 mb-4">
                         <a 
@@ -127,11 +127,13 @@ const socialMedia = computed(() =>
         </div>
     </div>
     <div class="bg-accent1 py-4">
+        <a href="https://www.biptek.com/" target="_blank" rel="noopener noreferrer">
         <p
             class="text-center text-white font-merriweather font-thin text-xs md:text-sm"
         >
             © 2025 Powered by PT BIPTEK Tokodata Indonesia
         </p>
+        </a>
     </div>
 </template>
 

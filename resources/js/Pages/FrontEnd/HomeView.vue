@@ -118,9 +118,9 @@ onMounted(() => {
 
       </div>
       <div class="absolute z-10 font-merriweather text-type1 mt-4 px-6 md:px-0">
-        <h1
+        <h2
           class=" justify-center items-center text-center text-4xl md:text-5xl 3xl:text-6xl 4xl:text-7xl font-semibold">
-          Selamat Datang</h1>
+          Selamat Datang</h2>
         <h2
           class=" justify-center items-center text-center text-md md:text-xl 3xl:text-2xl 4xl:text-3xl  font-thin mt-1 md:mt-4 3xl:mt-6">
           Sumber informasi terbaru tentang pemerintahan di {{ layout.name }}</h2>
@@ -158,9 +158,9 @@ onMounted(() => {
       <div class="px-[6.56%]">
         <!-- Berita Terbaru-->
         <article class="w-full flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2 my-3">
+          <h2 class="text-xl md:text-3xl font-semibold text-accent2 my-3">
             Berita Terbaru
-          </h1>
+          </h2>
 
           <div class="flex flex-col lg:flex-row justify-center gap-4 space-y-4 md:space-y-0 ">
             <!-- Loading State - Show skeleton cards -->
@@ -201,9 +201,9 @@ onMounted(() => {
 
         <!-- Event Terdekat-->
         <article class="w-full flex flex-col py-4 md:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2">
+          <h2 class="text-xl md:text-3xl font-semibold text-accent2">
             Event Terdekat
-          </h1>
+          </h2>
           <h2 class="text-sm md:text-xl text-black my-2 md:my-4 mb-4">
             <p class="italic">Informasi tentang event atau kegiatan terdekat Desa</p>
           </h2>
@@ -315,9 +315,9 @@ onMounted(() => {
 
         <!-- Produk Unggulan-->
         <article class="w-full flex flex-col py-6 lg:py-10 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2">
+          <h2 class="text-xl md:text-3xl font-semibold text-accent2">
             Produk Unggulan
-          </h1>
+          </h2>
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Produk unggulan desa yang berasal dari UMKM dan sumber daya alam desa</p>
           </h2>
@@ -339,9 +339,9 @@ onMounted(() => {
 
         <!-- Layanan Publik-->
         <article class="w-full flex flex-col py-6 4xl:py-0 4xl:mb-8 bg-type1 font-merriweather">
-          <h1 class="text-xl md:text-3xl font-semibold text-accent2">
+          <h2 class="text-xl md:text-3xl font-semibold text-accent2">
             Layanan Publik
-          </h1>
+          </h2>
           <h2 class="text-sm md:text-xl  text-black my-2 md:my-4 mb-4 ">
             <p class="italic">Pusat layanan dan informasi resmi dari Pemerintah Desa untuk masyarakat.</p>
           </h2>

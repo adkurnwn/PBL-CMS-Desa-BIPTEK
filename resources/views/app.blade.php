@@ -4,13 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- SEO Meta Tags -->
     @if(isset($page['props']['meta']))
         @foreach($page['props']['meta'] as $key => $value)
             @if(is_string($value))
                 <meta name="{{ $key }}" content="{{ $value }}">
             @endif
         @endforeach
+    @endif
+    @if(isset($page['props']['canonical']))
+        <link rel="canonical" href="{{ $page['props']['canonical'] }}">
+    @else
+        <link rel="canonical" href="{{ url()->current() }}">
     @endif
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
