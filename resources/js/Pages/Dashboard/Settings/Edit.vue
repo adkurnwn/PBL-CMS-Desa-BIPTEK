@@ -875,89 +875,91 @@ const testDatabaseConnection = () => {
                                 <div
                                     class="grid grid-cols-1 gap-4 md:grid-cols-2 p-[5.3px] sm:p-[6px] md:p-[6.7px] lg:p-[7.3px] xl:p-[8px] 2xl:p-[9.3px] 3xl:p-[10.7px] 4xl:p-[12px]"
                                 >
-                                    <!-- Primary Color -->
-                                    <div>
-                                        <InputLabel
-                                            for="primary_color"
-                                            value="Warna Utama"
-                                        />
-                                        <div
-                                            class="mt-2 flex items-center space-x-3"
-                                        >
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Primary Color -->
+                                        <div>
+                                            <InputLabel
+                                                for="primary_color"
+                                                value="Warna Utama"
+                                            />
                                             <div
-                                                v-for="(
-                                                    name, color
-                                                ) in colorOptions"
-                                                :key="color"
-                                                @click="
-                                                    themeForm.primary_color =
-                                                        color
+                                                class="mt-2 flex items-center space-x-3"
+                                            >
+                                                <div
+                                                    v-for="(
+                                                        name, color
+                                                    ) in colorOptions"
+                                                    :key="color"
+                                                    @click="
+                                                        themeForm.primary_color =
+                                                            color
+                                                    "
+                                                    :class="{
+                                                        'ring-2 ring-offset-2 ring-blue-500':
+                                                            themeForm.primary_color ===
+                                                            color,
+                                                    }"
+                                                    class="w-8 h-8 rounded-full cursor-pointer transition-all"
+                                                    :style="{
+                                                        backgroundColor: color,
+                                                    }"
+                                                    :title="name"
+                                                ></div>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Warna utama yang akan digunakan di
+                                                seluruh aplikasi web.
+                                            </p>
+                                            <InputError
+                                                :message="
+                                                    themeForm.errors.primary_color
                                                 "
-                                                :class="{
-                                                    'ring-2 ring-offset-2 ring-blue-500':
-                                                        themeForm.primary_color ===
-                                                        color,
-                                                }"
-                                                class="w-8 h-8 rounded-full cursor-pointer transition-all"
-                                                :style="{
-                                                    backgroundColor: color,
-                                                }"
-                                                :title="name"
-                                            ></div>
+                                                class="mt-2"
+                                            />
                                         </div>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Warna utama yang akan digunakan di
-                                            seluruh aplikasi web.
-                                        </p>
-                                        <InputError
-                                            :message="
-                                                themeForm.errors.primary_color
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
 
-                                    <!-- Secondary Color Display (Read-only) -->
-                                    <div>
-                                        <InputLabel
-                                            for="secondary_color"
-                                            value="Warna Aksen (Otomatis)"
-                                        />
-                                        <div
-                                            class="mt-2 flex items-center space-x-3"
-                                        >
+                                        <!-- Secondary Color Display (Read-only) -->
+                                        <div>
+                                            <InputLabel
+                                                for="secondary_color"
+                                                value="Warna Aksen (Otomatis)"
+                                            />
                                             <div
-                                                class="w-8 h-8 rounded-full border-2 border-gray-300"
-                                                :style="{
-                                                    backgroundColor:
-                                                        themeForm.secondary_color,
-                                                }"
-                                                :title="
-                                                    secondaryColorOptions[
-                                                        themeForm
-                                                            .secondary_color
-                                                    ] || 'Auto-selected color'
+                                                class="mt-2 flex items-center space-x-3"
+                                            >
+                                                <div
+                                                    class="w-8 h-8 rounded-full border-2 border-gray-300"
+                                                    :style="{
+                                                        backgroundColor:
+                                                            themeForm.secondary_color,
+                                                    }"
+                                                    :title="
+                                                        secondaryColorOptions[
+                                                            themeForm
+                                                                .secondary_color
+                                                        ] || 'Auto-selected color'
+                                                    "
+                                                ></div>
+                                                <span class="text-sm text-gray-600">
+                                                    {{
+                                                        secondaryColorOptions[
+                                                            themeForm
+                                                                .secondary_color
+                                                        ] || "Auto-selected"
+                                                    }}
+                                                </span>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Warna aksen terpilih secara otomatis
+                                                berdasarkan warna utama.
+                                            </p>
+                                            <InputError
+                                                :message="
+                                                    themeForm.errors.secondary_color
                                                 "
-                                            ></div>
-                                            <span class="text-sm text-gray-600">
-                                                {{
-                                                    secondaryColorOptions[
-                                                        themeForm
-                                                            .secondary_color
-                                                    ] || "Auto-selected"
-                                                }}
-                                            </span>
+                                                class="mt-2"
+                                            />
                                         </div>
-                                        <p class="mt-1 text-sm text-gray-500">
-                                            Warna aksen terpilih secara otomatis
-                                            berdasarkan warna utama.
-                                        </p>
-                                        <InputError
-                                            :message="
-                                                themeForm.errors.secondary_color
-                                            "
-                                            class="mt-2"
-                                        />
                                     </div>
 
                                     <!-- Preview Section -->

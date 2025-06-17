@@ -33,7 +33,7 @@ const dropdownStyles = {
 </script>
 
 <template>
-    <header class="bg-accent1 shadow h-[60px] sm:h-[65px] md:h-[70px] xl:h-[74px] 2xl:h-[82px] 3xl:h-[88px] 4xl:h-[110px] text-white flex items-center fixed top-0 left-0 right-0 z-20">
+    <header class="bg-accent1 shadow h-[60px] sm:h-[65px] md:h-[70px] xl:h-[74px] 2xl:h-[82px] 3xl:h-[88px] 4xl:h-[110px] text-white flex items-center fixed top-0 left-0 right-0 z-[51]">
         <div class="flex justify-between items-center py-[12px] md:py-[15px] px-3 sm:px-4 md:px-[19px] w-full">
             <!-- Left Side -->
             <div class="flex items-center">
