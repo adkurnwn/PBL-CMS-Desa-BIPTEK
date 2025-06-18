@@ -36,7 +36,7 @@ class ProdukDesaController extends Controller
                 });
             }
 
-            $produkDesa = $query->latest()->paginate(12);
+            $produkDesa = $query->where('status', true)->latest()->paginate(12);
             if ($produkDesa->isEmpty()) {
                 return response()->json([
                     'success' => false,
@@ -102,6 +102,7 @@ class ProdukDesaController extends Controller
         try {
             $produkDesa = ProdukDesa::with(['images', 'user:id,name'])
                 ->where('slug', $slug)
+                ->where('status', true)
                 ->first();
 
             if (!$produkDesa) {
