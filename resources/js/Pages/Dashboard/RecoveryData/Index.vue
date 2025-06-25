@@ -111,9 +111,9 @@ const emptyStateMessage = "Tidak ada data pencadangan yang tersedia. Lakukan pen
             </h4>
             <p
                 class="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] 4xl:text-[20px] text-gray-600">
-                Dengan halaman ini Anda dapat membuat, mengunduh, dan memulihkan cadangan data untuk website CMS Desa
+                Dengan halaman ini Anda dapat membuat, mengunduh, dan memulihkan cadangan data untuk website CMS Waradesa
                 Anda.
-                Membuat cadangan akan menyimpan database dan semua file dari website CMS Desa. Secara default, pencadangan data
+                Membuat cadangan akan menyimpan database dan semua file dari website CMS Waradesa. Secara default, pencadangan data
                 dilakukan secara
                 otomatis setiap hari. 
             </p>

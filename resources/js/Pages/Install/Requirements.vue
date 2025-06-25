@@ -62,7 +62,7 @@ const canContinue = computed(() => {
 
                     <div class="text-gray-600 mb-6 space-y-4">
                         <p>
-                            CMS Desa BIPTEK memerlukan beberapa ekstensi PHP dan
+                            CMS Waradesa memerlukan beberapa ekstensi PHP dan
                             versi minimum tertentu untuk berfungsi dengan baik.
                             Periksa apakah server Anda memenuhi persyaratan
                             berikut:
@@ -274,7 +274,8 @@ const canContinue = computed(() => {
 
             <!-- Disclaimer -->
             <div class="text-center text-xs text-gray-500">
-                <p>CMS Desa BIPTEK &copy; {{ new Date().getFullYear() }}</p>
+                <p>CMS Waradesa &copy; {{ new Date().getFullYear() }}</p>
+                <p>Powered by PT BIPTEK Tokodata Indonesia</p>
                 <p>
                     Dibuat untuk membantu pembangunan digital desa di Indonesia
                 </p>

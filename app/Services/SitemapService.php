@@ -74,7 +74,7 @@ class SitemapService
             Url::create(route('event'))
                 ->setLastModificationDate(now())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
-                ->setPriority(0.8)
+                ->setPriority(0.4)
         );
 
         $sitemap->add(
@@ -109,6 +109,34 @@ class SitemapService
             Url::create(route('dana-desa'))
                 ->setLastModificationDate(now())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.6)
+        );
+
+        $sitemap->add(
+            Url::create(url('/produk-unggulan'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.7)
+        );
+
+        $sitemap->add(
+            Url::create(url('/galeri'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                ->setPriority(0.8)
+        );
+
+        $sitemap->add(
+            Url::create(url('/data-demografi'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+                ->setPriority(0.6)
+        );
+
+        $sitemap->add(
+            Url::create(url('/struktur-organisasi'))
+                ->setLastModificationDate(now())
+                ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
                 ->setPriority(0.6)
         );
     }
@@ -147,8 +175,7 @@ class SitemapService
                                 $thumbnailUrl,
                                 $news->title,
                                 strip_tags(substr($news->content, 0, 200)),
-                                $videoUrl,
-                                route('berita.show', $news->slug)
+                                $videoUrl
                             );
                         }
 

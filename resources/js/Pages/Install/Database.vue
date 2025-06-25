@@ -491,7 +491,8 @@ const submit = () => {
 
             <!-- Disclaimer -->
             <div class="text-center text-xs text-gray-500">
-                <p>CMS Desa BIPTEK &copy; {{ new Date().getFullYear() }}</p>
+                <p>CMS Waradesa &copy; {{ new Date().getFullYear() }}</p>
+                <p>Powered by PT BIPTEK Tokodata Indonesia</p>
                 <p>
                     Dibuat untuk membantu pembangunan digital desa di Indonesia
                 </p>

@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/event</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.4</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/informasi</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/profile</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/layanan</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/galeri</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/data-demografi</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/struktur-organisasi</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/1</loc>
+    <lastmod>2025-06-25T20:14:57+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68485fb27985f.webp</image:loc>
+    <image:caption>1</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/test-video2</loc>
+    <lastmod>2025-06-25T20:08:44+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68424c34b6874.webp</image:loc>
+    <image:caption>test video</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/68424c34b6874.webp</video:thumbnail_loc>
+    <video:title>test video2</video:title>
+    <video:description>&quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/685bf4dc015df_1750856924.mp4</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/seorang-pedagang-dawet-gerobak-di-kawasan-klaten-kota-mengungkapkan-keluh-kesahnya-terkait-penurunan-drastis-pendapatan-akibat-kurangnya</loc>
+    <lastmod>2025-06-12T21:40:08+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68481c4b0bfe8.webp</image:loc>
+    <image:caption>vide12</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/teds13131232t3rtrf-1748228633</loc>
+    <lastmod>2025-06-10T11:28:14+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6833da1a49dd5.webp</image:loc>
+    <image:caption>teds13131232t3rtrf</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/bubadibakoo</loc>
+    <lastmod>2025-06-10T10:10:41+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6844777e49e5a.webp</image:loc>
+    <image:caption>bubadibako</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/6844777e49e5a.webp</video:thumbnail_loc>
+    <video:title>bubadibakoo</video:title>
+    <video:description>(Fake dummy)Klaten, Jawa Tengah - Seorang pedagang dawet gerobak di kawasan Klaten Kota mengungkapkan keluh kesahnya terkait penurunan drastis pendapatan akibat kurangnya dukungan </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/D:\laragon\laragon\tmp\phpC573.tmp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/test-video2-1</loc>
+    <lastmod>2025-06-10T02:21:32+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68412a4739510.webp</image:loc>
+    <image:caption>test with richtext upload</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/efds23-1748169182</loc>
+    <lastmod>2025-06-10T02:12:38+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f1decd413.webp</image:loc>
+    <image:caption>efds23</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/peresmian-posyandu-baru-di-desa</loc>
+    <lastmod>2025-06-08T14:39:56+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68453e4c89502.webp</image:loc>
+    <image:caption>Peresmian Posyandu Baru di Desa</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/test-newplaceholder</loc>
+    <lastmod>2025-06-08T10:57:03+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68481c3be9015.webp</image:loc>
+    <image:caption>Test newplaceholder</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/234-1748067041</loc>
+    <lastmod>2025-06-08T00:39:03+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683162e1584d3.webp</image:loc>
+    <image:caption>234</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-video-1748183572</loc>
+    <lastmod>2025-06-08T00:28:35+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68332a14e7176.webp</image:loc>
+    <image:caption>tes video</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/68332a14e7176.webp</video:thumbnail_loc>
+    <video:title>tes video</video:title>
+    <video:description>tes</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/68332a1577962.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-123new-1748182225</loc>
+    <lastmod>2025-06-08T00:27:50+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683324d18a3db.webp</image:loc>
+    <image:caption>tes 123new</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/test-placeholder-with-more</loc>
+    <lastmod>2025-06-06T14:48:18+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/684129ec78b22.webp</image:loc>
+    <image:caption>test placeholder with more</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes123</loc>
+    <lastmod>2025-06-05T12:12:43+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683d125b0fb94.webp</image:loc>
+    <image:caption>tes123</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/123-1748184500</loc>
+    <lastmod>2025-06-05T00:22:27+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68332db470f7d.webp</image:loc>
+    <image:caption>123</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/77-mb</loc>
+    <lastmod>2025-06-04T22:04:41+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683d1352a3887.webp</image:loc>
+    <image:caption>77 mb</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/hello-there-1748183103</loc>
+    <lastmod>2025-06-01T21:53:37+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6833283fd0f0f.webp</image:loc>
+    <image:caption>hello there</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/ew34324d-1748184048</loc>
+    <lastmod>2025-06-01T21:52:26+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68332bf055e98.webp</image:loc>
+    <image:caption>ew34324d</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/new2222-1748182698</loc>
+    <lastmod>2025-06-01T20:53:56+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683326aa39661.webp</image:loc>
+    <image:caption>new2222</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tesss-2-1748066722</loc>
+    <lastmod>2025-05-26T11:40:52+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683161a2af789.webp</image:loc>
+    <image:caption>tesss</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/gfsfsd-1748170463</loc>
+    <lastmod>2025-05-25T22:13:45+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f6dfdc378.webp</image:loc>
+    <image:caption>gfsfsd</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/newnewnewn-1748180536</loc>
+    <lastmod>2025-05-25T20:42:32+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-123-1748163261</loc>
+    <lastmod>2025-05-25T20:41:06+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832dabd55ed1.webp</image:loc>
+    <image:caption>tes 123</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/teees-1748178763</loc>
+    <lastmod>2025-05-25T20:13:35+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6833174baed39.webp</image:loc>
+    <image:caption>teees</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes12321-1748178518</loc>
+    <lastmod>2025-05-25T20:08:39+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683316562c8e0.webp</image:loc>
+    <image:caption>tes12321</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/683316562c8e0.webp</video:thumbnail_loc>
+    <video:title>tes12321</video:title>
+    <video:description>
+                
+</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/68331657094dc.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/thumbnail-1748175849</loc>
+    <lastmod>2025-05-25T19:24:10+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68330be9cb263.webp</image:loc>
+    <image:caption>thumbnail</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/68330be9cb263.webp</video:thumbnail_loc>
+    <video:title>thumbnail</video:title>
+    <video:description>
+                
+ </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/68330beaa68f5.mp4</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-1748174873</loc>
+    <lastmod>2025-05-25T19:07:54+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683308197e56a.webp</image:loc>
+    <image:caption>tes</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/683308197e56a.webp</video:thumbnail_loc>
+    <video:title>tes</video:title>
+    <video:description>res
+                </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/6833081a5a01d.webm</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/2333333-1748174238</loc>
+    <lastmod>2025-05-25T18:57:19+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6833059e7412f.webp</image:loc>
+    <image:caption>2333333</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/6833059e7412f.webp</video:thumbnail_loc>
+    <video:title>2333333</video:title>
+    <video:description>Your browser does not </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/6833059f10de4.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/baru-1748173874</loc>
+    <lastmod>2025-05-25T18:51:14+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683304321619c.webp</image:loc>
+    <image:caption>baru</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/683304321619c.webp</video:thumbnail_loc>
+    <video:title>baru</video:title>
+    <video:description>Your browser does not </video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/6833043262dfb.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-1748173608</loc>
+    <lastmod>2025-05-25T18:46:49+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68330328a47a5.webp</image:loc>
+    <image:caption>tes</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/68330328a47a5.webp</video:thumbnail_loc>
+    <video:title>tes</video:title>
+    <video:description>{{VIDEO_PLACEHOLDER}}</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/6833032909f2d.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/233333-1748173569</loc>
+    <lastmod>2025-05-25T18:46:10+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68330301aef42.webp</image:loc>
+    <image:caption>233333</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/68330301aef42.webp</video:thumbnail_loc>
+    <video:title>233333</video:title>
+    <video:description>{{VIDEO_PLACEHOLDER}}</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/news-videos/683303024e043.webp</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/video-new-1748173014</loc>
+    <lastmod>2025-05-25T18:36:55+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683300d6ed9d5.webp</image:loc>
+    <image:caption>video new</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/683300d6ed9d5.webp</video:thumbnail_loc>
+    <video:title>video new</video:title>
+    <video:description>tes 12313123</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/videos/news/1748173015_EaglercraftX 1.8-u34 ultimate - YeelerYee544 - 2024-06-09 02-25-15.webm</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tesvideo-1748172778</loc>
+    <lastmod>2025-05-25T18:32:59+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832ffeae8b71.webp</image:loc>
+    <image:caption>tesvideo</image:caption>
+</image:image>
+    <video:video>
+    <video:thumbnail_loc>http://pbl-cms-desa-biptek.test/news-images/6832ffeae8b71.webp</video:thumbnail_loc>
+    <video:title>tesvideo</video:title>
+    <video:description>Your browser</video:description>
+    <video:content_loc>http://pbl-cms-desa-biptek.test/storage/videos/news/1748172779_screenrecord.webm</video:content_loc>
+</video:video>
+    </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/3333333-1748171903</loc>
+    <lastmod>2025-05-25T18:18:24+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832fc7f98091.webp</image:loc>
+    <image:caption>3333333</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/123312-1748171779</loc>
+    <lastmod>2025-05-25T18:16:20+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832fc03a656c.webp</image:loc>
+    <image:caption>123312</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/ewrw2333-1748171696</loc>
+    <lastmod>2025-05-25T18:14:57+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832fbb0ea803.webp</image:loc>
+    <image:caption>ewrw2333</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-188-1748171520</loc>
+    <lastmod>2025-05-25T18:12:00+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832fb0010a59.webp</image:loc>
+    <image:caption>tes 188</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/rter-1748171294</loc>
+    <lastmod>2025-05-25T18:08:15+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832fa1ec99ef.webp</image:loc>
+    <image:caption>rter</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/rter-1748170582</loc>
+    <lastmod>2025-05-25T17:56:22+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f756cf4bc.webp</image:loc>
+    <image:caption>rter</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/gfsfsd-1748170414</loc>
+    <lastmod>2025-05-25T17:53:34+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f6ae0d3d5.webp</image:loc>
+    <image:caption>gfsfsd</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/trd-1748170361</loc>
+    <lastmod>2025-05-25T17:52:41+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f679adcea.webp</image:loc>
+    <image:caption>trd</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-1748169424</loc>
+    <lastmod>2025-05-25T17:37:04+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832f2d09f13a.webp</image:loc>
+    <image:caption>tes</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-preview-1748160561</loc>
+    <lastmod>2025-05-25T15:58:14+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832d03123a4a.webp</image:loc>
+    <image:caption>tes preview</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/multiple-images-1748160106</loc>
+    <lastmod>2025-05-25T15:02:13+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832ce6ada09b.webp</image:loc>
+    <image:caption>pertamax</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/1457-1748159953</loc>
+    <lastmod>2025-05-25T14:59:14+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832cdd1b44db.webp</image:loc>
+    <image:caption>kolom alt</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/edf-123123fv-1748158068</loc>
+    <lastmod>2025-05-25T14:27:48+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832c6745fc13.webp</image:loc>
+    <image:caption>alt dari sini</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/halo-bang-1748157700</loc>
+    <lastmod>2025-05-25T14:21:40+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832c5042911e.webp</image:loc>
+    <image:caption>tes</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-1748157378</loc>
+    <lastmod>2025-05-25T14:16:18+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832c3c251c79.webp</image:loc>
+    <image:caption>cobalaewrw</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tes-1748156655</loc>
+    <lastmod>2025-05-25T14:04:15+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6832c0efae3ff.webp</image:loc>
+    <image:caption>tes</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/perayaan-hari-kemerdekaan-di-desa-1</loc>
+    <lastmod>2025-05-24T17:50:20+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/68312baa7e6d1.webp</image:loc>
+    <image:caption>Perayaan Hari Kemerdekaan di Desa</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/kegiatan-gotong-royong-masyarakat-desa</loc>
+    <lastmod>2025-05-24T17:50:07+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/6.jpg</image:loc>
+    <image:caption>Image Kegiatan Gotong Royong Masyarakat Desa</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/234-1748067023</loc>
+    <lastmod>2025-05-24T17:43:36+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/683162cfd7b79.webp</image:loc>
+    <image:caption>234</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tesss-1</loc>
+    <lastmod>2025-05-24T13:04:10+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/5.jpg</image:loc>
+    <image:caption>Image Pemerintah Desa Mengadakan Pelatihan Keterampilan</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/tesss</loc>
+    <lastmod>2025-05-24T13:02:54+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage/news-images/6831610e091ce.webp</image:loc>
+    <image:caption>tesss</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/peluncuran-program-digitalisasi-administrasi-desa</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/11.jpg</image:loc>
+    <image:caption>Image Peluncuran Program Digitalisasi Administrasi Desa</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/desa-meraih-penghargaan-desa-terbaik-tingkat-kabupaten</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/10.jpg</image:loc>
+    <image:caption>Image Desa Meraih Penghargaan Desa Terbaik Tingkat Kabupaten</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/program-bantuan-pangan-untuk-warga-desa</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/9.jpg</image:loc>
+    <image:caption>Image Program Bantuan Pangan untuk Warga Desa</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/berita/pemerintah-desa-mengadakan-lomba-kebersihan</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+    <image:loc>http://pbl-cms-desa-biptek.test/storage//news-images/7.jpg</image:loc>
+    <image:caption>Image Pemerintah Desa Mengadakan Lomba Kebersihan</image:caption>
+</image:image>
+        </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/baru-nomor-124</loc>
+    <lastmod>2025-06-10T12:08:24+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/12-1r</loc>
+    <lastmod>2025-06-07T22:51:42+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/tes</loc>
+    <lastmod>2025-06-07T20:45:36+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/tes-nomor-12-tahun-2013</loc>
+    <lastmod>2025-06-07T20:00:21+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/tes-nomor-12-tahun-2013r</loc>
+    <lastmod>2025-06-07T20:00:21+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/paginate</loc>
+    <lastmod>2025-06-07T19:59:15+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/paginater</loc>
+    <lastmod>2025-06-07T19:59:15+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/tes-2</loc>
+    <lastmod>2025-06-07T18:57:08+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/tes-2r</loc>
+    <lastmod>2025-06-07T18:57:08+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/judul-produk-hukum-terbaru</loc>
+    <lastmod>2025-06-07T18:32:10+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-hukum/12-1</loc>
+    <lastmod>2025-05-24T23:03:42+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/produk-1-produk-1-produk-1-produk-1-produk-1-produk-1-produk-1-produk-1-produk-1-1</loc>
+    <lastmod>2025-06-10T19:55:58+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/cireng-2</loc>
+    <lastmod>2025-06-10T19:55:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/produk-2</loc>
+    <lastmod>2025-06-10T02:54:23+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/cireng-1</loc>
+    <lastmod>2025-06-10T02:54:03+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/gula-jawa-batye</loc>
+    <lastmod>2025-06-10T02:53:31+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/gula-jawa-baty</loc>
+    <lastmod>2025-06-08T16:23:07+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/cireng</loc>
+    <lastmod>2025-06-08T15:26:23+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/tte32</loc>
+    <lastmod>2025-06-02T10:07:55+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/pisang</loc>
+    <lastmod>2025-06-02T10:07:54+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/cireng-12</loc>
+    <lastmod>2025-06-02T10:07:53+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/-1</loc>
+    <lastmod>2025-05-25T10:57:46+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/produk-3</loc>
+    <lastmod>2025-05-25T10:38:35+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/produk-unggulan/produk-2-1</loc>
+    <lastmod>2025-05-25T10:38:34+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/baru-lagi</loc>
+    <lastmod>2025-06-17T22:57:59+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/33</loc>
+    <lastmod>2025-05-24T12:58:33+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/laporan-dana-desa-tahun-2024</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/anggaran-dana-desa-triwulan-i-2024</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/realisasi-dana-desa-tahun-2023</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/anggaran-pembangunan-infrastruktur-desa-2024</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/laporan-keuangan-dana-desa-2023</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/penggunaan-dana-desa-untuk-program-kesehatan</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/alokasi-dana-desa-untuk-umkm</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/anggaran-dana-desa-untuk-pendidikan</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/laporan-pertanggungjawaban-dana-desa-2023</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/rencana-anggaran-biaya-pembangunan-jalan-desa</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/dana-desa-untuk-penanggulangan-bencana</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>http://pbl-cms-desa-biptek.test/dana-desa/transparansi-penggunaan-dana-desa-2023</loc>
+    <lastmod>2025-05-23T15:48:37+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+</urlset>

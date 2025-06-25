@@ -17,7 +17,7 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
                     Instalasi Selesai
                 </h1>
                 <h2 class="text-xl text-gray-600">
-                    Langkah 6/6: Website CMS Desa siap digunakan
+                    Langkah 6/6: Website CMS Waradesa siap digunakan
                 </h2>
             </div>
 
@@ -43,7 +43,7 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
 
                     <div class="text-gray-600 mb-8 space-y-4">
                         <p class="text-center">
-                            Selamat! CMS Desa telah berhasil diinstal dan siap
+                            Selamat! CMS Waradesa telah berhasil diinstal dan siap
                             digunakan.
                         </p>
 
@@ -204,7 +204,8 @@ import SecondaryButton from "@/Components/DashboardComponent/SecondaryButton.vue
 
             <!-- Disclaimer -->
             <div class="text-center text-xs text-gray-500">
-                <p>CMS Desa BIPTEK &copy; {{ new Date().getFullYear() }}</p>
+                <p>CMS Waradesa &copy; {{ new Date().getFullYear() }}</p>
+                <p>Powered by PT BIPTEK Tokodata Indonesia</p>
                 <p>
                     Dibuat untuk membantu pembangunan digital desa di Indonesia
                 </p>

@@ -2,12 +2,12 @@ import { computed, unref } from 'vue';
 
 export function useMeta(options = {}) {
     const {
-        title = 'CMS Desa',
+        title = 'CMS Waradesa',
         description = 'Website resmi pemerintah desa',
         type = 'website',
         image = null,
         url = null,
-        siteName = 'CMS Desa',
+        siteName = 'CMS Waradesa',
         author = 'Admin',
         publishedTime = null,
         section = null,
@@ -16,7 +16,7 @@ export function useMeta(options = {}) {
 
     const metaTitle = computed(() => {
         const titleValue = unref(title);
-        return titleValue || 'CMS Desa';
+        return titleValue || 'CMS Waradesa';
     });
     
     const metaDescription = computed(() => {
