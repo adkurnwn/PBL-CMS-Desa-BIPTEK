@@ -17,6 +17,7 @@ class EventPreview extends JsonResource
         return [
             'title' => $this->title,
             'slug' => $this->slug,
+            'id' => $this->id,
             'date' => $this->date,
             'time' => $this->time,
             'description' => $this->description,
