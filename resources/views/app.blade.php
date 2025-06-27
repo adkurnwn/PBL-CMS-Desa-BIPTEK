@@ -11,11 +11,6 @@
             @endif
         @endforeach
     @endif
-    @if(isset($page['props']['canonical']))
-        <link rel="canonical" href="{{ $page['props']['canonical'] }}">
-    @else
-        <link rel="canonical" href="{{ url()->current() }}">
-    @endif
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Favicon -->
