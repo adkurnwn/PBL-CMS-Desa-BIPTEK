@@ -64,6 +64,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create deployment directory
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.DEV_DEPLOY_SERVER }}
+          username: ${{ env.DEV_DEPLOY_USER }}
+          key: ${{ env.DEV_SSH_PRIVATE_KEY }}
+          port: ${{ env.DEV_DEPLOY_PORT }}
+          script: |
+            # Create deployment directory if it doesn't exist
+            mkdir -p ${{ env.DEV_DEPLOY_PATH }}
+            echo "✅ Deployment directory created: ${{ env.DEV_DEPLOY_PATH }}"
+
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -74,6 +86,7 @@ jobs:
           source: "docker-compose.yml,docker/"
           target: ${{ env.DEV_DEPLOY_PATH }}
           strip_components: 0
+          overwrite: true
 
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
