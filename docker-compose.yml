@@ -19,7 +19,7 @@ services:
     container_name: cms-desa-webserver
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8086:80"
       - "443:443"
     volumes:
       - app-public:/var/www/public:ro
