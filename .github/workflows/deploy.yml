@@ -5,7 +5,7 @@ on:
     branches: 
       - dev/dockerize
     workflow_dispatch:
-    
+
 env:
   DOCKER_IMAGE: adkurnwn/cms-desa-biptek
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -15,7 +15,6 @@ env:
   DEV_SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
   DEV_DEPLOY_PORT: ${{ secrets.DEV_DEPLOY_PORT }}
   DEV_DEPLOY_PATH: ${{ secrets.DEV_DEPLOY_PATH }}
-  
   
 jobs:
   build:
