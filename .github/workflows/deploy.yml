@@ -58,7 +58,7 @@ jobs:
   deploy:
     runs-on: ubuntu-22.04
     needs: build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production'
+    if: github.ref == 'refs/heads/dev/dockerize'
     
     steps:
       - name: Deploy to production server
