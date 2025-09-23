@@ -1,6 +1,6 @@
 services:
   app:
-    image: adkurnwn/cms-desa-biptek:latest  # Pre-built image
+    image: adkurnwn/cms-desa-biptek:latest 
     container_name: cms-desa-app
     restart: unless-stopped
     working_dir: /var/www
