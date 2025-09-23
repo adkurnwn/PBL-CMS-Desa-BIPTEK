@@ -64,6 +64,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.DEV_DEPLOY_SERVER }}
+          username: ${{ env.DEV_DEPLOY_USER }}
+          key: ${{ env.DEV_SSH_PRIVATE_KEY }}
+          port: ${{ env.DEV_DEPLOY_PORT }}
+          source: "docker-compose.yml,docker/"
+          target: ${{ env.DEV_DEPLOY_PATH }}
+          strip_components: 0
+
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -72,8 +83,8 @@ jobs:
           key: ${{ env.DEV_SSH_PRIVATE_KEY }}
           port: ${{ env.DEV_DEPLOY_PORT }}
           script: |
-
-            cd ${{ env.DEV_DEPLOY_PATH || '/opt/cms-desa' }}
+            # Navigate to application directory
+            cd ${{ env.DEV_DEPLOY_PATH }}
             
             docker compose pull
             
