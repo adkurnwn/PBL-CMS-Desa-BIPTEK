@@ -69,22 +69,17 @@ jobs:
           key: ${{ env.DEV_SSH_PRIVATE_KEY }}
           port: ${{ env.DEV_DEPLOY_PORT }}
           script: |
-            # Navigate to application directory
+
             cd ${{ env.DEV_DEPLOY_PATH || '/opt/cms-desa' }}
             
-            # Pull latest images
             docker compose pull
             
-            # Stop and remove containers
             docker compose down
             
-            # Start containers with new images
             docker compose up -d
             
-            # Clean up unused images
             docker image prune -f
             
-            # Show running containers
             docker compose ps
             
       - name: Deployment notification
