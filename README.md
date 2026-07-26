@@ -23,92 +23,130 @@ PBL CMS Desa BIPTEK is a comprehensive content management system designed specif
 
 ## Technology Stack
 
--   **Backend**: Laravel (PHP Framework)
--   **Frontend**: Vite + Tailwind CSS
--   **Database**: MySQL/PostgreSQL (configurable)
+-   **Backend**: Laravel 11 (PHP Framework)
+-   **Frontend**: Vue 3 + Inertia.js (SPA) + Tailwind CSS + Vite
+-   **Database**: MySQL / MariaDB / PostgreSQL
 -   **Testing**: PHPUnit
--   **Development**: Laragon (Windows development environment)
+-   **Development**: Laragon / Herd / Docker (Laravel Sail)
 
-## Installation
+## Installation & Setup
 
 ### Prerequisites
 
--   PHP >= 8.1
--   Composer
--   Node.js & npm
--   MySQL/PostgreSQL database
--   Web server (Apache/Nginx)
+-   **PHP >= 8.2** (Required by Laravel 11)
+-   **Composer**
+-   **Node.js & npm** (v18+ recommended)
+-   **MySQL or PostgreSQL Database**
+-   **PHP Extensions**: `bcmath`, `ctype`, `fileinfo`, `json`, `mbstring`, `openssl`, `pdo`, `tokenizer`, `xml`, `curl`, `gd`, `zip`
 
 ### Setup Steps
 
-1. **Clone the repository**
+1. **Clone the Repository**
 
     ```bash
     git clone <repository-url>
     cd PBL-CMS-Desa-BIPTEK
     ```
 
-2. **Install PHP dependencies**
+2. **Install PHP Dependencies**
 
     ```bash
     composer install
     ```
 
-3. **Install Node.js dependencies**
+3. **Install Frontend Dependencies**
 
     ```bash
     npm install
     ```
 
-4. **Environment configuration**
+4. **Environment Configuration**
+
+    Copy the example environment file to create your `.env` file:
 
     ```bash
     cp .env.example .env
     ```
 
-    Edit `.env` file with your database credentials and application settings.
+    By default, the `.env` file will have `APP_INSTALLED=false`.
 
-5. **Generate application key**
+5. **Generate Application Key**
 
     ```bash
     php artisan key:generate
     ```
 
-6. **Run database migrations**
+---
 
-    ```bash
-    php artisan migrate
-    ```
+### Option A: Web-Based Installation Wizard (Recommended)
 
-7. **Seed database (optional)**
+This project features a web installer that automates database setup, migrations, default seeding, and initial profile/admin configuration.
 
-    ```bash
-    php artisan db:seed
-    ```
+1. **Start the local servers**
+   - Run the Vite dev server (frontend):
+     ```bash
+     npm run dev
+     ```
+   - Start the Laravel local server:
+     ```bash
+     php artisan serve
+     ```
+2. **Access the Installer**
+   - Open your browser and navigate to `http://localhost:8000`.
+   - The application will automatically redirect you to the **Installation Wizard** (`/install`).
+   - Follow the steps to:
+     - Check system requirements & directory permissions.
+     - Configure your database credentials (the installer will automatically run migrations and core seeders like `IndoRegionSeeder` for Indonesian administrative regions).
+     - Set up the Administrator account.
+     - Configure the initial Village Profile (logo, name, regions, vision, and mission).
+   - Once completed, you will be redirected to the `/login` page.
 
-8. **Build frontend assets**
-    ```bash
-    npm run build
-    ```
+---
 
-## Development
+### Option B: Manual Installation (Developers)
 
-### Running the Application
+If you prefer to set up the system manually via the CLI, follow these steps:
 
-1. **Start the Laravel development server**
+1. **Configure `.env`**
+   - Open `.env` and fill in your database credentials (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
+   - Change `APP_INSTALLED=false` to `APP_INSTALLED=true` in your `.env`.
 
-    ```bash
-    php artisan serve
-    ```
+2. **Run Migrations & Seeders**
+   - Run the migration and seeders in order (including the Indonesian regions data which might take a minute or two):
+     ```bash
+     php artisan migrate:fresh
+     php artisan db:seed --class=IndoRegionSeeder
+     php artisan db:seed --class=RoleSeeder
+     php artisan db:seed --class=PermissionSeeder
+     php artisan db:seed --class=UserSeeder
+     php artisan db:seed --class=ProfileSeeder
+     php artisan db:seed --class=DatabaseSeeder
+     ```
 
-2. **Watch frontend assets (in separate terminal)**
-    ```bash
-    npm run dev
-    ```
+3. **Link Public Storage**
+     ```bash
+     php artisan storage:link
+     ```
 
-The application will be available at `http://localhost:8000`.
+4. **Run the Application**
+   - Run Vite development server:
+     ```bash
+     npm run dev
+     ```
+   - Run Laravel server:
+     ```bash
+     php artisan serve
+     ```
+   - Access the application at `http://localhost:8000`.
+   - Use the seeded default credentials to log in:
+     - **Admin**: `admin@gmail.com` | Password: `password`
+     - **Kepala Desa**: `kepala@gmail.com` | Password: `password`
+     - **Sekretaris Desa**: `sekretaris@gmail.com` | Password: `password`
+     - **Bendahara Desa**: `bendahara@gmail.com` | Password: `password`
 
-### Testing
+---
+
+## Testing
 
 Run the test suite:
 
